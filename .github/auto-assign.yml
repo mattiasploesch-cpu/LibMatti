@@ -1,0 +1,6 @@
+# Set the assignee to the PR author, add the reviewer bot.
+settings:
+  addAssignees: author
+  addReviewers:
+    - coderabbitai
+  numberOfReviewers: 0

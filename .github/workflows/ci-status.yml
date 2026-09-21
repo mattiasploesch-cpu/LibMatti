@@ -1,0 +1,36 @@
+name: CI Status
+
+on:
+  workflow_run:
+    workflows: ["Build & Test", "PR Checks", "Mod Validation"]
+    types: [completed]
+
+permissions:
+  checks: read
+  actions: read
+
+jobs:
+  summary:
+    name: Aggregate the checks
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.pull_requests[0] }}
+    steps:
+      - name: Collect the run results
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = github.event.workflow_run.pull_requests[0];
+            const checks = await github.paginate(github.rest.checks.listForRef, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: github.event.workflow_run.head_sha,
+              per_page: 100
+            });
+            const lines = checks.check_runs.map(c =>
+              `- ${c.conclusion === 'success' ? 'OK ' : 'FAIL'} ${c.name}`);
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: pr.number,
+              body: `### Check overview\n${lines.join('\n')}\n\nReviewed by @coderabbitai on the diff itself.`
+            }).catch(e => core.notice(e.message));

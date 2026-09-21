@@ -1,0 +1,53 @@
+name: PR Milestone Labels
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  pull-requests: write
+  contents: read
+
+jobs:
+  label:
+    name: Tag the plan phase
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Derive the phase from the touched paths
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const files = await github.paginate(github.rest.pulls.listFiles, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number,
+              per_page: 100
+            });
+            const paths = files.map(f => f.filename);
+            const map = [
+              ['bsl/', 'modlauncher'], ['sjh/', 'modlauncher'],
+              ['cpw/modlauncher', 'modlauncher'],
+              ['net/neoforged/fml', 'fml'],
+              ['matti/mixin', 'mixins'],
+              ['blaze3d', 'render'], ['org/lwjgl', 'render'], ['earlydisplay', 'render'],
+              ['net/minecraft/core', 'registry'], ['VanillaBlocks', 'registry'],
+              ['tests/', 'tests'], ['mods/', 'mod'], ['.github/', 'ci'],
+              ['README', 'docs'], ['plan.md', 'docs']
+            ];
+            const labels = new Set();
+            for (const p of paths) {
+              for (const [prefix, label] of map) {
+                if (p.includes(prefix)) labels.add(label);
+              }
+            }
+            if (labels.size === 0) labels.add('port');
+            await github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              labels: [...labels]
+            }).catch(e => core.notice(e.message));

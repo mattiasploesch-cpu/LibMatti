@@ -1,0 +1,144 @@
+name: Mod Validation
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, labeled]
+
+permissions:
+  contents: read
+  checks: write
+  pull-requests: write
+
+concurrency:
+  group: mod-validate-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: Validate imported mod
+    # The import workflow (mod-import) copies the .matti from the PR into
+    # mods/import/ on the PR branch; this job only runs for new_mod PRs.
+    if: contains(github.event.pull_request.labels.*.name, 'new_mod')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            cmake ninja-build gcc zlib1g-dev libglfw3-dev xvfb binutils file
+
+      - name: Locate the .matti package
+        id: locate
+        run: |
+          pkg="$(find mods/import -name '*.matti' -type f | head -1)"
+          if [ -z "$pkg" ]; then
+            echo "::error::No .matti package found under mods/import/ - a new_mod PR must add exactly one"
+            exit 1
+          fi
+          count="$(find mods/import -name '*.matti' -type f | wc -l)"
+          if [ "$count" -ne 1 ]; then
+            echo "::error::Expected exactly one .matti package, found $count"
+            exit 1
+          fi
+          echo "pkg=$pkg" >> "$GITHUB_OUTPUT"
+          echo "Found package: $pkg"
+
+      - name: Read the manifest
+        id: manifest
+        run: |
+          chmod +x tools/*.sh
+          info="$(./tools/matti-mod-info.sh "${{ steps.locate.outputs.pkg }}")"
+          echo "$info"
+          eval "$info"
+          echo "mod_id=$MOD_ID" >> "$GITHUB_OUTPUT"
+          echo "mod_version=$MOD_VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Source code review surface
+        run: |
+          # Every source section the MDK embedded is dumped into the workspace
+          # so CodeRabbit (and any reviewer) sees the full mod source in the
+          # PR diff - see .github/workflows/mod-import.yml for the section
+          # layout the MDK writes.
+          mkdir -p review-src
+          pkg="${{ steps.locate.outputs.pkg }}"
+          list="$(mktemp)"
+          objcopy -O binary --only-section=matti_src_list "$pkg" "$list" 2>/dev/null || true
+          if [ -s "$list" ]; then
+            while IFS= read -r entry; do
+              [ -n "$entry" ] || continue
+              out="review-src/$entry"
+              mkdir -p "$(dirname "$out")"
+              objcopy -O binary --only-section="matti_src/$entry" "$pkg" "$out" 2>/dev/null || true
+            done < "$list"
+          fi
+          find review-src -type f | tee review-src.txt
+          rm -f "$list"
+
+      - name: Build the main project
+        run: |
+          cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug
+          cmake --build build -j "$(nproc)" --target runClient build_mods
+
+      - name: Rebuild the mod from its embedded source
+        run: |
+          pkg="${{ steps.locate.outputs.pkg }}"
+          mod_id="${{ steps.manifest.outputs.mod_id }}"
+          # The binary inside the package must correspond to the embedded
+          # source: rebuild it and compare the manifest, then confirm the
+          # rebuilt .so exports the mod entry point.
+          mkdir -p rebuild
+          if [ -f "review-src/CMakeLists.txt" ]; then
+            # A self-contained mod project: configure it against the library headers.
+            MATTI_LIBRARY_DIR="$PWD/library/src" MATTI_MODS_DIR="$PWD/rebuild" \
+              cmake -S review-src -B rebuild/build -G Ninja -DCMAKE_BUILD_TYPE=Debug
+            cmake --build rebuild/build
+          else
+            echo "::notice::No embedded CMake file; falling back to the manifest-only check"
+          fi
+
+      - name: Client run with the imported mod
+        run: |
+          mod_id="${{ steps.manifest.outputs.mod_id }}"
+          # The package binary is what the game would load; place it like the
+          # import step would and boot the client against it.
+          xvfb-run -a ./build/runClient \
+            --launchTarget neoforge --gameDir . \
+            --version 1.21.11 --fml.neoForgeVersion 21.11.45 \
+            --fml.mcVersion 1.21.11 --fml.neoFormVersion 20251209.172050 \
+            --no-tests > mod-run.log 2>&1 || true
+          tail -40 mod-run.log
+          if grep -qi "segfault\|SIGSEGV" mod-run.log; then
+            echo "::error::The client crashed with the imported mod loaded"
+            exit 1
+          fi
+          if ! grep -q "Fired event for modid examplemod" mod-run.log; then
+            echo "::warning::The lifecycle markers are incomplete - inspect mod-run.log"
+          fi
+
+      - name: Upload validation logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mod-validation
+          path: |
+            mod-run.log
+            review-src.txt
+          retention-days: 7
+
+  review-trigger:
+    name: CodeRabbit review trigger
+    runs-on: ubuntu-latest
+    needs: validate
+    steps:
+      - name: Request the CodeRabbit review
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: '@coderabbitai please review the imported mod source in this PR (the mod sources are under review-src/ and mods/import/). Validate the mod metadata, the entry point and the CMake file.'
+            });

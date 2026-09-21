@@ -1,0 +1,68 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Build & publish release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            cmake ninja-build gcc zlib1g-dev libglfw3-dev file
+
+      - name: Configure (Release)
+        run: cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build everything
+        run: cmake --build build -j "$(nproc)"
+
+      - name: Tests
+        run: ctest --test-dir build --output-on-failure
+
+      - name: Pack demo mods (.matti)
+        run: |
+          mkdir -p dist
+          for so in mods/*.so; do
+            [ -f "$so" ] || continue
+            base="$(basename "$so" .so)"
+            mod_id="${base%-*}"
+            version="${base##*-}"
+            ./tools/matti-pack.sh "$so" "dist/${base}.matti" "$mod_id" "$version"
+          done
+          ls -la dist/
+
+      - name: Bundle binaries
+        run: |
+          mkdir -p dist/bin
+          cp build/client/matticraft dist/bin/
+          cp build/runClient dist/bin/
+          tar -czf dist/matticraft-bin-linux-x64.tar.gz -C dist bin
+          rm -rf dist/bin
+
+      - name: Create release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: Matticraft ${{ github.ref_name }}
+          body: |
+            Automated release of ${{ github.ref_name }}.
+
+            ## Contents
+            - `matticraft-bin-linux-x64.tar.gz` — the client binaries
+            - `*.matti` — the demo mods as importable packages
+
+            The tests passed and the client boot smoke test ran before this release.
+          draft: false
+          prerelease: ${{ contains(github.ref_name, '-rc') || contains(github.ref_name, '-beta') }}
+          files: |
+            dist/*

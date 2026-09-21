@@ -1,0 +1,12 @@
+# Default ownership.
+*                                       @mattiasploesch-cpu
+
+# Imported mods: every new_mod PR touches this folder; keep the owner on it.
+mods/import/                            @mattiasploesch-cpu
+mods/custom/                            @mattiasploesch-cpu
+
+# The mod tooling is import-critical (manifest parse, unpack, rebuild).
+tools/matti-mod-info.sh                 @mattiasploesch-cpu
+tools/matti-pack.sh                     @mattiasploesch-cpu
+tools/matti-import.sh                   @mattiasploesch-cpu
+tools/matti-src-embed.sh                @mattiasploesch-cpu

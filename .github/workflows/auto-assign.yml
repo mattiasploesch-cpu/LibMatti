@@ -1,0 +1,37 @@
+name: Auto Assign
+
+on:
+  pull_request:
+    types: [opened, reopened]
+
+permissions:
+  pull-requests: write
+
+jobs:
+  assign:
+    name: Assign author + reviewer
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Assign the author, request the CodeRabbit review
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const author = context.payload.pull_request.user.login;
+            await github.rest.issues.addAssignees({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              assignees: [author]
+            });
+            // CodeRabbit reviews every PR automatically.
+            await github.rest.pulls.requestReviewers({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number,
+              reviewers: ['coderabbitai']
+            }).catch(e => {
+              core.notice(`Could not request the coderabbitai review (${e.message}). ` +
+                'Install the CodeRabbit GitHub App so reviews are automatic.');
+            });

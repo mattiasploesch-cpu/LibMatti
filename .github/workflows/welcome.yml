@@ -1,0 +1,33 @@
+name: Welcome
+
+on:
+  pull_request_target:
+    types: [opened]
+  issues:
+    types: [opened]
+
+permissions:
+  pull-requests: write
+  issues: write
+
+jobs:
+  greet:
+    name: Greet new contributors
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/first-interaction@v1
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          pr_message: |
+            Thanks for your first pull request!
+
+            - A full build + test run is attached to this PR as required checks.
+            - @coderabbitai reviews the diff automatically.
+            - If this is a **mod import**, make sure it uses the
+              [`new_mod` template](https://github.com/mattiasploesch-cpu/LibMatti/blob/main/.github/PULL_REQUEST_TEMPLATE/new_mod.md)
+              and carries the `new_mod` label.
+          issue_message: |
+            Thanks for opening your first issue!
+
+            Bug reports: the exact console log lines around the failure help the most.
+            Mod requests: use the `[mod]` title prefix.

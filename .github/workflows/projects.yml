@@ -1,0 +1,34 @@
+name: Projects Automation
+
+on:
+  pull_request:
+    types: [opened, reopened, ready_for_review, closed]
+
+permissions:
+  contents: read
+  # The GraphQL mutation for project items needs the project scope; use the
+  # default token's limited surface and degrade gracefully when the project
+  # is not linked.
+  pull-requests: read
+
+jobs:
+  track:
+    name: Track in the Port Roadmap project
+    runs-on: ubuntu-latest
+    steps:
+      - name: Add the PR to the project board
+        uses: actions/add-to-project@v1
+        with:
+          # The project is looked up by its URL; create it once under
+          # https://github.com/orgs/mattiasploesch-cpu/projects (the setup
+          # script does this - see .github/setup-repo.sh).
+          project-url: https://github.com/users/mattiasploesch-cpu/projects/1
+          github-token: ${{ secrets.PROJECTS_TOKEN || secrets.GITHUB_TOKEN }}
+
+      - name: Mark merged PRs done
+        if: github.event.pull_request.merged == true
+        uses: actions/github-script@v7
+        with:
+          script: |
+            core.notice('Merged PR ' + context.issue.number +
+              ' - set Status=Done in the project board (automatic field sync runs via the project workflow).');

@@ -1,0 +1,69 @@
+name: Mod Import
+
+on:
+  pull_request:
+    types: [closed]
+    paths:
+      - 'mods/import/**'
+
+permissions:
+  contents: write
+  pull-requests: read
+
+jobs:
+  import:
+    name: Import mod into mods/custom
+    if: github.event.pull_request.merged == true && contains(github.event.pull_request.labels.*.name, 'new_mod')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends binutils file
+
+      - name: Import the package
+        id: import
+        run: |
+          chmod +x tools/*.sh
+          pkg="$(find mods/import -name '*.matti' -type f | head -1)"
+          ./tools/matti-import.sh "$pkg" .
+          info="$(./tools/matti-mod-info.sh "$pkg")"
+          echo "$info"
+          eval "$info"
+          echo "mod_id=$MOD_ID" >> "$GITHUB_OUTPUT"
+
+      - name: Link the mod into the mods project
+        run: |
+          mod_id="${{ steps.import.outputs.mod_id }}"
+          # mods/custom is auto-added by mods/CMakeLists.txt (glob); verify the
+          # configure step picks the new mod up.
+          cmake -S mods -B mods/build -DCMAKE_BUILD_TYPE=Debug
+          cmake --build mods/build
+
+      - name: Commit the imported source
+        run: |
+          git config user.name "matti-mod-import"
+          git config user.email "actions@users.noreply.github.com"
+          git add mods/custom mods/*.so
+          if git diff --cached --quiet; then
+            echo "Nothing to commit"
+            exit 0
+          fi
+          git commit -m "Import mod: ${{ steps.import.outputs.mod_id }} (from #${{ github.event.pull_request.number }})"
+          git push origin main
+
+      - name: Comment on the PR
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: 'The mod was imported into `mods/custom/${{ steps.import.outputs.mod_id }}/` on `main`, linked into the mods build and the built `.so` was placed in `mods/`.'
+            });

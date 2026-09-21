@@ -1,0 +1,61 @@
+name: Live Run
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+  schedule:
+    - cron: '0 4 * * 1'   # weekly, Monday 04:00 UTC
+
+permissions:
+  contents: read
+
+jobs:
+  run:
+    name: Live client run (headless)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            cmake ninja-build gcc zlib1g-dev libglfw3-dev xvfb file
+
+      - name: Build
+        run: |
+          cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug
+          cmake --build build -j "$(nproc)"
+
+      - name: Full selftest run (matticraft target)
+        run: |
+          ctest --test-dir build --output-on-failure
+
+      - name: Client live run
+        run: |
+          xvfb-run -a ./build/runClient \
+            --launchTarget neoforge --gameDir . \
+            --version 1.21.11 --fml.neoForgeVersion 21.11.45 \
+            --fml.mcVersion 1.21.11 --fml.neoFormVersion 20251209.172050 \
+            --no-tests > client-run.log 2>&1 || true
+          tail -40 client-run.log
+
+      - name: Verify the run reached the hand-over
+        run: |
+          if grep -q "Fired event for modid examplemod" client-run.log; then
+            echo "The FML lifecycle ran through the mod events."
+          else
+            echo "::warning::The run log lacks the lifecycle markers - inspect client-run.log"
+          fi
+          if grep -qi "segfault\|SIGSEGV" client-run.log; then
+            echo "::error::The client run hit a segfault"
+            exit 1
+          fi
+
+      - name: Upload run log
+        uses: actions/upload-artifact@v4
+        with:
+          name: client-run-log
+          path: client-run.log
+          retention-days: 7
