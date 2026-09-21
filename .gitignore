@@ -15,6 +15,7 @@ out/
 
 # ---- Runtime state (created by runClient / matticraft) -----------------
 config/
+/night-config/core/
 defaultconfigs/
 mods/options.txt
 logs/
@@ -27,7 +28,7 @@ kitchen/
 # ---- Debug / profiling dumps ------------------------------------------
 vgcore.*
 core.*
-core
+/core
 lm_nm.txt
 *.ppm
 

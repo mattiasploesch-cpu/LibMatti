@@ -1,0 +1,114 @@
+// Port of net.minecraft.core.component.DataComponents.
+// Generated from the vendor Java sources: every public static final DataComponentType
+// constant becomes one accessor in declaration order. The Java value-type generics
+// (CustomData, FoodProperties, ...) collapse to void* component values; their codecs
+// stay with the game port.
+
+#ifndef MATTICRAFT_MC_CORE_COMPONENT_DATACOMPONENTS_H
+#define MATTICRAFT_MC_CORE_COMPONENT_DATACOMPONENTS_H
+
+#include "libmatti/net/minecraft/core/component/DataComponentMap.h"
+#include "libmatti/net/minecraft/core/component/DataComponentType.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+// Java: COMMON_ITEM_COMPONENTS - the prototype map every item starts from
+LIBMATTI_MC_DataComponentMap *LIBMATTI_MC_DataComponents_CommonItemComponents(void);
+
+// One accessor per Java constant, in declaration order.
+const LIBMATTI_MC_DataComponentType *LIBMATTI_MC_DataComponents_CUSTOM_DATA(void);
+const LIBMATTI_MC_DataComponentType *LIBMATTI_MC_DataComponents_MAX_STACK_SIZE(void);
+const LIBMATTI_MC_DataComponentType *LIBMATTI_MC_DataComponents_MAX_DAMAGE(void);
+const LIBMATTI_MC_DataComponentType *LIBMATTI_MC_DataComponents_DAMAGE(void);
+const LIBMATTI_MC_DataComponentType *LIBMATTI_MC_DataComponents_UNBREAKABLE(void);
+const LIBMATTI_MC_DataComponentType *LIBMATTI_MC_DataComponents_USE_EFFECTS(void);
+const LIBMATTI_MC_DataComponentType *LIBMATTI_MC_DataComponents_CUSTOM_NAME(void);
+const LIBMATTI_MC_DataComponentType *LIBMATTI_MC_DataComponents_MINIMUM_ATTACK_CHARGE(void);
+const LIBMATTI_MC_DataComponentType *LIBMATTI_MC_DataComponents_ITEM_NAME(void);
+const LIBMATTI_MC_DataComponentType *LIBMATTI_MC_DataComponents_ITEM_MODEL(void);
+const LIBMATTI_MC_DataComponentType *LIBMATTI_MC_DataComponents_LORE(void);
+const LIBMATTI_MC_DataComponentType *LIBMATTI_MC_DataComponents_RARITY(void);
+const LIBMATTI_MC_DataComponentType *LIBMATTI_MC_DataComponents_ENCHANTMENTS(void);
+const LIBMATTI_MC_DataComponentType *LIBMATTI_MC_DataComponents_CAN_PLACE_ON(void);
+const LIBMATTI_MC_DataComponentType *LIBMATTI_MC_DataComponents_CAN_BREAK(void);
+const LIBMATTI_MC_DataComponentType *LIBMATTI_MC_DataComponents_ATTRIBUTE_MODIFIERS(void);
+const LIBMATTI_MC_DataComponentType *LIBMATTI_MC_DataComponents_CUSTOM_MODEL_DATA(void);
+const LIBMATTI_MC_DataComponentType *LIBMATTI_MC_DataComponents_TOOLTIP_DISPLAY(void);
+const LIBMATTI_MC_DataComponentType *LIBMATTI_MC_DataComponents_REPAIR_COST(void);
+const LIBMATTI_MC_DataComponentType *LIBMATTI_MC_DataComponents_CREATIVE_SLOT_LOCK(void);
+const LIBMATTI_MC_DataComponentType *LIBMATTI_MC_DataComponents_ENCHANTMENT_GLINT_OVERRIDE(void);
+const LIBMATTI_MC_DataComponentType *LIBMATTI_MC_DataComponents_INTANGIBLE_PROJECTILE(void);
+const LIBMATTI_MC_DataComponentType *LIBMATTI_MC_DataComponents_FOOD(void);
+const LIBMATTI_MC_DataComponentType *LIBMATTI_MC_DataComponents_CONSUMABLE(void);
+const LIBMATTI_MC_DataComponentType *LIBMATTI_MC_DataComponents_USE_REMAINDER(void);
+const LIBMATTI_MC_DataComponentType *LIBMATTI_MC_DataComponents_USE_COOLDOWN(void);
+const LIBMATTI_MC_DataComponentType *LIBMATTI_MC_DataComponents_DAMAGE_RESISTANT(void);
+const LIBMATTI_MC_DataComponentType *LIBMATTI_MC_DataComponents_TOOL(void);
+const LIBMATTI_MC_DataComponentType *LIBMATTI_MC_DataComponents_WEAPON(void);
+const LIBMATTI_MC_DataComponentType *LIBMATTI_MC_DataComponents_ATTACK_RANGE(void);
+const LIBMATTI_MC_DataComponentType *LIBMATTI_MC_DataComponents_ENCHANTABLE(void);
+const LIBMATTI_MC_DataComponentType *LIBMATTI_MC_DataComponents_EQUIPPABLE(void);
+const LIBMATTI_MC_DataComponentType *LIBMATTI_MC_DataComponents_REPAIRABLE(void);
+const LIBMATTI_MC_DataComponentType *LIBMATTI_MC_DataComponents_GLIDER(void);
+const LIBMATTI_MC_DataComponentType *LIBMATTI_MC_DataComponents_TOOLTIP_STYLE(void);
+const LIBMATTI_MC_DataComponentType *LIBMATTI_MC_DataComponents_DEATH_PROTECTION(void);
+const LIBMATTI_MC_DataComponentType *LIBMATTI_MC_DataComponents_BLOCKS_ATTACKS(void);
+const LIBMATTI_MC_DataComponentType *LIBMATTI_MC_DataComponents_PIERCING_WEAPON(void);
+const LIBMATTI_MC_DataComponentType *LIBMATTI_MC_DataComponents_KINETIC_WEAPON(void);
+const LIBMATTI_MC_DataComponentType *LIBMATTI_MC_DataComponents_SWING_ANIMATION(void);
+const LIBMATTI_MC_DataComponentType *LIBMATTI_MC_DataComponents_STORED_ENCHANTMENTS(void);
+const LIBMATTI_MC_DataComponentType *LIBMATTI_MC_DataComponents_DYED_COLOR(void);
+const LIBMATTI_MC_DataComponentType *LIBMATTI_MC_DataComponents_MAP_COLOR(void);
+const LIBMATTI_MC_DataComponentType *LIBMATTI_MC_DataComponents_MAP_ID(void);
+const LIBMATTI_MC_DataComponentType *LIBMATTI_MC_DataComponents_MAP_DECORATIONS(void);
+const LIBMATTI_MC_DataComponentType *LIBMATTI_MC_DataComponents_MAP_POST_PROCESSING(void);
+const LIBMATTI_MC_DataComponentType *LIBMATTI_MC_DataComponents_CHARGED_PROJECTILES(void);
+const LIBMATTI_MC_DataComponentType *LIBMATTI_MC_DataComponents_BUNDLE_CONTENTS(void);
+const LIBMATTI_MC_DataComponentType *LIBMATTI_MC_DataComponents_POTION_CONTENTS(void);
+const LIBMATTI_MC_DataComponentType *LIBMATTI_MC_DataComponents_POTION_DURATION_SCALE(void);
+const LIBMATTI_MC_DataComponentType *LIBMATTI_MC_DataComponents_SUSPICIOUS_STEW_EFFECTS(void);
+const LIBMATTI_MC_DataComponentType *LIBMATTI_MC_DataComponents_WRITABLE_BOOK_CONTENT(void);
+const LIBMATTI_MC_DataComponentType *LIBMATTI_MC_DataComponents_WRITTEN_BOOK_CONTENT(void);
+const LIBMATTI_MC_DataComponentType *LIBMATTI_MC_DataComponents_TRIM(void);
+const LIBMATTI_MC_DataComponentType *LIBMATTI_MC_DataComponents_DEBUG_STICK_STATE(void);
+const LIBMATTI_MC_DataComponentType *LIBMATTI_MC_DataComponents_BUCKET_ENTITY_DATA(void);
+const LIBMATTI_MC_DataComponentType *LIBMATTI_MC_DataComponents_INSTRUMENT(void);
+const LIBMATTI_MC_DataComponentType *LIBMATTI_MC_DataComponents_PROVIDES_TRIM_MATERIAL(void);
+const LIBMATTI_MC_DataComponentType *LIBMATTI_MC_DataComponents_OMINOUS_BOTTLE_AMPLIFIER(void);
+const LIBMATTI_MC_DataComponentType *LIBMATTI_MC_DataComponents_JUKEBOX_PLAYABLE(void);
+const LIBMATTI_MC_DataComponentType *LIBMATTI_MC_DataComponents_LODESTONE_TRACKER(void);
+const LIBMATTI_MC_DataComponentType *LIBMATTI_MC_DataComponents_FIREWORK_EXPLOSION(void);
+const LIBMATTI_MC_DataComponentType *LIBMATTI_MC_DataComponents_FIREWORKS(void);
+const LIBMATTI_MC_DataComponentType *LIBMATTI_MC_DataComponents_PROFILE(void);
+const LIBMATTI_MC_DataComponentType *LIBMATTI_MC_DataComponents_NOTE_BLOCK_SOUND(void);
+const LIBMATTI_MC_DataComponentType *LIBMATTI_MC_DataComponents_BANNER_PATTERNS(void);
+const LIBMATTI_MC_DataComponentType *LIBMATTI_MC_DataComponents_BASE_COLOR(void);
+const LIBMATTI_MC_DataComponentType *LIBMATTI_MC_DataComponents_POT_DECORATIONS(void);
+const LIBMATTI_MC_DataComponentType *LIBMATTI_MC_DataComponents_CONTAINER(void);
+const LIBMATTI_MC_DataComponentType *LIBMATTI_MC_DataComponents_BLOCK_STATE(void);
+const LIBMATTI_MC_DataComponentType *LIBMATTI_MC_DataComponents_BEES(void);
+const LIBMATTI_MC_DataComponentType *LIBMATTI_MC_DataComponents_LOCK(void);
+const LIBMATTI_MC_DataComponentType *LIBMATTI_MC_DataComponents_CONTAINER_LOOT(void);
+const LIBMATTI_MC_DataComponentType *LIBMATTI_MC_DataComponents_WOLF_COLLAR(void);
+const LIBMATTI_MC_DataComponentType *LIBMATTI_MC_DataComponents_FOX_VARIANT(void);
+const LIBMATTI_MC_DataComponentType *LIBMATTI_MC_DataComponents_SALMON_SIZE(void);
+const LIBMATTI_MC_DataComponentType *LIBMATTI_MC_DataComponents_PARROT_VARIANT(void);
+const LIBMATTI_MC_DataComponentType *LIBMATTI_MC_DataComponents_TROPICAL_FISH_PATTERN(void);
+const LIBMATTI_MC_DataComponentType *LIBMATTI_MC_DataComponents_TROPICAL_FISH_BASE_COLOR(void);
+const LIBMATTI_MC_DataComponentType *LIBMATTI_MC_DataComponents_TROPICAL_FISH_PATTERN_COLOR(void);
+const LIBMATTI_MC_DataComponentType *LIBMATTI_MC_DataComponents_MOOSHROOM_VARIANT(void);
+const LIBMATTI_MC_DataComponentType *LIBMATTI_MC_DataComponents_RABBIT_VARIANT(void);
+const LIBMATTI_MC_DataComponentType *LIBMATTI_MC_DataComponents_HORSE_VARIANT(void);
+const LIBMATTI_MC_DataComponentType *LIBMATTI_MC_DataComponents_LLAMA_VARIANT(void);
+const LIBMATTI_MC_DataComponentType *LIBMATTI_MC_DataComponents_AXOLOTL_VARIANT(void);
+const LIBMATTI_MC_DataComponentType *LIBMATTI_MC_DataComponents_CAT_COLLAR(void);
+const LIBMATTI_MC_DataComponentType *LIBMATTI_MC_DataComponents_SHEEP_COLOR(void);
+const LIBMATTI_MC_DataComponentType *LIBMATTI_MC_DataComponents_SHULKER_COLOR(void);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif //MATTICRAFT_MC_CORE_COMPONENT_DATACOMPONENTS_H

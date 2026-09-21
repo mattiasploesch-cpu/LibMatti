@@ -1,0 +1,128 @@
+// Port of net.minecraft.core.registries.BuiltInRegistries.
+// Java declares one Registry/DefaultedRegistry static per registry, created through
+// registerSimple/registerDefaulted and registered into the WRITABLE_REGISTRY; the C port
+// builds the same objects lazily on first access (no static initialisation order in C) and
+// keeps every registry in the root registry, exactly like Java. The bootstrap callbacks run
+// through bootStrap() - the contents themselves are the game port's part.
+
+#ifndef MATTICRAFT_NET_MINECRAFT_CORE_REGISTRIES_BUILTINREGISTRIES_H
+#define MATTICRAFT_NET_MINECRAFT_CORE_REGISTRIES_BUILTINREGISTRIES_H
+
+#include "libmatti/net/minecraft/core/MappedRegistry.h"
+
+// Java: public static final WritableRegistry<WritableRegistry<?>> WRITABLE_REGISTRY
+LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_BuiltInRegistries_WritableRegistry(void);
+// Java: public static final Registry<? extends Registry<?>> REGISTRY = WRITABLE_REGISTRY
+LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_BuiltInRegistries_Registry(void);
+
+// Java: the Registry statics in declaration order - one accessor per field, named after it.
+// Every call returns the same object (Java: the static field).
+LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_BuiltInRegistries_GAME_EVENT(void);
+LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_BuiltInRegistries_SOUND_EVENT(void);
+LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_BuiltInRegistries_FLUID(void);
+LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_BuiltInRegistries_MOB_EFFECT(void);
+LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_BuiltInRegistries_BLOCK(void);
+LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_BuiltInRegistries_DEBUG_SUBSCRIPTION(void);
+LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_BuiltInRegistries_ENTITY_TYPE(void);
+LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_BuiltInRegistries_ITEM(void);
+LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_BuiltInRegistries_POTION(void);
+LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_BuiltInRegistries_PARTICLE_TYPE(void);
+LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_BuiltInRegistries_BLOCK_ENTITY_TYPE(void);
+LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_BuiltInRegistries_CUSTOM_STAT(void);
+LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_BuiltInRegistries_CHUNK_STATUS(void);
+LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_BuiltInRegistries_RULE_TEST(void);
+LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_BuiltInRegistries_RULE_BLOCK_ENTITY_MODIFIER(void);
+LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_BuiltInRegistries_POS_RULE_TEST(void);
+LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_BuiltInRegistries_MENU(void);
+LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_BuiltInRegistries_RECIPE_TYPE(void);
+LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_BuiltInRegistries_RECIPE_SERIALIZER(void);
+LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_BuiltInRegistries_ATTRIBUTE(void);
+LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_BuiltInRegistries_POSITION_SOURCE_TYPE(void);
+LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_BuiltInRegistries_COMMAND_ARGUMENT_TYPE(void);
+LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_BuiltInRegistries_STAT_TYPE(void);
+LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_BuiltInRegistries_VILLAGER_TYPE(void);
+LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_BuiltInRegistries_VILLAGER_PROFESSION(void);
+LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_BuiltInRegistries_POINT_OF_INTEREST_TYPE(void);
+LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_BuiltInRegistries_MEMORY_MODULE_TYPE(void);
+LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_BuiltInRegistries_SENSOR_TYPE(void);
+LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_BuiltInRegistries_ACTIVITY(void);
+LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_BuiltInRegistries_LOOT_POOL_ENTRY_TYPE(void);
+LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_BuiltInRegistries_LOOT_FUNCTION_TYPE(void);
+LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_BuiltInRegistries_LOOT_CONDITION_TYPE(void);
+LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_BuiltInRegistries_LOOT_NUMBER_PROVIDER_TYPE(void);
+LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_BuiltInRegistries_LOOT_NBT_PROVIDER_TYPE(void);
+LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_BuiltInRegistries_LOOT_SCORE_PROVIDER_TYPE(void);
+LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_BuiltInRegistries_FLOAT_PROVIDER_TYPE(void);
+LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_BuiltInRegistries_INT_PROVIDER_TYPE(void);
+LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_BuiltInRegistries_HEIGHT_PROVIDER_TYPE(void);
+LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_BuiltInRegistries_BLOCK_PREDICATE_TYPE(void);
+LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_BuiltInRegistries_CARVER(void);
+LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_BuiltInRegistries_FEATURE(void);
+LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_BuiltInRegistries_STRUCTURE_PLACEMENT(void);
+LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_BuiltInRegistries_STRUCTURE_PIECE(void);
+LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_BuiltInRegistries_STRUCTURE_TYPE(void);
+LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_BuiltInRegistries_PLACEMENT_MODIFIER_TYPE(void);
+LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_BuiltInRegistries_BLOCKSTATE_PROVIDER_TYPE(void);
+LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_BuiltInRegistries_FOLIAGE_PLACER_TYPE(void);
+LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_BuiltInRegistries_TRUNK_PLACER_TYPE(void);
+LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_BuiltInRegistries_ROOT_PLACER_TYPE(void);
+LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_BuiltInRegistries_TREE_DECORATOR_TYPE(void);
+LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_BuiltInRegistries_FEATURE_SIZE_TYPE(void);
+LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_BuiltInRegistries_BIOME_SOURCE(void);
+LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_BuiltInRegistries_CHUNK_GENERATOR(void);
+LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_BuiltInRegistries_MATERIAL_CONDITION(void);
+LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_BuiltInRegistries_MATERIAL_RULE(void);
+LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_BuiltInRegistries_DENSITY_FUNCTION_TYPE(void);
+LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_BuiltInRegistries_BLOCK_TYPE(void);
+LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_BuiltInRegistries_STRUCTURE_PROCESSOR(void);
+LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_BuiltInRegistries_STRUCTURE_POOL_ELEMENT(void);
+LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_BuiltInRegistries_POOL_ALIAS_BINDING_TYPE(void);
+LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_BuiltInRegistries_DECORATED_POT_PATTERN(void);
+LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_BuiltInRegistries_CREATIVE_MODE_TAB(void);
+LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_BuiltInRegistries_TRIGGER_TYPES(void);
+LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_BuiltInRegistries_NUMBER_FORMAT_TYPE(void);
+LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_BuiltInRegistries_DATA_COMPONENT_TYPE(void);
+LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_BuiltInRegistries_GAME_RULE(void);
+LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_BuiltInRegistries_ENTITY_SUB_PREDICATE_TYPE(void);
+LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_BuiltInRegistries_DATA_COMPONENT_PREDICATE_TYPE(void);
+LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_BuiltInRegistries_MAP_DECORATION_TYPE(void);
+LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_BuiltInRegistries_ENCHANTMENT_EFFECT_COMPONENT_TYPE(void);
+LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_BuiltInRegistries_ENCHANTMENT_LEVEL_BASED_VALUE_TYPE(void);
+LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_BuiltInRegistries_ENCHANTMENT_ENTITY_EFFECT_TYPE(void);
+LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_BuiltInRegistries_ENCHANTMENT_LOCATION_BASED_EFFECT_TYPE(void);
+LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_BuiltInRegistries_ENCHANTMENT_VALUE_EFFECT_TYPE(void);
+LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_BuiltInRegistries_ENCHANTMENT_PROVIDER_TYPE(void);
+LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_BuiltInRegistries_CONSUME_EFFECT_TYPE(void);
+LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_BuiltInRegistries_RECIPE_DISPLAY(void);
+LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_BuiltInRegistries_SLOT_DISPLAY(void);
+LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_BuiltInRegistries_RECIPE_BOOK_CATEGORY(void);
+LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_BuiltInRegistries_TICKET_TYPE(void);
+LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_BuiltInRegistries_INCOMING_RPC_METHOD(void);
+LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_BuiltInRegistries_OUTGOING_RPC_METHOD(void);
+LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_BuiltInRegistries_TEST_ENVIRONMENT_DEFINITION_TYPE(void);
+LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_BuiltInRegistries_TEST_INSTANCE_TYPE(void);
+LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_BuiltInRegistries_SPAWN_CONDITION_TYPE(void);
+LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_BuiltInRegistries_DIALOG_TYPE(void);
+LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_BuiltInRegistries_DIALOG_ACTION_TYPE(void);
+LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_BuiltInRegistries_INPUT_CONTROL_TYPE(void);
+LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_BuiltInRegistries_DIALOG_BODY_TYPE(void);
+LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_BuiltInRegistries_PERMISSION_TYPE(void);
+LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_BuiltInRegistries_PERMISSION_CHECK_TYPE(void);
+LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_BuiltInRegistries_ENVIRONMENT_ATTRIBUTE(void);
+LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_BuiltInRegistries_ATTRIBUTE_TYPE(void);
+LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_BuiltInRegistries_SLOT_SOURCE_TYPE(void);
+LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_BuiltInRegistries_TEST_FUNCTION(void);
+
+// Java: the static initialisers run once on first class use, in declaration order; the port
+// runs every lazy constructor in the same order so the root registry carries the vanilla order
+// (idempotent - Java class init also runs once)
+void LIBMATTI_MC_BuiltInRegistries_InitializeAll(void);
+
+// Java: static List<Identifier> getVanillaRegistrationOrder() - every root registry name in
+// the REGISTRY declaration order (the bootstrap order)
+LIBMATTI_MC_Identifier **LIBMATTI_MC_BuiltInRegistries_GetVanillaRegistrationOrder(size_t *count);
+
+// Java: public static void bootStrap() - createContents(), freeze(), validate(REGISTRY)
+void LIBMATTI_MC_BuiltInRegistries_BootStrap(void);
+
+#endif //MATTICRAFT_NET_MINECRAFT_CORE_REGISTRIES_BUILTINREGISTRIES_H
