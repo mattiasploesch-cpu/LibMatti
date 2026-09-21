@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Mod development (MDK)
+    url: https://github.com/mattiasploesch-cpu/matti-mdk
+    about: Build your own mod with the MDK - import happens through a new_mod PR here.
+  - name: Run/build commands
+    url: https://github.com/mattiasploesch-cpu/LibMatti/blob/main/.github/RUN_COMMANDS.md
+    about: The exact commands behind the run configurations and CI.

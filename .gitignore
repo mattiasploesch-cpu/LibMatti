@@ -1,0 +1,59 @@
+# ---- Build directories -------------------------------------------------
+build/
+build-*/
+cmake-build-*/
+mods/build/
+out/
+
+# ---- Build artifacts ---------------------------------------------------
+*.so
+*.a
+*.o
+*.obj
+*.dll
+*.exe
+
+# ---- Runtime state (created by runClient / matticraft) -----------------
+config/
+defaultconfigs/
+mods/options.txt
+logs/
+crash-reports/
+saves/
+screenshots/
+kitchen/
+*.log
+
+# ---- Debug / profiling dumps ------------------------------------------
+vgcore.*
+core.*
+core
+lm_nm.txt
+*.ppm
+
+# ---- IDE ---------------------------------------------------------------
+.idea/*
+!.idea/runConfigurations/
+!.idea/codeStyles/
+.vscode/
+*.iml
+
+# ---- OS ---------------------------------------------------------------
+.DS_Store
+Thumbs.db
+
+# ---- Vendored upstream clones (reference material, re-clone with
+# tools/vendor-sync.sh - only pinned/modified vendor content is tracked) --
+vendor/*
+!vendor/README.md
+!vendor/stb/
+vendor/stb/stb_truetype_impl.c
+vendor/tests/
+
+# ---- CMake generated ---------------------------------------------------
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+Testing/

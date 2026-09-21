@@ -1,0 +1,27 @@
+name: Stale
+
+on:
+  schedule:
+    - cron: '0 5 * * *'   # daily
+  workflow_dispatch:
+
+permissions:
+  issues: write
+  pull-requests: write
+
+jobs:
+  stale:
+    name: Close stale issues/PRs
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/stale@v9
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          days-before-stale: 30
+          days-before-close: 14
+          stale-issue-message: 'This issue is stale: 30 days without activity. Comment to keep it open.'
+          stale-pr-message: 'This pull request is stale: 30 days without activity. Rebase or comment to keep it open.'
+          exempt-issue-labels: 'pinned,game-port'
+          exempt-pr-labels: 'pinned,new_mod'
+          stale-issue-label: 'stale'
+          stale-pr-label: 'stale'

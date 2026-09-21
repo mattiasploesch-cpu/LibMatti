@@ -1,0 +1,50 @@
+# Repository labels - synced by .github/workflows/label-sync.yml on every
+# change to this file and on demand.
+- name: bug
+  color: d73a4a
+  description: Something does not behave like the Java original (or crashes)
+- name: enhancement
+  color: a2eeef
+  description: A port improvement that does not change semantics
+- name: port
+  color: 1d76db
+  description: New 1:1 port of upstream Java functionality
+- name: game-port
+  color: 0e8a16
+  description: Minecraft/NeoForge content port (deliberately out of scope for now)
+- name: render
+  color: fbca04
+  description: blaze3d / GL / window / font / texture
+- name: fml
+  color: 5319e7
+  description: FML loader, lifecycle, discovery, containers
+- name: modlauncher
+  color: c5def5
+  description: ModLauncher transformation pipeline
+- name: mixins
+  color: f9d0c4
+  description: M2/M4 mixin backends, hook tables, GOT patching
+- name: registry
+  color: 006b75
+  description: Registries, bootstrap, GameData, RegisterEvent
+- name: mod
+  color: e99695
+  description: Related to the mods/ sub-project or the MDK
+- name: new_mod
+  color: 62d50f
+  description: A PR importing a new mod package (.matti) - see .github/PULL_REQUEST_TEMPLATE/new_mod.md
+- name: ci
+  color: 000000
+  description: Workflows, run configurations, build plumbing
+- name: docs
+  color: 0075ca
+  description: README, plan.md, comments
+- name: tests
+  color: b60205
+  description: Harnesses and test infrastructure
+- name: release
+  color: d4c5f9
+  description: Release engineering, tags, packaging
+- name: dependencies
+  color: 032f62
+  description: Vendor/reference updates
