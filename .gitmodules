@@ -1,0 +1,67 @@
+# The vendor submodules - the upstream Java sources every port file maps to
+# 1:1. They are NOT part of the repository's own code and keep their original
+# licenses; they are cloned with the repo:
+#
+#     git clone --recurse-submodules https://github.com/mattiasploesch-cpu/LibMatti.git
+#     # or, for an already cloned repo:
+#     git submodule update --init --recursive
+#
+# Pinned at the revisions the port currently references.
+
+[submodule "vendor/AccessTransformer"]
+	path = vendor/AccessTransformer
+	url = https://github.com/neoforged/AccessTransformers
+[submodule "vendor/Bus"]
+	path = vendor/Bus
+	url = https://github.com/neoforged/Bus.git
+[submodule "vendor/FancyModLoader"]
+	path = vendor/FancyModLoader
+	url = https://github.com/neoforged/FancyModLoader.git
+[submodule "vendor/JarJar"]
+	path = vendor/JarJar
+	url = https://github.com/neoforged/JarJar
+[submodule "vendor/MCP-Reborn"]
+	path = vendor/MCP-Reborn
+	url = https://github.com/Hexeption/MCP-Reborn.git
+[submodule "vendor/NeoForge"]
+	path = vendor/NeoForge
+	url = https://github.com/neoforged/NeoForge.git
+[submodule "vendor/bootstraplauncher"]
+	path = vendor/bootstraplauncher
+	url = https://github.com/McModLauncher/bootstraplauncher.git
+[submodule "vendor/brigadier"]
+	path = vendor/brigadier
+	url = https://github.com/Mojang/brigadier
+[submodule "vendor/commons-lang"]
+	path = vendor/commons-lang
+	url = https://github.com/apache/commons-lang
+[submodule "vendor/DataFixerUpper"]
+	path = vendor/DataFixerUpper
+	url = https://github.com/Mojang/DataFixerUpper
+[submodule "vendor/fastutil"]
+	path = vendor/fastutil
+	url = https://github.com/vigna/fastutil
+[submodule "vendor/JOML"]
+	path = vendor/JOML
+	url = https://github.com/JOML-CI/JOML
+[submodule "vendor/maven"]
+	path = vendor/maven
+	url = https://github.com/apache/maven.git
+[submodule "vendor/modlauncher"]
+	path = vendor/modlauncher
+	url = https://github.com/McModLauncher/modlauncher.git
+[submodule "vendor/netty"]
+	path = vendor/netty
+	url = https://github.com/netty/netty
+[submodule "vendor/night-config"]
+	path = vendor/night-config
+	url = https://github.com/TheElectronWill/night-config.git
+[submodule "vendor/securejarhandler"]
+	path = vendor/securejarhandler
+	url = https://github.com/McModLauncher/securejarhandler.git
+[submodule "vendor/sponge-mixin"]
+	path = vendor/sponge-mixin
+	url = https://github.com/SpongePowered/Mixin.git
+[submodule "vendor/stb"]
+	path = vendor/stb
+	url = https://github.com/nothings/stb.git
