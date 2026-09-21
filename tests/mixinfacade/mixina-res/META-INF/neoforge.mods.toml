@@ -1,0 +1,27 @@
+modLoader="javafml"
+loaderVersion="[1,)"
+license="MIT"
+
+[[mods]]
+modId="mixina"
+version="1.0"
+displayName="Mixin Test A"
+
+[[mixins]]
+config="mixina.mixins.json"
+behaviorVersion="0.17.1"
+
+[[mixins]]
+config="missing.mixins.json"
+
+[[mixins]]
+config="needsmod.mixins.json"
+requiredMods=["absentmod"]
+
+[[mixins]]
+config="toonew.mixins.json"
+behaviorVersion="0.18.0"
+
+[[mixins]]
+config="tooold.mixins.json"
+behaviorVersion="0.17.0"

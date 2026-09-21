@@ -1,0 +1,11 @@
+modLoader="javafml"
+loaderVersion="[1,)"
+license="MIT"
+
+[[mods]]
+modId="mixinb"
+version="1.0"
+displayName="Mixin Test B"
+
+[[mixins]]
+config="mixina.mixins.json"
