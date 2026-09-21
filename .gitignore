@@ -14,8 +14,10 @@ out/
 *.exe
 
 # ---- Runtime state (created by runClient / matticraft) -----------------
-config/
+/config/
 /night-config/core/
+fml.toml
+examplemod-client.toml
 defaultconfigs/
 mods/options.txt
 logs/
