@@ -1,0 +1,159 @@
+// Port of net.minecraft.core.registries.Registries.
+// Java declares one ResourceKey<Registry<T>> constant per registry through
+// createRegistryKey(Identifier.withDefaultNamespace(name)); the C port interns the same
+// keys through ResourceKey_CreateRegistryKey so identity matches Java. Every key of the
+// Java file is carried in declaration order; the typed generics collapse to the shared
+// ResourceKey type (C has no generics).
+
+#ifndef MATTICRAFT_NET_MINECRAFT_CORE_REGISTRIES_REGISTRIES_H
+#define MATTICRAFT_NET_MINECRAFT_CORE_REGISTRIES_REGISTRIES_H
+
+#include "libmatti/net/minecraft/resources/ResourceKey.h"
+
+// Java: public static final Identifier ROOT_REGISTRY_NAME = Identifier.withDefaultNamespace("root")
+LIBMATTI_MC_Identifier *LIBMATTI_MC_MC_Registries_RootRegistryName(void);
+
+// One accessor per Java constant, named after it. The keys are interned, so every call
+// returns the same object (Java: the static field).
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_ACTIVITY(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_ATTRIBUTE(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_BIOME_SOURCE(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_BLOCK_ENTITY_TYPE(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_BLOCK_PREDICATE_TYPE(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_BLOCK_STATE_PROVIDER_TYPE(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_BLOCK_TYPE(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_BLOCK(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_CARVER(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_CHUNK_GENERATOR(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_CHUNK_STATUS(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_COMMAND_ARGUMENT_TYPE(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_CONSUME_EFFECT_TYPE(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_CREATIVE_MODE_TAB(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_CUSTOM_STAT(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_DATA_COMPONENT_PREDICATE_TYPE(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_DATA_COMPONENT_TYPE(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_GAME_RULE(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_DEBUG_SUBSCRIPTION(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_DECORATED_POT_PATTERN(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_DENSITY_FUNCTION_TYPE(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_DIALOG_BODY_TYPE(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_DIALOG_TYPE(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_ENCHANTMENT_EFFECT_COMPONENT_TYPE(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_ENCHANTMENT_ENTITY_EFFECT_TYPE(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_ENCHANTMENT_LEVEL_BASED_VALUE_TYPE(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_ENCHANTMENT_LOCATION_BASED_EFFECT_TYPE(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_ENCHANTMENT_PROVIDER_TYPE(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_ENCHANTMENT_VALUE_EFFECT_TYPE(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_ENTITY_SUB_PREDICATE_TYPE(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_ENTITY_TYPE(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_ENVIRONMENT_ATTRIBUTE(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_ATTRIBUTE_TYPE(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_FEATURE_SIZE_TYPE(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_FEATURE(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_FLOAT_PROVIDER_TYPE(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_FLUID(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_FOLIAGE_PLACER_TYPE(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_GAME_EVENT(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_HEIGHT_PROVIDER_TYPE(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_INPUT_CONTROL_TYPE(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_INT_PROVIDER_TYPE(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_ITEM(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_SLOT_SOURCE_TYPE(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_LOOT_CONDITION_TYPE(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_LOOT_FUNCTION_TYPE(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_LOOT_NBT_PROVIDER_TYPE(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_LOOT_NUMBER_PROVIDER_TYPE(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_LOOT_POOL_ENTRY_TYPE(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_LOOT_SCORE_PROVIDER_TYPE(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_MAP_DECORATION_TYPE(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_MATERIAL_CONDITION(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_MATERIAL_RULE(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_MEMORY_MODULE_TYPE(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_MENU(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_MOB_EFFECT(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_NUMBER_FORMAT_TYPE(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_PARTICLE_TYPE(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_PLACEMENT_MODIFIER_TYPE(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_POINT_OF_INTEREST_TYPE(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_POOL_ALIAS_BINDING(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_POSITION_SOURCE_TYPE(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_POS_RULE_TEST(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_POTION(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_RECIPE_BOOK_CATEGORY(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_RECIPE_DISPLAY(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_RECIPE_SERIALIZER(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_RECIPE_TYPE(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_ROOT_PLACER_TYPE(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_RULE_BLOCK_ENTITY_MODIFIER(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_RULE_TEST(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_SENSOR_TYPE(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_SLOT_DISPLAY(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_SOUND_EVENT(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_SPAWN_CONDITION_TYPE(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_STAT_TYPE(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_STRUCTURE_PIECE(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_STRUCTURE_PLACEMENT(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_STRUCTURE_POOL_ELEMENT(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_STRUCTURE_PROCESSOR(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_STRUCTURE_TYPE(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_DIALOG_ACTION_TYPE(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_TEST_ENVIRONMENT_DEFINITION_TYPE(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_TEST_FUNCTION(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_TEST_INSTANCE_TYPE(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_TICKET_TYPE(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_TREE_DECORATOR_TYPE(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_TRUNK_PLACER_TYPE(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_VILLAGER_PROFESSION(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_VILLAGER_TYPE(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_INCOMING_RPC_METHOD(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_OUTGOING_RPC_METHOD(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_PERMISSION_TYPE(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_PERMISSION_CHECK_TYPE(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_BANNER_PATTERN(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_BIOME(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_CAT_VARIANT(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_CHAT_TYPE(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_CHICKEN_VARIANT(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_ZOMBIE_NAUTILUS_VARIANT(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_CONFIGURED_CARVER(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_CONFIGURED_FEATURE(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_COW_VARIANT(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_DAMAGE_TYPE(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_DENSITY_FUNCTION(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_DIALOG(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_DIMENSION_TYPE(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_ENCHANTMENT_PROVIDER(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_ENCHANTMENT(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_FLAT_LEVEL_GENERATOR_PRESET(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_FROG_VARIANT(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_INSTRUMENT(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_JUKEBOX_SONG(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_MULTI_NOISE_BIOME_SOURCE_PARAMETER_LIST(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_NOISE_SETTINGS(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_NOISE(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_PAINTING_VARIANT(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_PIG_VARIANT(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_PLACED_FEATURE(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_PROCESSOR_LIST(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_STRUCTURE_SET(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_STRUCTURE(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_TEMPLATE_POOL(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_TEST_ENVIRONMENT(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_TEST_INSTANCE(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_TIMELINE(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_TRIAL_SPAWNER(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_TRIGGER_TYPE(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_TRIM_MATERIAL(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_TRIM_PATTERN(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_WOLF_VARIANT(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_WOLF_SOUND_VARIANT(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_WORLD_PRESET(void);
+// Java: the dynamic registry keys (createRegistryKey with the same names, declared at the end)
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_DIMENSION(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_LOOT_TABLE(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_ITEM_MODIFIER(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_PREDICATE(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_ADVANCEMENT(void);
+LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_RECIPE(void);
+
+#endif //MATTICRAFT_NET_MINECRAFT_CORE_REGISTRIES_REGISTRIES_H
