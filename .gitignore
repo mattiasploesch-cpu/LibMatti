@@ -56,3 +56,7 @@ cmake_install.cmake
 install_manifest.txt
 compile_commands.json
 Testing/
+
+# A stray nested clone of this repository (created by IDE tooling)
+/LibMatti/
+*.bak
