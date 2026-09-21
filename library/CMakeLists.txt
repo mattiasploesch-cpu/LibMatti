@@ -5,7 +5,7 @@ file(GLOB_RECURSE LIBMATTI_SOURCES
 
 # The vendored stb_truetype (used by the LWJGL STBTruetype port) instantiates
 # in exactly one translation unit, like the upstream "easy to use" section says.
-list(APPEND LIBMATTI_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/../vendor/stb/stb_truetype_impl.c")
+list(APPEND LIBMATTI_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/libmatti/org/lwjgl/stb/stb_truetype_impl.c")
 
 # Java: loader/build.gradle generates FMLVersionProperties with the gradle project version
 # (gradleutils.version, a `git describe` over the cloned FML repository).
@@ -34,7 +34,7 @@ add_library(matti STATIC
 target_include_directories(matti
         PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/src
-        # the vendored stb headers (stb_truetype.h sits next to the LWJGL binding)
+        # the vendored stb headers (the stb submodule, see .gitmodules)
         SYSTEM ${CMAKE_CURRENT_SOURCE_DIR}/../vendor/stb
 )
 

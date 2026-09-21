@@ -42,13 +42,12 @@ lm_nm.txt
 .DS_Store
 Thumbs.db
 
-# ---- Vendored upstream clones (reference material, re-clone with
-# tools/vendor-sync.sh - only pinned/modified vendor content is tracked) --
+# ---- Vendored upstream clones - git submodules (.gitmodules). The clones
+# arrive with the repo (git clone --recurse-submodules) but stay outside this
+# repository's own code and history.
 vendor/*
-!vendor/README.md
 !vendor/stb/
-vendor/stb/stb_truetype_impl.c
-vendor/tests/
+vendor/stb/*
 
 # ---- CMake generated ---------------------------------------------------
 CMakeCache.txt
