@@ -217,7 +217,10 @@ LIBMATTI_MC_Minecraft *LIBMATTI_MC_Minecraft_New(const LIBMATTI_MC_GameConfig *c
     LIBMATTI_GLFW_glfwMakeContextCurrent(minecraft->window);
     LIBMATTI_B3D_RenderSystem_InitRenderer(minecraft->window);
     LIBMATTI_B3D_RenderSystem_SetupDefaultState();
-    LIBMATTI_GLFW_glfwSwapInterval(1); // Java: vsync on by default
+    // Java: vsync on by default. On a headless runner the GLX swap with
+    // interval 1 never returns (xvfb delivers no vblank), so CI gets interval 0
+    // and the loop ticks like on a real display.
+    LIBMATTI_GLFW_glfwSwapInterval(getenv("CI") != NULL ? 0 : 1);
     LIBMATTI_GLFW_glfwFocusWindow(minecraft->window);
     LIBMATTI_GLFW_glfwShowWindow(minecraft->window);
 

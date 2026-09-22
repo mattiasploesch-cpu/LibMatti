@@ -36,7 +36,9 @@ jobs:
 
       - name: Client live run
         run: |
-          xvfb-run -a -s "-screen 0 1280x1024x24" ./build/runClient \
+          # The smoke run has no one to close its window, so the timeout ends
+          # it after a full boot + a couple of seconds of live frames.
+          timeout 75 xvfb-run -a -s "-screen 0 1280x1024x24" ./build/runClient \
             --launchTarget neoforge --gameDir . \
             --version 1.21.11 --fml.neoForgeVersion 21.11.45 \
             --fml.mcVersion 1.21.11 --fml.neoFormVersion 20251209.172050 \
