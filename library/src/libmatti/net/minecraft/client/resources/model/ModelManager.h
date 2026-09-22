@@ -39,6 +39,12 @@ int LIBMATTI_MC_ModelManager_LoadModel(LIBMATTI_MC_ModelManager *manager, const 
 const LIBMATTI_MC_QuadCollection *LIBMATTI_MC_ModelManager_GetModel(const LIBMATTI_MC_ModelManager *manager,
                                                                     const char *modelId);
 
+// Java: the registry.put step of the bake - registers an already-baked
+// collection under the id (the vanilla bootstrap bakes outside LoadModel).
+// Takes over the collection on success; returns 0 when the id exists.
+int LIBMATTI_MC_ModelManager_RegisterBaked(LIBMATTI_MC_ModelManager *manager, const char *modelId,
+                                           LIBMATTI_MC_QuadCollection *collection);
+
 // The block atlas (the renderers bind it before drawing quads).
 LIBMATTI_MC_TextureAtlas *LIBMATTI_MC_ModelManager_GetAtlas(const LIBMATTI_MC_ModelManager *manager);
 

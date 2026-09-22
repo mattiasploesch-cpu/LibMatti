@@ -116,6 +116,34 @@ const LIBMATTI_MC_QuadCollection *LIBMATTI_MC_ModelManager_GetModel(const LIBMAT
     return NULL;
 }
 
+// Java: the registry.put step of the bake - the bootstrap registers
+// already-baked collections here.
+int LIBMATTI_MC_ModelManager_RegisterBaked(LIBMATTI_MC_ModelManager *manager, const char *modelId,
+                                           LIBMATTI_MC_QuadCollection *collection)
+{
+    if (manager == NULL || modelId == NULL || collection == NULL)
+        return 0;
+    if (LIBMATTI_MC_ModelManager_GetModel(manager, modelId) != NULL)
+    {
+        LIBMATTI_MC_QuadCollection_Free(collection);
+        return 0; // Java: the registry dedupes.
+    }
+    char **ids = realloc(manager->modelIds, (manager->modelCount + 1) * sizeof(char *));
+    LIBMATTI_MC_QuadCollection *models =
+        realloc(manager->models, (manager->modelCount + 1) * sizeof(LIBMATTI_MC_QuadCollection));
+    if (ids == NULL || models == NULL)
+    {
+        LIBMATTI_MC_QuadCollection_Free(collection);
+        return 0;
+    }
+    manager->modelIds = ids;
+    manager->models = models;
+    manager->modelIds[manager->modelCount] = strdup(modelId);
+    manager->models[manager->modelCount] = *collection;
+    manager->modelCount++;
+    return 1;
+}
+
 LIBMATTI_MC_TextureAtlas *LIBMATTI_MC_ModelManager_GetAtlas(const LIBMATTI_MC_ModelManager *manager)
 {
     return manager != NULL ? manager->blockAtlas : NULL;
