@@ -39,7 +39,7 @@ jobs:
         run: cmake --build build -j "$(nproc)"
 
       - name: Tests
-        run: xvfb-run -a ctest --test-dir build --output-on-failure
+        run: xvfb-run -a -s "-screen 0 1280x1024x24" ctest --test-dir build --output-on-failure
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
@@ -74,7 +74,7 @@ jobs:
 
       - name: Run client boot (headless)
         run: |
-          xvfb-run -a ./build/runClient \
+          xvfb-run -a -s "-screen 0 1280x1024x24" ./build/runClient \
             --launchTarget neoforge --gameDir . \
             --version 1.21.11 --fml.neoForgeVersion 21.11.45 \
             --fml.mcVersion 1.21.11 --fml.neoFormVersion 20251209.172050 \

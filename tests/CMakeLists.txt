@@ -217,3 +217,14 @@ matti_add_section(fixture_classmod "example/ExampleMod.class"
 # The standalone output folder the old docs pointed at; the harnesses take the
 # fixture .so by argument, so where it lands does not matter.
 set(MATTI_TESTS_OUTPUT_DIR "${CMAKE_CURRENT_BINARY_DIR}" CACHE PATH "unused, kept for compatibility")
+
+# ---------------------------------------------------------------------------
+# Every harness finishes in seconds. A hung test (a GL stack stuck on a broken
+# display, a stalled fixture) must fail the suite instead of blocking CI
+# forever, so every test gets a hard timeout.
+# ---------------------------------------------------------------------------
+
+get_property(MATTI_ALL_TESTS DIRECTORY PROPERTY TESTS)
+if(MATTI_ALL_TESTS)
+    set_tests_properties(${MATTI_ALL_TESTS} PROPERTIES TIMEOUT 120)
+endif()

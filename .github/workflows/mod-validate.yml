@@ -105,7 +105,7 @@ jobs:
           mod_id="${{ steps.manifest.outputs.mod_id }}"
           # The package binary is what the game would load; place it like the
           # import step would and boot the client against it.
-          xvfb-run -a ./build/runClient \
+          xvfb-run -a -s "-screen 0 1280x1024x24" ./build/runClient \
             --launchTarget neoforge --gameDir . \
             --version 1.21.11 --fml.neoForgeVersion 21.11.45 \
             --fml.mcVersion 1.21.11 --fml.neoFormVersion 20251209.172050 \

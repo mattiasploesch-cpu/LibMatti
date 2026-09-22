@@ -32,11 +32,11 @@ jobs:
 
       - name: Full selftest run (matticraft target)
         run: |
-          xvfb-run -a ctest --test-dir build --output-on-failure
+          xvfb-run -a -s "-screen 0 1280x1024x24" ctest --test-dir build --output-on-failure
 
       - name: Client live run
         run: |
-          xvfb-run -a ./build/runClient \
+          xvfb-run -a -s "-screen 0 1280x1024x24" ./build/runClient \
             --launchTarget neoforge --gameDir . \
             --version 1.21.11 --fml.neoForgeVersion 21.11.45 \
             --fml.mcVersion 1.21.11 --fml.neoFormVersion 20251209.172050 \
