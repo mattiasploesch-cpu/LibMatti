@@ -31,6 +31,7 @@
 #include "libmatti/org/lwjgl/opengl/GL.h"
 #include "libmatti/org/lwjgl/opengl/Constants.h"
 
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -115,23 +116,11 @@ static const LIBMATTI_MC_QuadCollection *model_for_block(void *userdata, const L
     LIBMATTI_MC_ResourceKey *key = LIBMATTI_MC_Block_GetKey(block);
     if (key == NULL)
         return NULL;
-    char *keyString = LIBMATTI_MC_ResourceKey_ToString(key);
-    if (keyString == NULL)
-        return NULL;
-    // Java: the key string "Block{minecraft:stone}" carries the location -
-    // the port extracts the path segment after ':' for the model id.
+    // Java: ResourceKey.location() - the identifier directly (no ToString parse).
     char modelId[128];
-    const char *colon = strchr(keyString, ':');
-    if (colon != NULL)
-        snprintf(modelId, sizeof(modelId), "block/%s", colon + 1);
-    else
-        snprintf(modelId, sizeof(modelId), "block/%s", keyString);
-    // Java: the closing brace would ride along - strip it.
-    char *brace = strchr(modelId, '}');
-    if (brace != NULL)
-        *brace = '\0';
+    snprintf(modelId, sizeof(modelId), "block/%s", LIBMATTI_MC_Identifier_GetPath(key->identifier));
     const LIBMATTI_MC_QuadCollection *model = LIBMATTI_MC_ModelManager_GetModel(manager, modelId);
-    free(keyString);
+    return model;
     return model;
 }
 
@@ -146,20 +135,11 @@ static void sprite_rect_for_block(void *userdata, const LIBMATTI_MC_Block *block
     LIBMATTI_MC_ResourceKey *key = LIBMATTI_MC_Block_GetKey(block);
     if (key == NULL)
         return;
-    char *keyString = LIBMATTI_MC_ResourceKey_ToString(key);
-    if (keyString == NULL)
-        return;
+    // Java: ResourceKey.location() - the identifier directly (no ToString parse).
     char textureId[128];
-    const char *colon = strchr(keyString, ':');
-    if (colon != NULL)
-        snprintf(textureId, sizeof(textureId), "block/%s", colon + 1);
-    else
-        snprintf(textureId, sizeof(textureId), "block/%s", keyString);
-    char *brace = strchr(textureId, '}');
-    if (brace != NULL)
-        *brace = '\0';
+    snprintf(textureId, sizeof(textureId), "block/%s", LIBMATTI_MC_Identifier_GetPath(key->identifier));
     LIBMATTI_MC_SpriteGetter_SpriteRect(atlas, textureId, uv);
-    free(keyString);
+    return;
 }
 
 // Java: public static Minecraft getInstance()
@@ -589,39 +569,81 @@ static void runTick(LIBMATTI_MC_Minecraft *minecraft, int runGameTime)
                         if (terrainProgram != 0)
                         {
                             // Java: the render pass resets the raster state every
-                            // frame (RenderSystem.layeredGlState); the probe proved
-                            // the mesh path needs the full-window viewport + colour
-                            // write back on before the draw.
+                            // frame (RenderSystem.layeredGlState).
                             LIBMATTI_B3D_GlStateManager_Viewport(0, 0, width, height);
                             LIBMATTI_GL_glColorMask(1, 1, 1, 1);
                             LIBMATTI_GL_glDisable(LIBMATTI_GL_GL_SCISSOR_TEST);
                             LIBMATTI_GL_glDisable(LIBMATTI_GL_GL_STENCIL_TEST);
                             LIBMATTI_GL_glDisable(LIBMATTI_GL_GL_CULL_FACE);
+                            LIBMATTI_B3D_GlStateManager_DisableBlend();
+                            LIBMATTI_B3D_GlStateManager_DisableColorLogicOp();
+                            LIBMATTI_B3D_GlStateManager_DisableScissorTest();
+                            LIBMATTI_GL_glDisable(LIBMATTI_GL_GL_POLYGON_OFFSET_FILL);
                             LIBMATTI_B3D_GlStateManager_EnableDepthTest();
                             LIBMATTI_B3D_GlStateManager_DepthFunc(LIBMATTI_GL_GL_LEQUAL);
+                            LIBMATTI_B3D_GlStateManager_DepthMask(1);
 
-                            // Java: the render camera above the platform looking
-                            // down at the section (yaw 45, pitch 30). The view is
-                            // T(0,0,-24) * Rx(30) * Ry(45) * T(-8,-66,-8).
-                            LIBMATTI_JOML_Matrix4f projection;
-                            LIBMATTI_JOML_Matrix4f view;
-                            LIBMATTI_JOML_Matrix4f mvp;
-                            LIBMATTI_JOML_Matrix4f_SetPerspective(&projection, 1.2217f, // 70 degrees
-                                                                  (float) width / (float) height, 0.05f, 1000.0f);
-                            LIBMATTI_JOML_Matrix4f_RotationX(&view, 0.5236f); // 30 degrees down
-                            LIBMATTI_JOML_Matrix4f tmp = {0};
-                            LIBMATTI_JOML_Matrix4f_RotationY(&tmp, 0.7854f); // 45 degrees
-                            LIBMATTI_JOML_Matrix4f_Mul(&view, &tmp, &view);
-                            LIBMATTI_JOML_Matrix4f_Translation(&tmp, 0.0f, 0.0f, -24.0f);
-                            LIBMATTI_JOML_Matrix4f_Mul(&tmp, &view, &view);
-                            LIBMATTI_JOML_Matrix4f_Translation(&tmp, -8.0f, -66.0f, -8.0f);
-                            LIBMATTI_JOML_Matrix4f_Mul(&view, &tmp, &view);
-                            LIBMATTI_JOML_Matrix4f_Mul(&projection, &view, &mvp);
+                            // The camera above the platform looking at its centre
+                            // (Java: GameRenderer's camera at pitch -50, yaw 0 over
+                            // the spawn platform). Built as explicit column-major
+                            // floats - the layout GL's glUniformMatrix4fv reads
+                            // with transpose = GL_FALSE.
+                            float mvp[16];
+                            {
+                                const float eye[3] = {8.0f, 88.0f, 40.0f};
+                                const float target[3] = {8.0f, 64.0f, 8.0f};
+                                const float up[3] = {0.0f, 1.0f, 0.0f};
+                                // forward = normalize(target - eye)
+                                float f[3] = {target[0] - eye[0], target[1] - eye[1], target[2] - eye[2]};
+                                float fl = sqrtf(f[0] * f[0] + f[1] * f[1] + f[2] * f[2]);
+                                f[0] /= fl; f[1] /= fl; f[2] /= fl;
+                                // right = normalize(cross(forward, up))
+                                float r[3] = {f[1] * up[2] - f[2] * up[1],
+                                              f[2] * up[0] - f[0] * up[2],
+                                              f[0] * up[1] - f[1] * up[0]};
+                                float rl = sqrtf(r[0] * r[0] + r[1] * r[1] + r[2] * r[2]);
+                                r[0] /= rl; r[1] /= rl; r[2] /= rl;
+                                // trueUp = cross(right, forward)
+                                float u[3] = {r[1] * f[2] - r[2] * f[1],
+                                              r[2] * f[0] - r[0] * f[2],
+                                              r[0] * f[1] - r[1] * f[0]};
+                                // view (column-major): rows = right/up/-forward
+                                float view[16] = {
+                                    r[0], u[0], -f[0], 0.0f,
+                                    r[1], u[1], -f[1], 0.0f,
+                                    r[2], u[2], -f[2], 0.0f,
+                                    -(r[0] * eye[0] + r[1] * eye[1] + r[2] * eye[2]),
+                                    -(u[0] * eye[0] + u[1] * eye[1] + u[2] * eye[2]),
+                                    (f[0] * eye[0] + f[1] * eye[1] + f[2] * eye[2]),
+                                    1.0f};
+                                // perspective (column-major), 70 degrees, near .05, far 1000
+                                const float aspect = (float) width / (float) height;
+                                const float tanHalf = tanf(1.2217f * 0.5f);
+                                const float zn = 0.05f, zf = 1000.0f;
+                                float proj[16] = {0};
+                                proj[0] = 1.0f / (tanHalf * aspect);
+                                proj[5] = 1.0f / tanHalf;
+                                proj[10] = (zf + zn) / (zn - zf);
+                                proj[11] = -1.0f;
+                                proj[14] = (2.0f * zf * zn) / (zn - zf);
+                                // mvp = proj * view (column-major)
+                                for (int c = 0; c < 4; c++)
+                                    for (int ro = 0; ro < 4; ro++)
+                                        mvp[c * 4 + ro] = proj[ro] * view[c * 4]
+                                                        + proj[4 + ro] * view[c * 4 + 1]
+                                                        + proj[8 + ro] * view[c * 4 + 2]
+                                                        + proj[12 + ro] * view[c * 4 + 3];
+                            }
 
                             float origin[3] = {0.0f, 0.0f, 0.0f};
                             LIBMATTI_MC_SectionRenderDispatcher_RenderLayer(
                                 minecraft->sectionDispatcher, LIBMATTI_MC_ChunkSectionLayer_SOLID,
-                                terrainProgram, &mvp.m00, origin);
+                                terrainProgram, mvp, origin);
+
+                            LIBMATTI_MC_SectionRenderDispatcher_RenderLayer(
+                                minecraft->sectionDispatcher, LIBMATTI_MC_ChunkSectionLayer_SOLID,
+                                terrainProgram, mvp, origin);
+
                         }
                     }
 
@@ -637,33 +659,6 @@ static void runTick(LIBMATTI_MC_Minecraft *minecraft, int runGameTime)
                                                            0xef / 255.0f, 0x32 / 255.0f, 0x3d / 255.0f,
                                                            width, height);
 
-                // Debug: MATTI_FONT_DUMP=<path> writes the composited frame
-                // (read straight from the default framebuffer after the blit)
-                // once, for verifying what the window actually shows.
-                if (getenv("MATTI_FONT_DUMP") != NULL)
-                {
-                    static int screenDumped = 0;
-                    screenDumped++;
-                    if (screenDumped == 3)
-                    {
-                        unsigned char *pix = malloc((size_t) (width * height * 3));
-                        // byte-aligned rows (RGB of an odd width is not 4-aligned)
-                        LIBMATTI_GL_glPixelStorei(LIBMATTI_GL_GL_PACK_ALIGNMENT, 1);
-                        LIBMATTI_GL_glReadPixels(0, 0, width, height, LIBMATTI_GL_GL_RGB,
-                                                 LIBMATTI_GL_GL_UNSIGNED_BYTE, pix);
-                        LIBMATTI_GL_glPixelStorei(LIBMATTI_GL_GL_PACK_ALIGNMENT, 4);
-                        FILE *out = fopen(getenv("MATTI_FONT_DUMP"), "wb");
-                        if (out != NULL)
-                        {
-                            fprintf(out, "P6\n%d %d\n255\n", width, height);
-                            // GL returns rows bottom-up; PPM is top-down - mirror
-                            for (int row = height - 1; row >= 0; row--)
-                                fwrite(pix + (size_t) row * width * 3, 1, (size_t) width * 3, out);
-                            fclose(out);
-                        }
-                        free(pix);
-                    }
-                }
             }
             else
             {
