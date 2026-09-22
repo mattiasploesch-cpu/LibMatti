@@ -44,7 +44,7 @@ jobs:
         run: |
           cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug
           cmake --build build -j "$(nproc)"
-          xvfb-run -a ctest --test-dir build --output-on-failure
+          xvfb-run -a -s "-screen 0 1280x1024x24" ctest --test-dir build --output-on-failure
 
       - name: Annotate build results
         uses: actions/upload-artifact@v4
