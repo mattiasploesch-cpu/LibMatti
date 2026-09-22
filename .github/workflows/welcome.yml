@@ -15,7 +15,7 @@ jobs:
     name: Greet new contributors
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/first-interaction@v1
+      - uses: actions/first-interaction@v3
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           pr_message: |
