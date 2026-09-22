@@ -13,6 +13,12 @@
 #include "libmatti/matti_mixin.h"
 #include "libmatti/net/minecraft/client/renderer/texture/TextureManager.h"
 #include "libmatti/net/neoforged/fml/earlydisplay/EarlyFramebuffer.h"
+#include "libmatti/net/minecraft/client/renderer/chunk/SectionRenderDispatcher.h"
+#include "libmatti/net/minecraft/client/renderer/chunk/ChunkSectionLayer.h"
+#include "libmatti/net/minecraft/core/BlockPos.h"
+#include "libmatti/net/minecraft/server/bootstrap/VanillaBlocks.h"
+#include "libmatti/net/minecraft/Bootstrap.h"
+#include "libmatti/org/joml/Matrix4f.h"
 #include "libmatti/net/neoforged/fml/earlydisplay/FontShader.h"
 #include "libmatti/net/neoforged/fml/earlydisplay/SimpleFont.h"
 #include "libmatti/net/neoforged/fml/loading/EarlyLoadingScreenController.h"
@@ -86,6 +92,10 @@ struct LIBMATTI_MC_Minecraft
 
     // The in-memory level the skeleton drives (game port content).
     void *level;
+
+    // Java: this.levelRenderer = new LevelRenderer - the section dispatcher the
+    // chunk meshes go through (the P4.1 port).
+    LIBMATTI_MC_SectionRenderDispatcher *sectionDispatcher;
 };
 
 // Java: public static Minecraft getInstance()
@@ -262,6 +272,46 @@ LIBMATTI_MC_Minecraft *LIBMATTI_MC_Minecraft_New(const LIBMATTI_MC_GameConfig *c
     }
 
     instance = minecraft;
+
+    // Java: this.level = new ClientLevel(...) + levelRenderer.setLevel - the
+    // skeleton's demo level: bootstrap the vanilla blocks, one in-memory level
+    // and a flat 16x16 stone platform at y=64 the section compiler meshes.
+    {
+        LIBMATTI_MC_Bootstrap_BootStrap();
+        LIBMATTI_MC_Level *level = LIBMATTI_MC_Level_New(-64, 384, LIBMATTI_MC_Level_OVERWORLD, true);
+        LIBMATTI_MC_Block *stone = LIBMATTI_MC_VanillaBlocks_GetByName("STONE");
+        LIBMATTI_MC_Block *dirt = LIBMATTI_MC_VanillaBlocks_GetByName("DIRT");
+        if (stone != NULL && dirt != NULL)
+        {
+            for (int x = 0; x < 16; x++)
+            {
+                for (int z = 0; z < 16; z++)
+                {
+                    LIBMATTI_MC_BlockPos ground = {{x, 64, z}};
+                    LIBMATTI_MC_Level_SetBlock(level, &ground, LIBMATTI_MC_Block_DefaultBlockState(stone),
+                                               LIBMATTI_MC_Level_UPDATE_CLIENTS);
+                    LIBMATTI_MC_BlockPos fill = {{x, 63, z}};
+                    LIBMATTI_MC_Level_SetBlock(level, &fill, LIBMATTI_MC_Block_DefaultBlockState(dirt),
+                                               LIBMATTI_MC_Level_UPDATE_CLIENTS);
+                }
+            }
+            // Two stone towers to make the geometry visible from the camera.
+            for (int y = 65; y < 70; y++)
+            {
+                LIBMATTI_MC_BlockPos a = {{4, y, 4}};
+                LIBMATTI_MC_Level_SetBlock(level, &a, LIBMATTI_MC_Block_DefaultBlockState(stone),
+                                           LIBMATTI_MC_Level_UPDATE_CLIENTS);
+                LIBMATTI_MC_BlockPos b = {{11, y, 11}};
+                LIBMATTI_MC_Level_SetBlock(level, &b, LIBMATTI_MC_Block_DefaultBlockState(stone),
+                                           LIBMATTI_MC_Level_UPDATE_CLIENTS);
+            }
+        }
+
+        minecraft->level = level;
+        minecraft->sectionDispatcher = LIBMATTI_MC_SectionRenderDispatcher_New();
+        LIBMATTI_MC_SectionRenderDispatcher_CreateSection(minecraft->sectionDispatcher, 0, 4, 0);
+    }
+
     return minecraft;
 }
 
@@ -278,12 +328,20 @@ MATTI_MIXIN_TARGET("matticraft::demo::tick", minecraft_demo_tick)
 
 static void tick(LIBMATTI_MC_Minecraft *minecraft)
 {
-    (void) minecraft;
     MattiMixinResult result = MATTI_MIXIN_PASS;
     void *args[1] = {NULL};
     // Java: the woven call site runs the mod chain, then the body unless cancelled.
     if (LIBMATTI_MIXIN_Invoke(LIBMATTI_MIXIN_HookTable_Default(), "matticraft::demo::tick", NULL, args, 1, &result))
         minecraft_demo_tick();
+
+    // Java: LevelRenderer.renderLevel's compile pass - every dirty section is
+    // rebuilt before the frame draws (the port compiles synchronously).
+    if (minecraft->sectionDispatcher != NULL && minecraft->level != NULL)
+    {
+        LIBMATTI_MC_SectionRenderDispatcher_CompileDirty(minecraft->sectionDispatcher,
+                                                         (LIBMATTI_MC_Level *) minecraft->level,
+                                                         (long long) (LIBMATTI_GLFW_glfwGetTime() * 1000.0));
+    }
 }
 
 // Java: private void renderTitleLine(...) - the skeleton draws the game title
@@ -436,6 +494,53 @@ static void runTick(LIBMATTI_MC_Minecraft *minecraft, int runGameTime)
                     LIBMATTI_B3D_GlStateManager_ClearColor(0xef / 255.0f, 0x32 / 255.0f, 0x3d / 255.0f, 1.0f);
                     LIBMATTI_B3D_GlStateManager_Clear(LIBMATTI_GL_GL_COLOR_BUFFER_BIT | LIBMATTI_GL_GL_DEPTH_BUFFER_BIT);
 
+                    // Java: LevelRenderer.renderLevel - the demo level's section
+                    // meshes draw behind the loading layout (perspective from a
+                    // fixed camera above the platform).
+                    if (minecraft->sectionDispatcher != NULL)
+                    {
+                        static unsigned int terrainProgram = 0;
+                        if (terrainProgram == 0)
+                            terrainProgram = LIBMATTI_MC_SectionShader_Compile(NULL, NULL, NULL);
+                        if (terrainProgram != 0)
+                        {
+                            // Java: the render pass resets the raster state every
+                            // frame (RenderSystem.layeredGlState); the probe proved
+                            // the mesh path needs the full-window viewport + colour
+                            // write back on before the draw.
+                            LIBMATTI_B3D_GlStateManager_Viewport(0, 0, width, height);
+                            LIBMATTI_GL_glColorMask(1, 1, 1, 1);
+                            LIBMATTI_GL_glDisable(LIBMATTI_GL_GL_SCISSOR_TEST);
+                            LIBMATTI_GL_glDisable(LIBMATTI_GL_GL_STENCIL_TEST);
+                            LIBMATTI_GL_glDisable(LIBMATTI_GL_GL_CULL_FACE);
+                            LIBMATTI_B3D_GlStateManager_EnableDepthTest();
+                            LIBMATTI_B3D_GlStateManager_DepthFunc(LIBMATTI_GL_GL_LEQUAL);
+
+                            // Java: the render camera above the platform looking
+                            // down at the section (yaw 45, pitch 30). The view is
+                            // T(0,0,-24) * Rx(30) * Ry(45) * T(-8,-66,-8).
+                            LIBMATTI_JOML_Matrix4f projection;
+                            LIBMATTI_JOML_Matrix4f view;
+                            LIBMATTI_JOML_Matrix4f mvp;
+                            LIBMATTI_JOML_Matrix4f_SetPerspective(&projection, 1.2217f, // 70 degrees
+                                                                  (float) width / (float) height, 0.05f, 1000.0f);
+                            LIBMATTI_JOML_Matrix4f_RotationX(&view, 0.5236f); // 30 degrees down
+                            LIBMATTI_JOML_Matrix4f tmp = {0};
+                            LIBMATTI_JOML_Matrix4f_RotationY(&tmp, 0.7854f); // 45 degrees
+                            LIBMATTI_JOML_Matrix4f_Mul(&view, &tmp, &view);
+                            LIBMATTI_JOML_Matrix4f_Translation(&tmp, 0.0f, 0.0f, -24.0f);
+                            LIBMATTI_JOML_Matrix4f_Mul(&tmp, &view, &view);
+                            LIBMATTI_JOML_Matrix4f_Translation(&tmp, -8.0f, -66.0f, -8.0f);
+                            LIBMATTI_JOML_Matrix4f_Mul(&view, &tmp, &view);
+                            LIBMATTI_JOML_Matrix4f_Mul(&projection, &view, &mvp);
+
+                            float origin[3] = {0.0f, 0.0f, 0.0f};
+                            LIBMATTI_MC_SectionRenderDispatcher_RenderLayer(
+                                minecraft->sectionDispatcher, LIBMATTI_MC_ChunkSectionLayer_SOLID,
+                                terrainProgram, &mvp.m00, origin);
+                        }
+                    }
+
                     // The skeleton's title line (Java: the theme's LabelElement
                     // renders the game title inside the layout).
                     render_title(minecraft, 854, 480);
@@ -534,6 +639,14 @@ int LIBMATTI_MC_Minecraft_IsRunning(const LIBMATTI_MC_Minecraft *minecraft)
 void LIBMATTI_MC_Minecraft_Destroy(LIBMATTI_MC_Minecraft *minecraft)
 {
     if (minecraft == NULL) return;
+
+    // Java: this.close() -> levelRenderer.close() -> the section dispatcher's
+    // sections and compiled meshes free with the level.
+    if (minecraft->sectionDispatcher != NULL)
+    {
+        LIBMATTI_MC_SectionRenderDispatcher_Free(minecraft->sectionDispatcher);
+        minecraft->sectionDispatcher = NULL;
+    }
 
     // Java: public void destroy() { LOGGER.info("Stopping!"); ... }
     LOG("Stopping!");
