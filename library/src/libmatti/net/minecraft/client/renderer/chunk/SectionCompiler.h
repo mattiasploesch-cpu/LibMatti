@@ -25,6 +25,10 @@ typedef struct LIBMATTI_MC_SectionCompiler
     // resolves through the block atlas; NULL means the missing-texture sprite.
     void (*spriteRectForBlock)(void *userdata, const struct LIBMATTI_MC_Block *block, float uv[4]);
     void *userdata;
+    // Java: the block-model resolver (ModelManager) - when set, the compiler
+    // renders the baked model quads for the block's model id instead of the
+    // hardcoded cube faces. The block carries its model id.
+    const struct LIBMATTI_MC_QuadCollection *(*modelForBlock)(void *userdata, const struct LIBMATTI_MC_Block *block);
 } LIBMATTI_MC_SectionCompiler;
 
 // Java: the compile result (Java returns CompiledSectionMesh directly).

@@ -109,6 +109,15 @@ void LIBMATTI_MC_SectionRenderDispatcher_SetSpriteResolver(
     dispatcher->compiler->userdata = userdata;
 }
 
+void LIBMATTI_MC_SectionRenderDispatcher_SetModelResolver(
+    LIBMATTI_MC_SectionRenderDispatcher *dispatcher,
+    const struct LIBMATTI_MC_QuadCollection *(*modelForBlock)(void *userdata, const struct LIBMATTI_MC_Block *block),
+    void *userdata)
+{
+    dispatcher->compiler->modelForBlock = modelForBlock;
+    dispatcher->compiler->userdata = userdata;
+}
+
 static void grow_sections(LIBMATTI_MC_SectionRenderDispatcher *dispatcher)
 {
     int newCapacity = dispatcher->sectionCapacity * 2;

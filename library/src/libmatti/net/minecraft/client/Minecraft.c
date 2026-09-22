@@ -14,6 +14,9 @@
 #include "libmatti/net/minecraft/client/renderer/texture/TextureManager.h"
 #include "libmatti/net/neoforged/fml/earlydisplay/EarlyFramebuffer.h"
 #include "libmatti/net/minecraft/client/renderer/chunk/SectionRenderDispatcher.h"
+#include "libmatti/net/minecraft/client/renderer/chunk/SectionShader.h"
+#include "libmatti/net/minecraft/client/resources/model/ModelManager.h"
+#include "libmatti/net/minecraft/server/bootstrap/VanillaBlockModels.h"
 #include "libmatti/net/minecraft/client/renderer/chunk/ChunkSectionLayer.h"
 #include "libmatti/net/minecraft/core/BlockPos.h"
 #include "libmatti/net/minecraft/server/bootstrap/VanillaBlocks.h"
@@ -96,7 +99,39 @@ struct LIBMATTI_MC_Minecraft
     // Java: this.levelRenderer = new LevelRenderer - the section dispatcher the
     // chunk meshes go through (the P4.1 port).
     LIBMATTI_MC_SectionRenderDispatcher *sectionDispatcher;
+
+    // Java: this.modelManager - the baked block models (the P4.2 port); the
+    // section compiler resolves the block model quads through it.
+    LIBMATTI_MC_ModelManager *modelManager;
 };
+
+// Java: the ModelManager model lookup the compiler consults per block - the
+// block's registry key path maps onto the model id ("block/<path>").
+static const LIBMATTI_MC_QuadCollection *model_for_block(void *userdata, const LIBMATTI_MC_Block *block)
+{
+    LIBMATTI_MC_ModelManager *manager = (LIBMATTI_MC_ModelManager *) userdata;
+    LIBMATTI_MC_ResourceKey *key = LIBMATTI_MC_Block_GetKey(block);
+    if (key == NULL)
+        return NULL;
+    char *keyString = LIBMATTI_MC_ResourceKey_ToString(key);
+    if (keyString == NULL)
+        return NULL;
+    // Java: the key string "Block{minecraft:stone}" carries the location -
+    // the port extracts the path segment after ':' for the model id.
+    char modelId[128];
+    const char *colon = strchr(keyString, ':');
+    if (colon != NULL)
+        snprintf(modelId, sizeof(modelId), "block/%s", colon + 1);
+    else
+        snprintf(modelId, sizeof(modelId), "block/%s", keyString);
+    // Java: the closing brace would ride along - strip it.
+    char *brace = strchr(modelId, '}');
+    if (brace != NULL)
+        *brace = '\0';
+    const LIBMATTI_MC_QuadCollection *model = LIBMATTI_MC_ModelManager_GetModel(manager, modelId);
+    free(keyString);
+    return model;
+}
 
 // Java: public static Minecraft getInstance()
 static LIBMATTI_MC_Minecraft *instance = NULL;
@@ -309,11 +344,30 @@ LIBMATTI_MC_Minecraft *LIBMATTI_MC_Minecraft_New(const LIBMATTI_MC_GameConfig *c
 
         minecraft->level = level;
         minecraft->sectionDispatcher = LIBMATTI_MC_SectionRenderDispatcher_New();
+
+        // Java: this.modelManager = new ModelManager(atlas) + ModelBakery's
+        // vanilla block model bootstrap - the embedded stone/dirt models bake
+        // against the block atlas (headless-safe: without the atlas the bake
+        // falls back to the missing sprite like the vanilla client does).
+        minecraft->modelManager = LIBMATTI_MC_ModelManager_New(NULL);
+        if (LIBMATTI_MC_VanillaBlockModels_Bootstrap(minecraft->modelManager))
+        {
+            LIBMATTI_MC_SectionRenderDispatcher_SetModelResolver(
+                minecraft->sectionDispatcher,
+                (const LIBMATTI_MC_QuadCollection * (*)(void *, const LIBMATTI_MC_Block *))
+                    model_for_block,
+                minecraft->modelManager);
+        }
+
         LIBMATTI_MC_SectionRenderDispatcher_CreateSection(minecraft->sectionDispatcher, 0, 4, 0);
     }
 
     return minecraft;
 }
+
+// Java: the ModelManager model lookup the compiler consults per block - the
+// block's registry key path maps onto the model id ("block/<path>").
+static const LIBMATTI_MC_QuadCollection *model_for_block(void *userdata, const LIBMATTI_MC_Block *block);
 
 // Java: public void tick() - the per-tick body; level/entity/screens updates are
 // the game port. The body is the mixable function the example mods hook
