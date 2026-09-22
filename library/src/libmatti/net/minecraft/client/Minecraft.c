@@ -460,6 +460,15 @@ static LIBMATTI_FML_SimpleFont *load_font(void)
 
     // 1) MATTI_THEME_FONT=<path> - the explicit override.
     const char *override = getenv("MATTI_THEME_FONT");
+    if (override != NULL)
+    {
+        // Reject clearly unsafe paths from environment input.
+        if (*override == '\0' || strstr(override, "..") != NULL || strchr(override, '\n') != NULL ||
+            strchr(override, '\r') != NULL)
+        {
+            override = NULL;
+        }
+    }
     // 2) the repo checkout (dev builds, same path the manifest uses).
     const char *base = MATTI_SOURCE_DIR;
     const char *relative =
