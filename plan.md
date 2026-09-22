@@ -1,7 +1,7 @@
 # Plan: Minecraft-Port (net.minecraft.*) in Phasen
 
 > **Status-Marker:** ✅ fertig · 🟨 teilweise · ⬜ offen
-> Stand: 20.09.2026 — Build grün, ctest 11/11, `runClient` bootet FML vollständig (Mods, Configs, Mixins, Registries, Vanilla-Bootstrap) und endet mit „Minecraft ran successfully“.
+> Stand: 22.09.2026 — Build grün, ctest 20/20, `runClient` bootet FML vollständig (Mods, Configs, Mixins, Registries, Vanilla-Bootstrap) und rendert die Welt-Ladeansicht mit Titel, Progress-Bar und gebackenem Terrain; Stable-Release-Pipeline (AppImage, Portable-Zip, Dev-SDK) per `workflow_dispatch` verfügbar.
 > Dieser Plan ist die bereinigte Übersicht; inhaltlich wurde nichts umgeschrieben, nur der Fortschritt markiert.
 
 **Orientierung:** unten nach oben bauen — jede Phase hat ein sichtbares Ziel in `runClient`, damit du immer was siehst.
@@ -78,15 +78,13 @@ Vor P0 fertig (frühere Meilensteine, nicht Teil des Plans):
 
 ────────────────────────────────────────────────────────────────────────────────
 
-## P4 — Welt rendern
-
-| # | Was                                                                       | Status |
-|---|---------------------------------------------------------------------------|--------|
-| 1 | Chunk-Meshing (ChunkRenderDispatcher, Section-Builder, BlockModel→Mesh)    | ⬜     |
-| 2 | BlockModel/BakedModel (JSON-Modelle, Elemente, Face-Baking, Atlas-Sprites) | ⬜     |
-| 3 | Camera + Frustum + Culling                                                 | ⬜     |
-| 4 | BlockRenderDispatcher (AO, Tinting)                                        | ⬜     |
-| 5 | Himmel/Sonne/Mond/Wolken (günstig, sieht sofort nach MC aus)               | ⬜     |
+## P4 — Welt rendern| #  | Was                                                                       | Status | Anmerkung |
+|----|---------------------------------------------------------------------------|--------|-----------|
+| 1  | Chunk-Meshing (ChunkRenderDispatcher, Section-Builder, BlockModel→Mesh)    | ✅     | SectionRenderDispatcher/-Region/-Section, SectionCompiler + VisGraph + VisibilitySet (6-Bit Face-Cull), SectionBufferBuilderPack, SectionBuffers + GpuBuffer-Upload, SectionShader (terrain.vert/frag, ChunkPos-Uniform, VAO-Rebuild bei Buffer-Wechsel), CompiledSectionMesh + ChunkSectionLayer; ChunkMesh-Harness grün |
+| 2  | BlockModel/BakedModel (JSON-Modelle, Elemente, Face-Baking, Atlas-Sprites) | ✅     | BlockElement/ElementFace + Gson-Deserializer (cullface 1:1), FaceBakery (defaultFaceUV/bakeVertex/calculateFacing/recalculateWinding), QuadCollection + ModelBaker (SimpleUnbakedGeometry.bake, Cullface-Buckets, Degenerate-Axis-Gate), SpriteGetter (Atlas-UV-Rects), ModelManager (lädt + backt Modelle, Child-Texturen über Parent-Chain), VanillaModels (cube/cube_all) + VanillaBlockModels/VanillaBlockTextures (Texturen in den Block-Atlas gestitcht); AtlasTextures-Harness 24 Checks grün; MVP-Upload column-major verifiziert |
+| 3  | Camera + Frustum + Culling                                                 | ⬜     | als nächstes |
+| 4  | BlockRenderDispatcher (AO, Tinting)                                        | ⬜     |
+| 5  | Himmel/Sonne/Mond/Wolken (günstig, sieht sofort nach MC aus)               | ⬜     |
 
 **Ziel:** du stehst in einer Welt aus echten Blöcken und drehst die Kamera.
 
@@ -165,6 +163,14 @@ Vor P0 fertig (frühere Meilensteine, nicht Teil des Plans):
 | `m4proof`    | Mixin-Backend-Proof                                                         |
 | `level`      | Level/LevelChunk/Section/Heightmap/BlockEntity (36 Checks)                  |
 | `gl`         | GL-Binding: Konstanten, dlopen-Verfügbarkeit, Fallbacks ohne Treiber (44 Checks) |
+| `window`     | Minecraft-Run-Loop: init, 20-TPS-Ticks, Mixin-Dispatch, Stop/Destroy        |
+| `rendersystem` | RenderSystem/GlStateManager State-Cache, VertexArrayCache, GpuBuffer      |
+| `bufferbuilder` | ByteBufferBuilder/BufferBuilder/MeshData/VertexFormat/Tesselator (49 Checks) |
+| `font`       | SimpleFont-Pack über Monocraft.ttf, Glyph-Metriken (11 Checks)              |
+| `shader`     | GlslPreprocessor (moj_import), GlShaderModule/GlProgram, ShaderManager      |
+| `texture`    | NativeImage/PNG, Stitcher, SpriteLoader, TextureAtlas-Stitching (11 Checks) |
+| `chunkmesh`  | P4.1-Compile-Pipeline über eine echte Level-Region (VisGraph, Layer-Packing) |
+| `atlastextures` | P4.2: Vanilla-Modelle backen gegen den echten Block-Atlas (24 Checks)    |
 
 Run-Configurations (CLion): **runClient** (der eine Client mit allem), **build mods** (baut alle Mods aus `mods/`), **matticraft** (Client mit Tests).
 
@@ -172,8 +178,9 @@ Run-Configurations (CLion): **runClient** (der eine Client mit allem), **build m
 
 ## Nächste sinnvolle Schritte (Reihenfolge-Vorschlag)
 
-1. **P3.1 OpenGL-Binding** — der größte Hebel, danach ist alles Sichtbare möglich.
-2. **P3.2 Window/GameLoop** — ✅ erledigt: `Minecraft.c` (init/Run/Stop/Destroy), `DeltaTracker` (20 TPS, saturierendes f2i wie JLS 5.1.3), `Main` parst FML-Args in `GameConfig`. Mixin-Target `matticraft::demo::tick` feuert pro Tick aus dem Loop; Context-Guard skipped GL-Calls ohne aktuellen Context (Mesa-Dispatch-Trampolines < 4096 werden im Loader verworfen).
-3. **P3.3 RenderSystem + GLState** — ✅ erledigt: `RenderSystem` (initRenderer/setupDefaultState/flipFrame/limitDisplayFPS/GetSequentialBuffer/QueueFencedTask + Matrix4fStack push/pop), `GlStateManager` State-Cache 1:1 (nur echte Änderungen treffen GL), `GpuBuffer`/`GlBuffer` (usage-Flags, Map-Read-View), `VertexFormat`/`VertexFormatElement` (Offsets/VertexSize/IndexCount), `VertexArrayCache` Emulated+Separate (Mesa-25.0.x-Workaround). Minecraft-Renderpfad routet jetzt über Viewport/ClearColor/Clear des State-Managers.
-3. **P2-Nachtrag:** PalettedContainer für LevelChunkSection (echte Palette + BitStorage statt Plain-Array), EntityBlock-Interface am Block (hat BlockEntity statt 49-Typen-Scan), BlockEntity-NBT (saveWithFullMetadata/loadStatic über den NBT-Port).
+1. **P4.3 Camera + Frustum + Culling** — `Camera`-Port (Position/Rotation, Look-Vector, view-Matrix aus Pitch/Yaw), `Frustum` (6 Planes aus der Projection×View-Matrix, cubeInFrustum), im Dispatcher: Sichtbarkeits-Test pro Section statt des ersten-N-Draws; danach kann man die Kamera drehen und es rendert nur was im Blick ist.
+2. **P4.4 BlockRenderDispatcher (AO, Tinting)** — Ambient-Occlusion pro Vertex über die Nachbar-States, Biome-Tinting (Gras/Laub/Wasser), ModelBlockRenderer als echte Backplate hinter dem SectionCompiler.
+3. **P4.5 Himmel/Sonne/Mond/Wolken** — Sky-Gradient + Celestial-Quads (Sonne/Mond-Texturen über den TextureManager), Wolken-Ebene; sieht sofort nach MC aus.
 4. **P0-Rest:** java.util-Lücken (UUID, BitSet, Collections.unmodifiable), fastutil nur nach Bedarf der nächsten Phasen.
+5. **P2-Nachtrag:** PalettedContainer für LevelChunkSection (echte Palette + BitStorage statt Plain-Array), EntityBlock-Interface am Block (hat BlockEntity statt 49-Typen-Scan), BlockEntity-NBT (saveWithFullMetadata/loadStatic über den NBT-Port).
+6. **Run-Configs/CI:** Stable-Release (workflow_dispatch: AppImage, Portable-Zip, Dev-SDK, `.matti`-Mods, Changelog, SHA256SUMS) steht — siehe `.github/WORKFLOWS.md` für alle Actions.
