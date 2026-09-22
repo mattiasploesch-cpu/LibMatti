@@ -21,7 +21,7 @@ jobs:
     if: contains(github.event.pull_request.labels.*.name, 'new_mod')
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           submodules: recursive
 
@@ -121,7 +121,7 @@ jobs:
 
       - name: Upload validation logs
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: mod-validation
           path: |
@@ -135,7 +135,7 @@ jobs:
     needs: validate
     steps:
       - name: Request the CodeRabbit review
-        uses: actions/github-script@v7
+        uses: actions/github-script@v9
         with:
           script: |
             await github.rest.issues.createComment({

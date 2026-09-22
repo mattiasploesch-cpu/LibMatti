@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Add the PR to the project board
-        uses: actions/add-to-project@v1
+        uses: actions/add-to-project@v2
         with:
           # The project is looked up by its URL; create it once under
           # https://github.com/orgs/mattiasploesch-cpu/projects (the setup
@@ -27,7 +27,7 @@ jobs:
 
       - name: Mark merged PRs done
         if: github.event.pull_request.merged == true
-        uses: actions/github-script@v7
+        uses: actions/github-script@v9
         with:
           script: |
             core.notice('Merged PR ' + context.issue.number +

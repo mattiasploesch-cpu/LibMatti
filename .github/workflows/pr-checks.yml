@@ -18,7 +18,7 @@ jobs:
     name: PR report
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           submodules: recursive
         with:
@@ -47,7 +47,7 @@ jobs:
           xvfb-run -a -s "-screen 0 1280x1024x24" ctest --test-dir build --output-on-failure
 
       - name: Annotate build results
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: pr-build-log
           path: build/CMakeFiles/*.log
