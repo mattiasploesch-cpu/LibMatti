@@ -9,20 +9,23 @@
 #include <math.h>
 
 // Java: private void calculateFrustum(Matrix4f projection, Matrix4f view)
-//   view.mul(projection, this.matrix); intersection.set(matrix);
+//   view.mul(projection, this.matrix) - Java's ctor receives (modelView,
+//   projection) and multiplies second·first, i.e. the clip matrix P·V
+//   (projection applies last). The C Init mirrors the ctor arg order
+//   (projection, view) and computes projection·view directly.
 //   viewVector = matrix.transformTranspose(new Vector4f(0, 0, 1, 0));
 static void calculate_frustum(LIBMATTI_MC_Frustum *frustum,
                               const LIBMATTI_JOML_Matrix4f *projection,
                               const LIBMATTI_JOML_Matrix4f *view)
 {
-    LIBMATTI_JOML_Matrix4f_Mul(view, projection, &frustum->matrix);
+    LIBMATTI_JOML_Matrix4f_Mul(projection, view, &frustum->matrix);
     LIBMATTI_JOML_FrustumIntersection_Set(&frustum->intersection, &frustum->matrix);
-    // transformTranspose((0,0,1,0)): the result is the third ROW of the
-    // matrix (row-major JOML accessor names): (m02, m12, m22, m32).
-    frustum->viewVector.x = frustum->matrix.m02;
-    frustum->viewVector.y = frustum->matrix.m12;
+    // JOML: transformTranspose((0,0,1,0)) -> dest = (m20, m21, m22, m23)
+    // (JOML names mXY column X, row Y - same convention as the C struct).
+    frustum->viewVector.x = frustum->matrix.m20;
+    frustum->viewVector.y = frustum->matrix.m21;
     frustum->viewVector.z = frustum->matrix.m22;
-    frustum->viewVector.w = frustum->matrix.m32;
+    frustum->viewVector.w = frustum->matrix.m23;
 }
 
 // Java: public Frustum(Matrix4f projection, Matrix4f view)

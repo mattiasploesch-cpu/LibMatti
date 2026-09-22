@@ -77,7 +77,12 @@ void LIBMATTI_MC_Camera_SetRotation(LIBMATTI_MC_Camera *camera, float yRot, floa
                                          (float) M_PI - yRot * ((float) M_PI / 180.0f), 0.0f, 1.0f, 0.0f);
     LIBMATTI_JOML_Quaternionf_RotateAxis(&camera->rotation,
                                          -xRot * ((float) M_PI / 180.0f), 1.0f, 0.0f, 0.0f);
-    // Java: FORWARDS.rotate(this.rotation, this.forwards); (UP, LEFT ditto)
+    // Java: FORWARDS.rotate(this.rotation, this.forwards) - the CONSTANTS
+    // rotate INTO the fields, so every call starts from the unit axes again
+    // (rotating the fields in place would compose with the previous frame).
+    set_vec3(&camera->forwards, 0.0f, 0.0f, -1.0f);
+    set_vec3(&camera->up, 0.0f, 1.0f, 0.0f);
+    set_vec3(&camera->left, -1.0f, 0.0f, 0.0f);
     rotate_by_quaternion(&camera->rotation, &camera->forwards, &camera->forwards);
     rotate_by_quaternion(&camera->rotation, &camera->up, &camera->up);
     rotate_by_quaternion(&camera->rotation, &camera->left, &camera->left);

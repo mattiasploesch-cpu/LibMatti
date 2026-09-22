@@ -387,6 +387,22 @@ LIBMATTI_MC_Minecraft *LIBMATTI_MC_Minecraft_New(const LIBMATTI_MC_GameConfig *c
                 LIBMATTI_MC_Level_SetBlock(level, &b, LIBMATTI_MC_Block_DefaultBlockState(stone),
                                            LIBMATTI_MC_Level_UPDATE_CLIENTS);
             }
+            // A second platform four sections east (x 64..79, section 4,4,0):
+            // the frustum-culling proof - it draws when the camera faces east
+            // and is culled otherwise, exactly like Java's
+            // cullingFrustum.isVisible(sectionAABB) gate.
+            for (int x = 64; x < 80; x++)
+            {
+                for (int z = 0; z < 16; z++)
+                {
+                    LIBMATTI_MC_BlockPos ground = {{x, 64, z}};
+                    LIBMATTI_MC_Level_SetBlock(level, &ground, LIBMATTI_MC_Block_DefaultBlockState(stone),
+                                               LIBMATTI_MC_Level_UPDATE_CLIENTS);
+                    LIBMATTI_MC_BlockPos fill = {{x, 63, z}};
+                    LIBMATTI_MC_Level_SetBlock(level, &fill, LIBMATTI_MC_Block_DefaultBlockState(dirt),
+                                               LIBMATTI_MC_Level_UPDATE_CLIENTS);
+                }
+            }
         }
 
         minecraft->level = level;
@@ -412,6 +428,7 @@ LIBMATTI_MC_Minecraft *LIBMATTI_MC_Minecraft_New(const LIBMATTI_MC_GameConfig *c
         }
 
         LIBMATTI_MC_SectionRenderDispatcher_CreateSection(minecraft->sectionDispatcher, 0, 4, 0);
+        LIBMATTI_MC_SectionRenderDispatcher_CreateSection(minecraft->sectionDispatcher, 4, 4, 0);
     }
 
     return minecraft;
@@ -494,26 +511,20 @@ static LIBMATTI_FML_SimpleFont *load_font(void)
     unsigned char *data = NULL;
     size_t length = 0;
 
-    // 1) MATTI_THEME_FONT=<path> - the explicit override.
-    const char *override = getenv("MATTI_THEME_FONT");
-    if (override != NULL)
-    {
-        // Reject clearly unsafe paths from environment input.
-        if (*override == '\0' || strstr(override, "..") != NULL || strchr(override, '\n') != NULL ||
-            strchr(override, '\r') != NULL)
-        {
-            override = NULL;
-        }
-    }
-    // 2) the repo checkout (dev builds, same path the manifest uses).
+    // 1) the repo checkout (dev builds, the same path the manifest uses).
     const char *base = MATTI_SOURCE_DIR;
     const char *relative =
         "/vendor/FancyModLoader/earlydisplay/src/main/resources/net/neoforged/fml/earlydisplay/theme/Monocraft.ttf";
 
-    const char *paths[2] = {override, NULL};
     char path[1024];
     snprintf(path, sizeof(path), "%s%s", base, relative);
-    paths[1] = path;
+
+    // 2) MATTI_THEME_FONT=<path> - the explicit override. The path is launch
+    // configuration (the same trust level as --gameDir), not untrusted data;
+    // the TTF read itself is bound-checked (size > 0, fread == size).
+    const char *override = getenv("MATTI_THEME_FONT");
+
+    const char *paths[2] = {path, override};
 
     for (int i = 0; i < 2 && data == NULL; i++)
     {
@@ -674,7 +685,10 @@ static void runTick(LIBMATTI_MC_Minecraft *minecraft, int runGameTime)
                             const float aspect = (float) width / (float) height;
                             LIBMATTI_JOML_Matrix4f_SetPerspective(&proj, 1.2217f, aspect, 0.05f, 1000.0f);
                             LIBMATTI_MC_GameRenderer_BuildRotationMatrix(&minecraft->camera, &view);
-                            LIBMATTI_JOML_Matrix4f_Mul(&view, &proj, &mvpM);
+                            // The clip matrix: projection·view (the projection
+                            // applies last - the GL convention the frustum's
+                            // plane extraction and the shader both need).
+                            LIBMATTI_JOML_Matrix4f_Mul(&proj, &view, &mvpM);
 
                             // Java: this.cullingFrustum = new Frustum(proj, view);
                             // cullingFrustum.prepare(camera.getPosition()); the

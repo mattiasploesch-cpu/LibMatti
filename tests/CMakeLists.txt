@@ -162,6 +162,13 @@ matti_test(test_atlastextures atlastextures/AtlasTexturesHarness.c)
 add_test(NAME atlastextures COMMAND test_atlastextures)
 
 # ---------------------------------------------------------------------------
+# frustum: the P4.3 plane extraction, cube tests and camera contract
+# ---------------------------------------------------------------------------
+
+matti_test(test_frustum frustum/FrustumHarness.c)
+add_test(NAME frustum COMMAND test_frustum)
+
+# ---------------------------------------------------------------------------
 # modscan: class-file scan harness
 # ---------------------------------------------------------------------------
 

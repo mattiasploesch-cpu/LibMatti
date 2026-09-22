@@ -31,9 +31,9 @@ LIBMATTI_JOML_FrustumIntersection *LIBMATTI_JOML_FrustumIntersection_Set(
 LIBMATTI_JOML_FrustumIntersection *LIBMATTI_JOML_FrustumIntersection_SetEx(
     LIBMATTI_JOML_FrustumIntersection *fi, const LIBMATTI_JOML_Matrix4f *m, int allowTestSpheres)
 {
-    // JOML column-major accessors: m03() is column 0 row 3, so the struct's
-    // m03 field maps directly (the port keeps the same layout).
-    fi->nxX = m->m03 + m->m00; fi->nxY = m->m13 + m->m10; fi->nxZ = m->m23 + m->m20; fi->nxW = m->m33 + m->m30;
+    // JOML names the fields m<column><row> (the translation sits in
+    // m30..m32) - exactly the C struct's convention, so Java mXY() == C.mXY.
+    fi->nxX = m->m00 + m->m03; fi->nxY = m->m10 + m->m13; fi->nxZ = m->m20 + m->m23; fi->nxW = m->m30 + m->m33;
     if (allowTestSpheres)
     {
         float invl = 1.0f / sqrtf(fi->nxX * fi->nxX + fi->nxY * fi->nxY + fi->nxZ * fi->nxZ);
@@ -45,7 +45,7 @@ LIBMATTI_JOML_FrustumIntersection *LIBMATTI_JOML_FrustumIntersection_SetEx(
         float invl = 1.0f / sqrtf(fi->pxX * fi->pxX + fi->pxY * fi->pxY + fi->pxZ * fi->pxZ);
         fi->pxX *= invl; fi->pxY *= invl; fi->pxZ *= invl; fi->pxW *= invl;
     }
-    fi->nyX = m->m03 + m->m01; fi->nyY = m->m13 + m->m11; fi->nyZ = m->m23 + m->m21; fi->nyW = m->m33 + m->m31;
+    fi->nyX = m->m01 + m->m03; fi->nyY = m->m11 + m->m13; fi->nyZ = m->m21 + m->m23; fi->nyW = m->m31 + m->m33;
     if (allowTestSpheres)
     {
         float invl = 1.0f / sqrtf(fi->nyX * fi->nyX + fi->nyY * fi->nyY + fi->nyZ * fi->nyZ);
@@ -57,7 +57,7 @@ LIBMATTI_JOML_FrustumIntersection *LIBMATTI_JOML_FrustumIntersection_SetEx(
         float invl = 1.0f / sqrtf(fi->pyX * fi->pyX + fi->pyY * fi->pyY + fi->pyZ * fi->pyZ);
         fi->pyX *= invl; fi->pyY *= invl; fi->pyZ *= invl; fi->pyW *= invl;
     }
-    fi->nzX = m->m03 + m->m02; fi->nzY = m->m13 + m->m12; fi->nzZ = m->m23 + m->m22; fi->nzW = m->m33 + m->m32;
+    fi->nzX = m->m02 + m->m03; fi->nzY = m->m12 + m->m13; fi->nzZ = m->m22 + m->m23; fi->nzW = m->m32 + m->m33;
     if (allowTestSpheres)
     {
         float invl = 1.0f / sqrtf(fi->nzX * fi->nzX + fi->nzY * fi->nzY + fi->nzZ * fi->nzZ);
