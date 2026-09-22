@@ -2,6 +2,7 @@
 
 #include "libmatti/net/minecraft/client/resources/model/ModelManager.h"
 
+#include "libmatti/net/minecraft/client/resources/model/SpriteGetter.h"
 #include "libmatti/net/minecraft/client/renderer/block/model/BlockModel.h"
 #include "libmatti/net/minecraft/resources/Identifier.h"
 
@@ -42,6 +43,13 @@ typedef struct ResolverContext
     const LIBMATTI_MC_TextureAtlas *atlas;
 } ResolverContext;
 
+// Java: SpriteGetter.resolveSlot - the atlas rect for a texture id.
+static int resolve_sprite(void *userdata, const char *textureId, float uvRect[4])
+{
+    const LIBMATTI_MC_TextureAtlas *atlas = (const LIBMATTI_MC_TextureAtlas *) userdata;
+    return LIBMATTI_MC_SpriteGetter_SpriteRect(atlas, textureId, uvRect);
+}
+
 LIBMATTI_MC_ModelManager *LIBMATTI_MC_ModelManager_New(LIBMATTI_MC_TextureAtlas *atlas)
 {
     LIBMATTI_MC_ModelManager *manager = calloc(1, sizeof(LIBMATTI_MC_ModelManager));
@@ -81,7 +89,7 @@ int LIBMATTI_MC_ModelManager_LoadModel(LIBMATTI_MC_ModelManager *manager, const 
     // Java: the bake against the block atlas through the SpriteGetter.
     ResolverContext context = {manager->blockAtlas};
     LIBMATTI_MC_QuadCollection collection;
-    int ok = LIBMATTI_MC_ModelBaker_Bake(model, (LIBMATTI_MC_ModelBaker_SpriteResolver) NULL, &context, &collection);
+    int ok = LIBMATTI_MC_ModelBaker_Bake(model, resolve_sprite, &context, &collection);
     LIBMATTI_MC_BlockModel_Free(model);
     if (!ok)
         return 0;

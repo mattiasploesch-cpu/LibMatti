@@ -16,6 +16,8 @@
 #include "libmatti/net/minecraft/client/renderer/chunk/VisGraph.h"
 #include "libmatti/net/minecraft/client/resources/model/QuadCollection.h"
 #include "libmatti/net/minecraft/world/level/block/Block.h"
+
+#include <stdio.h>
 #include "libmatti/net/minecraft/world/level/block/state/BlockBehaviour.h"
 #include "libmatti/net/minecraft/world/level/chunk/LevelChunkSection.h"
 #include "libmatti/net/minecraft/core/Direction.h"
@@ -326,6 +328,15 @@ LIBMATTI_MC_CompiledSectionMesh *LIBMATTI_MC_SectionCompiler_Compile(
         const unsigned char *indexData = LIBMATTI_B3D_MeshData_IndexBuffer(mesh, &indexSize);
         int vertexCount = (int) (vertexSize / (size_t) LIBMATTI_B3D_VertexFormat_GetVertexSize(
                                                        LIBMATTI_B3D_DefaultVertexFormat_BLOCK()));
+        if (getenv("MATTI_CHUNK_DUMP") != NULL)
+        {
+            const float *fv = (const float *) vertexData;
+            fprintf(stderr,
+                    "[CHUNKDEBUG] mesh layer=%d vertexSize=%zu indexSize=%zu v0=(%.2f,%.2f,%.2f) v1=(%.2f,%.2f,%.2f) stride=%d\n",
+                    layer, vertexSize, indexSize,
+                    fv[0], fv[1], fv[2], fv[8], fv[9], fv[10],
+                    LIBMATTI_B3D_VertexFormat_GetVertexSize(LIBMATTI_B3D_DefaultVertexFormat_BLOCK()));
+        }
         // Java: the buffers carry the draw count - mode.indexCount(vertices)
         // turns the quad vertices into the 6-per-quad element count.
         int indexCount = vertexCount / 4 * 6;

@@ -17,11 +17,45 @@
 
 // (ModelManager_RegisterBaked comes from ModelManager.h via the include.)
 
+// Java: TextureSlots.Data - the child's textures override the parent's map
+// entries by slot name; new slots append.
+static void merge_textures(LIBMATTI_MC_BlockModel *parent, const LIBMATTI_MC_BlockModel *child)
+{
+    for (size_t c = 0; c < child->textureCount; c++)
+    {
+        size_t slot = parent->textureCount;
+        for (size_t p = 0; p < parent->textureCount; p++)
+        {
+            if (strcmp(parent->textureNames[p], child->textureNames[c]) == 0)
+            {
+                slot = p;
+                break;
+            }
+        }
+        if (slot == parent->textureCount)
+        {
+            char **names = realloc(parent->textureNames, (parent->textureCount + 1) * sizeof(char *));
+            char **values = realloc(parent->textureValues, (parent->textureCount + 1) * sizeof(char *));
+            if (names == NULL || values == NULL)
+                continue;
+            parent->textureNames = names;
+            parent->textureValues = values;
+            parent->textureNames[slot] = strdup(child->textureNames[c]);
+            parent->textureValues[slot] = strdup(child->textureValues[c]);
+            parent->textureCount++;
+        }
+        else
+        {
+            free(parent->textureValues[slot]);
+            parent->textureValues[slot] = strdup(child->textureValues[c]);
+        }
+    }
+}
+
 // The parent-resolved model for an id: the model's own JSON when it carries
-// elements, otherwise the parent chain's first element carrier. Java's
-// ModelDiscovery walks the chain and merges; the port resolves to the first
-// model with elements (cube_all carries the cube for every vanilla cube_all
-// child - the textures map rides along on the child).
+// elements, otherwise the parent chain's first element carrier with the child
+// textures merged over it (Java: ModelDiscovery's parent walk + the
+// TextureSlots merge - cube_all carries the cube for every cube_all child).
 static LIBMATTI_MC_BlockModel *resolve_model(const char *modelId)
 {
     const char *json = LIBMATTI_MC_VanillaModels_ModelById(modelId);
@@ -41,6 +75,12 @@ static LIBMATTI_MC_BlockModel *resolve_model(const char *modelId)
         return NULL;
     }
     LIBMATTI_MC_BlockModel *parent = LIBMATTI_MC_BlockModel_Parse(parentJson);
+    if (parent == NULL)
+    {
+        LIBMATTI_MC_BlockModel_Free(model);
+        return NULL;
+    }
+    merge_textures(parent, model);
     LIBMATTI_MC_BlockModel_Free(model);
     return parent;
 }

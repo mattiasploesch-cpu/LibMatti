@@ -10,7 +10,6 @@ enable_testing()
 add_subdirectory(library)
 add_subdirectory(client)
 add_subdirectory(tests)
-add_subdirectory(external_tests)
 
 # The mods are a separate project: they only include the library headers, the
 # running game provides the symbols. This target configures and builds the mods

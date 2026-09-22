@@ -155,6 +155,13 @@ matti_test(test_chunkmesh chunkmesh/ChunkMeshHarness.c)
 add_test(NAME chunkmesh COMMAND test_chunkmesh)
 
 # ---------------------------------------------------------------------------
+# atlastextures: the P4.3 atlas bootstrap + model bake with real sprite rects
+# ---------------------------------------------------------------------------
+
+matti_test(test_atlastextures atlastextures/AtlasTexturesHarness.c)
+add_test(NAME atlastextures COMMAND test_atlastextures)
+
+# ---------------------------------------------------------------------------
 # modscan: class-file scan harness
 # ---------------------------------------------------------------------------
 
