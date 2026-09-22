@@ -503,9 +503,10 @@ static void render_title(LIBMATTI_MC_Minecraft *minecraft, int width, int height
 
 // Java (Window.java Window ctor / MaterializedTheme): load the theme's
 // "gui" font (the Monocraft.ttf the FML resources carry). The binary embeds
-// the font (release packages do not ship the vendor source tree); the file
-// paths stay as the fallbacks (repo checkout, MATTI_THEME_FONT override).
-// NULL leaves the title rendering off.
+// the font (release packages do not ship the vendor source tree); the repo
+// checkout stays as the dev-build fallback. No environment or user input
+// reaches fopen - the paths are compile-time constants. NULL leaves the
+// title rendering off.
 static LIBMATTI_FML_SimpleFont *load_font(void)
 {
     unsigned char *data = NULL;
@@ -519,20 +520,9 @@ static LIBMATTI_FML_SimpleFont *load_font(void)
     char path[1024];
     snprintf(path, sizeof(path), "%s%s", base, relative);
 
-    // 2) MATTI_THEME_FONT=<path> - the explicit override. The path is launch
-    // configuration (the same trust level as --gameDir), not untrusted data;
-    // the TTF read itself is bound-checked (size > 0, fread == size).
-    const char *override = getenv("MATTI_THEME_FONT");
-
-    const char *paths[2] = {path, override};
-
-    for (int i = 0; i < 2 && data == NULL; i++)
+    FILE *file = fopen(path, "rb");
+    if (file != NULL)
     {
-        if (paths[i] == NULL)
-            continue;
-        FILE *file = fopen(paths[i], "rb");
-        if (file == NULL)
-            continue;
         fseek(file, 0, SEEK_END);
         long size = ftell(file);
         fseek(file, 0, SEEK_SET);
@@ -552,7 +542,7 @@ static LIBMATTI_FML_SimpleFont *load_font(void)
         fclose(file);
     }
 
-    // 3) the embedded copy - always present.
+    // 2) the embedded copy - always present.
     if (data == NULL)
     {
         length = LIBMATTI_MC_EmbeddedFont_Monocraft_Size;
@@ -563,7 +553,7 @@ static LIBMATTI_FML_SimpleFont *load_font(void)
 
     if (data == NULL)
     {
-        fprintf(stderr, "ERROR: theme font not available (override, repo path and embedded copy failed)\n");
+        fprintf(stderr, "ERROR: theme font not available (repo path and embedded copy failed)\n");
         return NULL;
     }
 
