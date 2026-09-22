@@ -148,6 +148,13 @@ matti_test(test_brigadier brigadier/BrigadierHarness.c)
 add_test(NAME brigadier COMMAND test_brigadier)
 
 # ---------------------------------------------------------------------------
+# chunkmesh: the P4.1 section compile pipeline over a real level
+# ---------------------------------------------------------------------------
+
+matti_test(test_chunkmesh chunkmesh/ChunkMeshHarness.c)
+add_test(NAME chunkmesh COMMAND test_chunkmesh)
+
+# ---------------------------------------------------------------------------
 # modscan: class-file scan harness
 # ---------------------------------------------------------------------------
 

@@ -17,6 +17,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Add the PR to the project board
+        # The board needs the project scope (PROJECTS_TOKEN) and must exist;
+        # both are missing on forks/fresh clones, so skip silently there
+        # instead of failing every PR run.
+        continue-on-error: true
         uses: actions/add-to-project@v2
         with:
           # The project is looked up by its URL; create it once under

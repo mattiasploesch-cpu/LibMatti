@@ -25,13 +25,8 @@ jobs:
               issue_number: context.issue.number,
               assignees: [author]
             });
-            // CodeRabbit reviews every PR automatically.
-            await github.rest.pulls.requestReviewers({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              pull_number: context.issue.number,
-              reviewers: ['coderabbitai']
-            }).catch(e => {
-              core.notice(`Could not request the coderabbitai review (${e.message}). ` +
-                'Install the CodeRabbit GitHub App so reviews are automatic.');
-            });
+            // CodeRabbit reviews every PR automatically - the GitHub App
+            // must be installed on the repo. Requesting the reviewer here
+            // left a forever-pending check behind when the app is missing,
+            // so the install is required instead of a reviewer request.
+            core.notice('CodeRabbit: install the GitHub App from https://github.com/apps/coderabbitai to enable automatic reviews.');

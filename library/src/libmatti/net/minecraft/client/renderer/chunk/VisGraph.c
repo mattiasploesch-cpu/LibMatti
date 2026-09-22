@@ -151,26 +151,38 @@ static int get_neighbor_index_at_face(const struct LIBMATTI_MC_VisGraph *g, int 
     }
 }
 
-// Java: private void addEdges(int, Set<Direction>)
+// Java: private void addEdges(int, Set<Direction>) - the Java side collects
+// into a Set, so the six-element array must only receive unique faces.
+static void add_edge_face_unique(LIBMATTI_MC_Direction *faces, int *faceCount, LIBMATTI_MC_Direction face)
+{
+    for (int i = 0; i < *faceCount; i++)
+    {
+        if (faces[i] == face)
+            return;
+    }
+    if (*faceCount < LIBMATTI_MC_Direction_COUNT)
+        faces[(*faceCount)++] = face;
+}
+
 static void add_edges(int index, LIBMATTI_MC_Direction *faces, int *faceCount)
 {
     int i = index >> X_SHIFT & MASK;
     if (i == 0)
-        faces[(*faceCount)++] = LIBMATTI_MC_Direction_WEST;
+        add_edge_face_unique(faces, faceCount, LIBMATTI_MC_Direction_WEST);
     else if (i == 15)
-        faces[(*faceCount)++] = LIBMATTI_MC_Direction_EAST;
+        add_edge_face_unique(faces, faceCount, LIBMATTI_MC_Direction_EAST);
 
     int j = index >> Y_SHIFT & MASK;
     if (j == 0)
-        faces[(*faceCount)++] = LIBMATTI_MC_Direction_DOWN;
+        add_edge_face_unique(faces, faceCount, LIBMATTI_MC_Direction_DOWN);
     else if (j == 15)
-        faces[(*faceCount)++] = LIBMATTI_MC_Direction_UP;
+        add_edge_face_unique(faces, faceCount, LIBMATTI_MC_Direction_UP);
 
     int k = index >> Z_SHIFT & MASK;
     if (k == 0)
-        faces[(*faceCount)++] = LIBMATTI_MC_Direction_NORTH;
+        add_edge_face_unique(faces, faceCount, LIBMATTI_MC_Direction_NORTH);
     else if (k == 15)
-        faces[(*faceCount)++] = LIBMATTI_MC_Direction_SOUTH;
+        add_edge_face_unique(faces, faceCount, LIBMATTI_MC_Direction_SOUTH);
 }
 
 // Java: private Set<Direction> floodFill(int) - the port fills into a caller
