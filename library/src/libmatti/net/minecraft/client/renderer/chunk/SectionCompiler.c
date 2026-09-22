@@ -14,6 +14,7 @@
 #include "libmatti/net/minecraft/client/renderer/chunk/ModelBlockRenderer.h"
 #include "libmatti/net/minecraft/client/renderer/chunk/SectionBuffers.h"
 #include "libmatti/net/minecraft/client/renderer/chunk/VisGraph.h"
+#include "libmatti/net/minecraft/client/resources/model/QuadCollection.h"
 #include "libmatti/net/minecraft/world/level/block/Block.h"
 #include "libmatti/net/minecraft/world/level/block/state/BlockBehaviour.h"
 #include "libmatti/net/minecraft/world/level/chunk/LevelChunkSection.h"
@@ -70,6 +71,79 @@ static int face_is_visible(const CompileState *state, int blockX, int blockY, in
     return !state_can_occlude(neighbour);
 }
 
+// Java: the vertex packer for a BakedQuad - the model quad's positions are
+// in block-model space (0..1 per element after FaceBakery's /16), the block
+// offset moves it into world space; the UVs rescale from the sprite rect.
+static void emit_baked_quad(CompileState *state, LIBMATTI_B3D_BufferBuilder *builder,
+                            const LIBMATTI_MC_BakedQuad *quad, int blockX, int blockY, int blockZ,
+                            const float spriteUv[4])
+{
+    (void) state;
+    for (int corner = 0; corner < 4; corner++)
+    {
+        float x = quad->pos[corner][0] + (float) blockX;
+        float y = quad->pos[corner][1] + (float) blockY;
+        float z = quad->pos[corner][2] + (float) blockZ;
+        // Java: the model UVs sit in the sprite's 0..1 space; the atlas rect
+        // maps them in (the vanilla quads bake sprite-relative UVs).
+        float u = spriteUv[0] + quad->uv[corner][0] * (spriteUv[2] - spriteUv[0]);
+        float v = spriteUv[1] + quad->uv[corner][1] * (spriteUv[3] - spriteUv[1]);
+        LIBMATTI_B3D_BufferBuilder_AddVertexFull(
+            builder,
+            x, y, z,
+            -1, // Java: the untinted white color
+            u, v,
+            0, quad->shade ? 0 : 0, // Java: the lightmap pass rides on the game port
+            (float) LIBMATTI_MC_Direction_GetStepX(quad->direction),
+            (float) LIBMATTI_MC_Direction_GetStepY(quad->direction),
+            (float) LIBMATTI_MC_Direction_GetStepZ(quad->direction));
+    }
+}
+
+// Java: the baked-model path of ModelBlockRenderer.tesselateBlock - the model
+// quads render with the block offset; the model's UVs are already in atlas
+// space, the sprite rect scales them onto the block's sprite (the demo uses
+// one sprite per block, so the rect is the same for every face).
+static void render_model_quads(CompileState *state, const LIBMATTI_MC_QuadCollection *model,
+                               const LIBMATTI_MC_BlockState *blockState, int blockX, int blockY, int blockZ,
+                               const float spriteUv[4])
+{
+    const LIBMATTI_MC_Block *block = LIBMATTI_MC_BlockState_GetBlock(blockState);
+
+    LIBMATTI_MC_ChunkSectionLayer layer = LIBMATTI_MC_ChunkSectionLayer_SOLID;
+    if (!state_can_occlude(blockState))
+        layer = LIBMATTI_MC_ChunkSectionLayer_CUTOUT;
+
+    LIBMATTI_B3D_BufferBuilder *builder = state->builders[layer];
+    if (builder == NULL)
+    {
+        builder = LIBMATTI_B3D_BufferBuilder_New(
+            LIBMATTI_MC_SectionBufferBuilderPack_Buffer(state->pack, layer),
+            LIBMATTI_B3D_Mode_QUADS, LIBMATTI_B3D_DefaultVertexFormat_BLOCK());
+        state->builders[layer] = builder;
+    }
+    if (builder == NULL)
+        return;
+
+    // Java: getUnculledFaces() first, then every cull bucket whose face passes
+    // the region visibility gate.
+    size_t count = 0;
+    const LIBMATTI_MC_BakedQuad *quads = LIBMATTI_MC_QuadCollection_GetUnculled(model, &count);
+    for (size_t i = 0; i < count; i++)
+        emit_baked_quad(state, builder, &quads[i], blockX, blockY, blockZ, spriteUv);
+
+    for (int d = 0; d < 6; d++)
+    {
+        LIBMATTI_MC_Direction direction = (LIBMATTI_MC_Direction) d;
+        if (!face_is_visible(state, blockX, blockY, blockZ, direction))
+            continue;
+        quads = LIBMATTI_MC_QuadCollection_GetCulled(model, direction, &count);
+        for (size_t i = 0; i < count; i++)
+            emit_baked_quad(state, builder, &quads[i], blockX, blockY, blockZ, spriteUv);
+    }
+    (void) block;
+}
+
 // Java: ModelBlockRenderer.tesselateBlock - one quad per visible face of the
 // default cube. The port writes the BLOCK-format vertices (position, color,
 // uv, light, normal) straight into the layer buffer; the dispatcher uploads.
@@ -100,6 +174,18 @@ static void render_block_faces(CompileState *state, const LIBMATTI_MC_BlockState
     float spriteUv[4] = {0.0f, 0.0f, 1.0f, 1.0f};
     if (state->compiler->spriteRectForBlock != NULL)
         state->compiler->spriteRectForBlock(state->compiler->userdata, block, spriteUv);
+
+    // Java: the baked block-model quads (ModelManager) replace the hardcoded
+    // cube when the block carries a model. The unculled quads + the per-
+    // direction culled buckets map onto the same face-visibility gate.
+    const LIBMATTI_MC_QuadCollection *model = NULL;
+    if (state->compiler->modelForBlock != NULL)
+        model = state->compiler->modelForBlock(state->compiler->userdata, block);
+    if (model != NULL)
+    {
+        render_model_quads(state, model, blockState, blockX, blockY, blockZ, spriteUv);
+        return;
+    }
 
     for (int facing = 0; facing < 6; facing++)
     {
