@@ -25,11 +25,12 @@ jobs:
             const checks = await github.paginate(github.rest.checks.listForRef, {
               owner: context.repo.owner,
               repo: context.repo.repo,
-              ref: github.event.workflow_run.head_sha,
+              ref: wfr.head_sha,
               per_page: 100
             });
             const lines = checks.check_runs.map(c =>
-              `- ${c.conclusion === 'success' ? 'OK ' : 'FAIL'} ${c.name}`);            await github.rest.issues.createComment({
+              `- ${c.conclusion === 'success' ? 'OK ' : 'FAIL'} ${c.name}`);
+            await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: pr.number,
