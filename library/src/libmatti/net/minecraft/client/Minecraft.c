@@ -36,6 +36,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "libmatti/net/minecraft/client/EmbeddedFont.h"
+
 // The theme resource root (see load_font below); every consumer defines it
 // from CMake (client/src does the same for the selftest fixtures).
 #ifndef MATTI_SOURCE_DIR
@@ -446,42 +448,70 @@ static void render_title(LIBMATTI_MC_Minecraft *minecraft, int width, int height
     LIBMATTI_B3D_GlStateManager_DisableBlend();
 }
 
-// Java (Window.java Window ctor / MaterializedTheme): load the theme's "gui"
-// font (the Monocraft.ttf the FML resources carry). The port reads it from the
-// source tree resources (MATTI_SOURCE_DIR, the same mechanism the manifest
-// uses); NULL leaves the title rendering off.
+// Java (Window.java Window ctor / MaterializedTheme): load the theme's
+// "gui" font (the Monocraft.ttf the FML resources carry). The binary embeds
+// the font (release packages do not ship the vendor source tree); the file
+// paths stay as the fallbacks (repo checkout, MATTI_THEME_FONT override).
+// NULL leaves the title rendering off.
 static LIBMATTI_FML_SimpleFont *load_font(void)
 {
+    unsigned char *data = NULL;
+    size_t length = 0;
+
+    // 1) MATTI_THEME_FONT=<path> - the explicit override.
+    const char *override = getenv("MATTI_THEME_FONT");
+    // 2) the repo checkout (dev builds, same path the manifest uses).
     const char *base = MATTI_SOURCE_DIR;
     const char *relative =
         "/vendor/FancyModLoader/earlydisplay/src/main/resources/net/neoforged/fml/earlydisplay/theme/Monocraft.ttf";
+
+    const char *paths[2] = {override, NULL};
     char path[1024];
     snprintf(path, sizeof(path), "%s%s", base, relative);
+    paths[1] = path;
 
-    FILE *file = fopen(path, "rb");
-    if (file == NULL)
+    for (int i = 0; i < 2 && data == NULL; i++)
     {
-        fprintf(stderr, "ERROR: theme font not found: %s\n", path);
-        return NULL;
-    }
-    fseek(file, 0, SEEK_END);
-    long length = ftell(file);
-    fseek(file, 0, SEEK_SET);
-    if (length <= 0)
-    {
+        if (paths[i] == NULL)
+            continue;
+        FILE *file = fopen(paths[i], "rb");
+        if (file == NULL)
+            continue;
+        fseek(file, 0, SEEK_END);
+        long size = ftell(file);
+        fseek(file, 0, SEEK_SET);
+        if (size > 0)
+        {
+            data = malloc((size_t) size);
+            if (fread(data, 1, (size_t) size, file) != (size_t) size)
+            {
+                free(data);
+                data = NULL;
+            }
+            else
+            {
+                length = (size_t) size;
+            }
+        }
         fclose(file);
-        return NULL;
     }
-    unsigned char *data = malloc((size_t) length);
-    if (fread(data, 1, (size_t) length, file) != (size_t) length)
-    {
-        free(data);
-        fclose(file);
-        return NULL;
-    }
-    fclose(file);
 
-    LIBMATTI_FML_SimpleFont *font = LIBMATTI_FML_SimpleFont_New(data, (size_t) length);
+    // 3) the embedded copy - always present.
+    if (data == NULL)
+    {
+        length = LIBMATTI_MC_EmbeddedFont_Monocraft_Size;
+        data = malloc(length);
+        if (data != NULL)
+            memcpy(data, LIBMATTI_MC_EmbeddedFont_Monocraft, length);
+    }
+
+    if (data == NULL)
+    {
+        fprintf(stderr, "ERROR: theme font not available (override, repo path and embedded copy failed)\n");
+        return NULL;
+    }
+
+    LIBMATTI_FML_SimpleFont *font = LIBMATTI_FML_SimpleFont_New(data, length);
     free(data);
     return font;
 }
