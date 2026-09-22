@@ -21,6 +21,7 @@ git submodule update --init --recursive
 | `sponge-mixin/` | Sponge Mixin |
 | `brigadier/`, `DataFixerUpper/`, `fastutil/`, `JOML/`, `netty/`, `night-config/`, `maven/`, `commons-lang/`, `Bus/`, `JarJar/`, `AccessTransformer/` | library references |
 | `stb/` | stb_truetype (the font port binds it like LWJGL does) |
+| `MinecraftC` | Huge help with implementing many features |
 
 The submodules keep their original licenses and are **not** built - the C port
 never links them. Two exceptions the build reads at compile/run time:
