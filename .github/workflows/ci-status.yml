@@ -22,13 +22,14 @@ jobs:
             const wfr = (context.payload && context.payload.workflow_run) || {};
             const pr = (wfr.pull_requests || [])[0];
             if (!pr) { core.notice('No PR associated with this run'); return; }
-            const checks = await github.paginate(github.rest.checks.listForRef, {
+            const pages = await github.paginate(github.rest.checks.listForRef, {
               owner: context.repo.owner,
               repo: context.repo.repo,
               ref: wfr.head_sha,
               per_page: 100
             });
-            const lines = checks.check_runs.map(c =>
+            const runs = pages.flatMap(p => (p && p.check_runs) || []);
+            const lines = runs.map(c =>
               `- ${c.conclusion === 'success' ? 'OK ' : 'FAIL'} ${c.name}`);
             await github.rest.issues.createComment({
               owner: context.repo.owner,
