@@ -17,6 +17,8 @@
 #include "libmatti/net/minecraft/client/renderer/chunk/SectionShader.h"
 #include "libmatti/net/minecraft/client/resources/model/ModelManager.h"
 #include "libmatti/net/minecraft/server/bootstrap/VanillaBlockModels.h"
+#include "libmatti/net/minecraft/server/bootstrap/VanillaBlockTextures.h"
+#include "libmatti/net/minecraft/client/resources/model/SpriteGetter.h"
 #include "libmatti/net/minecraft/client/renderer/chunk/ChunkSectionLayer.h"
 #include "libmatti/net/minecraft/core/BlockPos.h"
 #include "libmatti/net/minecraft/server/bootstrap/VanillaBlocks.h"
@@ -131,6 +133,33 @@ static const LIBMATTI_MC_QuadCollection *model_for_block(void *userdata, const L
     const LIBMATTI_MC_QuadCollection *model = LIBMATTI_MC_ModelManager_GetModel(manager, modelId);
     free(keyString);
     return model;
+}
+
+// Java: the sprite-rect resolver - the block's model sprite rect for the face
+// UVs (the atlas texture "block/<path>").
+static void sprite_rect_for_block(void *userdata, const LIBMATTI_MC_Block *block, float uv[4])
+{
+    LIBMATTI_MC_ModelManager *manager = (LIBMATTI_MC_ModelManager *) userdata;
+    LIBMATTI_MC_TextureAtlas *atlas = LIBMATTI_MC_ModelManager_GetAtlas(manager);
+    if (atlas == NULL)
+        return; // the default full-sprite rect stays.
+    LIBMATTI_MC_ResourceKey *key = LIBMATTI_MC_Block_GetKey(block);
+    if (key == NULL)
+        return;
+    char *keyString = LIBMATTI_MC_ResourceKey_ToString(key);
+    if (keyString == NULL)
+        return;
+    char textureId[128];
+    const char *colon = strchr(keyString, ':');
+    if (colon != NULL)
+        snprintf(textureId, sizeof(textureId), "block/%s", colon + 1);
+    else
+        snprintf(textureId, sizeof(textureId), "block/%s", keyString);
+    char *brace = strchr(textureId, '}');
+    if (brace != NULL)
+        *brace = '\0';
+    LIBMATTI_MC_SpriteGetter_SpriteRect(atlas, textureId, uv);
+    free(keyString);
 }
 
 // Java: public static Minecraft getInstance()
@@ -345,11 +374,12 @@ LIBMATTI_MC_Minecraft *LIBMATTI_MC_Minecraft_New(const LIBMATTI_MC_GameConfig *c
         minecraft->level = level;
         minecraft->sectionDispatcher = LIBMATTI_MC_SectionRenderDispatcher_New();
 
-        // Java: this.modelManager = new ModelManager(atlas) + ModelBakery's
-        // vanilla block model bootstrap - the embedded stone/dirt models bake
-        // against the block atlas (headless-safe: without the atlas the bake
-        // falls back to the missing sprite like the vanilla client does).
-        minecraft->modelManager = LIBMATTI_MC_ModelManager_New(NULL);
+        // Java: the bootstrap order - MODEL_ATLAS (the block textures stitch
+        // first) then ModelBakery (the models bake against it). The atlas is
+        // procedural in the port (VanillaBlockTextures), the models embedded
+        // (VanillaModels) - headless-safe, no resource pack on disk.
+        LIBMATTI_MC_TextureAtlas *blockAtlas = LIBMATTI_MC_VanillaBlockTextures_Bootstrap(1024);
+        minecraft->modelManager = LIBMATTI_MC_ModelManager_New(blockAtlas);
         if (LIBMATTI_MC_VanillaBlockModels_Bootstrap(minecraft->modelManager))
         {
             LIBMATTI_MC_SectionRenderDispatcher_SetModelResolver(
@@ -357,6 +387,10 @@ LIBMATTI_MC_Minecraft *LIBMATTI_MC_Minecraft_New(const LIBMATTI_MC_GameConfig *c
                 (const LIBMATTI_MC_QuadCollection * (*)(void *, const LIBMATTI_MC_Block *))
                     model_for_block,
                 minecraft->modelManager);
+            // Java: the sprite-rect resolver rides on the same atlas - the
+            // compiler maps the block's model sprite for the face UVs.
+            LIBMATTI_MC_SectionRenderDispatcher_SetSpriteResolver(
+                minecraft->sectionDispatcher, sprite_rect_for_block, minecraft->modelManager);
         }
 
         LIBMATTI_MC_SectionRenderDispatcher_CreateSection(minecraft->sectionDispatcher, 0, 4, 0);
@@ -364,10 +398,6 @@ LIBMATTI_MC_Minecraft *LIBMATTI_MC_Minecraft_New(const LIBMATTI_MC_GameConfig *c
 
     return minecraft;
 }
-
-// Java: the ModelManager model lookup the compiler consults per block - the
-// block's registry key path maps onto the model id ("block/<path>").
-static const LIBMATTI_MC_QuadCollection *model_for_block(void *userdata, const LIBMATTI_MC_Block *block);
 
 // Java: public void tick() - the per-tick body; level/entity/screens updates are
 // the game port. The body is the mixable function the example mods hook
@@ -700,6 +730,14 @@ void LIBMATTI_MC_Minecraft_Destroy(LIBMATTI_MC_Minecraft *minecraft)
     {
         LIBMATTI_MC_SectionRenderDispatcher_Free(minecraft->sectionDispatcher);
         minecraft->sectionDispatcher = NULL;
+    }
+
+    // Java: the ModelManager closes with the game (the atlas stays with the
+    // TextureManager path; the port owns it here).
+    if (minecraft->modelManager != NULL)
+    {
+        LIBMATTI_MC_ModelManager_Free(minecraft->modelManager);
+        minecraft->modelManager = NULL;
     }
 
     // Java: public void destroy() { LOGGER.info("Stopping!"); ... }
