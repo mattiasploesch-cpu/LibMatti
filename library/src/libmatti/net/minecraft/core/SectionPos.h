@@ -44,6 +44,8 @@ int64_t LIBMATTI_MC_SectionPos_BlockToSectionLong(int64_t blockPos);
 int64_t LIBMATTI_MC_SectionPos_GetZeroNode(int64_t packed);
 // Java: public static int blockToSectionCoord(int coord)
 int LIBMATTI_MC_SectionPos_BlockToSectionCoord(int coord);
+// Java: public static int sectionToBlockCoord(int coord)
+int LIBMATTI_MC_SectionPos_SectionToBlockCoord(int coord);
 // Java: public static int sectionRelative(int coord)
 int LIBMATTI_MC_SectionPos_SectionRelative(int coord);
 // Java: public static short sectionRelativePos(BlockPos)
@@ -82,6 +84,9 @@ size_t LIBMATTI_MC_SectionPos_BetweenClosedCount(const LIBMATTI_MC_SectionPos *m
 LIBMATTI_MC_SectionPos *LIBMATTI_MC_SectionPos_BetweenClosedGet(const LIBMATTI_MC_SectionPos *min,
                                                                const LIBMATTI_MC_SectionPos *max,
                                                                size_t index);
+
+// Java: the coordinate shifts - the port exposes them as the functions above
+// (blockToSectionCoord / sectionToBlockCoord), like every other helper.
 
 #ifdef __cplusplus
 }
