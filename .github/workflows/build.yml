@@ -30,7 +30,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends \
-            cmake ninja-build gcc gdb zlib1g-dev libglfw3-dev file
+            cmake ninja-build gcc gdb zlib1g-dev libglfw3-dev xvfb file
 
       - name: Configure
         run: cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug
@@ -39,7 +39,7 @@ jobs:
         run: cmake --build build -j "$(nproc)"
 
       - name: Tests
-        run: ctest --test-dir build --output-on-failure
+        run: xvfb-run -a ctest --test-dir build --output-on-failure
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
