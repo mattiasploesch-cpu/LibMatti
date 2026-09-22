@@ -3,7 +3,8 @@ build/
 build-*/
 cmake-build-*/
 mods/build/
-out/
+out/*
+!tests/modscan/out/**
 
 # ---- Build artifacts ---------------------------------------------------
 *.so
