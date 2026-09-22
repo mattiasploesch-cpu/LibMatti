@@ -315,7 +315,7 @@ void LIBMATTI_MC_SectionRenderDispatcher_RenderLayer(
 
     int dbg = getenv("MATTI_CHUNK_DEBUG") != NULL;
     if (dbg)
-        fprintf(stderr, "[CHUNKDEBUG] RenderLayer layer=%d sections=%zu\n", (int) layer, dispatcher->sectionCount);
+        fprintf(stderr, "[CHUNKDEBUG] RenderLayer layer=%d sections=%d\n", (int) layer, dispatcher->sectionCount);
     for (int i = 0; i < dispatcher->sectionCount; i++)
     {
         const LIBMATTI_MC_RenderSection *section = dispatcher->sections[i];
