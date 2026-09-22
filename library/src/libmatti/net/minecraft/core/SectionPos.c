@@ -75,6 +75,12 @@ int LIBMATTI_MC_SectionPos_BlockToSectionCoord(int coord)
     return section_coord(coord);
 }
 
+// Java: public static int sectionToBlockCoord(int coord)
+int LIBMATTI_MC_SectionPos_SectionToBlockCoord(int coord)
+{
+    return coord << LIBMATTI_MC_SectionPos_SECTION_BITS;
+}
+
 int LIBMATTI_MC_SectionPos_SectionRelative(int coord)
 {
     return rel_pos(coord);

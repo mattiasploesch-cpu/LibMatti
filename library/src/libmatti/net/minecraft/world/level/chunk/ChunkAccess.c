@@ -3,6 +3,7 @@
 #include "libmatti/net/minecraft/world/level/chunk/ChunkAccess.h"
 
 #include "libmatti/net/minecraft/core/BlockPos.h"
+#include "libmatti/net/minecraft/core/SectionPos.h"
 #include "libmatti/net/minecraft/server/bootstrap/VanillaBlocks.h"
 #include "libmatti/net/minecraft/world/level/chunk/LevelChunk.h"
 

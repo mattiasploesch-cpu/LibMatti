@@ -2,6 +2,8 @@
 
 #include "libmatti/net/minecraft/world/level/LevelHeightAccessor.h"
 
+#include "libmatti/net/minecraft/core/SectionPos.h"
+
 int LIBMATTI_MC_LevelHeightAccessor_GetMaxY(const LIBMATTI_MC_LevelHeightAccessor *accessor)
 {
     return accessor->minY + accessor->height - 1;

@@ -8,16 +8,17 @@
 #ifndef MATTICRAFT_MC_WORLD_LEVEL_LEVELHEIGHTACCESSOR_H
 #define MATTICRAFT_MC_WORLD_LEVEL_LEVELHEIGHTACCESSOR_H
 
+#include "libmatti/net/minecraft/core/SectionPos.h"
+
 #include <stdbool.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-// Java: SectionPos.blockToSectionCoord(int) = coord >> 4
-#define LIBMATTI_MC_SectionPos_BlockToSectionCoord(coord) ((coord) >> 4)
-// Java: SectionPos.sectionToBlockCoord(int) = coord << 4
-#define LIBMATTI_MC_SectionPos_SectionToBlockCoord(coord) ((coord) << 4)
+// Java: SectionPos.blockToSectionCoord(int) = coord >> 4 and
+// sectionToBlockCoord(int) = coord << 4 - the macros live on SectionPos.h and
+// come with that include (Level.h pulls it through the chunk headers).
 
 // Java: public interface LevelHeightAccessor - the port keeps the two abstract
 // accessors in the struct and implements every default as a free function
