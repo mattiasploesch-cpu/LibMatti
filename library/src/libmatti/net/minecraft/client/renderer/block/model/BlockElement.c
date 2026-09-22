@@ -112,6 +112,25 @@ static int deserialize_faces(const LIBMATTI_GSON_JsonElement *object, LIBMATTI_M
         const LIBMATTI_GSON_JsonElement *tint = LIBMATTI_GSON_JsonElement_GetMember(faceJson, "tintindex");
         if (tint != NULL)
             face->tintIndex = (int) LIBMATTI_GSON_JsonElement_GetAsFloat((LIBMATTI_GSON_JsonElement *) tint);
+        // Java: parseNullDirection(json, "cullface") - a missing/null member
+        // means never culled, a name resolves through Direction.byName.
+        const LIBMATTI_GSON_JsonElement *cull = LIBMATTI_GSON_JsonElement_GetMember(faceJson, "cullface");
+        if (cull != NULL && !LIBMATTI_GSON_JsonElement_IsJsonNull((LIBMATTI_GSON_JsonElement *) cull))
+        {
+            char *cullName = LIBMATTI_GSON_JsonElement_GetAsString((LIBMATTI_GSON_JsonElement *) cull);
+            if (cullName != NULL)
+            {
+                int found = 0;
+                LIBMATTI_MC_Direction cullDirection = LIBMATTI_MC_Direction_ByName(cullName, &found);
+                if (found)
+                {
+                    face->cullForDirection = malloc(sizeof(LIBMATTI_MC_Direction));
+                    if (face->cullForDirection != NULL)
+                        *face->cullForDirection = cullDirection;
+                }
+                free(cullName);
+            }
+        }
         const LIBMATTI_GSON_JsonElement *uvElement = LIBMATTI_GSON_JsonElement_GetMember(faceJson, "uv");
         if (uvElement != NULL && LIBMATTI_GSON_JsonElement_IsJsonArray((LIBMATTI_GSON_JsonElement *) uvElement)
             && LIBMATTI_GSON_JsonElement_ElementCount((LIBMATTI_GSON_JsonElement *) uvElement) == 4)

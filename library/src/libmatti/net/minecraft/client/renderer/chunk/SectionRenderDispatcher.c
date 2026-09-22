@@ -303,23 +303,29 @@ void LIBMATTI_MC_SectionRenderDispatcher_RenderLayer(
         return;
     LIBMATTI_GL_glUseProgram(program);
     // Java: the MVP + model-origin uniforms the terrain shader sets per draw.
-    // Java uploads through JOML's Matrix4f.get(FloatBuffer), which writes
-    // column-major for GL; the port's struct keeps JOML's field order (row
-    // major), so the upload carries the transpose flag (the 2D paths come out
-    // identical either way, the rotated view does not).
+    // JOML's mXY fields are column X, row Y - the C struct memory matches GL's
+    // column-major expectation, so the upload passes transpose = GL_FALSE (the
+    // CPU clip probe places the platform quad at NDC +-0.37, z = 0.983).
     int mvpLocation = LIBMATTI_GL_glGetUniformLocation(program, "mvp");
     int originLocation = LIBMATTI_GL_glGetUniformLocation(program, "origin");
     if (mvpLocation >= 0 && mvpMatrix != NULL)
-        LIBMATTI_GL_glUniformMatrix4fv(mvpLocation, 1, mvpMatrix);
+        LIBMATTI_GL_glUniformMatrix4fv(mvpLocation, 0, mvpMatrix);
     if (originLocation >= 0 && modelOrigin != NULL)
         LIBMATTI_GL_glUniform3f(originLocation, modelOrigin[0], modelOrigin[1], modelOrigin[2]);
 
+    int dbg = getenv("MATTI_CHUNK_DEBUG") != NULL;
+    if (dbg)
+        fprintf(stderr, "[CHUNKDEBUG] RenderLayer layer=%d sections=%d\n", (int) layer, dispatcher->sectionCount);
     for (int i = 0; i < dispatcher->sectionCount; i++)
     {
         const LIBMATTI_MC_RenderSection *section = dispatcher->sections[i];
         const LIBMATTI_MC_CompiledSectionMesh *compiled = section->compiled;
         if (compiled == NULL || !LIBMATTI_MC_CompiledSectionMesh_HasRenderedLayer(compiled, layer))
+        {
+            if (dbg)
+                fprintf(stderr, "[CHUNKDEBUG] section %d: compiled=%p\n", i, (const void *) compiled);
             continue;
+        }
         const LIBMATTI_MC_SectionBuffers *buffers = LIBMATTI_MC_CompiledSectionMesh_GetBuffers(compiled, layer);
         if (buffers == NULL || buffers->vertexBuffer == NULL || buffers->indexCount <= 0)
             continue;
@@ -328,16 +334,20 @@ void LIBMATTI_MC_SectionRenderDispatcher_RenderLayer(
         if (getenv("MATTI_CHUNK_DEBUG") != NULL)
         {
             fprintf(stderr, "[CHUNKDEBUG] section %d: vao=%u vbo=%u ibo=%u indexCount=%d\n",
-                    i, vao->vao, vao->vbo, vao->ibo, buffers->indexCount);
+                    i, vao->vao, vao->vbo, buffers->vertexBuffer->handle, buffers->indexCount);
         }
-        if (vao->vao == 0 && buffers->vertexBuffer->handle != 0)
+        // The compile pass allocates fresh GpuBuffers per rebuild (Java: the
+        // RenderSection's buffers swap), so the layer VAO must rebind whenever
+        // the current mesh's handles differ from the ones it was built with.
+        if (buffers->vertexBuffer->handle != 0
+            && (vao->vao == 0 || vao->vbo != buffers->vertexBuffer->handle))
         {
             vao->vbo = buffers->vertexBuffer->handle;
             if (buffers->indexBuffer != NULL)
             {
                 vao->ibo = buffers->indexBuffer->handle;
             }
-            else
+            else if (vao->ibo == 0)
             {
                 // Java: the render pass owns the element indices - the port
                 // allocates the shared IBO for the generated quad indices.
@@ -345,7 +355,10 @@ void LIBMATTI_MC_SectionRenderDispatcher_RenderLayer(
                 LIBMATTI_GL_glGenBuffers(1, ibos);
                 vao->ibo = ibos[0];
             }
+            if (vao->vao != 0)
+                LIBMATTI_GL_glDeleteVertexArrays(1, &vao->vao);
             vao->vao = create_block_vao(vao->vbo, vao->ibo);
+            vao->indexDataBytes = 0; // the new IBO starts empty
         }
         if (vao->vao == 0 || vao->ibo == 0)
             continue; // no GL context (headless): nothing to draw through.
@@ -361,6 +374,8 @@ void LIBMATTI_MC_SectionRenderDispatcher_RenderLayer(
                                                                                : LIBMATTI_GL_GL_UNSIGNED_INT,
             NULL);
         LIBMATTI_GL_glBindVertexArray(0);
+        if (dbg)
+            fprintf(stderr, "[CHUNKDEBUG] drew section %d count=%d\n", i, buffers->indexCount);
     }
     LIBMATTI_GL_glUseProgram(0);
 }
