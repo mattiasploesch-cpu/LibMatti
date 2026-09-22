@@ -23,6 +23,8 @@ jobs:
         os: [ubuntu-latest]
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: recursive
 
       - name: Install dependencies
         run: |
@@ -56,6 +58,8 @@ jobs:
     needs: build
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: recursive
 
       - name: Install dependencies
         run: |
@@ -86,6 +90,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: recursive
 
       - name: Install clang-format
         run: |
