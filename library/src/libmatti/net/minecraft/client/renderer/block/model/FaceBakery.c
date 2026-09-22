@@ -91,8 +91,9 @@ static float extent_select(FaceExtent extent, const float from[3], const float t
 // (unused placeholder removed - extent_select drives every axis directly)
 
 // Java: static BlockElementFace.UVs defaultFaceUV(Vector3fc, Vector3fc, Direction)
-void LIBMATTI_MC_FaceBakery_DefaultFaceUV(const float from[3], const float to[3], LIBMATTI_MC_Direction direction,
-                                          LIBMATTI_MC_BlockElementFace_UVs *out)
+void LIBMATTI_MC_FaceBakery_DefaultFaceUVModelSpace(const float from[3], const float to[3],
+                                                    LIBMATTI_MC_Direction direction,
+                                                    LIBMATTI_MC_BlockElementFace_UVs *out)
 {
     switch (direction)
     {
@@ -283,7 +284,7 @@ void LIBMATTI_MC_FaceBakery_BakeQuad(const float from[3], const float to[3],
     if (face->uvsPresent)
         uvs = face->uvs;
     else
-        LIBMATTI_MC_FaceBakery_DefaultFaceUV(from, to, direction, &uvs);
+        LIBMATTI_MC_FaceBakery_DefaultFaceUVModelSpace(from, to, direction, &uvs);
 
     const FaceVertexInfo *row = FACE_INFO[direction];
     for (int i = 0; i < 4; i++)

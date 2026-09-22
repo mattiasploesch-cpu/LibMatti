@@ -77,6 +77,13 @@ void LIBMATTI_MC_SectionRenderDispatcher_SetSpriteResolver(
     void (*spriteRectForBlock)(void *userdata, const struct LIBMATTI_MC_Block *block, float uv[4]),
     void *userdata);
 
+// Java: the block-model resolver (ModelManager) - the compiler renders the
+// baked model quads when the block carries one.
+void LIBMATTI_MC_SectionRenderDispatcher_SetModelResolver(
+    LIBMATTI_MC_SectionRenderDispatcher *dispatcher,
+    const struct LIBMATTI_MC_QuadCollection *(*modelForBlock)(void *userdata, const struct LIBMATTI_MC_Block *block),
+    void *userdata);
+
 // Java: the section registry (createRenderSection on the level renderer).
 LIBMATTI_MC_RenderSection *LIBMATTI_MC_SectionRenderDispatcher_CreateSection(
     LIBMATTI_MC_SectionRenderDispatcher *dispatcher, int sectionX, int sectionY, int sectionZ);

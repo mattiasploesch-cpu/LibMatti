@@ -30,8 +30,11 @@ typedef struct LIBMATTI_MC_BakedQuad
 
 // Java: static BlockElementFace.UVs defaultFaceUV(Vector3fc from, Vector3fc to, Direction) -
 // the per-direction UV derivation over the 0..16 model space.
-void LIBMATTI_MC_FaceBakery_DefaultFaceUV(const float from[3], const float to[3], LIBMATTI_MC_Direction direction,
-                                          LIBMATTI_MC_BlockElementFace_UVs *out);
+// (named with the FaceBakery_ prefix plus the FaceBakery model-space suffix -
+// the chunk renderer keeps its own corner-table variant)
+void LIBMATTI_MC_FaceBakery_DefaultFaceUVModelSpace(const float from[3], const float to[3],
+                                                    LIBMATTI_MC_Direction direction,
+                                                    LIBMATTI_MC_BlockElementFace_UVs *out);
 
 // Java: public static BakedQuad bakeQuad(Vector3fc from, Vector3fc to, BlockElementFace,
 //           sprite getter context, Direction, ModelState, @Nullable BlockElementRotation,
