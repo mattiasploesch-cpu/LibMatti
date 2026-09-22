@@ -84,6 +84,8 @@ static void *p_glGetUniformLocation = NULL;
 static void *p_glUniform1i = NULL;
 static void *p_glUniform2f = NULL;
 static void *p_glUniform4f = NULL;
+static void *p_glUniform3f = NULL;
+static void *p_glUniformMatrix4fv = NULL;
 static void *p_glBindAttribLocation = NULL;
 static void *p_glEnableVertexAttribArray = NULL;
 static void *p_glVertexAttribPointer = NULL;
@@ -95,6 +97,10 @@ static void *p_glGenFramebuffers = NULL;
 static void *p_glDeleteFramebuffers = NULL;
 static void *p_glBindFramebuffer = NULL;
 static void *p_glFramebufferTexture2D = NULL;
+static void *p_glGenRenderbuffers = NULL;
+static void *p_glBindRenderbuffer = NULL;
+static void *p_glRenderbufferStorage = NULL;
+static void *p_glFramebufferRenderbuffer = NULL;
 static void *p_glCheckFramebufferStatus = NULL;
 static void *p_glBlitFramebuffer = NULL;
 static void *p_glGenTextures = NULL;
@@ -252,6 +258,8 @@ int LIBMATTI_GL_Load(void)
     GL_PROC(glUniform1i, "glUniform1i");
     GL_PROC(glUniform2f, "glUniform2f");
     GL_PROC(glUniform4f, "glUniform4f");
+    GL_PROC(glUniform3f, "glUniform3f");
+    GL_PROC(glUniformMatrix4fv, "glUniformMatrix4fv");
     GL_PROC(glBindAttribLocation, "glBindAttribLocation");
     GL_PROC(glEnableVertexAttribArray, "glEnableVertexAttribArray");
     GL_PROC(glVertexAttribPointer, "glVertexAttribPointer");
@@ -263,6 +271,10 @@ int LIBMATTI_GL_Load(void)
     GL_PROC(glDeleteFramebuffers, "glDeleteFramebuffers");
     GL_PROC(glBindFramebuffer, "glBindFramebuffer");
     GL_PROC(glFramebufferTexture2D, "glFramebufferTexture2D");
+    GL_PROC(glGenRenderbuffers, "glGenRenderbuffers");
+    GL_PROC(glBindRenderbuffer, "glBindRenderbuffer");
+    GL_PROC(glRenderbufferStorage, "glRenderbufferStorage");
+    GL_PROC(glFramebufferRenderbuffer, "glFramebufferRenderbuffer");
     GL_PROC(glCheckFramebufferStatus, "glCheckFramebufferStatus");
     GL_PROC(glBlitFramebuffer, "glBlitFramebuffer");
     GL_PROC(glGenTextures, "glGenTextures");
@@ -713,6 +725,18 @@ void LIBMATTI_GL_glUniform2f(int location, float v0, float v1)
     if (fn != NULL) fn(location, v0, v1);
 }
 
+void LIBMATTI_GL_glUniform3f(int location, float v0, float v1, float v2)
+{
+    void (*fn)(int, float, float, float) = (void (*)(int, float, float, float)) p_glUniform3f;
+    if (fn != NULL) fn(location, v0, v1, v2);
+}
+
+void LIBMATTI_GL_glUniformMatrix4fv(int location, int transpose, const float *value)
+{
+    void (*fn)(int, int, int, const float *) = (void (*)(int, int, int, const float *)) p_glUniformMatrix4fv;
+    if (fn != NULL) fn(location, transpose, 1, value);
+}
+
 int LIBMATTI_GL_glGetShaderiv(unsigned int shader, unsigned int pname)
 {
     int value = 0;
@@ -806,6 +830,33 @@ void LIBMATTI_GL_glFramebufferTexture2D(unsigned int target, unsigned int attach
     void (*fn)(unsigned int, unsigned int, unsigned int, unsigned int, int) =
         (void (*)(unsigned int, unsigned int, unsigned int, unsigned int, int)) p_glFramebufferTexture2D;
     if (fn != NULL) fn(target, attachment, textarget, texture, level);
+}
+
+void LIBMATTI_GL_glGenRenderbuffers(int n, unsigned int *renderbuffers)
+{
+    void (*fn)(int, unsigned int *) = (void (*)(int, unsigned int *)) p_glGenRenderbuffers;
+    if (fn != NULL) fn(n, renderbuffers);
+}
+
+void LIBMATTI_GL_glBindRenderbuffer(unsigned int target, unsigned int renderbuffer)
+{
+    void (*fn)(unsigned int, unsigned int) = (void (*)(unsigned int, unsigned int)) p_glBindRenderbuffer;
+    if (fn != NULL) fn(target, renderbuffer);
+}
+
+void LIBMATTI_GL_glRenderbufferStorage(unsigned int target, unsigned int internalformat, int width, int height)
+{
+    void (*fn)(unsigned int, unsigned int, int, int) =
+        (void (*)(unsigned int, unsigned int, int, int)) p_glRenderbufferStorage;
+    if (fn != NULL) fn(target, internalformat, width, height);
+}
+
+void LIBMATTI_GL_glFramebufferRenderbuffer(unsigned int target, unsigned int attachment,
+                                           unsigned int renderbuffertarget, unsigned int renderbuffer)
+{
+    void (*fn)(unsigned int, unsigned int, unsigned int, unsigned int) =
+        (void (*)(unsigned int, unsigned int, unsigned int, unsigned int)) p_glFramebufferRenderbuffer;
+    if (fn != NULL) fn(target, attachment, renderbuffertarget, renderbuffer);
 }
 
 unsigned int LIBMATTI_GL_glCheckFramebufferStatus(unsigned int target)
