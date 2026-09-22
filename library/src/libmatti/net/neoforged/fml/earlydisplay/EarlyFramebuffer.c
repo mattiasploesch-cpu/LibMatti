@@ -23,9 +23,34 @@ struct LIBMATTI_FML_EarlyFramebuffer
 {
     unsigned int framebuffer;
     unsigned int texture;
+    // The depth renderbuffer the 3D passes (the section meshes) need: the
+    // Java earlydisplay renders 2D only, but the framebuffer stays a complete
+    // GL target once the game draws its depth-tested geometry into it.
+    unsigned int depthRenderbuffer;
     int width;
     int height;
 };
+
+// Java: the constructor's texture setup - the port adds the depth renderbuffer
+// attach the depth-tested draws require (glClear(GL_DEPTH_BUFFER_BIT) without
+// an attachment discards every depth-tested fragment).
+static void attach_storage(LIBMATTI_FML_EarlyFramebuffer *fb)
+{
+    LIBMATTI_B3D_GlStateManager_BindTexture((int) fb->texture);
+    LIBMATTI_GL_glTexImage2D(LIBMATTI_GL_GL_TEXTURE_2D, 0, LIBMATTI_GL_GL_RGBA, fb->width, fb->height, 0,
+                             LIBMATTI_GL_GL_RGBA, LIBMATTI_GL_GL_UNSIGNED_BYTE, NULL);
+    LIBMATTI_GL_glBindRenderbuffer(LIBMATTI_GL_GL_RENDERBUFFER, fb->depthRenderbuffer);
+    LIBMATTI_GL_glRenderbufferStorage(LIBMATTI_GL_GL_RENDERBUFFER, LIBMATTI_GL_GL_DEPTH_COMPONENT24,
+                                      fb->width, fb->height);
+    LIBMATTI_GL_glBindRenderbuffer(LIBMATTI_GL_GL_RENDERBUFFER, 0);
+    LIBMATTI_B3D_GlStateManager_BindFramebuffer(LIBMATTI_GL_GL_FRAMEBUFFER, fb->framebuffer);
+    LIBMATTI_B3D_GlStateManager_BindTexture((int) fb->texture);
+    LIBMATTI_GL_glFramebufferTexture2D(LIBMATTI_GL_GL_FRAMEBUFFER, LIBMATTI_GL_GL_COLOR_ATTACHMENT0,
+                                       LIBMATTI_GL_GL_TEXTURE_2D, fb->texture, 0);
+    LIBMATTI_GL_glFramebufferRenderbuffer(LIBMATTI_GL_GL_FRAMEBUFFER, LIBMATTI_GL_GL_DEPTH_ATTACHMENT,
+                                          LIBMATTI_GL_GL_RENDERBUFFER, fb->depthRenderbuffer);
+    LIBMATTI_B3D_GlStateManager_BindFramebuffer(LIBMATTI_GL_GL_FRAMEBUFFER, 0);
+}
 
 // Java: new EarlyFramebuffer(width, height) - the constructor body
 LIBMATTI_FML_EarlyFramebuffer *LIBMATTI_FML_EarlyFramebuffer_New(int width, int height)
@@ -34,18 +59,12 @@ LIBMATTI_FML_EarlyFramebuffer *LIBMATTI_FML_EarlyFramebuffer_New(int width, int 
     fb->width = width;
     fb->height = height;
     fb->framebuffer = (unsigned int) LIBMATTI_B3D_GlStateManager_GenFramebuffers();
+    fb->depthRenderbuffer = 0;
+    LIBMATTI_GL_glGenRenderbuffers(1, &fb->depthRenderbuffer);
     fb->texture = 0;
     LIBMATTI_GL_glGenTextures(1, &fb->texture);
 
-    LIBMATTI_B3D_GlStateManager_BindFramebuffer(LIBMATTI_GL_GL_FRAMEBUFFER, fb->framebuffer);
-    LIBMATTI_B3D_GlStateManager_BindTexture((int) fb->texture);
-    LIBMATTI_GL_glTexImage2D(LIBMATTI_GL_GL_TEXTURE_2D, 0, LIBMATTI_GL_GL_RGBA, width, height, 0,
-                             LIBMATTI_GL_GL_RGBA, LIBMATTI_GL_GL_UNSIGNED_BYTE, NULL);
-    LIBMATTI_GL_glTexParameteri(LIBMATTI_GL_GL_TEXTURE_2D, LIBMATTI_GL_GL_TEXTURE_MIN_FILTER, LIBMATTI_GL_GL_NEAREST);
-    LIBMATTI_GL_glTexParameteri(LIBMATTI_GL_GL_TEXTURE_2D, LIBMATTI_GL_GL_TEXTURE_MAG_FILTER, LIBMATTI_GL_GL_NEAREST);
-    LIBMATTI_GL_glFramebufferTexture2D(LIBMATTI_GL_GL_FRAMEBUFFER, LIBMATTI_GL_GL_COLOR_ATTACHMENT0,
-                                       LIBMATTI_GL_GL_TEXTURE_2D, fb->texture, 0);
-    LIBMATTI_B3D_GlStateManager_BindFramebuffer(LIBMATTI_GL_GL_FRAMEBUFFER, 0);
+    attach_storage(fb);
     return fb;
 }
 
@@ -54,12 +73,9 @@ void LIBMATTI_FML_EarlyFramebuffer_Resize(LIBMATTI_FML_EarlyFramebuffer *fb, int
 {
     if (fb->width != width || fb->height != height)
     {
-        LIBMATTI_B3D_GlStateManager_BindFramebuffer(LIBMATTI_GL_GL_FRAMEBUFFER, fb->framebuffer);
-        LIBMATTI_B3D_GlStateManager_BindTexture((int) fb->texture);
         fb->width = width;
         fb->height = height;
-        LIBMATTI_GL_glTexImage2D(LIBMATTI_GL_GL_TEXTURE_2D, 0, LIBMATTI_GL_GL_RGBA, width, height, 0,
-                                 LIBMATTI_GL_GL_RGBA, LIBMATTI_GL_GL_UNSIGNED_BYTE, NULL);
+        attach_storage(fb);
     }
 }
 

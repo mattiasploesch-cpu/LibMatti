@@ -94,6 +94,9 @@ void LIBMATTI_GL_glUniform1i(int location, int v0);
 // Java: GL20.glUniform2f(int, float, float) / GL20.glUniform4f(int, float, float, float, float)
 void LIBMATTI_GL_glUniform2f(int location, float v0, float v1);
 void LIBMATTI_GL_glUniform4f(int location, float v0, float v1, float v2, float v3);
+// Java: GL20.glUniform3f / GL20.glUniformMatrix4fv (the terrain uniforms).
+void LIBMATTI_GL_glUniform3f(int location, float v0, float v1, float v2);
+void LIBMATTI_GL_glUniformMatrix4fv(int location, int transpose, const float *value);
 void LIBMATTI_GL_glBindAttribLocation(unsigned int program, unsigned int index, const char *name);
 void LIBMATTI_GL_glEnableVertexAttribArray(unsigned int index);
 void LIBMATTI_GL_glVertexAttribPointer(unsigned int index, int size, unsigned int type, unsigned char normalized, int stride, const void *pointer);
@@ -106,6 +109,13 @@ void LIBMATTI_GL_glGenFramebuffers(int n, unsigned int *framebuffers);
 void LIBMATTI_GL_glDeleteFramebuffers(int n, const unsigned int *framebuffers);
 void LIBMATTI_GL_glBindFramebuffer(unsigned int target, unsigned int framebuffer);
 void LIBMATTI_GL_glFramebufferTexture2D(unsigned int target, unsigned int attachment, unsigned int textarget, unsigned int texture, int level);
+// Java: GL30.glGenRenderbuffers / glBindRenderbuffer / glRenderbufferStorage /
+// glFramebufferRenderbuffer (the depth attachment the FBO needs).
+void LIBMATTI_GL_glGenRenderbuffers(int n, unsigned int *renderbuffers);
+void LIBMATTI_GL_glBindRenderbuffer(unsigned int target, unsigned int renderbuffer);
+void LIBMATTI_GL_glRenderbufferStorage(unsigned int target, unsigned int internalformat, int width, int height);
+void LIBMATTI_GL_glFramebufferRenderbuffer(unsigned int target, unsigned int attachment,
+                                           unsigned int renderbuffertarget, unsigned int renderbuffer);
 unsigned int LIBMATTI_GL_glCheckFramebufferStatus(unsigned int target);
 void LIBMATTI_GL_glBlitFramebuffer(int srcX0, int srcY0, int srcX1, int srcY1, int dstX0, int dstY0, int dstX1, int dstY1, unsigned int mask, unsigned int filter);
 void LIBMATTI_GL_glGenTextures(int n, unsigned int *textures);

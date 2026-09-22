@@ -30,6 +30,13 @@ LIBMATTI_MC_SectionBuffers *LIBMATTI_MC_SectionBuffers_New(LIBMATTI_B3D_GpuBuffe
 // Java: public void close() - frees both buffers.
 void LIBMATTI_MC_SectionBuffers_Free(LIBMATTI_MC_SectionBuffers *buffers);
 
+// Java: the upload step in SectionRenderDispatcher.uploadSection - the vertex
+// and index data go into the pair's stores through the GlStateManager layer.
+// indexData may be NULL (vertex-data-only layer).
+void LIBMATTI_MC_SectionBuffers_Upload(LIBMATTI_MC_SectionBuffers *buffers,
+                                       const void *vertexData, long vertexSize,
+                                       const void *indexData, long indexSize);
+
 // The getters/setters (Java: getVertexBuffer, setIndexBuffer, getIndexCount, ...).
 LIBMATTI_B3D_GpuBuffer *LIBMATTI_MC_SectionBuffers_GetVertexBuffer(const LIBMATTI_MC_SectionBuffers *buffers);
 LIBMATTI_B3D_GpuBuffer *LIBMATTI_MC_SectionBuffers_GetIndexBuffer(const LIBMATTI_MC_SectionBuffers *buffers);
