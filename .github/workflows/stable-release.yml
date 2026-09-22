@@ -1,0 +1,280 @@
+name: Stable Release
+
+# Manual stable release. Produces, for one tagged commit:
+#   - Matticraft-x86_64.AppImage  (the game, double-click / --appimage-extract)
+#   - matticraft-portable-linux-x64.zip (unpack anywhere, ./run-matticraft.sh)
+#   - libmatti-dev-linux-x64.tar.gz    (the library, headers, CMake config for mod devs)
+#   - the demo mods as .matti packages
+#   - SHA256SUMS for every artifact
+# and attaches a changelog generated from the commits since the last tag.
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version (e.g. 1.21.11-r1). Used for the tag, the AppImage name and the changelog.'
+        required: true
+        default: '1.21.11-r1'
+      prerelease:
+        description: 'Mark as pre-release'
+        type: boolean
+        required: false
+        default: false
+      skip_tests:
+        description: 'Skip the ctest gate before packaging'
+        type: boolean
+        required: false
+        default: false
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Build & publish stable release
+    runs-on: ubuntu-latest
+    env:
+      VERSION: ${{ inputs.version }}
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          submodules: recursive
+          fetch-depth: 0   # full history for the changelog
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            cmake ninja-build gcc zlib1g-dev libglfw3-dev file \
+            libfuse2 patchelf zip
+
+      # ------------------------------------------------------------------
+      # Build (Release)
+      # ------------------------------------------------------------------
+      - name: Configure (Release)
+        run: cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build everything
+        run: cmake --build build -j "$(nproc)"
+
+      - name: Tests
+        if: ${{ inputs.skip_tests != true }}
+        run: ctest --test-dir build --output-on-failure
+
+      # ------------------------------------------------------------------
+      # Staging - the portable layout both the zip and the AppImage use
+      # ------------------------------------------------------------------
+      #   Matticraft.AppDir/
+      #     matticraft          <- single binary: client + whole libmatti archive
+      #     run-matticraft.sh   <- launcher (game dir next to the binary)
+      #     README.txt          <- what this is, how to start it
+      #     mods/               <- empty; drop your .matti/.so mods here
+      #     .env                <- LD_LIBRARY_PATH export for the AppRun
+      #     usr/bin/matticraft  <- AppImage convention copy
+      #     matticraft.desktop  <- menu entry (the loading window icon comes
+      #                            from the FML theme, not a file - hence no
+      #                            separate icon asset)
+      - name: Stage portable layout
+        run: |
+          mkdir -p staging/Matticraft.AppDir/usr/bin \
+                   staging/Matticraft.AppDir/mods \
+                   staging/dev
+
+          # The single binary: the client executable with the whole static
+          # libmatti archive linked in (WHOLE_ARCHIVE - mods resolve their
+          # libmatti symbols against the host process at load time).
+          cp build/client/matticraft staging/Matticraft.AppDir/matticraft
+          cp build/client/matticraft staging/Matticraft.AppDir/usr/bin/matticraft
+          chmod +x staging/Matticraft.AppDir/matticraft staging/Matticraft.AppDir/usr/bin/matticraft
+
+          # Launcher: sets the game dir next to the binary, portable.
+          cat > staging/Matticraft.AppDir/run-matticraft.sh <<'EOF'
+          #!/bin/sh
+          # Portable launcher - runs the game with the game directory set to
+          # the folder this AppDir/package lives in.
+          DIR="$(cd "$(dirname "$0")" && pwd)"
+          exec "$DIR/matticraft" --launchTarget neoforge --gameDir "$DIR" "$@"
+          EOF
+          chmod +x staging/Matticraft.AppDir/run-matticraft.sh
+
+          # AppRun: the AppImage entry point.
+          cat > staging/Matticraft.AppDir/AppRun <<'EOF'
+          #!/bin/sh
+          # AppImage AppRun: exec the game from the mounted AppDir.
+          HERE="$(cd "$(dirname "$0")" && pwd)"
+          exec "$HERE/usr/bin/matticraft" "$@"
+          EOF
+          chmod +x staging/Matticraft.AppDir/AppRun
+
+          # Desktop entry.
+          cat > staging/Matticraft.AppDir/matticraft.desktop <<EOF
+          [Desktop Entry]
+          Type=Application
+          Name=Matticraft
+          Comment=A from-scratch C port of the Minecraft + NeoForge toolchain
+          Exec=matticraft
+          Icon=matticraft
+          Categories=Game;
+          Terminal=true
+          EOF
+
+          # A minimal icon: linuxdeploy rejects AppDirs without one. 64x64
+          # red square PNG (the theme's background colour) as a placeholder
+          # until the game ships a real icon asset.
+          python3 - <<'PYEOF'
+          import struct, zlib
+          w = h = 64
+          rows = b''.join(b'\x00' + b'\xef\x32\x3d' * w for _ in range(h))
+          def chunk(tag, data):
+              c = tag + data
+              return struct.pack('>I', len(data)) + c + struct.pack('>I', zlib.crc32(c))
+          png = (b'\x89PNG\r\n\x1a\n'
+                 + chunk(b'IHDR', struct.pack('>IIBBBBB', w, h, 8, 2, 0, 0, 0))
+                 + chunk(b'IDAT', zlib.compress(rows))
+                 + chunk(b'IEND', b''))
+          open('staging/Matticraft.AppDir/matticraft.png', 'wb').write(png)
+          open('staging/matticraft.png', 'wb').write(png)
+          PYEOF
+
+          # README for both packages.
+          cat > staging/Matticraft.AppDir/README.txt <<EOF
+          Matticraft ${VERSION}
+          =========
+
+          A from-scratch C port of the Minecraft 1.21.11 + NeoForge toolchain
+          (libmatti). This binary is self-contained: the whole libmatti
+          library is linked into the client executable - no external
+          library install needed beyond OpenGL/GLFW system drivers.
+
+          Start it:
+            ./run-matticraft.sh
+          or directly:
+            ./matticraft --launchTarget neoforge --gameDir .
+
+          Mods:
+            Drop *.matti (or plain *.so) mod packages into ./mods
+            and restart.
+
+          The unpacked AppImage: ./Matticraft.AppDir/run-matticraft.sh
+          EOF
+          cp staging/Matticraft.AppDir/README.txt staging/README.txt
+
+      # ------------------------------------------------------------------
+      # AppImage
+      # ------------------------------------------------------------------
+      - name: Build AppImage
+        run: |
+          cd staging
+          wget -q https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage
+          chmod +x linuxdeploy-x86_64.AppImage
+          # --appimage-extract-and-run: the CI runner has no FUSE mount.
+          ./linuxdeploy-x86_64.AppImage --appimage-extract-and-run \
+            --appdir Matticraft.AppDir \
+            --desktop-file Matticraft.AppDir/matticraft.desktop \
+            --icon-file matticraft.png --icon-filename matticraft \
+            --output appimage
+          mv Matticraft-*.AppImage "../Matticraft-${VERSION}-x86_64.AppImage"
+          cd ..
+
+      # ------------------------------------------------------------------
+      # Portable zip - unpack and run, the "most wanted" second place
+      # ------------------------------------------------------------------
+      - name: Pack portable zip
+        run: |
+          mkdir -p dist pkg/Matticraft-${VERSION}
+          cp -r staging/Matticraft.AppDir/. pkg/Matticraft-${VERSION}/
+          # The AppDir-internal AppRun/desktop/icon are AppImage plumbing;
+          # the zip package just ships the game folder.
+          rm -f pkg/Matticraft-${VERSION}/AppRun pkg/Matticraft-${VERSION}/*.desktop
+          zip -qr "dist/Matticraft-${VERSION}-portable-linux-x64.zip" pkg/Matticraft-${VERSION}
+
+      # ------------------------------------------------------------------
+      # Dev SDK: the static library + headers + CMake config for mod devs
+      # ------------------------------------------------------------------
+      - name: Pack dev SDK
+        run: |
+          DEV=staging/dev/libmatti-dev
+          mkdir -p "$DEV/lib" "$DEV/include"
+          cp build/library/libmatti.a "$DEV/lib/"
+          cp -r library/src/libmatti "$DEV/include/libmatti"
+          find "$DEV/include" -name '*.c' -delete
+          cat > "$DEV/libmatti-config.cmake" <<EOF
+          # Point mod projects at the extracted SDK root via MATTI_SDK_DIR.
+          set(MATTI_SDK_DIR "\${CMAKE_CURRENT_LIST_DIR}")
+          EOF
+          tar -czf "dist/libmatti-dev-linux-x64.tar.gz" -C staging/dev libmatti-dev
+
+      # ------------------------------------------------------------------
+      # Demo mods (.matti)
+      # ------------------------------------------------------------------
+      - name: Pack demo mods
+        run: |
+          mkdir -p dist/mods
+          for so in mods/*.so; do
+            [ -f "$so" ] || continue
+            base="$(basename "$so" .so)"
+            mod_id="${base%-*}"
+            version="${base##*-}"
+            ./tools/matti-pack.sh "$so" "dist/mods/${base}.matti" "$mod_id" "$version"
+          done
+
+      # ------------------------------------------------------------------
+      # Changelog - commits since the last tag (or the first 200 for the
+      # first release)
+      # ------------------------------------------------------------------
+      - name: Generate changelog
+        run: |
+          git fetch --tags --force
+          LAST_TAG="$(git describe --tags --abbrev=0 2>/dev/null || true)"
+          if [ -n "$LAST_TAG" ]; then
+            RANGE="${LAST_TAG}..${GITHUB_SHA}"
+            HEADER="Changes since ${LAST_TAG}"
+          else
+            RANGE="${GITHUB_SHA} -200"
+            HEADER="First release - full history (last 200 commits)"
+          fi
+          {
+            echo "# Matticraft ${VERSION}"
+            echo
+            echo "$HEADER"
+            echo
+            git log --pretty=format:'- %h %s (%an)' --no-merges $RANGE
+          } > CHANGELOG-${VERSION}.md
+          cat CHANGELOG-${VERSION}.md
+
+      # ------------------------------------------------------------------
+      # Checksums
+      # ------------------------------------------------------------------
+      - name: Generate SHA256SUMS
+        run: |
+          cd dist
+          find . -type f ! -name SHA256SUMS -print0 \
+            | sort -z | xargs -0 sha256sum > SHA256SUMS
+          cd ..
+
+      # ------------------------------------------------------------------
+      # Release
+      # ------------------------------------------------------------------
+      - name: Tag release
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag -f "v${VERSION}" "$GITHUB_SHA"
+          git push origin "v${VERSION}"
+
+      - name: Create release
+        uses: softprops/action-gh-release@v3
+        with:
+          tag_name: v${{ inputs.version }}
+          name: Matticraft ${{ inputs.version }}
+          body_path: CHANGELOG-${{ inputs.version }}.md
+          draft: false
+          prerelease: ${{ inputs.prerelease }}
+          files: |
+            Matticraft-${{ inputs.version }}-x86_64.AppImage
+            dist/Matticraft-${{ inputs.version }}-portable-linux-x64.zip
+            dist/libmatti-dev-linux-x64.tar.gz
+            dist/mods/*
+            dist/SHA256SUMS
+            CHANGELOG-${{ inputs.version }}.md
