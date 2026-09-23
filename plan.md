@@ -1,7 +1,7 @@
 # Plan: Minecraft-Port (net.minecraft.*) in Phasen
 
 > **Status-Marker:** ✅ fertig · 🟨 teilweise · ⬜ offen
-> Stand: 23.09.2026 — Build grün, ctest 21/21, `runClient` bootet FML vollständig (Mods, Configs, Mixins, Registries, Vanilla-Bootstrap), rendert die Welt-Ladeansicht mit Titel, Progress-Bar und gebackenem Terrain und cullt Sections per Frustum (Camera + FrustumIntersection 1:1 JOML); Stable-Release-Pipeline (AppImage, Portable-Zip, Dev-SDK) per `workflow_dispatch` verfügbar.
+> Stand: 23.09.2026 — Build grün, ctest 22/22, `runClient` bootet FML vollständig (Mods, Configs, Mixins, Registries, Vanilla-Bootstrap), rendert die Welt-Ladeansicht mit Titel, Progress-Bar und gebackenem Terrain, cullt Sections per Frustum (Camera + FrustumIntersection 1:1 JOML) und rendert über den BlockRenderDispatcher mit AO + Tinting; Stable-Release-Pipeline (AppImage, Portable-Zip, Dev-SDK) per `workflow_dispatch` verfügbar.
 > Dieser Plan ist die bereinigte Übersicht; inhaltlich wurde nichts umgeschrieben, nur der Fortschritt markiert.
 
 **Orientierung:** unten nach oben bauen — jede Phase hat ein sichtbares Ziel in `runClient`, damit du immer was siehst.
@@ -85,7 +85,7 @@ Vor P0 fertig (frühere Meilensteine, nicht Teil des Plans):
 | 1  | Chunk-Meshing (ChunkRenderDispatcher, Section-Builder, BlockModel→Mesh)    | ✅     | SectionRenderDispatcher/-Region/-Section, SectionCompiler + VisGraph + VisibilitySet (6-Bit Face-Cull), SectionBufferBuilderPack, SectionBuffers + GpuBuffer-Upload, SectionShader (terrain.vert/frag, ChunkPos-Uniform, VAO-Rebuild bei Buffer-Wechsel), CompiledSectionMesh + ChunkSectionLayer; ChunkMesh-Harness grün |
 | 2  | BlockModel/BakedModel (JSON-Modelle, Elemente, Face-Baking, Atlas-Sprites) | ✅     | BlockElement/ElementFace + Gson-Deserializer (cullface 1:1), FaceBakery (defaultFaceUV/bakeVertex/calculateFacing/recalculateWinding), QuadCollection + ModelBaker (SimpleUnbakedGeometry.bake, Cullface-Buckets, Degenerate-Axis-Gate), SpriteGetter (Atlas-UV-Rects), ModelManager (lädt + backt Modelle, Child-Texturen über Parent-Chain), VanillaModels (cube/cube_all) + VanillaBlockModels/VanillaBlockTextures (Texturen in den Block-Atlas gestitcht); AtlasTextures-Harness 24 Checks grün; MVP-Upload column-major verifiziert |
 | 3  | Camera + Frustum + Culling                                                 | ✅     | Camera (SetRotation/SetPosition/Move über die Quaternion-Basis, Basisvektoren wie Java: pitch + schaut hoch), FrustumIntersection (Plane-Extraktion 1:1 JOML, m<SPALTE><ZEILE>-Konvention, NZ/PZ = Near/Far), Frustum (calculateFrustum = projection·view wie MCs LevelRenderer.calculateFrustum(view, projection) mit p2.mul(p1), viewVector = transformTranspose((0,0,1,0)), CubeInFrustum/PointInFrustum/IsVisible kamera-relativ), RenderLayer cullt pro Section (AABB im Frustum); Demo-Level: zweite Plattform 4 Sections östlich als Culling-Beweis (yaw-Sweep: Ost-Sicht zeichnet sie, Nord-Sicht cullt sie); frustum-Harness 18 Checks grün; MVP = projection·view (Clip-Raum) |
-| 4  | BlockRenderDispatcher (AO, Tinting)                                        | ⬜     |
+| 4  | BlockRenderDispatcher (AO, Tinting)                                        | ✅     | IdMapper, GrassColor/FoliageColor-Tabellen, BlockColors.createDefault() mit allen Vanilla-Providern (Gras/Laub/Wasser/Redstone/Stems/Lily), ModelBlockRenderer AO-Kern 1:1 (AdjacencyInfo-Corner-Tables, AmbientVertexRemap, calculateShape, die Open-Checks, Nicht-Cubic-Gewichte, beide blend-Helfer, LightTexture.pack), BlockRenderDispatcher-Facade (AO-Entscheidung, renderBatched), SectionCompiler läuft über den Dispatcher-Pfad, BlockAndTintGetter.getShade; ao-Harness 14 Checks grün |
 | 5  | Himmel/Sonne/Mond/Wolken (günstig, sieht sofort nach MC aus)               | ⬜     |
 
 **Ziel:** du stehst in einer Welt aus echten Blöcken und drehst die Kamera.
@@ -173,7 +173,7 @@ Vor P0 fertig (frühere Meilensteine, nicht Teil des Plans):
 | `texture`    | NativeImage/PNG, Stitcher, SpriteLoader, TextureAtlas-Stitching (11 Checks) |
 | `chunkmesh`  | P4.1-Compile-Pipeline über eine echte Level-Region (VisGraph, Layer-Packing) |
 | `atlastextures` | P4.2: Vanilla-Modelle backen gegen den echten Block-Atlas (24 Checks)    |
-| `frustum`    | P4.3: Plane-Extraktion, Punkt-/Cube-Tests, Camera-Basisvektoren + Move (18 Checks) |
+| `ao`         | P4.4: AO-Kern über echtem Level, BlockColors-Provider, Shade-Tabelle, Tesselate-Pfad (14 Checks) |
 
 Run-Configurations (CLion): **runClient** (der eine Client mit allem), **build mods** (baut alle Mods aus `mods/`), **matticraft** (Client mit Tests).
 
@@ -182,7 +182,7 @@ Run-Configurations (CLion): **runClient** (der eine Client mit allem), **build m
 ## Nächste sinnvolle Schritte (Reihenfolge-Vorschlag)
 
 1. ~~P4.3 Camera + Frustum + Culling~~ ✅ erledigt — Camera/Frustum/FrustumIntersection portiert, Dispatcher cullt pro Section (Yaw-Sweep im Client verifiziert).
-2. **P4.4 BlockRenderDispatcher (AO, Tinting)** — Ambient-Occlusion pro Vertex über die Nachbar-States, Biome-Tinting (Gras/Laub/Wasser), ModelBlockRenderer als echte Backplate hinter dem SectionCompiler.
+2. ~~P4.4 BlockRenderDispatcher (AO, Tinting)~~ ✅ erledigt — AO-Kern 1:1 (AdjacencyInfo/Remap/calculateShape/blend), BlockColors mit allen Vanilla-Providern, Dispatcher-Facade, SectionCompiler über renderBatched; ao-Harness grün.
 3. **P4.5 Himmel/Sonne/Mond/Wolken** — Sky-Gradient + Celestial-Quads (Sonne/Mond-Texturen über den TextureManager), Wolken-Ebene; sieht sofort nach MC aus.
 4. **P0-Rest:** java.util-Lücken (UUID, BitSet, Collections.unmodifiable), fastutil nur nach Bedarf der nächsten Phasen.
 5. **P2-Nachtrag:** PalettedContainer für LevelChunkSection (echte Palette + BitStorage statt Plain-Array), EntityBlock-Interface am Block (hat BlockEntity statt 49-Typen-Scan), BlockEntity-NBT (saveWithFullMetadata/loadStatic über den NBT-Port).
