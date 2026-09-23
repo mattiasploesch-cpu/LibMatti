@@ -1,7 +1,7 @@
 # Plan: Minecraft-Port (net.minecraft.*) in Phasen
 
 > **Status-Marker:** ✅ fertig · 🟨 teilweise · ⬜ offen
-> Stand: 22.09.2026 — Build grün, ctest 20/20, `runClient` bootet FML vollständig (Mods, Configs, Mixins, Registries, Vanilla-Bootstrap) und rendert die Welt-Ladeansicht mit Titel, Progress-Bar und gebackenem Terrain; Stable-Release-Pipeline (AppImage, Portable-Zip, Dev-SDK) per `workflow_dispatch` verfügbar.
+> Stand: 23.09.2026 — Build grün, ctest 21/21, `runClient` bootet FML vollständig (Mods, Configs, Mixins, Registries, Vanilla-Bootstrap), rendert die Welt-Ladeansicht mit Titel, Progress-Bar und gebackenem Terrain und cullt Sections per Frustum (Camera + FrustumIntersection 1:1 JOML); Stable-Release-Pipeline (AppImage, Portable-Zip, Dev-SDK) per `workflow_dispatch` verfügbar.
 > Dieser Plan ist die bereinigte Übersicht; inhaltlich wurde nichts umgeschrieben, nur der Fortschritt markiert.
 
 **Orientierung:** unten nach oben bauen — jede Phase hat ein sichtbares Ziel in `runClient`, damit du immer was siehst.
