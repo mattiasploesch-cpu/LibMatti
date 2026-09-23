@@ -97,9 +97,13 @@ void LIBMATTI_MC_SectionRenderDispatcher_CompileDirty(LIBMATTI_MC_SectionRenderD
 // Java: renderSection - draws one compiled layer through the section shader.
 // mvpMatrix is the column-major projection*view, modelOrigin the section's
 // world offset (section corner minus the camera-relative render origin).
+// frustum (optional) culls the sections before their draw - NULL draws all
+// (the headless/selftest path).
+typedef struct LIBMATTI_MC_Frustum LIBMATTI_MC_Frustum;
 void LIBMATTI_MC_SectionRenderDispatcher_RenderLayer(
     const LIBMATTI_MC_SectionRenderDispatcher *dispatcher, LIBMATTI_MC_ChunkSectionLayer layer,
-    unsigned int program, const float *mvpMatrix, const float *modelOrigin);
+    unsigned int program, const float *mvpMatrix, const float *modelOrigin,
+    const LIBMATTI_MC_Frustum *frustum);
 
 // The terrain program (Java: RenderPipelines' terrain shader): compiles once
 // per process, the out locations ride with the returned program.

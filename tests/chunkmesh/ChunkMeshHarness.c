@@ -82,7 +82,7 @@ int main(void)
 
     // Headless draw path: no GL context, the call returns without touching the
     // program (the guard is the no-driver fallback).
-    LIBMATTI_MC_SectionRenderDispatcher_RenderLayer(dispatcher, LIBMATTI_MC_ChunkSectionLayer_SOLID, 0, NULL, NULL);
+    LIBMATTI_MC_SectionRenderDispatcher_RenderLayer(dispatcher, LIBMATTI_MC_ChunkSectionLayer_SOLID, 0, NULL, NULL, NULL);
 
     LIBMATTI_MC_SectionRenderDispatcher_Free(dispatcher);
     LIBMATTI_MC_Level_Free(level);

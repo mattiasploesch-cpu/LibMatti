@@ -99,10 +99,14 @@ jobs:
           sudo apt-get install -y --no-install-recommends clang-format
 
       - name: Check formatting (library, client, tests, mods)
+        timeout-minutes: 10
         run: |
           set +e
-          find library client tests mods -name '*.c' -o -name '*.h' | \
-            xargs clang-format --dry-run --Werror 2> clang-format.log
+          # Generated files (byte-array dumps) are excluded: clang-format takes
+          # minutes on them. Parallel batches keep the scan fast.
+          find library client tests mods \( -name '*.c' -o -name '*.h' \) \
+            ! -name 'EmbeddedFont.c' ! -path '*/build/*' \
+            | xargs -P "$(nproc)" -n 50 clang-format --dry-run --Werror 2> clang-format.log
           STATUS=$?
           if [ $STATUS -ne 0 ]; then
             echo "::warning::clang-format found differences (non-blocking):"
