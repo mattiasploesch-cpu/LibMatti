@@ -628,9 +628,6 @@ static void set_transform(unsigned int program, const LIBMATTI_JOML_Matrix4f *mo
     int colorLocation = LIBMATTI_GL_glGetUniformLocation(program, "color");
     if (colorLocation >= 0)
         LIBMATTI_GL_glUniform4f(colorLocation, r, g, b, a);
-    if (getenv("MATTI_SKY_DEBUG") != NULL)
-        fprintf(stderr, "[SKYDEBUG] transform: prog=%u mvpLoc=%d colorLoc=%d row0=(%g %g %g %g)\n",
-                program, mvpLocation, colorLocation, mvp.m00, mvp.m01, mvp.m02, mvp.m03);
 }
 
 // The draw helpers keep the pass structure of the Java class: each renders one
@@ -654,10 +651,6 @@ void LIBMATTI_MC_SkyRenderer_DrawSkyDisc(LIBMATTI_MC_SkyRenderer *renderer, cons
     LIBMATTI_GL_glBindVertexArray(topVao);
     LIBMATTI_GL_glDrawArrays(LIBMATTI_GL_GL_TRIANGLES, 0, renderer->topSkyBuffer.vertexCount);
     LIBMATTI_GL_glBindVertexArray(0);
-    if (getenv("MATTI_SKY_DEBUG") != NULL)
-        fprintf(stderr, "[SKYDEBUG] sky disc: program=%u vao=%u vbo=%u count=%d glErr=%u\n",
-                program, topVao, renderer->topSkyBuffer.vbo, renderer->topSkyBuffer.vertexCount,
-                LIBMATTI_GL_glGetError());
 }
 
 // Java: public void renderDarkDisc() - the bottom disc, translated +12 on y.

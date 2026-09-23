@@ -265,8 +265,6 @@ static void upload_quad_indices(LayerVao *vao, int quadCount)
     }
 }
 
-// Java: VertexFormat.setupBufferState - the BLOCK format's attribute pointers
-// over the interleaved layout (position, color, uv0, uv2, normal).
 static unsigned int create_block_vao(unsigned int vbo, unsigned int ibo)
 {
     const LIBMATTI_B3D_VertexFormat *format = LIBMATTI_B3D_DefaultVertexFormat_BLOCK();
@@ -316,6 +314,7 @@ void LIBMATTI_MC_SectionRenderDispatcher_RenderLayer(
         LIBMATTI_GL_glUniform3f(originLocation, modelOrigin[0], modelOrigin[1], modelOrigin[2]);
 
     int dbg = getenv("MATTI_CHUNK_DEBUG") != NULL;
+    int dumped = getenv("MATTI_VBODUMP") != NULL ? 0 : 1;
     if (dbg)
         fprintf(stderr, "[CHUNKDEBUG] RenderLayer layer=%d sections=%d\n", (int) layer, dispatcher->sectionCount);
     for (int i = 0; i < dispatcher->sectionCount; i++)

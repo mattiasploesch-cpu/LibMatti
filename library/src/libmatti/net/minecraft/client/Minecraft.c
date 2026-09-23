@@ -515,6 +515,41 @@ static void tick(LIBMATTI_MC_Minecraft *minecraft)
 // Java: private void renderTitleLine(...) - the skeleton draws the game title
 // with the earlydisplay Monocraft font (Java: MaterializedTheme fonts +
 // RenderContext.renderTextWithShadow). White with the Java 0.25x shadow.
+// MATTI_SHOT_AFTER: the phase-gated screenshot (clear|sky|terrain) - the
+// readback runs right after the named phase and stops, so the pixel histogram
+// names the pass that paints (or erases) the content.
+static void shot_after(LIBMATTI_MC_Minecraft *minecraft, const char *phase)
+{
+    const char *want = getenv("MATTI_SHOT_AFTER");
+    if (want == NULL || strcmp(want, phase) != 0)
+        return;
+    static int done = 0;
+    if (done)
+        return;
+    done = 1;
+    int fbw = 0, fbh = 0;
+    LIBMATTI_GLFW_glfwGetFramebufferSize(minecraft->window, &fbw, &fbh);
+    unsigned char *pixels = malloc((size_t) fbw * fbh * 3);
+    if (pixels == NULL)
+        return;
+    LIBMATTI_GL_glPixelStorei(LIBMATTI_GL_GL_PACK_ALIGNMENT, 1);
+    LIBMATTI_GL_glReadPixels(0, 0, fbw, fbh, LIBMATTI_GL_GL_RGB, LIBMATTI_GL_GL_UNSIGNED_BYTE, pixels);
+    LIBMATTI_GL_glPixelStorei(LIBMATTI_GL_GL_PACK_ALIGNMENT, 4);
+    char path[128];
+    snprintf(path, sizeof(path), "/tmp/phase_%s.ppm", phase);
+    FILE *out = fopen(path, "wb");
+    if (out != NULL)
+    {
+        fprintf(out, "P6\n%d %d\n255\n", fbw, fbh);
+        for (int y = fbh - 1; y >= 0; y--)
+            fwrite(pixels + (size_t) y * fbw * 3, 1, (size_t) fbw * 3, out);
+        fclose(out);
+    }
+    free(pixels);
+    fprintf(stderr, "[PHASE] wrote %s\n", path);
+    LIBMATTI_MC_Minecraft_Stop(minecraft);
+}
+
 static void render_title(LIBMATTI_MC_Minecraft *minecraft, int width, int height)
 {
     (void) width;
@@ -682,6 +717,7 @@ static void runTick(LIBMATTI_MC_Minecraft *minecraft, int runGameTime)
                     // Java: clear to the theme screenBackground (#ef323d)
                     LIBMATTI_B3D_GlStateManager_ClearColor(0xef / 255.0f, 0x32 / 255.0f, 0x3d / 255.0f, 1.0f);
                     LIBMATTI_B3D_GlStateManager_Clear(LIBMATTI_GL_GL_COLOR_BUFFER_BIT | LIBMATTI_GL_GL_DEPTH_BUFFER_BIT);
+                    shot_after(minecraft, "clear");
 
                     // Java: LevelRenderer.renderLevel - the demo level's section
                     // meshes draw behind the loading layout (perspective from a
@@ -729,10 +765,16 @@ static void runTick(LIBMATTI_MC_Minecraft *minecraft, int runGameTime)
                             // plane extraction and the shader both need).
                             LIBMATTI_JOML_Matrix4f_Mul(&proj, &view, &mvpM);
 
-                            // Java: this.cullingFrustum = new Frustum(proj, view);
-                            // cullingFrustum.prepare(camera.getPosition()); the
-                            // section culler consumes the same matrix as the shader.
-                            LIBMATTI_MC_Frustum_Init(&minecraft->frustum, &proj, &view);
+                            // Java: this.cullingFrustum = new Frustum(proj, view)
+                            // with the ROTATION-ONLY modelview - prepare() shifts
+                            // the box tests by the camera position instead. The
+                            // full view (with the translation) rides the shader.
+                            LIBMATTI_JOML_Matrix4f viewRotOnly;
+                            memcpy(&viewRotOnly, &view, sizeof(viewRotOnly));
+                            viewRotOnly.m30 = 0.0f;
+                            viewRotOnly.m31 = 0.0f;
+                            viewRotOnly.m32 = 0.0f;
+                            LIBMATTI_MC_Frustum_Init(&minecraft->frustum, &proj, &viewRotOnly);
                             LIBMATTI_MC_Frustum_Prepare(&minecraft->frustum,
                                                         minecraft->camera.x, minecraft->camera.y, minecraft->camera.z);
 
@@ -783,13 +825,13 @@ static void runTick(LIBMATTI_MC_Minecraft *minecraft, int runGameTime)
                                                                               LIBMATTI_GL_GL_ZERO);
                                 LIBMATTI_B3D_GlStateManager_DepthMask(0);
 
-                                if (getenv("MATTI_STATE_DEBUG") != NULL)
-                                {
-                                    fprintf(stderr, "[STATE] pre-sky depthMask=%d\n",
-                                            LIBMATTI_GL_glGetInteger(0x0B72));
-                                }
-
-                                LIBMATTI_MC_SkyRenderer_DrawSkyDisc(minecraft->skyRenderer, &view, &proj, skyR,
+                                // Java: the sky pass renders with the
+                                // rotation-only model view - the disc/celestials
+                                // coordinates are CAMERA-RELATIVE (the disc at
+                                // y=16 is 16 above the EYE, not above world 0).
+                                // The full view (with the translation) would put
+                                // the disc 72 blocks below the camera at (8,88).
+                                LIBMATTI_MC_SkyRenderer_DrawSkyDisc(minecraft->skyRenderer, &viewRotOnly, &proj, skyR,
                                                                     skyG, skyB, 1.0f);
 
                                 // Java: renderSunriseAndSunset - the alpha comes
@@ -804,10 +846,10 @@ static void runTick(LIBMATTI_MC_Minecraft *minecraft, int runGameTime)
                                     sunriseAlpha = 0.6f;
                                 if (sunriseAlpha > 0.0f)
                                     LIBMATTI_MC_SkyRenderer_DrawSunriseSunset(
-                                        minecraft->skyRenderer, &view, &proj, sunAngle, sunriseAlpha);
+                                        minecraft->skyRenderer, &viewRotOnly, &proj, sunAngle, sunriseAlpha);
 
                                 LIBMATTI_MC_SkyRenderer_RenderSunMoonAndStars(
-                                    minecraft->skyRenderer, &view, &proj, sunAngle, moonAngle, starAngle, phase,
+                                    minecraft->skyRenderer, &viewRotOnly, &proj, sunAngle, moonAngle, starAngle, phase,
                                     rainBrightness, starBrightness);
 
                                 // Java: shouldRenderDarkDisc - the eye below the
@@ -815,6 +857,7 @@ static void runTick(LIBMATTI_MC_Minecraft *minecraft, int runGameTime)
 
                                 LIBMATTI_B3D_GlStateManager_DepthMask(1);
                                 LIBMATTI_B3D_GlStateManager_DisableBlend();
+                                shot_after(minecraft, "sky");
                             }
 
                             float mvp[16];
@@ -829,7 +872,7 @@ static void runTick(LIBMATTI_MC_Minecraft *minecraft, int runGameTime)
                             // CLOUD_COLOR attribute (the overworld curve:
                             // white by day, dimmed at dusk/night), the cloud
                             // height is the vanilla 192.
-                            if (minecraft->cloudRenderer != NULL)
+                            if (minecraft->cloudRenderer != NULL && getenv("MATTI_NO_CLOUDS") == NULL)
                             {
                                 float dim = 1.0f;
                                 if (dayFraction > 13670.0f / 24000.0f && dayFraction < 22330.0f / 24000.0f)
@@ -851,11 +894,11 @@ static void runTick(LIBMATTI_MC_Minecraft *minecraft, int runGameTime)
                                 LIBMATTI_B3D_GlStateManager_DepthMask(1);
                                 LIBMATTI_B3D_GlStateManager_DisableBlend();
                             }
+                            shot_after(minecraft, "terrain");
                         }
-                    }
-
-                    // The skeleton's title line (Java: the theme's LabelElement
+                    }                    // The skeleton's title line (Java: the theme's LabelElement
                     // renders the game title inside the layout).
+
                     if (getenv("MATTI_NO_TITLE") == NULL)
                         render_title(minecraft, 854, 480);
 
