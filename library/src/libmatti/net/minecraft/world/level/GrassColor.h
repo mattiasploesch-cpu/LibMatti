@@ -14,12 +14,10 @@ extern "C" {
 extern const int LIBMATTI_MC_GrassColor_pixels[256];
 extern const int LIBMATTI_MC_FoliageColor_pixels[256];
 
-// Java: public static int getDefaultColor() (GrassColor) - the average of the table's
-// middle entries; the port resolves it from the embedded table like
-// GrassColorReloadListener's default without a resource pack.
+// Returns the embedded grass table's center sample at index 128.
 int LIBMATTI_MC_GrassColor_GetDefaultColor(void);
 
-// Java: FoliageColor.getDefaultColor() = the table's center pixel
+// Returns the embedded foliage table's center sample at index 128.
 int LIBMATTI_MC_FoliageColor_GetDefaultColor(void);
 
 #ifdef __cplusplus

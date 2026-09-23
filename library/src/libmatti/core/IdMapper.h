@@ -18,20 +18,24 @@ typedef struct LIBMATTI_JL_IdMapper
     int capacity;
 } LIBMATTI_JL_IdMapper;
 
-// Java: public IdMapper() - and IdMapper(int capacity) alike
+// Creates an empty mapper. The mapper stores values by pointer and does not
+// take ownership of them.
 LIBMATTI_JL_IdMapper *LIBMATTI_JL_IdMapper_New(void);
+
+// Frees the mapper's lookup storage, but not its mapped values. NULL is allowed.
 void LIBMATTI_JL_IdMapper_Free(LIBMATTI_JL_IdMapper *mapper);
 
-// Java: public void addMapping(T value, int id)
+// Appends a value/id pair. Duplicate values and ids are retained; lookups
+// return the first matching pair.
 void LIBMATTI_JL_IdMapper_AddMapping(LIBMATTI_JL_IdMapper *mapper, void *value, int id);
 
-// Java: public T byId(int id) - NULL when unknown
+// Returns the first value mapped to id, or NULL when id is unknown.
 void *LIBMATTI_JL_IdMapper_ById(const LIBMATTI_JL_IdMapper *mapper, int id);
 
-// Java: public int getId(T value) - -1 when unknown
+// Returns the id of the first pointer-identical value, or -1 when unknown.
 int LIBMATTI_JL_IdMapper_GetId(const LIBMATTI_JL_IdMapper *mapper, const void *value);
 
-// Java: public int size()
+// Returns the number of appended mappings, including duplicates.
 int LIBMATTI_JL_IdMapper_Size(const LIBMATTI_JL_IdMapper *mapper);
 
 #ifdef __cplusplus
