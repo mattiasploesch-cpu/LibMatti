@@ -23,5 +23,10 @@ LIBMATTI_JOML_Matrix3f *LIBMATTI_JOML_Matrix3f_Mul(const LIBMATTI_JOML_Matrix3f 
                                                    LIBMATTI_JOML_Matrix3f *dest);
 // Java: public Vector3f transform(Vector3f v)
 void LIBMATTI_JOML_Matrix3f_Transform(const LIBMATTI_JOML_Matrix3f *m, float *x, float *y, float *z);
+// Java: public Matrix3f rotateTowards(Vector3fc direction, Vector3fc up)
+LIBMATTI_JOML_Matrix3f *LIBMATTI_JOML_Matrix3f_RotateTowards(LIBMATTI_JOML_Matrix3f *m, float dirX, float dirY,
+                                                             float dirZ, float upX, float upY, float upZ);
+// Java: public Matrix3f rotateZ(float ang)
+LIBMATTI_JOML_Matrix3f *LIBMATTI_JOML_Matrix3f_RotateZ(LIBMATTI_JOML_Matrix3f *m, float ang);
 
 #endif //MATTICRAFT_JOML_MATRIX3F_H
