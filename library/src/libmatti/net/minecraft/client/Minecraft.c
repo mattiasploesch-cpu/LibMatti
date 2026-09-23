@@ -17,6 +17,7 @@
 #include "libmatti/net/minecraft/client/Camera.h"
 #include "libmatti/net/minecraft/client/renderer/culling/Frustum.h"
 #include "libmatti/net/minecraft/client/renderer/SkyRenderer.h"
+#include "libmatti/net/minecraft/client/renderer/CloudRenderer.h"
 #include "libmatti/net/minecraft/client/renderer/texture/TextureManager.h"
 #include "libmatti/net/minecraft/client/renderer/texture/TextureAtlas.h"
 #include "libmatti/net/neoforged/fml/earlydisplay/EarlyFramebuffer.h"
@@ -133,6 +134,8 @@ struct LIBMATTI_MC_Minecraft
     // Java: private SkyRenderer skyRenderer (the P4.5 port) + the CELESTIALS
     // atlas the sun/moon quads ride.
     LIBMATTI_MC_SkyRenderer *skyRenderer;
+    // Java: private final CloudRenderer cloudRenderer (LevelRenderer)
+    LIBMATTI_MC_CloudRenderer *cloudRenderer;
     LIBMATTI_MC_TextureAtlas *celestialsAtlas;
 };
 
@@ -470,6 +473,11 @@ LIBMATTI_MC_Minecraft *LIBMATTI_MC_Minecraft_New(const LIBMATTI_MC_GameConfig *c
         minecraft->skyRenderer = LIBMATTI_MC_SkyRenderer_New();
         LIBMATTI_MC_SkyRenderer_SetAtlas(minecraft->skyRenderer, minecraft->celestialsAtlas);
         LOG("SkyRenderer ready (atlas=%p)", (void *) minecraft->celestialsAtlas);
+        // Java: this.cloudRenderer = new CloudRenderer() (the reload listener
+        // applies the texture cells once).
+        minecraft->cloudRenderer = LIBMATTI_MC_CloudRenderer_New();
+        LOG("CloudRenderer ready (%d cells)",
+            minecraft->cloudRenderer != NULL ? 1 : 0);
     }
 
     return minecraft;
@@ -732,19 +740,17 @@ static void runTick(LIBMATTI_MC_Minecraft *minecraft, int runGameTime)
                             // renderSky section) - the disc, sunrise/sunset,
                             // sun/moon/stars and the dark disc draw through
                             // the SkyRenderer before the sections.
+                            long dayTime = minecraft->level != NULL
+                                               ? LIBMATTI_MC_Level_GetDayTime((LIBMATTI_MC_Level *) minecraft->level)
+                                               : 0;
+                            float timeOfDay = (float) (dayTime % 24000L);
+                            float dayFraction = timeOfDay / 24000.0f;
                             if (minecraft->skyRenderer != NULL)
                             {
                                 // Java: ClientLevel - timeOfDay = dayTime % 24000
                                 // over the DAY timeline period; the angles follow
                                 // the 1.21.11 keys (sun/star 0 -> 360, moon 180 ->
                                 // 540 over the day, sunrise color at the edges).
-                                long dayTime = minecraft->level != NULL
-                                                   ? LIBMATTI_MC_Level_GetDayTime((LIBMATTI_MC_Level *) minecraft->level)
-                                                   : 0;
-                                float timeOfDay = (float) (dayTime % 24000L);
-                                float dayFraction = timeOfDay / 24000.0f;
-                                // Java: the angle keys ease around noon (6000);
-                                // the linear stand-in keeps the same key geometry.
                                 float sunAngle = dayFraction * (float) (2.0 * M_PI);
                                 float moonAngle = sunAngle + (float) M_PI;
                                 float starAngle = sunAngle;
@@ -817,6 +823,34 @@ static void runTick(LIBMATTI_MC_Minecraft *minecraft, int runGameTime)
                             LIBMATTI_MC_SectionRenderDispatcher_RenderLayer(
                                 minecraft->sectionDispatcher, LIBMATTI_MC_ChunkSectionLayer_SOLID,
                                 terrainProgram, mvp, origin, &minecraft->frustum);
+
+                            // Java: addCloudsPass - after the main (terrain)
+                            // pass, before weather. The cloud color is the
+                            // CLOUD_COLOR attribute (the overworld curve:
+                            // white by day, dimmed at dusk/night), the cloud
+                            // height is the vanilla 192.
+                            if (minecraft->cloudRenderer != NULL)
+                            {
+                                float dim = 1.0f;
+                                if (dayFraction > 13670.0f / 24000.0f && dayFraction < 22330.0f / 24000.0f)
+                                    dim = 0.35f;
+                                LIBMATTI_B3D_GlStateManager_EnableBlend();
+                                LIBMATTI_B3D_GlStateManager_BlendFuncSeparate(LIBMATTI_GL_GL_SRC_ALPHA,
+                                                                              LIBMATTI_GL_GL_ONE_MINUS_SRC_ALPHA,
+                                                                              LIBMATTI_GL_GL_ONE,
+                                                                              LIBMATTI_GL_GL_ZERO);
+                                LIBMATTI_B3D_GlStateManager_DepthMask(0);
+                                LIBMATTI_MC_CloudRenderer_Render(minecraft->cloudRenderer,
+                                                                 LIBMATTI_MC_CloudStatus_FANCY,
+                                                                 1.0f, 1.0f, 1.0f, dim, 192.0f,
+                                                                 minecraft->camera.x, minecraft->camera.y,
+                                                                 minecraft->camera.z,
+                                                                 LIBMATTI_MC_Level_GetGameTime(
+                                                                     (LIBMATTI_MC_Level *) minecraft->level),
+                                                                 0.0f, &view, &proj, 12);
+                                LIBMATTI_B3D_GlStateManager_DepthMask(1);
+                                LIBMATTI_B3D_GlStateManager_DisableBlend();
+                            }
                         }
                     }
 
