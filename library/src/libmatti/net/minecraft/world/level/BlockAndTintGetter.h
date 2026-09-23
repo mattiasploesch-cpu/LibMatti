@@ -15,6 +15,8 @@ extern "C" {
 // through the Level surface (the header stays level-free).
 struct LIBMATTI_MC_Level;
 
+typedef struct LIBMATTI_MC_BlockAndTintGetter LIBMATTI_MC_BlockAndTintGetter;
+
 // Java: float getShade(Direction, boolean shade) - the cardinal light table of
 // the dimension (ClientLevel's overworld switch).
 float LIBMATTI_MC_BlockAndTintGetter_GetShade(LIBMATTI_MC_Direction direction, int shade);
