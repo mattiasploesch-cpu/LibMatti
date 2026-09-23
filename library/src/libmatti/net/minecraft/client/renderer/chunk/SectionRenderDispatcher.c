@@ -9,6 +9,7 @@
 #include "libmatti/com/mojang/blaze3d/vertex/VertexFormatElement.h"
 #include "libmatti/org/lwjgl/opengl/GL.h"
 #include "libmatti/org/lwjgl/opengl/Constants.h"
+#include "libmatti/net/minecraft/client/renderer/culling/Frustum.h"
 #include "libmatti/net/minecraft/world/level/Level.h"
 #include "libmatti/net/minecraft/world/level/LevelHeightAccessor.h"
 #include "libmatti/net/minecraft/world/level/chunk/LevelChunkSection.h"
@@ -297,7 +298,8 @@ static unsigned int create_block_vao(unsigned int vbo, unsigned int ibo)
 
 void LIBMATTI_MC_SectionRenderDispatcher_RenderLayer(
     const LIBMATTI_MC_SectionRenderDispatcher *dispatcher, LIBMATTI_MC_ChunkSectionLayer layer,
-    unsigned int program, const float *mvpMatrix, const float *modelOrigin)
+    unsigned int program, const float *mvpMatrix, const float *modelOrigin,
+    const LIBMATTI_MC_Frustum *frustum)
 {
     if (dispatcher == NULL || program == 0)
         return;
@@ -329,6 +331,26 @@ void LIBMATTI_MC_SectionRenderDispatcher_RenderLayer(
         const LIBMATTI_MC_SectionBuffers *buffers = LIBMATTI_MC_CompiledSectionMesh_GetBuffers(compiled, layer);
         if (buffers == NULL || buffers->vertexBuffer == NULL || buffers->indexCount <= 0)
             continue;
+
+        // Java: LevelRenderer.renderLevel - section.isDirty? no: the frustum
+        // test (renderSection -> cullingFrustum.isVisible(aabb)) before the
+        // draw; the section's 16^3 box in world coordinates (the port keeps
+        // the origin uniform as the camera-relative offset so the box uses
+        // plain section coordinates).
+        if (frustum != NULL)
+        {
+            const LIBMATTI_MC_SectionPos *pos = section->sectionPos;
+            int sx = pos->base.x, sy = pos->base.y, sz = pos->base.z;
+            if (!LIBMATTI_MC_Frustum_IsVisible(frustum,
+                                               (double) (sx * 16), (double) (sy * 16), (double) (sz * 16),
+                                               (double) (sx * 16 + 16), (double) (sy * 16 + 16),
+                                               (double) (sz * 16 + 16)))
+            {
+                if (dbg)
+                    fprintf(stderr, "[CHUNKDEBUG] section %d: culled (%d,%d,%d)\n", i, sx, sy, sz);
+                continue;
+            }
+        }
 
         LayerVao *vao = &g_layerVaos[layer];
         if (getenv("MATTI_CHUNK_DEBUG") != NULL)

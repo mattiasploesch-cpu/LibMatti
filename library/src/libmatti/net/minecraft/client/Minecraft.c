@@ -11,6 +11,8 @@
 #include "libmatti/java/lang/System.h"
 #include "libmatti/matti/mixin/MixinHookTable.h"
 #include "libmatti/matti_mixin.h"
+#include "libmatti/net/minecraft/client/Camera.h"
+#include "libmatti/net/minecraft/client/renderer/culling/Frustum.h"
 #include "libmatti/net/minecraft/client/renderer/texture/TextureManager.h"
 #include "libmatti/net/neoforged/fml/earlydisplay/EarlyFramebuffer.h"
 #include "libmatti/net/minecraft/client/renderer/chunk/SectionRenderDispatcher.h"
@@ -35,6 +37,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include "libmatti/net/minecraft/client/EmbeddedFont.h"
 
 // The theme resource root (see load_font below); every consumer defines it
 // from CMake (client/src does the same for the selftest fixtures).
@@ -106,7 +110,37 @@ struct LIBMATTI_MC_Minecraft
     // Java: this.modelManager - the baked block models (the P4.2 port); the
     // section compiler resolves the block model quads through it.
     LIBMATTI_MC_ModelManager *modelManager;
+
+    // Java: private final Camera camera (GameRenderer owns it in Java; the
+    // skeleton keeps it on the Minecraft struct) + the culling frustum the
+    // level renderer feeds per frame (the P4.3 port).
+    LIBMATTI_MC_Camera camera;
+    LIBMATTI_MC_Frustum frustum;
+    int frustumInitialized;
 };
+
+// Java: GameRenderer.renderLevel - "Matrix4f matrix4f1 = new Matrix4f()
+// .rotation(quaternionf)" with quaternionf = camera.rotation().conjugate():
+// the view ROTATION (no translation - the camera position enters the cull
+// through Frustum.prepare and the render through the modelview translation).
+// The rows are right/up/-forward with right = -left (the camera's left is
+// screen-left); that 3x3 IS the inverse camera rotation.
+void LIBMATTI_MC_GameRenderer_BuildRotationMatrix(const LIBMATTI_MC_Camera *camera, LIBMATTI_JOML_Matrix4f *view)
+{
+    const LIBMATTI_JOML_Vector3f *f = LIBMATTI_MC_Camera_ForwardVector(camera);
+    const LIBMATTI_JOML_Vector3f *u = LIBMATTI_MC_Camera_UpVector(camera);
+    const LIBMATTI_JOML_Vector3f *l = LIBMATTI_MC_Camera_LeftVector(camera);
+    float rx = -l->x, ry = -l->y, rz = -l->z;
+    // Column-major view: element (row, col) = view[col * 4 + row].
+    view->m00 = rx; view->m01 = u->x; view->m02 = -f->x; view->m03 = 0.0f;
+    view->m10 = ry; view->m11 = u->y; view->m12 = -f->y; view->m13 = 0.0f;
+    view->m20 = rz; view->m21 = u->z; view->m22 = -f->z; view->m23 = 0.0f;
+    view->m30 = 0.0f; view->m31 = 0.0f; view->m32 = 0.0f; view->m33 = 1.0f;
+}
+
+// The full view for the terrain shader: the rotation above plus the negated
+// rotation*translation column (the world->camera shift the Java path does
+// through the PoseStack translate(-camera) instead).
 
 // Java: the ModelManager model lookup the compiler consults per block - the
 // block's registry key path maps onto the model id ("block/<path>").
@@ -208,6 +242,10 @@ LIBMATTI_MC_Minecraft *LIBMATTI_MC_Minecraft_New(const LIBMATTI_MC_GameConfig *c
 
     // Java: this.deltaTracker = new DeltaTracker.Timer(20.0F, 0L, this::getTickTargetMillis);
     minecraft->deltaTracker = LIBMATTI_MC_DeltaTracker_Timer_New(20.0f, LIBMATTI_MC_Minecraft_GetTickTargetMillis);
+
+    // Java: the Camera field initializer (GameRenderer's camera).
+    LIBMATTI_MC_Camera_Init(&minecraft->camera);
+    minecraft->frustumInitialized = 0;
 
     // ---- Window init (com.mojang.blaze3d.platform.Window) -----------------
     // Java: Window.init - glfwSetErrorCallback, checkGlfwError
@@ -349,6 +387,22 @@ LIBMATTI_MC_Minecraft *LIBMATTI_MC_Minecraft_New(const LIBMATTI_MC_GameConfig *c
                 LIBMATTI_MC_Level_SetBlock(level, &b, LIBMATTI_MC_Block_DefaultBlockState(stone),
                                            LIBMATTI_MC_Level_UPDATE_CLIENTS);
             }
+            // A second platform four sections east (x 64..79, section 4,4,0):
+            // the frustum-culling proof - it draws when the camera faces east
+            // and is culled otherwise, exactly like Java's
+            // cullingFrustum.isVisible(sectionAABB) gate.
+            for (int x = 64; x < 80; x++)
+            {
+                for (int z = 0; z < 16; z++)
+                {
+                    LIBMATTI_MC_BlockPos ground = {{x, 64, z}};
+                    LIBMATTI_MC_Level_SetBlock(level, &ground, LIBMATTI_MC_Block_DefaultBlockState(stone),
+                                               LIBMATTI_MC_Level_UPDATE_CLIENTS);
+                    LIBMATTI_MC_BlockPos fill = {{x, 63, z}};
+                    LIBMATTI_MC_Level_SetBlock(level, &fill, LIBMATTI_MC_Block_DefaultBlockState(dirt),
+                                               LIBMATTI_MC_Level_UPDATE_CLIENTS);
+                }
+            }
         }
 
         minecraft->level = level;
@@ -374,6 +428,7 @@ LIBMATTI_MC_Minecraft *LIBMATTI_MC_Minecraft_New(const LIBMATTI_MC_GameConfig *c
         }
 
         LIBMATTI_MC_SectionRenderDispatcher_CreateSection(minecraft->sectionDispatcher, 0, 4, 0);
+        LIBMATTI_MC_SectionRenderDispatcher_CreateSection(minecraft->sectionDispatcher, 4, 4, 0);
     }
 
     return minecraft;
@@ -446,42 +501,63 @@ static void render_title(LIBMATTI_MC_Minecraft *minecraft, int width, int height
     LIBMATTI_B3D_GlStateManager_DisableBlend();
 }
 
-// Java (Window.java Window ctor / MaterializedTheme): load the theme's "gui"
-// font (the Monocraft.ttf the FML resources carry). The port reads it from the
-// source tree resources (MATTI_SOURCE_DIR, the same mechanism the manifest
-// uses); NULL leaves the title rendering off.
+// Java (Window.java Window ctor / MaterializedTheme): load the theme's
+// "gui" font (the Monocraft.ttf the FML resources carry). The binary embeds
+// the font (release packages do not ship the vendor source tree); the repo
+// checkout stays as the dev-build fallback. No environment or user input
+// reaches fopen - the paths are compile-time constants. NULL leaves the
+// title rendering off.
 static LIBMATTI_FML_SimpleFont *load_font(void)
 {
+    unsigned char *data = NULL;
+    size_t length = 0;
+
+    // 1) the repo checkout (dev builds, the same path the manifest uses).
     const char *base = MATTI_SOURCE_DIR;
     const char *relative =
         "/vendor/FancyModLoader/earlydisplay/src/main/resources/net/neoforged/fml/earlydisplay/theme/Monocraft.ttf";
+
     char path[1024];
     snprintf(path, sizeof(path), "%s%s", base, relative);
 
     FILE *file = fopen(path, "rb");
-    if (file == NULL)
+    if (file != NULL)
     {
-        fprintf(stderr, "ERROR: theme font not found: %s\n", path);
-        return NULL;
-    }
-    fseek(file, 0, SEEK_END);
-    long length = ftell(file);
-    fseek(file, 0, SEEK_SET);
-    if (length <= 0)
-    {
+        fseek(file, 0, SEEK_END);
+        long size = ftell(file);
+        fseek(file, 0, SEEK_SET);
+        if (size > 0)
+        {
+            data = malloc((size_t) size);
+            if (fread(data, 1, (size_t) size, file) != (size_t) size)
+            {
+                free(data);
+                data = NULL;
+            }
+            else
+            {
+                length = (size_t) size;
+            }
+        }
         fclose(file);
-        return NULL;
     }
-    unsigned char *data = malloc((size_t) length);
-    if (fread(data, 1, (size_t) length, file) != (size_t) length)
-    {
-        free(data);
-        fclose(file);
-        return NULL;
-    }
-    fclose(file);
 
-    LIBMATTI_FML_SimpleFont *font = LIBMATTI_FML_SimpleFont_New(data, (size_t) length);
+    // 2) the embedded copy - always present.
+    if (data == NULL)
+    {
+        length = LIBMATTI_MC_EmbeddedFont_Monocraft_Size;
+        data = malloc(length);
+        if (data != NULL)
+            memcpy(data, LIBMATTI_MC_EmbeddedFont_Monocraft, length);
+    }
+
+    if (data == NULL)
+    {
+        fprintf(stderr, "ERROR: theme font not available (repo path and embedded copy failed)\n");
+        return NULL;
+    }
+
+    LIBMATTI_FML_SimpleFont *font = LIBMATTI_FML_SimpleFont_New(data, length);
     free(data);
     return font;
 }
@@ -583,67 +659,40 @@ static void runTick(LIBMATTI_MC_Minecraft *minecraft, int runGameTime)
                             LIBMATTI_B3D_GlStateManager_DepthFunc(LIBMATTI_GL_GL_LEQUAL);
                             LIBMATTI_B3D_GlStateManager_DepthMask(1);
 
-                            // The camera above the platform looking at its centre
-                            // (Java: GameRenderer's camera at pitch -50, yaw 0 over
-                            // the spawn platform). Built as explicit column-major
-                            // floats - the layout GL's glUniformMatrix4fv reads
-                            // with transpose = GL_FALSE.
-                            float mvp[16];
-                            {
-                                const float eye[3] = {8.0f, 88.0f, 40.0f};
-                                const float target[3] = {8.0f, 64.0f, 8.0f};
-                                const float up[3] = {0.0f, 1.0f, 0.0f};
-                                // forward = normalize(target - eye)
-                                float f[3] = {target[0] - eye[0], target[1] - eye[1], target[2] - eye[2]};
-                                float fl = sqrtf(f[0] * f[0] + f[1] * f[1] + f[2] * f[2]);
-                                f[0] /= fl; f[1] /= fl; f[2] /= fl;
-                                // right = normalize(cross(forward, up))
-                                float r[3] = {f[1] * up[2] - f[2] * up[1],
-                                              f[2] * up[0] - f[0] * up[2],
-                                              f[0] * up[1] - f[1] * up[0]};
-                                float rl = sqrtf(r[0] * r[0] + r[1] * r[1] + r[2] * r[2]);
-                                r[0] /= rl; r[1] /= rl; r[2] /= rl;
-                                // trueUp = cross(right, forward)
-                                float u[3] = {r[1] * f[2] - r[2] * f[1],
-                                              r[2] * f[0] - r[0] * f[2],
-                                              r[0] * f[1] - r[1] * f[0]};
-                                // view (column-major): rows = right/up/-forward
-                                float view[16] = {
-                                    r[0], u[0], -f[0], 0.0f,
-                                    r[1], u[1], -f[1], 0.0f,
-                                    r[2], u[2], -f[2], 0.0f,
-                                    -(r[0] * eye[0] + r[1] * eye[1] + r[2] * eye[2]),
-                                    -(u[0] * eye[0] + u[1] * eye[1] + u[2] * eye[2]),
-                                    (f[0] * eye[0] + f[1] * eye[1] + f[2] * eye[2]),
-                                    1.0f};
-                                // perspective (column-major), 70 degrees, near .05, far 1000
-                                const float aspect = (float) width / (float) height;
-                                const float tanHalf = tanf(1.2217f * 0.5f);
-                                const float zn = 0.05f, zf = 1000.0f;
-                                float proj[16] = {0};
-                                proj[0] = 1.0f / (tanHalf * aspect);
-                                proj[5] = 1.0f / tanHalf;
-                                proj[10] = (zf + zn) / (zn - zf);
-                                proj[11] = -1.0f;
-                                proj[14] = (2.0f * zf * zn) / (zn - zf);
-                                // mvp = proj * view (column-major)
-                                for (int c = 0; c < 4; c++)
-                                    for (int ro = 0; ro < 4; ro++)
-                                        mvp[c * 4 + ro] = proj[ro] * view[c * 4]
-                                                        + proj[4 + ro] * view[c * 4 + 1]
-                                                        + proj[8 + ro] * view[c * 4 + 2]
-                                                        + proj[12 + ro] * view[c * 4 + 3];
-                            }
+                            // Java: yaw 0 faces +Z (south), negative pitch looks
+                            // UP - so the skeleton camera looks north-down at the
+                            // spawn platform with yaw 180, pitch +50.
+                            // MATTI_CAM_YAW/MATTI_CAM_PITCH sweep for the cull check.
+                            float camYaw = 180.0f, camPitch = 50.0f;
+                            if (getenv("MATTI_CAM_YAW") != NULL)
+                                camYaw = (float) atof(getenv("MATTI_CAM_YAW"));
+                            if (getenv("MATTI_CAM_PITCH") != NULL)
+                                camPitch = (float) atof(getenv("MATTI_CAM_PITCH"));
+                            LIBMATTI_MC_Camera_SetRotation(&minecraft->camera, camYaw, camPitch);
+                            LIBMATTI_MC_Camera_SetPosition(&minecraft->camera, 8.0, 88.0, 40.0);
 
+                            LIBMATTI_JOML_Matrix4f proj, view, mvpM;
+                            const float aspect = (float) width / (float) height;
+                            LIBMATTI_JOML_Matrix4f_SetPerspective(&proj, 1.2217f, aspect, 0.05f, 1000.0f);
+                            LIBMATTI_MC_GameRenderer_BuildRotationMatrix(&minecraft->camera, &view);
+                            // The clip matrix: projection·view (the projection
+                            // applies last - the GL convention the frustum's
+                            // plane extraction and the shader both need).
+                            LIBMATTI_JOML_Matrix4f_Mul(&proj, &view, &mvpM);
+
+                            // Java: this.cullingFrustum = new Frustum(proj, view);
+                            // cullingFrustum.prepare(camera.getPosition()); the
+                            // section culler consumes the same matrix as the shader.
+                            LIBMATTI_MC_Frustum_Init(&minecraft->frustum, &proj, &view);
+                            LIBMATTI_MC_Frustum_Prepare(&minecraft->frustum,
+                                                        minecraft->camera.x, minecraft->camera.y, minecraft->camera.z);
+
+                            float mvp[16];
+                            memcpy(mvp, &mvpM, sizeof(mvp));
                             float origin[3] = {0.0f, 0.0f, 0.0f};
                             LIBMATTI_MC_SectionRenderDispatcher_RenderLayer(
                                 minecraft->sectionDispatcher, LIBMATTI_MC_ChunkSectionLayer_SOLID,
-                                terrainProgram, mvp, origin);
-
-                            LIBMATTI_MC_SectionRenderDispatcher_RenderLayer(
-                                minecraft->sectionDispatcher, LIBMATTI_MC_ChunkSectionLayer_SOLID,
-                                terrainProgram, mvp, origin);
-
+                                terrainProgram, mvp, origin, &minecraft->frustum);
                         }
                     }
 

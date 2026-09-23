@@ -15,13 +15,16 @@ on:
         description: 'Release version (e.g. 1.21.11-r1). Used for the tag, the AppImage name and the changelog.'
         required: true
         default: '1.21.11-r1'
+      build_type:
+        description: 'Release (default, no tests - what users install) or Debug (runs the full ctest gate).'
+        type: choice
+        required: true
+        default: 'Release'
+        options:
+          - 'Release'
+          - 'Debug'
       prerelease:
         description: 'Mark as pre-release'
-        type: boolean
-        required: false
-        default: false
-      skip_tests:
-        description: 'Skip the ctest gate before packaging'
         type: boolean
         required: false
         default: false
@@ -35,6 +38,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       VERSION: ${{ inputs.version }}
+      BUILD_TYPE: ${{ inputs.build_type || 'Release' }}
 
     steps:
       - uses: actions/checkout@v7
@@ -50,16 +54,17 @@ jobs:
             libfuse2 patchelf zip
 
       # ------------------------------------------------------------------
-      # Build (Release)
+      # Build - the input's build type. Release is what users install and
+      # skips the test gate; Debug releases (for QA) run the full suite.
       # ------------------------------------------------------------------
-      - name: Configure (Release)
-        run: cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
+      - name: Configure (${{ env.BUILD_TYPE }})
+        run: cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE="$BUILD_TYPE"
 
       - name: Build everything
         run: cmake --build build -j "$(nproc)"
 
-      - name: Tests
-        if: ${{ inputs.skip_tests != true }}
+      - name: Tests (Debug builds only)
+        if: ${{ env.BUILD_TYPE == 'Debug' }}
         run: ctest --test-dir build --output-on-failure
 
       # ------------------------------------------------------------------
@@ -190,6 +195,16 @@ jobs:
           zip -qr "dist/Matticraft-${VERSION}-portable-linux-x64.zip" pkg/Matticraft-${VERSION}
 
       # ------------------------------------------------------------------
+      # Theme font - shipped standalone too (mods/skin packs can bundle it;
+      # the binary embeds the same copy so nothing has to download it).
+      # ------------------------------------------------------------------
+      - name: Stage theme font
+        run: |
+          mkdir -p dist
+          cp vendor/FancyModLoader/earlydisplay/src/main/resources/net/neoforged/fml/earlydisplay/theme/Monocraft.ttf \
+             dist/Monocraft.ttf
+
+      # ------------------------------------------------------------------
       # Dev SDK: the static library + headers + CMake config for mod devs
       # ------------------------------------------------------------------
       - name: Pack dev SDK
@@ -275,6 +290,7 @@ jobs:
             Matticraft-${{ inputs.version }}-x86_64.AppImage
             dist/Matticraft-${{ inputs.version }}-portable-linux-x64.zip
             dist/libmatti-dev-linux-x64.tar.gz
+            dist/Monocraft.ttf
             dist/mods/*
             dist/SHA256SUMS
             CHANGELOG-${{ inputs.version }}.md
