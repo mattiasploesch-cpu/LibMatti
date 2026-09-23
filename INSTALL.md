@@ -19,7 +19,14 @@ Das Skript:
 1. löst das neueste Release über die GitHub-API auf,
 2. lädt die Portable-Zip (und das AppImage) herunter,
 3. installiert nach `~/.local/share/matticraft` (kein Root nötig),
-4. legt den Starter `~/.local/bin/matticraft` an.
+4. legt den Starter `~/.local/bin/matticraft` an — der immer
+   `--launchTarget neoforge` und das Spiel-Verzeichnis `~/.matticraft`
+   mitgibt (auch den Ordner selbst, falls er fehlt),
+5. installiert einen Menü-Eintrag (`~/.local/share/applications/matticraft.desktop`)
+   samt Icon (`~/.local/share/pixmaps/matticraft.png`).
+
+Das Spiel startet mit Release-Defaults (keine Tests, kein Debug-Gedöns);
+weitere Argumente gehen 1:1 durch: `matticraft --help` zeigt alle Optionen.
 
 Optionen:
 
@@ -37,15 +44,20 @@ Starten danach:
 matticraft
 ```
 
-Das Spiel-Verzeichnis liegt bei `~/.matticraft` (Configs, `mods/`, Logs).
-Wer es woanders haben will: `MATTICRAFT_GAME_DIR=/pfad matticraft`.
+Ist `~/.local/bin` nicht im PATH, sagt das Skript die exakte Zeile zum
+Nachtragen (`export PATH="$HOME/.local/bin:$PATH" >> ~/.bashrc`) — oder
+starte direkt `~/.local/share/matticraft/game/run-matticraft.sh`.
 
 Deinstallieren:
 
 ```bash
-rm -rf ~/.local/share/matticraft ~/.local/bin/matticraft
+rm -rf ~/.local/share/matticraft ~/.local/bin/matticraft \
+      ~/.local/share/applications/matticraft.desktop \
+      ~/.local/share/pixmaps/matticraft.png
 # bzw. mit --root:
-sudo rm -rf /usr/local/share/matticraft /usr/local/bin/matticraft
+sudo rm -rf /usr/local/share/matticraft /usr/local/bin/matticraft \
+      /usr/local/share/applications/matticraft.desktop \
+      /usr/local/share/pixmaps/matticraft.png
 ```
 
 ---
