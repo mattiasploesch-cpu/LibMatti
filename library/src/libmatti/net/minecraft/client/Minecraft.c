@@ -1,6 +1,9 @@
 // Port of net.minecraft.client.Minecraft (the game skeleton). The constructor
 // opens the GLFW window (Window.java + Window init in the constructor), run()
 // is the while (!stopped) loop of Minecraft.run, runTick() carries the
+#include <fcntl.h>
+#include <sys/stat.h>
+#include <unistd.h>
 // advanceTime/tick/render split, destroy() the shutdown path.
 
 #include "libmatti/net/minecraft/client/Minecraft.h"
@@ -856,8 +859,18 @@ static void runTick(LIBMATTI_MC_Minecraft *minecraft, int runGameTime)
                             LIBMATTI_GL_glReadPixels(0, 0, fbw, fbh, LIBMATTI_GL_GL_RGB,
                                                      LIBMATTI_GL_GL_UNSIGNED_BYTE, pixels);
                             LIBMATTI_GL_glPixelStorei(LIBMATTI_GL_GL_PACK_ALIGNMENT, 4);
-                            FILE *out = fopen(getenv("MATTI_SCREENSHOT"), "wb");
-                            if (out != NULL)
+                            int outFd = open(getenv("MATTI_SCREENSHOT"),
+                                             O_WRONLY | O_CREAT | O_TRUNC,
+                                             S_IRUSR | S_IWUSR);
+                            FILE *out = NULL;
+                            if (outFd >= 0)
+                                out = fdopen(outFd, "wb");
+                            if (out == NULL)
+                            {
+                                if (outFd >= 0)
+                                    close(outFd);
+                            }
+                            else
                             {
                                 fprintf(out, "P6\n%d %d\n255\n", fbw, fbh);
                                 for (int y = fbh - 1; y >= 0; y--)
