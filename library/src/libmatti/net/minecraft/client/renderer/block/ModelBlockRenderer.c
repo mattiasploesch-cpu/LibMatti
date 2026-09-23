@@ -149,6 +149,9 @@ static const AmbientVertexRemap *remap_from_facing(LIBMATTI_MC_Direction facing)
 // Java: ClientLevel.getShade - the cardinal light table (overworld)
 // ---------------------------------------------------------------------------
 
+// Returns full brightness when shading is disabled. Otherwise returns the
+// overworld directional factor: down 0.5, up 1.0, north/south 0.8, west/east
+// 0.6; unknown directions also use full brightness.
 float LIBMATTI_MC_ModelBlockRenderer_GetShade(LIBMATTI_MC_Direction facing, int shade)
 {
     if (!shade)

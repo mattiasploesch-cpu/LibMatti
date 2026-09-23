@@ -34,26 +34,28 @@ typedef struct LIBMATTI_MC_BlockRenderDispatcher
     void *modelUserdata;
 } LIBMATTI_MC_BlockRenderDispatcher;
 
-// Java: the constructor slice - blockColors created through
-// BlockColors.createDefault(), the model renderer over them.
+// Creates a dispatcher with default block colors, ambient occlusion enabled,
+// and no model resolver. The dispatcher owns its colors and model renderer.
 LIBMATTI_MC_BlockRenderDispatcher *LIBMATTI_MC_BlockRenderDispatcher_New(void);
+
+// Frees the dispatcher and its owned colors and model renderer. NULL is allowed.
 void LIBMATTI_MC_BlockRenderDispatcher_Free(LIBMATTI_MC_BlockRenderDispatcher *dispatcher);
 
-// Java: public ModelBlockRenderer getModelRenderer()
+// Returns the dispatcher's borrowed model renderer.
 LIBMATTI_MC_ModelBlockRenderer *LIBMATTI_MC_BlockRenderDispatcher_GetModelRenderer(
     LIBMATTI_MC_BlockRenderDispatcher *dispatcher);
 
-// Java: public BlockStateModel getBlockModel(BlockState) - the port resolves
-// through the game layer's model-for-block callback; NULL keeps the caller on
-// the hardcoded cube path.
+// Resolves the state's block through modelForBlock. Returns NULL when no
+// resolver is installed or when the resolver has no model for the block.
 const struct LIBMATTI_MC_QuadCollection *LIBMATTI_MC_BlockRenderDispatcher_GetBlockModel(
     LIBMATTI_MC_BlockRenderDispatcher *dispatcher,
     const struct LIBMATTI_MC_BlockState *state);
 
-// Java: public void renderBatched(BlockState, BlockPos, BlockAndTintGetter,
-// PoseStack, VertexConsumer, boolean checkSides, List<BlockModelPart>) -
-// the model quads through the AO decision; the vertex sink is the
-// putBulkData slice the caller packs into its buffer.
+// Resolves and renders the state's model, emitting four model-local vertices
+// per rendered quad to sink. A nonzero checkSides culls faces hidden by solid
+// neighbors. Ambient occlusion is used when enabled and the block emits no
+// light; otherwise flat shading is used. No vertices are emitted when model
+// resolution returns NULL.
 void LIBMATTI_MC_BlockRenderDispatcher_RenderBatched(
     LIBMATTI_MC_BlockRenderDispatcher *dispatcher,
     const struct LIBMATTI_MC_BlockState *state,

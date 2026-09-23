@@ -17,8 +17,9 @@ struct LIBMATTI_MC_Level;
 
 typedef struct LIBMATTI_MC_BlockAndTintGetter LIBMATTI_MC_BlockAndTintGetter;
 
-// Java: float getShade(Direction, boolean shade) - the cardinal light table of
-// the dimension (ClientLevel's overworld switch).
+// Returns full brightness when shade is zero. Otherwise returns the overworld
+// directional factor: down 0.5, up 1.0, north/south 0.8, west/east 0.6;
+// unknown directions also return 1.0.
 float LIBMATTI_MC_BlockAndTintGetter_GetShade(LIBMATTI_MC_Direction direction, int shade);
 
 // Java: boolean canSeeSky(BlockPos) - rides on LevelReader's column scan
