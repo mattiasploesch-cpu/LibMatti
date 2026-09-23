@@ -23,6 +23,13 @@ target_compile_definitions(matticraft PRIVATE
         MATTI_BUILD_DIR="${CMAKE_BINARY_DIR}"
 )
 
+# Release builds compile the selftest phase out: the packages ship the game
+# binary only, the harness paths point at the build machine and would exit
+# 127 on every user machine. Debug releases (QA) keep the phase.
+target_compile_definitions(matticraft PRIVATE
+        $<$<CONFIG:Release>:MATTICRAFT_CLIENT_ONLY=1>
+)
+
 set_target_properties(matticraft PROPERTIES
         ENABLE_EXPORTS ON
 )
