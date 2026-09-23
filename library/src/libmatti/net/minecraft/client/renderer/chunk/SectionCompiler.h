@@ -29,6 +29,10 @@ typedef struct LIBMATTI_MC_SectionCompiler
     // renders the baked model quads for the block's model id instead of the
     // hardcoded cube faces. The block carries its model id.
     const struct LIBMATTI_MC_QuadCollection *(*modelForBlock)(void *userdata, const struct LIBMATTI_MC_Block *block);
+    // Java: this.blockRenderer - the BlockRenderDispatcher the compile walks
+    // through (tesselateBlock's AO path). When set, the model path renders
+    // through the dispatcher (AO + tint) instead of the flat emit.
+    struct LIBMATTI_MC_BlockRenderDispatcher *blockRenderer;
 } LIBMATTI_MC_SectionCompiler;
 
 // Java: the compile result (Java returns CompiledSectionMesh directly).

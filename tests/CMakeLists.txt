@@ -81,6 +81,11 @@ add_test(NAME itemstack COMMAND test_itemstack)
 matti_test(test_level level/LevelHarness.c)
 add_test(NAME level COMMAND test_level)
 
+# ao: the P4.4 AO kernel over a real level (BlockColors providers, shade table,
+# the tesselate paths through the dispatcher)
+matti_test(test_ao ao/AoHarness.c)
+add_test(NAME ao COMMAND test_ao)
+
 # ---------------------------------------------------------------------------
 # gl: GL binding constants, dlopen availability and no-driver fallbacks
 # ---------------------------------------------------------------------------

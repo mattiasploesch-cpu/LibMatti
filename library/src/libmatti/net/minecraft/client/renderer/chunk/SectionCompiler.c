@@ -12,6 +12,7 @@
 #include "libmatti/com/mojang/blaze3d/vertex/VertexFormat.h"
 #include "libmatti/com/mojang/blaze3d/buffers/GlBuffer.h"
 #include "libmatti/net/minecraft/client/renderer/chunk/ModelBlockRenderer.h"
+#include "libmatti/net/minecraft/client/renderer/block/BlockRenderDispatcher.h"
 #include "libmatti/net/minecraft/client/renderer/chunk/SectionBuffers.h"
 #include "libmatti/net/minecraft/client/renderer/chunk/VisGraph.h"
 #include "libmatti/net/minecraft/client/resources/model/QuadCollection.h"
@@ -102,6 +103,38 @@ static void emit_baked_quad(CompileState *state, LIBMATTI_B3D_BufferBuilder *bui
     }
 }
 
+// Java: BlockRenderDispatcher.renderBatched -> the vertex sink packs the
+// corner into the layer buffer (putBulkData on the BufferBuilder). The AO
+// path folds the per-vertex brightness into the color; the lightmap rides
+// through the uv2 channel.
+typedef struct BatchSinkState
+{
+    LIBMATTI_B3D_BufferBuilder *builder;
+    int blockX, blockY, blockZ;
+    const float *spriteUv;
+} BatchSinkState;
+
+static void batch_sink(void *userdata, int corner, const float vertexPos[3],
+                       const LIBMATTI_MC_BakedQuad *quad, float r, float g, float b, int lightmap)
+{
+    BatchSinkState *sinkState = userdata;
+    float u = sinkState->spriteUv[0] + quad->uv[corner][0] * (sinkState->spriteUv[2] - sinkState->spriteUv[0]);
+    float v = sinkState->spriteUv[1] + quad->uv[corner][1] * (sinkState->spriteUv[3] - sinkState->spriteUv[1]);
+    // Java: the ARGB vertex color - alpha 255, the channels as bytes
+    int color = 0xFF000000 | ((int) (b * 255.0f) & 0xFF) << 16 | ((int) (g * 255.0f) & 0xFF) << 8 | ((int) (r * 255.0f) & 0xFF);
+    LIBMATTI_B3D_BufferBuilder_AddVertexFull(
+        sinkState->builder,
+        vertexPos[0] + (float) sinkState->blockX,
+        vertexPos[1] + (float) sinkState->blockY,
+        vertexPos[2] + (float) sinkState->blockZ,
+        color,
+        u, v,
+        0, lightmap,
+        (float) LIBMATTI_MC_Direction_GetStepX(quad->direction),
+        (float) LIBMATTI_MC_Direction_GetStepY(quad->direction),
+        (float) LIBMATTI_MC_Direction_GetStepZ(quad->direction));
+}
+
 // Java: the baked-model path of ModelBlockRenderer.tesselateBlock - the model
 // quads render with the block offset; the model's UVs are already in atlas
 // space, the sprite rect scales them onto the block's sprite (the demo uses
@@ -127,6 +160,22 @@ static void render_model_quads(CompileState *state, const LIBMATTI_MC_QuadCollec
     if (builder == NULL)
         return;
 
+    // Java: this.blockRenderer.renderBatched(blockstate, blockpos2, region,
+    // posestack, bufferbuilder1, true, list) - the AO path folds the
+    // brightness into the vertex color; the sink packs the corners.
+    if (state->compiler->blockRenderer != NULL)
+    {
+        BatchSinkState sinkState = {builder, blockX, blockY, blockZ, spriteUv};
+        LIBMATTI_MC_BlockPos blockPos = {{blockX, blockY, blockZ}};
+        LIBMATTI_MC_BlockRenderDispatcher_RenderBatched(
+            state->compiler->blockRenderer, blockState, &blockPos,
+            (struct LIBMATTI_MC_BlockAndTintGetter *) state->region->level, 1,
+            batch_sink, &sinkState);
+        (void) block;
+        return;
+    }
+
+    // The flat fallback (no dispatcher wired): the untinted emit.
     // Java: getUnculledFaces() first, then every cull bucket whose face passes
     // the region visibility gate.
     size_t count = 0;

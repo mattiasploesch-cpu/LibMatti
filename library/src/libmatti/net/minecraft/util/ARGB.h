@@ -38,6 +38,30 @@ static inline int LIBMATTI_MC_ARGB_Color(int alpha, int red, int green, int blue
     return (alpha & 0xFF) << 24 | (blue & 0xFF) << 16 | (green & 0xFF) << 8 | (red & 0xFF);
 }
 
+// Java: public static int colorFromFloat(float alpha, float red, float green, float blue)
+static inline int LIBMATTI_MC_ARGB_ColorFromFloat(float alpha, float red, float green, float blue)
+{
+    return LIBMATTI_MC_ARGB_Color((int) (alpha * 255.0f), (int) (red * 255.0f), (int) (green * 255.0f), (int) (blue * 255.0f));
+}
+
+// Java: public static float redFloat(int color)
+static inline float LIBMATTI_MC_ARGB_RedFloat(int color)
+{
+    return (float) LIBMATTI_MC_ARGB_RED(color) / 255.0f;
+}
+
+// Java: public static float greenFloat(int color)
+static inline float LIBMATTI_MC_ARGB_GreenFloat(int color)
+{
+    return (float) LIBMATTI_MC_ARGB_GREEN(color) / 255.0f;
+}
+
+// Java: public static float blueFloat(int color)
+static inline float LIBMATTI_MC_ARGB_BlueFloat(int color)
+{
+    return (float) LIBMATTI_MC_ARGB_BLUE(color) / 255.0f;
+}
+
 // Java: public static int color(int alpha, int rgb)
 static inline int LIBMATTI_MC_ARGB_ColorAlpha(int alpha, int rgb)
 {

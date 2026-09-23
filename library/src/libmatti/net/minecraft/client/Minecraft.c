@@ -18,6 +18,7 @@
 #include "libmatti/net/minecraft/client/renderer/chunk/SectionRenderDispatcher.h"
 #include "libmatti/net/minecraft/client/renderer/chunk/SectionShader.h"
 #include "libmatti/net/minecraft/client/resources/model/ModelManager.h"
+#include "libmatti/net/minecraft/client/renderer/block/BlockRenderDispatcher.h"
 #include "libmatti/net/minecraft/server/bootstrap/VanillaBlockModels.h"
 #include "libmatti/net/minecraft/server/bootstrap/VanillaBlockTextures.h"
 #include "libmatti/net/minecraft/client/resources/model/SpriteGetter.h"
@@ -111,6 +112,11 @@ struct LIBMATTI_MC_Minecraft
     // section compiler resolves the block model quads through it.
     LIBMATTI_MC_ModelManager *modelManager;
 
+    // Java: this.blockRenderer = new BlockRenderDispatcher(...) - the P4.4
+    // facade (BlockColors + the AO ModelBlockRenderer) the section compiler's
+    // renderBatched path runs through.
+    LIBMATTI_MC_BlockRenderDispatcher *blockRenderer;
+
     // Java: private final Camera camera (GameRenderer owns it in Java; the
     // skeleton keeps it on the Minecraft struct) + the culling frustum the
     // level renderer feeds per frame (the P4.3 port).
@@ -154,7 +160,6 @@ static const LIBMATTI_MC_QuadCollection *model_for_block(void *userdata, const L
     char modelId[128];
     snprintf(modelId, sizeof(modelId), "block/%s", LIBMATTI_MC_Identifier_GetPath(key->identifier));
     const LIBMATTI_MC_QuadCollection *model = LIBMATTI_MC_ModelManager_GetModel(manager, modelId);
-    return model;
     return model;
 }
 
@@ -426,6 +431,14 @@ LIBMATTI_MC_Minecraft *LIBMATTI_MC_Minecraft_New(const LIBMATTI_MC_GameConfig *c
             LIBMATTI_MC_SectionRenderDispatcher_SetSpriteResolver(
                 minecraft->sectionDispatcher, sprite_rect_for_block, minecraft->modelManager);
         }
+
+        // Java: this.blockRenderer = new BlockRenderDispatcher(blockModelShaper,
+        // materials, blockColors) - created with the model manager so the
+        // compiler's renderBatched path carries AO + tint.
+        minecraft->blockRenderer = LIBMATTI_MC_BlockRenderDispatcher_New();
+        minecraft->sectionDispatcher->compiler->blockRenderer = minecraft->blockRenderer;
+        minecraft->blockRenderer->modelForBlock = model_for_block;
+        minecraft->blockRenderer->modelUserdata = minecraft->modelManager;
 
         LIBMATTI_MC_SectionRenderDispatcher_CreateSection(minecraft->sectionDispatcher, 0, 4, 0);
         LIBMATTI_MC_SectionRenderDispatcher_CreateSection(minecraft->sectionDispatcher, 4, 4, 0);
@@ -770,6 +783,11 @@ void LIBMATTI_MC_Minecraft_Destroy(LIBMATTI_MC_Minecraft *minecraft)
 
     // Java: this.close() -> levelRenderer.close() -> the section dispatcher's
     // sections and compiled meshes free with the level.
+    if (minecraft->blockRenderer != NULL)
+    {
+        LIBMATTI_MC_BlockRenderDispatcher_Free(minecraft->blockRenderer);
+        minecraft->blockRenderer = NULL;
+    }
     if (minecraft->sectionDispatcher != NULL)
     {
         LIBMATTI_MC_SectionRenderDispatcher_Free(minecraft->sectionDispatcher);
