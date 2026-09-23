@@ -594,10 +594,14 @@ static void put_quad_data(RenderContext *ctx, const LIBMATTI_MC_BakedQuad *quad,
         f2 = 1.0f;
     }
 
+    // Java: putBulkData(pose, quad, brightness[], r, g, b, 1.0F, lightmap[],
+    // overlay) - the per-vertex brightness folds into the vertex color.
     for (int corner = 0; corner < 4; corner++)
     {
         float vertexPos[3] = {quad->pos[corner][0], quad->pos[corner][1], quad->pos[corner][2]};
-        sink->sink(sink->userdata, corner, vertexPos, quad, f, f1, f2, st->lightmap[corner]);
+        float shade = st->brightness[corner];
+        sink->sink(sink->userdata, corner, vertexPos, quad, f * shade, f1 * shade, f2 * shade,
+                   st->lightmap[corner]);
     }
 }
 
@@ -620,17 +624,20 @@ static void render_face_list_flat(RenderContext *ctx, const LIBMATTI_MC_BakedQua
 {
     for (size_t q = 0; q < count; q++)
     {
+        const LIBMATTI_MC_BakedQuad *quad = &quads[q];
         LIBMATTI_MC_ModelBlockRenderer_Storage *st = ctx->storage;
-        st->brightness[0] = 1.0f;
-        st->brightness[1] = 1.0f;
-        st->brightness[2] = 1.0f;
-        st->brightness[3] = 1.0f;
+        // Java: float f = level.getShade(quad.direction(), quad.shade()) - the
+        // one shade value goes into all four brightness slots.
+        float shade = LIBMATTI_MC_ModelBlockRenderer_GetShade(quad->direction, quad->shade);
+        st->brightness[0] = shade;
+        st->brightness[1] = shade;
+        st->brightness[2] = shade;
+        st->brightness[3] = shade;
         st->lightmap[0] = light;
         st->lightmap[1] = light;
         st->lightmap[2] = light;
         st->lightmap[3] = light;
-        put_quad_data(ctx, &quads[q], sink);
-        (void) ctx;
+        put_quad_data(ctx, quad, sink);
     }
 }
 
