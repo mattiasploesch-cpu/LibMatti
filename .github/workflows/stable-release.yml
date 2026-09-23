@@ -192,7 +192,10 @@ jobs:
           # The AppDir-internal AppRun/desktop/icon are AppImage plumbing;
           # the zip package just ships the game folder.
           rm -f pkg/Matticraft-${VERSION}/AppRun pkg/Matticraft-${VERSION}/*.desktop
-          zip -qr "dist/Matticraft-${VERSION}-portable-linux-x64.zip" pkg/Matticraft-${VERSION}
+          rm -rf pkg/Matticraft-${VERSION}/usr
+          # The zip root IS the game folder (no pkg/ wrapper): unpacking into
+          # <prefix>/share/matticraft/game gives game/matticraft directly.
+          (cd pkg && zip -qr "../dist/Matticraft-${VERSION}-portable-linux-x64.zip" Matticraft-${VERSION})
 
       # ------------------------------------------------------------------
       # Theme font - shipped standalone too (mods/skin packs can bundle it;

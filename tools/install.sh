@@ -6,10 +6,15 @@
 #   ./install.sh --root         # latest release, system wide (/usr/local)
 #   ./install.sh --root v1.21.11-r1
 #
-# The installer downloads the portable zip from the GitHub release, unpacks
-# it into the target prefix, installs the AppImage alongside and symlinks
-# the launcher into PATH. User space needs no root; --root installs to
-# /usr/local (sudo when not running as root).
+# What you get:
+#   <prefix>/share/matticraft/game/     the game (binary, launcher, mods/)
+#   <prefix>/share/matticraft/Matticraft.AppImage
+#   <prefix>/bin/matticraft             the launcher on PATH
+#   ~/.local/share/applications/matticraft.desktop   (menu entry)
+#
+# The launcher always passes --launchTarget neoforge and a stable game dir
+# (~/.matticraft); more arguments go through to the game. User space needs
+# no root; --root installs to /usr/local (sudo when not running as root).
 
 set -euo pipefail
 
@@ -24,7 +29,7 @@ for arg in "$@"; do
     case "$arg" in
         --root) USE_ROOT=1 ;;
         -h|--help)
-            sed -n '2,12p' "$0" | sed 's/^# \{0,1\}//'
+            sed -n '2,20p' "$0" | sed 's/^# \{0,1\}//'
             exit 0
             ;;
         v*) TAG="$arg" ;;
@@ -63,6 +68,7 @@ META=$(curl -fsSL "https://api.github.com/repos/${REPO}/${API}") || {
 }
 
 VERSION=$(printf '%s' "$META" | grep -o '"tag_name": *"[^"]*"' | head -1 | sed 's/.*"v\?\([^"]*\)"$/\1/')
+# The asset names carry the version (Matticraft-<version>-portable-linux-x64.zip).
 ZIP_URL=$(printf '%s' "$META" | grep -o '"browser_download_url": *"[^"]*portable-linux-x64\.zip"' | head -1 | sed 's/.*"\(https[^"]*\)"$/\1/')
 APPIMAGE_URL=$(printf '%s' "$META" | grep -o '"browser_download_url": *"[^"]*x86_64\.AppImage"' | head -1 | sed 's/.*"\(https[^"]*\)"$/\1/')
 
@@ -91,16 +97,27 @@ fi
 # Install into the prefix
 # ---------------------------------------------------------------------------
 INSTALL_DIR="${PREFIX}/share/matticraft"
+GAME_DIR="${INSTALL_DIR}/game"
 echo "==> installing into ${INSTALL_DIR}"
 $SUDO mkdir -p "${INSTALL_DIR}" "${PREFIX}/bin"
 $SUDO unzip -oq "$TMP/matticraft.zip" -d "$TMP/unpack"
 
-# The zip carries a single top-level folder (Matticraft-<version>); move its
-# contents into the install dir so the path stays stable across versions.
-TOPDIR=$(find "$TMP/unpack" -mindepth 1 -maxdepth 1 -type d | head -1)
-$SUDO rm -rf "${INSTALL_DIR}/game"
-$SUDO mv "$TOPDIR" "${INSTALL_DIR}/game"
-$SUDO chmod +x "${INSTALL_DIR}/game/matticraft" "${INSTALL_DIR}/game/run-matticraft.sh"
+# The zip root carries the versioned game folder (Matticraft-<version>).
+TOPDIR=$(find "$TMP/unpack" -mindepth 1 -maxdepth 2 -type d -name 'Matticraft-*' | head -1)
+if [ -z "$TOPDIR" ]; then
+    echo "ERROR: unexpected zip layout (no Matticraft-* folder)" >&2
+    exit 1
+fi
+$SUDO rm -rf "${GAME_DIR}"
+$SUDO mv "$TOPDIR" "${GAME_DIR}"
+
+BIN="${GAME_DIR}/matticraft"
+LAUNCHER="${GAME_DIR}/run-matticraft.sh"
+if [ ! -f "$BIN" ]; then
+    echo "ERROR: the zip did not contain the matticraft binary" >&2
+    exit 1
+fi
+$SUDO chmod +x "$BIN" "$LAUNCHER"
 
 if [ -f "$TMP/Matticraft.AppImage" ]; then
     $SUDO mv "$TMP/Matticraft.AppImage" "${INSTALL_DIR}/Matticraft.AppImage"
@@ -108,32 +125,61 @@ if [ -f "$TMP/Matticraft.AppImage" ]; then
 fi
 
 # ---------------------------------------------------------------------------
-# Launcher on PATH
+# Launcher on PATH - always neoforge, stable game dir, extra args pass through
 # ---------------------------------------------------------------------------
 $SUDO tee "${PREFIX}/bin/matticraft" > /dev/null <<EOF
 #!/bin/sh
-# Installed by Matticraft install.sh - runs the game with a stable game dir.
+# Installed by Matticraft install.sh - the stable way to start the game.
 GAME_DIR="\${MATTICRAFT_GAME_DIR:-\${HOME}/.matticraft}"
-mkdir -p "\$GAME_DIR"
-exec "${INSTALL_DIR}/game/matticraft" --launchTarget neoforge --gameDir "\$GAME_DIR" "\$@"
+mkdir -p "\$GAME_DIR/mods"
+exec "${GAME_DIR}/matticraft" --launchTarget neoforge --gameDir "\$GAME_DIR" "\$@"
 EOF
 $SUDO chmod +x "${PREFIX}/bin/matticraft"
 
+# ---------------------------------------------------------------------------
+# Menu entry (.desktop) - user and root installs both get one
+# ---------------------------------------------------------------------------
 if [ "$USE_ROOT" = 1 ]; then
-    # A desktop entry makes the AppImage findable in menus.
-    $SUDO mkdir -p /usr/local/share/applications 2>/dev/null || true
-    if [ -f "${INSTALL_DIR}/game/matticraft.desktop" ]; then
-        $SUDO cp "${INSTALL_DIR}/game/matticraft.desktop" /usr/local/share/applications/ 2>/dev/null || true
-    fi
+    DESKTOP_DIR="/usr/local/share/applications"
+    ICON_DIR="/usr/local/share/pixmaps"
+else
+    DESKTOP_DIR="${HOME}/.local/share/applications"
+    ICON_DIR="${HOME}/.local/share/pixmaps"
 fi
+$SUDO mkdir -p "$DESKTOP_DIR" "$ICON_DIR"
+if [ -f "${GAME_DIR}/matticraft.png" ]; then
+    $SUDO cp "${GAME_DIR}/matticraft.png" "${ICON_DIR}/matticraft.png"
+else
+    # No icon asset in the zip - the desktop entry ships without one.
+    :
+fi
+$SUDO tee "${DESKTOP_DIR}/matticraft.desktop" > /dev/null <<EOF
+[Desktop Entry]
+Type=Application
+Name=Matticraft
+Comment=A from-scratch C port of the Minecraft + NeoForge toolchain
+Exec=${PREFIX}/bin/matticraft
+Icon=matticraft
+Categories=Game;
+Terminal=true
+EOF
 
+# ---------------------------------------------------------------------------
+# Done - tell the user what happened and what to check
+# ---------------------------------------------------------------------------
 echo
 echo "==> installed Matticraft ${VERSION}"
-echo "    run:          matticraft"
-echo "    game dir:     \${HOME}/.matticraft (override with MATTICRAFT_GAME_DIR)"
+echo "    game:         ${GAME_DIR}"
 [ -f "${INSTALL_DIR}/Matticraft.AppImage" ] && echo "    appimage:     ${INSTALL_DIR}/Matticraft.AppImage"
-[ "$USE_ROOT" = 0 ] && [ -d "${PREFIX}/bin" ] && case ":${PATH}:" in
+echo "    launcher:     ${PREFIX}/bin/matticraft"
+echo "    menu entry:   ${DESKTOP_DIR}/matticraft.desktop"
+echo "    game dir:     \${HOME}/.matticraft (override with MATTICRAFT_GAME_DIR)"
+echo
+case ":${PATH}:" in
     *":${PREFIX}/bin:"*) ;;
-    *) echo "    note: add ${PREFIX}/bin to your PATH to use the launcher" ;;
+    *)
+        echo "    NOTE: ${PREFIX}/bin is not in your PATH. Fix with:"
+        echo "        echo 'export PATH=\"${PREFIX}/bin:\$PATH\"' >> ~/.bashrc && source ~/.bashrc"
+        echo "    (or run the game directly: ${LAUNCHER})"
+        ;;
 esac
-echo "    uninstall:    rm -rf ${INSTALL_DIR} ${PREFIX}/bin/matticraft"
