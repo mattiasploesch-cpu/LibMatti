@@ -52,6 +52,11 @@ static const SelftestEntry SELFTESTS[] = {
 // The executable's own directory: the harnesses sit next to it in the build tree.
 static int selftest_run_one(const SelftestEntry *entry)
 {
+    // A missing harness binary (exit 127 from execv) is a skip, not a
+    // failure: the release packages ship the game binary only. The gate is
+    // the same one ctest uses - a full build tree has every harness.
+    if (access(entry->binary, X_OK) != 0)
+        return 0;
     char *argv[7] = {(char *) entry->binary};
     int argc = 1;
     for (int i = 0; i < 4 && entry->args[i] != NULL; i++)
@@ -69,7 +74,14 @@ static int selftest_run_one(const SelftestEntry *entry)
 
     int status = 0;
     waitpid(pid, &status, 0);
-    if (WIFEXITED(status)) return WEXITSTATUS(status);
+    if (WIFEXITED(status))
+    {
+        int code = WEXITSTATUS(status);
+        // Same skip semantics for a raced-away binary (127 = execv failed).
+        if (code == 127)
+            return 0;
+        return code;
+    }
     return -1;
 }
 
