@@ -1,6 +1,9 @@
 // Port of net.minecraft.client.Minecraft (the game skeleton). The constructor
 // opens the GLFW window (Window.java + Window init in the constructor), run()
 // is the while (!stopped) loop of Minecraft.run, runTick() carries the
+#include <fcntl.h>
+#include <sys/stat.h>
+#include <unistd.h>
 // advanceTime/tick/render split, destroy() the shutdown path.
 
 #include "libmatti/net/minecraft/client/Minecraft.h"
@@ -13,7 +16,9 @@
 #include "libmatti/matti_mixin.h"
 #include "libmatti/net/minecraft/client/Camera.h"
 #include "libmatti/net/minecraft/client/renderer/culling/Frustum.h"
+#include "libmatti/net/minecraft/client/renderer/SkyRenderer.h"
 #include "libmatti/net/minecraft/client/renderer/texture/TextureManager.h"
+#include "libmatti/net/minecraft/client/renderer/texture/TextureAtlas.h"
 #include "libmatti/net/neoforged/fml/earlydisplay/EarlyFramebuffer.h"
 #include "libmatti/net/minecraft/client/renderer/chunk/SectionRenderDispatcher.h"
 #include "libmatti/net/minecraft/client/renderer/chunk/SectionShader.h"
@@ -21,6 +26,7 @@
 #include "libmatti/net/minecraft/client/renderer/block/BlockRenderDispatcher.h"
 #include "libmatti/net/minecraft/server/bootstrap/VanillaBlockModels.h"
 #include "libmatti/net/minecraft/server/bootstrap/VanillaBlockTextures.h"
+#include "libmatti/net/minecraft/server/bootstrap/VanillaCelestialTextures.h"
 #include "libmatti/net/minecraft/client/resources/model/SpriteGetter.h"
 #include "libmatti/net/minecraft/client/renderer/chunk/ChunkSectionLayer.h"
 #include "libmatti/net/minecraft/core/BlockPos.h"
@@ -123,12 +129,21 @@ struct LIBMATTI_MC_Minecraft
     LIBMATTI_MC_Camera camera;
     LIBMATTI_MC_Frustum frustum;
     int frustumInitialized;
+
+    // Java: private SkyRenderer skyRenderer (the P4.5 port) + the CELESTIALS
+    // atlas the sun/moon quads ride.
+    LIBMATTI_MC_SkyRenderer *skyRenderer;
+    LIBMATTI_MC_TextureAtlas *celestialsAtlas;
 };
 
 // Java: GameRenderer.renderLevel - "Matrix4f matrix4f1 = new Matrix4f()
 // .rotation(quaternionf)" with quaternionf = camera.rotation().conjugate():
-// the view ROTATION (no translation - the camera position enters the cull
-// through Frustum.prepare and the render through the modelview translation).
+// the view ROTATION, and the camera position enters through the PoseStack
+// translate(-camera) the level path applies. The port folds that translation
+// into the view's translation column: the struct is JOML column-major
+// (mCR = column C, row R), so the GL translation slots are m30/m31/m32 and
+// the per-column constants are -dot(row, camPos) for the right/up rows and
+// +dot(forward, camPos) for the -forward row (V * p = R^T * (p - camPos)).
 // The rows are right/up/-forward with right = -left (the camera's left is
 // screen-left); that 3x3 IS the inverse camera rotation.
 void LIBMATTI_MC_GameRenderer_BuildRotationMatrix(const LIBMATTI_MC_Camera *camera, LIBMATTI_JOML_Matrix4f *view)
@@ -137,11 +152,16 @@ void LIBMATTI_MC_GameRenderer_BuildRotationMatrix(const LIBMATTI_MC_Camera *came
     const LIBMATTI_JOML_Vector3f *u = LIBMATTI_MC_Camera_UpVector(camera);
     const LIBMATTI_JOML_Vector3f *l = LIBMATTI_MC_Camera_LeftVector(camera);
     float rx = -l->x, ry = -l->y, rz = -l->z;
-    // Column-major view: element (row, col) = view[col * 4 + row].
+    float cx = (float) camera->x, cy = (float) camera->y, cz = (float) camera->z;
+    // Column-major view: element (column, row) = m<column><row>.
     view->m00 = rx; view->m01 = u->x; view->m02 = -f->x; view->m03 = 0.0f;
     view->m10 = ry; view->m11 = u->y; view->m12 = -f->y; view->m13 = 0.0f;
     view->m20 = rz; view->m21 = u->z; view->m22 = -f->z; view->m23 = 0.0f;
-    view->m30 = 0.0f; view->m31 = 0.0f; view->m32 = 0.0f; view->m33 = 1.0f;
+    // The translation column (GL: elements [0][3], [1][3], [2][3]).
+    view->m30 = -(rx * cx + ry * cy + rz * cz);
+    view->m31 = -(u->x * cx + u->y * cy + u->z * cz);
+    view->m32 = (f->x * cx + f->y * cy + f->z * cz);
+    view->m33 = 1.0f;
 }
 
 // The full view for the terrain shader: the rotation above plus the negated
@@ -442,6 +462,14 @@ LIBMATTI_MC_Minecraft *LIBMATTI_MC_Minecraft_New(const LIBMATTI_MC_GameConfig *c
 
         LIBMATTI_MC_SectionRenderDispatcher_CreateSection(minecraft->sectionDispatcher, 0, 4, 0);
         LIBMATTI_MC_SectionRenderDispatcher_CreateSection(minecraft->sectionDispatcher, 4, 4, 0);
+
+        // Java: the CELESTIALS atlas load + this.skyRenderer = new SkyRenderer(
+        // textureManager, atlasManager) - the sun/moon quads ride the atlas,
+        // the stars/sunrise/discs build once.
+        minecraft->celestialsAtlas = LIBMATTI_MC_VanillaCelestialTextures_Bootstrap(1024);
+        minecraft->skyRenderer = LIBMATTI_MC_SkyRenderer_New();
+        LIBMATTI_MC_SkyRenderer_SetAtlas(minecraft->skyRenderer, minecraft->celestialsAtlas);
+        LOG("SkyRenderer ready (atlas=%p)", (void *) minecraft->celestialsAtlas);
     }
 
     return minecraft;
@@ -700,6 +728,89 @@ static void runTick(LIBMATTI_MC_Minecraft *minecraft, int runGameTime)
                             LIBMATTI_MC_Frustum_Prepare(&minecraft->frustum,
                                                         minecraft->camera.x, minecraft->camera.y, minecraft->camera.z);
 
+                            // Java: LevelRenderer.renderLevel's sky pass (the
+                            // renderSky section) - the disc, sunrise/sunset,
+                            // sun/moon/stars and the dark disc draw through
+                            // the SkyRenderer before the sections.
+                            if (minecraft->skyRenderer != NULL)
+                            {
+                                // Java: ClientLevel - timeOfDay = dayTime % 24000
+                                // over the DAY timeline period; the angles follow
+                                // the 1.21.11 keys (sun/star 0 -> 360, moon 180 ->
+                                // 540 over the day, sunrise color at the edges).
+                                long dayTime = minecraft->level != NULL
+                                                   ? LIBMATTI_MC_Level_GetDayTime((LIBMATTI_MC_Level *) minecraft->level)
+                                                   : 0;
+                                float timeOfDay = (float) (dayTime % 24000L);
+                                float dayFraction = timeOfDay / 24000.0f;
+                                // Java: the angle keys ease around noon (6000);
+                                // the linear stand-in keeps the same key geometry.
+                                float sunAngle = dayFraction * (float) (2.0 * M_PI);
+                                float moonAngle = sunAngle + (float) M_PI;
+                                float starAngle = sunAngle;
+                                LIBMATTI_MC_MoonPhase phase = LIBMATTI_MC_MoonPhase_ByIndex(
+                                    (int) (((dayTime % (24000L * LIBMATTI_MC_MoonPhase_COUNT)) / 24000L)));
+                                // Java: the rainBrightness multiplier (1 - rain
+                                // level) - no weather yet, so 1.
+                                float rainBrightness = 1.0f;
+                                // Java: Timelines.DAY's STAR_BRIGHTNESS keys - 0
+                                // by day, 0.5 over the night plateau.
+                                float starBrightness = 0.0f;
+                                if (dayFraction > 13228.0f / 24000.0f || dayFraction < 92.0f / 24000.0f)
+                                    starBrightness = 0.5f;
+
+                                // Java: the sky color (the biome SKY_COLOR through
+                                // the DAY timeline's night multiplier; the port
+                                // carries the overworld day curve inline).
+                                float skyR = 0.466f, skyG = 0.709f, skyB = 0.996f;
+                                if (dayFraction > 13670.0f / 24000.0f && dayFraction < 22330.0f / 24000.0f)
+                                {
+                                    skyR = 0.028f;
+                                    skyG = 0.028f;
+                                    skyB = 0.088f;
+                                }
+
+                                LIBMATTI_B3D_GlStateManager_EnableBlend();
+                                LIBMATTI_B3D_GlStateManager_BlendFuncSeparate(LIBMATTI_GL_GL_SRC_ALPHA,
+                                                                              LIBMATTI_GL_GL_ONE_MINUS_SRC_ALPHA,
+                                                                              LIBMATTI_GL_GL_ONE,
+                                                                              LIBMATTI_GL_GL_ZERO);
+                                LIBMATTI_B3D_GlStateManager_DepthMask(0);
+
+                                if (getenv("MATTI_STATE_DEBUG") != NULL)
+                                {
+                                    fprintf(stderr, "[STATE] pre-sky depthMask=%d\n",
+                                            LIBMATTI_GL_glGetInteger(0x0B72));
+                                }
+
+                                LIBMATTI_MC_SkyRenderer_DrawSkyDisc(minecraft->skyRenderer, &view, &proj, skyR,
+                                                                    skyG, skyB, 1.0f);
+
+                                // Java: renderSunriseAndSunset - the alpha comes
+                                // from the SUNRISE_SUNSET_COLOR track's edges.
+                                float sunriseAlpha = 0.0f;
+                                float edge = dayFraction < 0.5f
+                                                 ? dayFraction - 71.0f / 24000.0f
+                                                 : 1.0f - (dayFraction - 21807.0f / 24000.0f) * (24000.0f / 2193.0f);
+                                (void) edge;
+                                if ((dayFraction > 71.0f / 24000.0f && dayFraction < 730.0f / 24000.0f)
+                                    || (dayFraction > 21807.0f / 24000.0f && dayFraction < 23757.0f / 24000.0f))
+                                    sunriseAlpha = 0.6f;
+                                if (sunriseAlpha > 0.0f)
+                                    LIBMATTI_MC_SkyRenderer_DrawSunriseSunset(
+                                        minecraft->skyRenderer, &view, &proj, sunAngle, sunriseAlpha);
+
+                                LIBMATTI_MC_SkyRenderer_RenderSunMoonAndStars(
+                                    minecraft->skyRenderer, &view, &proj, sunAngle, moonAngle, starAngle, phase,
+                                    rainBrightness, starBrightness);
+
+                                // Java: shouldRenderDarkDisc - the eye below the
+                                // horizon; the fixed skeleton camera stays above.
+
+                                LIBMATTI_B3D_GlStateManager_DepthMask(1);
+                                LIBMATTI_B3D_GlStateManager_DisableBlend();
+                            }
+
                             float mvp[16];
                             memcpy(mvp, &mvpM, sizeof(mvp));
                             float origin[3] = {0.0f, 0.0f, 0.0f};
@@ -711,7 +822,65 @@ static void runTick(LIBMATTI_MC_Minecraft *minecraft, int runGameTime)
 
                     // The skeleton's title line (Java: the theme's LabelElement
                     // renders the game title inside the layout).
-                    render_title(minecraft, 854, 480);
+                    if (getenv("MATTI_NO_TITLE") == NULL)
+                        render_title(minecraft, 854, 480);
+
+                    // The MATTI_SCREENSHOT debug hook: reads the layout FBO's
+                    // back buffer into a PPM once (the renderer verification).
+                    // The FBO carries the window framebuffer's size (Resize
+                    // runs with width/height), the hook reads exactly that.
+                    if (getenv("MATTI_SCREENSHOT") != NULL)
+                    {
+                        static int shotFrame = 0;
+                        shotFrame++;
+                        int targetFrame = 3;
+                        if (getenv("MATTI_SCREENSHOT_FRAME") != NULL)
+                            targetFrame = atoi(getenv("MATTI_SCREENSHOT_FRAME"));
+                        if (shotFrame < targetFrame)
+                            return;
+                        int fbw = 0, fbh = 0;
+                        LIBMATTI_GLFW_glfwGetFramebufferSize(minecraft->window, &fbw, &fbh);
+                        // Default: read the layout FBO itself (the same buffer
+                        // BlitToScreen reads); MATTI_SCREENSHOT_WINDOW=1 reads
+                        // the window's default framebuffer instead. The layout
+                        // FBO's handle is the GlStateManager's bound WRITE target
+                        // right after this frame's draws.
+                        if (getenv("MATTI_SCREENSHOT_WINDOW") == NULL)
+                            LIBMATTI_B3D_GlStateManager_BindFramebuffer(36008,
+                                                                        (unsigned int) LIBMATTI_B3D_GlStateManager_GetFrameBuffer(36009));
+                        fprintf(stderr, "[SHOT] fb=%dx%d readFbo=%d writeFbo=%d sample=(%d,%d)\n",
+                                fbw, fbh,
+                                LIBMATTI_B3D_GlStateManager_GetFrameBuffer(36008),
+                                LIBMATTI_B3D_GlStateManager_GetFrameBuffer(36009), fbw / 2, fbh / 2);
+                        unsigned char *pixels = malloc((size_t) fbw * fbh * 3);
+                        if (pixels != NULL)
+                        {
+                            LIBMATTI_GL_glPixelStorei(LIBMATTI_GL_GL_PACK_ALIGNMENT, 1);
+                            LIBMATTI_GL_glReadPixels(0, 0, fbw, fbh, LIBMATTI_GL_GL_RGB,
+                                                     LIBMATTI_GL_GL_UNSIGNED_BYTE, pixels);
+                            LIBMATTI_GL_glPixelStorei(LIBMATTI_GL_GL_PACK_ALIGNMENT, 4);
+                            int outFd = open(getenv("MATTI_SCREENSHOT"),
+                                             O_WRONLY | O_CREAT | O_TRUNC,
+                                             S_IRUSR | S_IWUSR);
+                            FILE *out = NULL;
+                            if (outFd >= 0)
+                                out = fdopen(outFd, "wb");
+                            if (out == NULL)
+                            {
+                                if (outFd >= 0)
+                                    close(outFd);
+                            }
+                            else
+                            {
+                                fprintf(out, "P6\n%d %d\n255\n", fbw, fbh);
+                                for (int y = fbh - 1; y >= 0; y--)
+                                    fwrite(pixels + (size_t) y * fbw * 3, 1, (size_t) fbw * 3, out);
+                                fclose(out);
+                            }
+                            free(pixels);
+                            LIBMATTI_MC_Minecraft_Stop(minecraft);
+                        }
+                    }
                 }
                 LIBMATTI_FML_EarlyFramebuffer_Deactivate(minecraft->framebuffer);
 
