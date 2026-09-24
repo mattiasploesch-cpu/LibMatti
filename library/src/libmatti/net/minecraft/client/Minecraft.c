@@ -872,6 +872,36 @@ static void runTick(LIBMATTI_MC_Minecraft *minecraft, int runGameTime)
                             // CLOUD_COLOR attribute (the overworld curve:
                             // white by day, dimmed at dusk/night), the cloud
                             // height is the vanilla 192.
+                            if (minecraft->cloudRenderer != NULL)
+                            {
+                                float dim = 1.0f;
+                                if (dayFraction > 13670.0f / 24000.0f && dayFraction < 22330.0f / 24000.0f)
+                                    dim = 0.35f;
+                                LIBMATTI_B3D_GlStateManager_EnableBlend();
+                                LIBMATTI_B3D_GlStateManager_BlendFuncSeparate(LIBMATTI_GL_GL_SRC_ALPHA,
+                                                                              LIBMATTI_GL_GL_ONE_MINUS_SRC_ALPHA,
+                                                                              LIBMATTI_GL_GL_ONE,
+                                                                              LIBMATTI_GL_GL_ZERO);
+                                LIBMATTI_B3D_GlStateManager_DepthMask(0);
+                                LIBMATTI_MC_CloudRenderer_Render(minecraft->cloudRenderer,
+                                                                 LIBMATTI_MC_CloudStatus_FANCY,
+                                                                 1.0f, 1.0f, 1.0f, dim, 192.0f,
+                                                                 minecraft->camera.x, minecraft->camera.y,
+                                                                 minecraft->camera.z,
+                                                                 LIBMATTI_MC_Level_GetGameTime(
+                                                                     (LIBMATTI_MC_Level *) minecraft->level),
+                                                                 0.0f, &view, &proj, 12);
+                                LIBMATTI_B3D_GlStateManager_DepthMask(1);
+                                LIBMATTI_B3D_GlStateManager_DisableBlend();
+                            }
+                        }
+                    }
+
+                            // Java: addCloudsPass - after the main (terrain)
+                            // pass, before weather. The cloud color is the
+                            // CLOUD_COLOR attribute (the overworld curve:
+                            // white by day, dimmed at dusk/night), the cloud
+                            // height is the vanilla 192.
                             if (minecraft->cloudRenderer != NULL && getenv("MATTI_NO_CLOUDS") == NULL)
                             {
                                 float dim = 1.0f;
