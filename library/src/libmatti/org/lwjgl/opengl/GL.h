@@ -90,6 +90,8 @@ int LIBMATTI_GL_glGetProgrami(unsigned int program, unsigned int pname);
 const char *LIBMATTI_GL_glGetProgramInfoLog(unsigned int program);
 void LIBMATTI_GL_glUseProgram(unsigned int program);
 int LIBMATTI_GL_glGetUniformLocation(unsigned int program, const char *name);
+// Java: GL20.glGetUniformfv - the debug path's uniform readback.
+void LIBMATTI_GL_glGetUniformfv(unsigned int program, int location, float *params);
 void LIBMATTI_GL_glUniform1i(int location, int v0);
 // Java: GL20.glUniform2f(int, float, float) / GL20.glUniform4f(int, float, float, float, float)
 void LIBMATTI_GL_glUniform2f(int location, float v0, float v1);
