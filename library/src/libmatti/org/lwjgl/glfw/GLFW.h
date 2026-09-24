@@ -30,6 +30,16 @@
 #define LIBMATTI_GLFW_PLATFORM_X11 0x00060004
 #define LIBMATTI_GLFW_X11_CLASS_NAME 0x00024001
 #define LIBMATTI_GLFW_X11_INSTANCE_NAME 0x00024002
+#define LIBMATTI_GLFW_CURSOR 0x00033001
+#define LIBMATTI_GLFW_CURSOR_NORMAL 0x00034001
+#define LIBMATTI_GLFW_CURSOR_HIDDEN 0x00034002
+#define LIBMATTI_GLFW_CURSOR_DISABLED 0x00034003
+#define LIBMATTI_GLFW_KEY_SPACE 32
+#define LIBMATTI_GLFW_KEY_A 65
+#define LIBMATTI_GLFW_KEY_S 83
+#define LIBMATTI_GLFW_KEY_D 68
+#define LIBMATTI_GLFW_KEY_W 87
+#define LIBMATTI_GLFW_KEY_ESCAPE 256
 
 // Java: public static boolean glfwInit()
 int LIBMATTI_GLFW_glfwInit(void);
@@ -90,6 +100,10 @@ int LIBMATTI_GLFW_glfwGetError(const char **description);
 int LIBMATTI_GLFW_glfwWindowShouldClose(long window);
 // Java: public static int glfwGetKey(long window, int key)
 int LIBMATTI_GLFW_glfwGetKey(long window, int key);
+// Java: public static void glfwSetInputMode(long window, int mode, int value)
+void LIBMATTI_GLFW_glfwSetInputMode(long window, int mode, int value);
+// Java: public static void glfwGetCursorPos(long window, double[] xpos, double[] ypos)
+void LIBMATTI_GLFW_glfwGetCursorPos(long window, double *xpos, double *ypos);
 
 void LIBMATTI_GLFW_glfwTerminate(void);
 

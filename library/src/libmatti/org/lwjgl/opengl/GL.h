@@ -123,6 +123,8 @@ void LIBMATTI_GL_glBlitFramebuffer(int srcX0, int srcY0, int srcX1, int srcY1, i
 void LIBMATTI_GL_glGenTextures(int n, unsigned int *textures);
 void LIBMATTI_GL_glDeleteTextures(int n, const unsigned int *textures);
 void LIBMATTI_GL_glBindTexture(unsigned int target, unsigned int texture);
+void LIBMATTI_GL_glGetTexParameteriv(unsigned int target, unsigned int pname, int *params);
+void LIBMATTI_GL_glGenerateMipmap(unsigned int target);
 void LIBMATTI_GL_glTexImage2D(unsigned int target, int level, int internalformat, int width, int height, int border, unsigned int format, unsigned int type, const void *pixels);
 void LIBMATTI_GL_glTexSubImage2D(unsigned int target, int level, int xoffset, int yoffset, int width, int height, unsigned int format, unsigned int type, const void *pixels);
 void LIBMATTI_GL_glTexParameteri(unsigned int target, unsigned int pname, int param);

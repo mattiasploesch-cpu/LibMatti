@@ -44,6 +44,8 @@ static void (*glfw_swap_buffers)(unsigned long) = NULL;
 static int (*glfw_get_error)(const char **) = NULL;
 static int (*glfw_window_should_close)(unsigned long) = NULL;
 static int (*glfw_get_key)(unsigned long, int) = NULL;
+static void (*glfw_set_input_mode)(unsigned long, int, int) = NULL;
+static void (*glfw_get_cursor_pos)(unsigned long, double *, double *) = NULL;
 static void (*glfw_terminate)(void) = NULL;
 static void (*glfw_set_window_should_close)(unsigned long, int) = NULL;
 static void (*glfw_get_framebuffer_size)(unsigned long, int *, int *) = NULL;
@@ -319,6 +321,28 @@ int LIBMATTI_GLFW_glfwGetKey(long window, int key)
     GLFW_DLSYM(get_key, "glfwGetKey");
     if (glfw_get_key == NULL) return 0;
     return glfw_get_key((unsigned long) window, key);
+}
+
+void LIBMATTI_GLFW_glfwSetInputMode(long window, int mode, int value)
+{
+    ensure_library();
+    if (glfw_lib == NULL) return;
+    GLFW_DLSYM(set_input_mode, "glfwSetInputMode");
+    if (glfw_set_input_mode != NULL)
+        glfw_set_input_mode((unsigned long) window, mode, value);
+}
+
+void LIBMATTI_GLFW_glfwGetCursorPos(long window, double *xpos, double *ypos)
+{
+    // A dead binding or window leaves the cursor at (0, 0) - the polling
+    // caller treats that as "no movement".
+    if (xpos != NULL) *xpos = 0.0;
+    if (ypos != NULL) *ypos = 0.0;
+    ensure_library();
+    if (glfw_lib == NULL) return;
+    GLFW_DLSYM(get_cursor_pos, "glfwGetCursorPos");
+    if (glfw_get_cursor_pos != NULL)
+        glfw_get_cursor_pos((unsigned long) window, xpos, ypos);
 }
 
 void LIBMATTI_GLFW_glfwTerminate(void)

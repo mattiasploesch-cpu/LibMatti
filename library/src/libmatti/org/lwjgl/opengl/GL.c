@@ -57,6 +57,8 @@ static void *p_glDisable = NULL;
 static void *p_glLogicOp = NULL;
 static void *p_glDrawBuffer = NULL;
 static void *p_glActiveTexture = NULL;
+static void *p_glGetTexParameteriv = NULL;
+static void *p_glGenerateMipmap = NULL;
 static void *p_glBlendFuncSeparate = NULL;
 static void *p_glBlendEquationSeparate = NULL;
 static void *p_glGenBuffers = NULL;
@@ -232,6 +234,8 @@ int LIBMATTI_GL_Load(void)
     GL_PROC(glLogicOp, "glLogicOp");
     GL_PROC(glDrawBuffer, "glDrawBuffer");
     GL_PROC(glActiveTexture, "glActiveTexture");
+    GL_PROC(glGetTexParameteriv, "glGetTexParameteriv");
+    GL_PROC(glGenerateMipmap, "glGenerateMipmap");
     GL_PROC(glBlendFuncSeparate, "glBlendFuncSeparate");
     GL_PROC(glBlendEquationSeparate, "glBlendEquationSeparate");
     GL_PROC(glGenBuffers, "glGenBuffers");
@@ -899,6 +903,18 @@ void LIBMATTI_GL_glBindTexture(unsigned int target, unsigned int texture)
 {
     void (*fn)(unsigned int, unsigned int) = (void (*)(unsigned int, unsigned int)) p_glBindTexture;
     if (fn != NULL) fn(target, texture);
+}
+
+void LIBMATTI_GL_glGetTexParameteriv(unsigned int target, unsigned int pname, int *params)
+{
+    void (*fn)(unsigned int, unsigned int, int *) = (void (*)(unsigned int, unsigned int, int *)) p_glGetTexParameteriv;
+    if (fn != NULL) fn(target, pname, params);
+}
+
+void LIBMATTI_GL_glGenerateMipmap(unsigned int target)
+{
+    void (*fn)(unsigned int) = (void (*)(unsigned int)) p_glGenerateMipmap;
+    if (fn != NULL) fn(target);
 }
 
 void LIBMATTI_GL_glTexImage2D(unsigned int target, int level, int internalformat, int width, int height, int border, unsigned int format, unsigned int type, const void *pixels)

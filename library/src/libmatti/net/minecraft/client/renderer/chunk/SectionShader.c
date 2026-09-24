@@ -30,16 +30,17 @@ static const char *TERRAIN_VERT =
     "    vtxUv2 = uv2;\n"
     "}\n";
 
-// Java: position_color.fsh - the vertex colour through (the lightmap multiply
-// rides on the game's fog/light pass).
+// Java: block.fsh - the atlas sample multiplied by the vertex colour (the
+// AO/light tint rides in the vertex color, the lightmap is folded there too).
 static const char *TERRAIN_FRAG =
     "#version 150\n"
     "in vec4 vtxColor;\n"
     "in vec2 vtxUv0;\n"
     "in vec2 vtxUv2;\n"
+    "uniform sampler2D Sampler0;\n"
     "out vec4 fragColor;\n"
     "void main() {\n"
-    "    fragColor = vtxColor;\n"
+    "    fragColor = texture(Sampler0, vtxUv0) * vtxColor;\n"
     "}\n";
 
 static int compile_ok(unsigned int shader, const char *label)
