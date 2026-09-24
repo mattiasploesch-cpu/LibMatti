@@ -183,7 +183,7 @@ Run-Configurations (CLion): **runClient** (der eine Client mit allem), **build m
 
 1. ~~P4.3 Camera + Frustum + Culling~~ ✅ erledigt — Camera/Frustum/FrustumIntersection portiert, Dispatcher cullt pro Section (Yaw-Sweep im Client verifiziert).
 2. ~~P4.4 BlockRenderDispatcher (AO, Tinting)~~ ✅ erledigt — AO-Kern 1:1 (AdjacencyInfo/Remap/calculateShape/blend), BlockColors mit allen Vanilla-Providern, Dispatcher-Facade, SectionCompiler über renderBatched; ao-Harness grün.
-3. **P4.5 Himmel/Sonne/Mond/Wolken** — Sky-Gradient + Celestial-Quads (Sonne/Mond-Texturen über den TextureManager), Wolken-Ebene; sieht sofort nach MC aus.
+3. ~~P4.5 Himmel/Sonne/Mond/Wolken~~ ✅ erledigt — Sky-Disc (Day/Night-Farbe), Sunrise/Sunset-Fan, Sonne/Mond-Phasen über die prozedurale Celestials-Atlas, Sterne, CloudRenderer (FANCY-Zellen, Zeit-Drift); kamera-relatives Rendern über die Rotation-only View wie Java (PR #12/#14).
 4. **P0-Rest:** java.util-Lücken (UUID, BitSet, Collections.unmodifiable), fastutil nur nach Bedarf der nächsten Phasen.
 5. **P2-Nachtrag:** PalettedContainer für LevelChunkSection (echte Palette + BitStorage statt Plain-Array), EntityBlock-Interface am Block (hat BlockEntity statt 49-Typen-Scan), BlockEntity-NBT (saveWithFullMetadata/loadStatic über den NBT-Port).
 6. **Run-Configs/CI:** Stable-Release (workflow_dispatch: AppImage, Portable-Zip, Dev-SDK, `.matti`-Mods, Changelog, SHA256SUMS) steht — siehe `.github/WORKFLOWS.md` für alle Actions.

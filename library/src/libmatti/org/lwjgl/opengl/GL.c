@@ -81,6 +81,7 @@ static void *p_glGetProgramiv = NULL;
 static void *p_glGetProgramInfoLog = NULL;
 static void *p_glUseProgram = NULL;
 static void *p_glGetUniformLocation = NULL;
+static void *p_glGetUniformfv = NULL;
 static void *p_glUniform1i = NULL;
 static void *p_glUniform2f = NULL;
 static void *p_glUniform4f = NULL;
@@ -255,6 +256,7 @@ int LIBMATTI_GL_Load(void)
     GL_PROC(glGetProgramInfoLog, "glGetProgramInfoLog");
     GL_PROC(glUseProgram, "glUseProgram");
     GL_PROC(glGetUniformLocation, "glGetUniformLocation");
+    GL_PROC(glGetUniformfv, "glGetUniformfv");
     GL_PROC(glUniform1i, "glUniform1i");
     GL_PROC(glUniform2f, "glUniform2f");
     GL_PROC(glUniform4f, "glUniform4f");
@@ -713,6 +715,12 @@ int LIBMATTI_GL_glGetUniformLocation(unsigned int program, const char *name)
     return fn != NULL ? fn(program, name) : -1;
 }
 
+void LIBMATTI_GL_glGetUniformfv(unsigned int program, int location, float *params)
+{
+    void (*fn)(unsigned int, int, float *) = (void (*)(unsigned int, int, float *)) p_glGetUniformfv;
+    if (fn != NULL) fn(program, location, params);
+}
+
 void LIBMATTI_GL_glUniform1i(int location, int v0)
 {
     void (*fn)(int, int) = (void (*)(int, int)) p_glUniform1i;
@@ -733,8 +741,10 @@ void LIBMATTI_GL_glUniform3f(int location, float v0, float v1, float v2)
 
 void LIBMATTI_GL_glUniformMatrix4fv(int location, int transpose, const float *value)
 {
+    // The real signature is (location, count, transpose, value); the port's
+    // wrapper takes (location, transpose, value) and uploads one matrix.
     void (*fn)(int, int, int, const float *) = (void (*)(int, int, int, const float *)) p_glUniformMatrix4fv;
-    if (fn != NULL) fn(location, transpose, 1, value);
+    if (fn != NULL) fn(location, 1, transpose, value);
 }
 
 int LIBMATTI_GL_glGetShaderiv(unsigned int shader, unsigned int pname)

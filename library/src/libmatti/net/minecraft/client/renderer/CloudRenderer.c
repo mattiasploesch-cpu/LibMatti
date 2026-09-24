@@ -548,11 +548,12 @@ void LIBMATTI_MC_CloudRenderer_Render(LIBMATTI_MC_CloudRenderer *renderer,
         return;
 
     // The world anchor. The mesh carries the RELATIVE ring offsets, so the
-    // shader origin reconstructs the base exactly like Java's CloudInfo:
-    // x/z = camera - the wrapped fraction (= cellX*12 - scroll), y = f (the
-    // cloud height above the camera, the shader adds the camera y).
+    // shader origin reconstructs the base. Java's origin (-f3, f, -f4) lives
+    // in the camera-relative space of its model-view; the port's view already
+    // carries the full camera transform, so the origin is world space:
+    // x/z = camera - the wrapped fraction, y = camera + f = the cloud height.
     float originX = (float) camX - f3;
-    float originY = f;
+    float originY = (float) camY + f;
     float originZ = (float) camZ - f4;
 
     LIBMATTI_JOML_Matrix4f mvp;
