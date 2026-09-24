@@ -71,6 +71,12 @@ static void texture_write(unsigned int textureId, int width, int height, const u
     LIBMATTI_GL_glPixelStorei(LIBMATTI_GL_GL_UNPACK_ALIGNMENT, 1);
     LIBMATTI_GL_glTexSubImage2D(LIBMATTI_GL_GL_TEXTURE_2D, 0, 0, 0, width, height,
                                 LIBMATTI_GL_GL_RED, LIBMATTI_GL_GL_UNSIGNED_BYTE, pixels);
+    // Restore the unpack state: a lingering UNPACK_ROW_LENGTH makes every
+    // later glTexImage2D/subImage read its source with a wrong row stride
+    // (the atlas upload read past its buffer - black terrain).
+    LIBMATTI_GL_glPixelStorei(LIBMATTI_GL_GL_UNPACK_ROW_LENGTH, 0);
+    LIBMATTI_GL_glPixelStorei(LIBMATTI_GL_GL_UNPACK_SKIP_PIXELS, 0);
+    LIBMATTI_GL_glPixelStorei(LIBMATTI_GL_GL_UNPACK_SKIP_ROWS, 0);
 }
 
 // ---------------------------------------------------------------------------

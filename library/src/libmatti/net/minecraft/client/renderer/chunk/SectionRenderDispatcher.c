@@ -314,7 +314,6 @@ void LIBMATTI_MC_SectionRenderDispatcher_RenderLayer(
         LIBMATTI_GL_glUniform3f(originLocation, modelOrigin[0], modelOrigin[1], modelOrigin[2]);
 
     int dbg = getenv("MATTI_CHUNK_DEBUG") != NULL;
-    int dumped = getenv("MATTI_VBODUMP") != NULL ? 0 : 1;
     if (dbg)
         fprintf(stderr, "[CHUNKDEBUG] RenderLayer layer=%d sections=%d\n", (int) layer, dispatcher->sectionCount);
     for (int i = 0; i < dispatcher->sectionCount; i++)
@@ -329,9 +328,7 @@ void LIBMATTI_MC_SectionRenderDispatcher_RenderLayer(
         }
         const LIBMATTI_MC_SectionBuffers *buffers = LIBMATTI_MC_CompiledSectionMesh_GetBuffers(compiled, layer);
         if (buffers == NULL || buffers->vertexBuffer == NULL || buffers->indexCount <= 0)
-            continue;
-
-        // Java: LevelRenderer.renderLevel - section.isDirty? no: the frustum
+            continue;        // Java: LevelRenderer.renderLevel - section.isDirty? no: the frustum
         // test (renderSection -> cullingFrustum.isVisible(aabb)) before the
         // draw; the section's 16^3 box in world coordinates (the port keeps
         // the origin uniform as the camera-relative offset so the box uses
@@ -342,8 +339,7 @@ void LIBMATTI_MC_SectionRenderDispatcher_RenderLayer(
             int sx = pos->base.x, sy = pos->base.y, sz = pos->base.z;
             if (!LIBMATTI_MC_Frustum_IsVisible(frustum,
                                                (double) (sx * 16), (double) (sy * 16), (double) (sz * 16),
-                                               (double) (sx * 16 + 16), (double) (sy * 16 + 16),
-                                               (double) (sz * 16 + 16)))
+                                               (double) (sx * 16 + 16), (double) (sy * 16 + 16), (double) (sz * 16 + 16)))
             {
                 if (dbg)
                     fprintf(stderr, "[CHUNKDEBUG] section %d: culled (%d,%d,%d)\n", i, sx, sy, sz);

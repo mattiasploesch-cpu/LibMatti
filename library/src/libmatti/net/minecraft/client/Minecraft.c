@@ -20,6 +20,7 @@
 #include "libmatti/net/minecraft/client/renderer/CloudRenderer.h"
 #include "libmatti/net/minecraft/client/renderer/texture/TextureManager.h"
 #include "libmatti/net/minecraft/client/renderer/texture/TextureAtlas.h"
+#include "libmatti/net/minecraft/client/renderer/texture/AbstractTexture.h"
 #include "libmatti/net/neoforged/fml/earlydisplay/EarlyFramebuffer.h"
 #include "libmatti/net/minecraft/client/renderer/chunk/SectionRenderDispatcher.h"
 #include "libmatti/net/minecraft/client/renderer/chunk/SectionShader.h"
@@ -272,7 +273,12 @@ LIBMATTI_MC_Minecraft *LIBMATTI_MC_Minecraft_New(const LIBMATTI_MC_GameConfig *c
     minecraft->deltaTracker = LIBMATTI_MC_DeltaTracker_Timer_New(20.0f, LIBMATTI_MC_Minecraft_GetTickTargetMillis);
 
     // Java: the Camera field initializer (GameRenderer's camera).
+    // The skeleton spawn: first-person on the platform (eye at feet 65 +
+    // 1.62 eye height). Like the old skeleton camera: yaw 180 faces north
+    // (-Z), the spawn eye at z=24 looks straight at the platform (z 0..16).
     LIBMATTI_MC_Camera_Init(&minecraft->camera);
+    LIBMATTI_MC_Camera_SetRotation(&minecraft->camera, 180.0f, 20.0f);
+    LIBMATTI_MC_Camera_SetPosition(&minecraft->camera, 8.0, 65.0 + 1.62, 24.0);
     minecraft->frustumInitialized = 0;
 
     // ---- Window init (com.mojang.blaze3d.platform.Window) -----------------
@@ -646,6 +652,75 @@ static LIBMATTI_FML_SimpleFont *load_font(void)
     return font;
 }
 
+// Java: MouseHandler.onMove - the mouse-look. The cursor is captured
+// (GLFW_CURSOR_DISABLED) and its per-frame delta turns xRot (pitch) /
+// yRot (yaw); xRot is clamped to +-90 like Java's Mth.clampTo90. The
+// enabled flag absorbs the first frame: the fresh grab reports the jump
+// to the window centre as one huge delta that must not turn the camera.
+static int mouseLookInitialized = 0;
+static int mouseLookEnabled = 0;
+static double lastCursorX = 0.0, lastCursorY = 0.0;
+
+static void updateMouseLook(LIBMATTI_MC_Minecraft *minecraft)
+{
+    if (minecraft->window == 0) return;
+
+    if (!mouseLookInitialized)
+    {
+        mouseLookInitialized = 1;
+        LIBMATTI_GLFW_glfwSetInputMode(minecraft->window, LIBMATTI_GLFW_CURSOR,
+                                       LIBMATTI_GLFW_CURSOR_DISABLED);
+    }
+    if (LIBMATTI_GLFW_glfwGetKey(minecraft->window, LIBMATTI_GLFW_KEY_ESCAPE))
+    {
+        if (mouseLookEnabled)
+            LIBMATTI_MC_Minecraft_Stop(minecraft);
+    }
+
+    double cx = 0.0, cy = 0.0;
+    LIBMATTI_GLFW_glfwGetCursorPos(minecraft->window, &cx, &cy);
+    if (mouseLookEnabled)
+    {
+        float dx = (float) (cx - lastCursorX);
+        float dy = (float) (cy - lastCursorY);
+        // Java: MouseHandler.turnPlayer - xRot = clamp(xRot - dy*sens, +-90),
+        // yRot += dx*sens; negative pitch looks UP (the camera convention).
+        float sens = 0.15f;
+        float yaw = minecraft->camera.yRot + dx * sens;
+        float pitch = minecraft->camera.xRot - dy * sens;
+        if (pitch > 90.0f) pitch = 90.0f;
+        if (pitch < -90.0f) pitch = -90.0f;
+        LIBMATTI_MC_Camera_SetRotation(&minecraft->camera, yaw, pitch);
+    }
+    lastCursorX = cx;
+    lastCursorY = cy;
+    mouseLookEnabled = 1;
+}
+
+// The walk: WASD in the camera's yaw plane (the player direction Java's
+// input moves along); a flat step per frame keeps the skeleton input
+// frame-bound like the rest of the input port.
+static void apply_walk(LIBMATTI_MC_Minecraft *minecraft)
+{
+    if (minecraft->window == 0) return;
+    float yawRad = minecraft->camera.yRot * ((float) M_PI / 180.0f);
+    // forward = (-sin yaw, cos yaw) like the camera basis; right = forward
+    // turned -90 degrees around +Y = (-cos yaw, -sin yaw).
+    float fwdX = -(float) sin(yawRad), fwdZ = (float) cos(yawRad);
+    float rightX = -(float) cos(yawRad), rightZ = -(float) sin(yawRad);
+    float step = 0.25f;
+    float dx = 0.0f, dz = 0.0f;
+    if (LIBMATTI_GLFW_glfwGetKey(minecraft->window, LIBMATTI_GLFW_KEY_W)) { dx += fwdX * step; dz += fwdZ * step; }
+    if (LIBMATTI_GLFW_glfwGetKey(minecraft->window, LIBMATTI_GLFW_KEY_S)) { dx -= fwdX * step; dz -= fwdZ * step; }
+    if (LIBMATTI_GLFW_glfwGetKey(minecraft->window, LIBMATTI_GLFW_KEY_D)) { dx += rightX * step; dz += rightZ * step; }
+    if (LIBMATTI_GLFW_glfwGetKey(minecraft->window, LIBMATTI_GLFW_KEY_A)) { dx -= rightX * step; dz -= rightZ * step; }
+    if (dx != 0.0f || dz != 0.0f)
+        LIBMATTI_MC_Camera_SetPosition(&minecraft->camera,
+                                       minecraft->camera.x + dx,
+                                       minecraft->camera.y,
+                                       minecraft->camera.z + dz);
+}
+
 // Java: private void runTick(boolean renderLevelInMainMenu) - the loop body.
 // Everything the game does inside (screens, packets, sounds) collapses into the
 // three statements the loop structure owns: advanceTime, tick, render+swap.
@@ -663,6 +738,11 @@ static void runTick(LIBMATTI_MC_Minecraft *minecraft, int runGameTime)
     // Java: int k = this.deltaTracker.advanceTime(Util.getMillis(), renderLevelInMainMenu);
     long long nowMs = LIBMATTI_JL_System_CurrentTimeMillis();
     int ticks = LIBMATTI_MC_DeltaTracker_AdvanceTime(minecraft->deltaTracker, nowMs, runGameTime);
+
+    // Java: MouseHandler - the mouse-look input runs every frame, before
+    // the renderer picks the camera up.
+    updateMouseLook(minecraft);
+    apply_walk(minecraft);
 
     // Java: if (renderLevelInMainMenu) { ... for (l = 0; l < min(10, k); l++) tick(); }
     if (runGameTime)
@@ -714,8 +794,9 @@ static void runTick(LIBMATTI_MC_Minecraft *minecraft, int runGameTime)
                     (void) offsetX;
                     (void) offsetY;
 
-                    // Java: clear to the theme screenBackground (#ef323d)
-                    LIBMATTI_B3D_GlStateManager_ClearColor(0xef / 255.0f, 0x32 / 255.0f, 0x3d / 255.0f, 1.0f);
+                    // Java: the world pass clears to the sky fog color (the
+                    // theme red stays the 2D layout's background).
+                    LIBMATTI_B3D_GlStateManager_ClearColor(0.47f, 0.65f, 1.0f, 1.0f);
                     LIBMATTI_B3D_GlStateManager_Clear(LIBMATTI_GL_GL_COLOR_BUFFER_BIT | LIBMATTI_GL_GL_DEPTH_BUFFER_BIT);
                     shot_after(minecraft, "clear");
 
@@ -744,21 +825,27 @@ static void runTick(LIBMATTI_MC_Minecraft *minecraft, int runGameTime)
                             LIBMATTI_B3D_GlStateManager_DepthFunc(LIBMATTI_GL_GL_LEQUAL);
                             LIBMATTI_B3D_GlStateManager_DepthMask(1);
 
-                            // Java: yaw 0 faces +Z (south), negative pitch looks
-                            // UP - so the skeleton camera looks north-down at the
-                            // spawn platform with yaw 180, pitch +50.
-                            // MATTI_CAM_YAW/MATTI_CAM_PITCH sweep for the cull check.
-                            float camYaw = 180.0f, camPitch = 50.0f;
+                            // Java: the GameRenderer picks up the camera the
+                            // player controls - MouseLook wrote yRot/xRot and
+                            // WASD walked the eye. The env overrides stay for
+                            // the deterministic screenshot/cull sweeps.
+                            float camYaw = minecraft->camera.yRot;
+                            float camPitch = minecraft->camera.xRot;
                             if (getenv("MATTI_CAM_YAW") != NULL)
                                 camYaw = (float) atof(getenv("MATTI_CAM_YAW"));
                             if (getenv("MATTI_CAM_PITCH") != NULL)
                                 camPitch = (float) atof(getenv("MATTI_CAM_PITCH"));
                             LIBMATTI_MC_Camera_SetRotation(&minecraft->camera, camYaw, camPitch);
-                            LIBMATTI_MC_Camera_SetPosition(&minecraft->camera, 8.0, 88.0, 40.0);
 
                             LIBMATTI_JOML_Matrix4f proj, view, mvpM;
                             const float aspect = (float) width / (float) height;
                             LIBMATTI_JOML_Matrix4f_SetPerspective(&proj, 1.2217f, aspect, 0.05f, 1000.0f);
+                            // The earlydisplay FBO is blitted vertically flipped
+                            // onto the window (the y-down GUI elements need it).
+                            // The 3D world passes render y-up, so they draw with
+                            // the Y-flipped projection: after the blit flip the
+                            // world lands upright AND the GUI stays consistent.
+                            proj.m11 = -proj.m11;
                             LIBMATTI_MC_GameRenderer_BuildRotationMatrix(&minecraft->camera, &view);
                             // The clip matrix: projection·view (the projection
                             // applies last - the GL convention the frustum's
@@ -787,7 +874,7 @@ static void runTick(LIBMATTI_MC_Minecraft *minecraft, int runGameTime)
                                                : 0;
                             float timeOfDay = (float) (dayTime % 24000L);
                             float dayFraction = timeOfDay / 24000.0f;
-                            if (minecraft->skyRenderer != NULL)
+                            if (minecraft->skyRenderer != NULL && getenv("MATTI_NO_SKY") == NULL)
                             {
                                 // Java: ClientLevel - timeOfDay = dayTime % 24000
                                 // over the DAY timeline period; the angles follow
@@ -863,6 +950,63 @@ static void runTick(LIBMATTI_MC_Minecraft *minecraft, int runGameTime)
                             float mvp[16];
                             memcpy(mvp, &mvpM, sizeof(mvp));
                             float origin[3] = {0.0f, 0.0f, 0.0f};
+                            // Java: renderLevel binds the atlas texture before the
+                            // section draws (ShaderInstance.SAMPLER_SOURCE -> the
+                            // TextureManager's block atlas on Sampler0). The unit
+                            // is set explicitly - the sky pass leaves unit 1 bound.
+                            if (minecraft->modelManager != NULL)
+                            {
+                                LIBMATTI_MC_TextureAtlas *atlas = LIBMATTI_MC_ModelManager_GetAtlas(minecraft->modelManager);
+                                // The procedural atlas uploads lazily - the GL
+                                // context does not exist at bootstrap time. The
+                                // first terrain draw pushes the 32x16 RGBA page.
+                                if (atlas != NULL && atlas->base.texture == 0 && atlas->base.pixels != NULL)
+                                {
+                                    atlas->base.texture = LIBMATTI_B3D_GlStateManager_GenTexture();
+                                    atlas->base.textureView = atlas->base.texture;
+                                    // Raw-bind on unit 0 BEFORE the upload: the
+                                    // GlStateManager cache may believe another texture
+                                    // is bound and skip the bind inside WriteToTexture,
+                                    // uploading into a foreign object.
+                                    LIBMATTI_GL_glActiveTexture(LIBMATTI_GL_GL_TEXTURE0);
+                                    LIBMATTI_GL_glBindTexture(LIBMATTI_GL_GL_TEXTURE_2D, atlas->base.texture);
+                                    LIBMATTI_MC_Texture_WriteToTexture(atlas->base.texture, atlas->base.pixels);
+                                    LIBMATTI_GL_glTexParameteri(LIBMATTI_GL_GL_TEXTURE_2D, LIBMATTI_GL_GL_TEXTURE_MIN_FILTER, LIBMATTI_GL_GL_NEAREST);
+                                    LIBMATTI_GL_glTexParameteri(LIBMATTI_GL_GL_TEXTURE_2D, LIBMATTI_GL_GL_TEXTURE_MAG_FILTER, LIBMATTI_GL_GL_NEAREST);
+                                    LIBMATTI_GL_glTexParameteri(LIBMATTI_GL_GL_TEXTURE_2D, LIBMATTI_GL_GL_TEXTURE_WRAP_S, LIBMATTI_GL_GL_CLAMP_TO_EDGE);
+                                    LIBMATTI_GL_glTexParameteri(LIBMATTI_GL_GL_TEXTURE_2D, LIBMATTI_GL_GL_TEXTURE_WRAP_T, LIBMATTI_GL_GL_CLAMP_TO_EDGE);
+                                    LIBMATTI_GL_glGenerateMipmap(LIBMATTI_GL_GL_TEXTURE_2D);
+                                    fprintf(stderr, "[TERRAINTEX] uploaded atlas=%u page=%dx%d\n",
+                                            atlas->base.texture, atlas->base.pixels->width, atlas->base.pixels->height);
+                                }
+                                if (atlas != NULL && atlas->base.texture != 0)
+                                {
+                                    // All raw: any GlStateManager cache state may
+                                    // be stale (the sky pass and FBO binds go around
+                                    // it), so force unit 0 + the atlas + sane filters
+                                    // right before the section draws.
+                                    LIBMATTI_GL_glActiveTexture(LIBMATTI_GL_GL_TEXTURE0);
+                                    LIBMATTI_GL_glBindTexture(LIBMATTI_GL_GL_TEXTURE_2D, atlas->base.texture);
+                                    LIBMATTI_GL_glTexParameteri(LIBMATTI_GL_GL_TEXTURE_2D, LIBMATTI_GL_GL_TEXTURE_MIN_FILTER, LIBMATTI_GL_GL_NEAREST);
+                                    LIBMATTI_GL_glTexParameteri(LIBMATTI_GL_GL_TEXTURE_2D, LIBMATTI_GL_GL_TEXTURE_MAG_FILTER, LIBMATTI_GL_GL_NEAREST);
+                                    LIBMATTI_GL_glTexParameteri(LIBMATTI_GL_GL_TEXTURE_2D, LIBMATTI_GL_GL_TEXTURE_WRAP_S, LIBMATTI_GL_GL_CLAMP_TO_EDGE);
+                                    LIBMATTI_GL_glTexParameteri(LIBMATTI_GL_GL_TEXTURE_2D, LIBMATTI_GL_GL_TEXTURE_WRAP_T, LIBMATTI_GL_GL_CLAMP_TO_EDGE);
+                                    int samplerLocation = LIBMATTI_GL_glGetUniformLocation(terrainProgram, "Sampler0");
+                                    if (samplerLocation >= 0)
+                                    {
+                                        // glUniform1i requires an active program -
+                                        // RenderLayer's glUseProgram comes later, so
+                                        // activate ours here or the call is a no-op.
+                                        LIBMATTI_GL_glUseProgram(terrainProgram);
+                                        LIBMATTI_GL_glUniform1i(samplerLocation, 0);
+                                    }
+                                }
+                                else
+                                {
+                                    fprintf(stderr, "[TERRAINTEX] NO ATLAS (atlas=%p tex=%u)\n",
+                                            (const void *) atlas, atlas != NULL ? atlas->base.texture : 0);
+                                }
+                            }
                             LIBMATTI_MC_SectionRenderDispatcher_RenderLayer(
                                 minecraft->sectionDispatcher, LIBMATTI_MC_ChunkSectionLayer_SOLID,
                                 terrainProgram, mvp, origin, &minecraft->frustum);
