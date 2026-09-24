@@ -554,11 +554,6 @@ void LIBMATTI_MC_CloudRenderer_Render(LIBMATTI_MC_CloudRenderer *renderer,
     // x/z = camera - the wrapped fraction, y = camera + f = the cloud height.
     float originX = (float) camX - f3;
     float originY = (float) camY + f;
-    // shader origin reconstructs the base exactly like Java's CloudInfo:
-    // x/z = camera - the wrapped fraction (= cellX*12 - scroll), y = f (the
-    // cloud height above the camera, the shader adds the camera y).
-    float originX = (float) camX - f3;
-    float originY = f;
     float originZ = (float) camZ - f4;
 
     LIBMATTI_JOML_Matrix4f mvp;
