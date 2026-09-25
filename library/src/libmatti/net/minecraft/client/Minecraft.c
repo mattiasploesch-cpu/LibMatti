@@ -498,6 +498,14 @@ LIBMATTI_MC_Minecraft *LIBMATTI_MC_Minecraft_New(const LIBMATTI_MC_GameConfig *c
             minecraft->cloudRenderer != NULL ? 1 : 0);
     }
 
+    // Java: this.options = new Options(this, ...) - the Options constructor
+    // creates the vanilla KeyMappings (key.forward/key.left/...) BEFORE the
+    // LocalPlayer/KeyboardInput read them through the Options fields. Without
+    // this the accessors return NULL and every IsDown() answers false - the
+    // move vector stays (0, 0) and the player never walks (the mouse-look does
+    // not touch the mappings, which is why turning still worked).
+    LIBMATTI_MC_KeyMapping_CreateVanillaMappings();
+
     // Java: this.player = new LocalPlayer(this, this.level, ...) - the session
     // profile name rides the GameConfig user. The spawn rides the platform
     // centre (the 16x16 slab spans x/z 0..15 at y 64, top face 65) - since the
@@ -527,6 +535,8 @@ static void minecraft_demo_tick(void)
 
 MATTI_MIXIN_TARGET("matticraft::demo::tick", minecraft_demo_tick)
 
+static void apply_walk(LIBMATTI_MC_Minecraft *minecraft);
+
 static void tick(LIBMATTI_MC_Minecraft *minecraft)
 {
     MattiMixinResult result = MATTI_MIXIN_PASS;
@@ -543,6 +553,12 @@ static void tick(LIBMATTI_MC_Minecraft *minecraft)
                                                          (LIBMATTI_MC_Level *) minecraft->level,
                                                          (long long) (LIBMATTI_GLFW_glfwGetTime() * 1000.0));
     }
+
+    // Java: this.tick() runs the player through LocalPlayer.tick -> aiStep ->
+    // travel: the per-TICK input poll + walk/gravity impulse (20 Hz, not the
+    // per-frame rate - the tick loop above repeats this body for every
+    // accumulated tick).
+    apply_walk(minecraft);
 }
 
 // Java: private void renderTitleLine(...) - the skeleton draws the game title
@@ -773,16 +789,36 @@ static void apply_walk(LIBMATTI_MC_Minecraft *minecraft)
         speed *= 1.3f;
     float accelX = (fwdX * move.y - rightX * move.x) * speed;
     float accelZ = (fwdZ * move.y - rightZ * move.x) * speed;
-    // Java: the friction - getDeltaMovement().multiply(0.91, 0.98, 0.91) per
-    // tick folds into the added impulse below (the drift decays)
-    LIBMATTI_MC_Vec3 next = {entity->dx * 0.91 + accelX,
+    // Java: LivingEntity.travel - the friction is the move-through block's
+    // slipperiness (0.6 default) * the entity inertia 0.91 = 0.546 ON THE
+    // GROUND, the raw 0.91 in the air; the steady-state walk speed is
+    // accel/(1 - friction) = 0.1/0.454 = 0.22 blocks/tick (4.4 m/s, vanilla).
+    // The old flat 0.91 ran the physics per FRAME and 14x too fast.
+    float friction = LIBMATTI_MC_Entity_OnGround(entity) ? 0.546f : 0.91f;
+    LIBMATTI_MC_Vec3 next = {entity->dx * friction + accelX,
                              entity->dy * 0.98 - 0.08,
-                             entity->dz * 0.91 + accelZ};
+                             entity->dz * friction + accelZ};
     LIBMATTI_MC_Entity_SetDeltaMovement(entity, &next);
 
     // Java: this.move(MoverType.SELF, this.getDeltaMovement()) - the collide
     // path clips the motion against the level's blocks (the P5.3 port)
     LIBMATTI_MC_Entity_Move(entity, LIBMATTI_MC_MoverType_SELF, &next);
+
+    // MATTI_DEBUG_POS - the per-second position/onGround trace (the input/
+    // physics smoke runs grep it to prove the walk actually moves the player).
+    static int debugPos = -1;
+    if (debugPos < 0)
+        debugPos = getenv("MATTI_DEBUG_POS") != NULL;
+    if (debugPos)
+    {
+        static int posFrame = 0;
+        if (posFrame++ % 20 == 0)
+            fprintf(stderr, "[POS] x=%.2f y=%.2f z=%.2f onGround=%d move=(%.2f,%.2f) fwdMap=%d rawW=%d\n",
+                    entity->x, entity->y, entity->z,
+                    LIBMATTI_MC_Entity_OnGround(entity), move.x, move.y,
+                    LIBMATTI_MC_KeyMapping_Forward() != NULL,
+                    LIBMATTI_GLFW_glfwGetKey(minecraft->window, LIBMATTI_GLFW_KEY_W));
+    }
 }
 
 // Java: private void runTick(boolean renderLevelInMainMenu) - the loop body.
@@ -804,9 +840,9 @@ static void runTick(LIBMATTI_MC_Minecraft *minecraft, int runGameTime)
     int ticks = LIBMATTI_MC_DeltaTracker_AdvanceTime(minecraft->deltaTracker, nowMs, runGameTime);
 
     // Java: MouseHandler - the mouse-look input runs every frame, before
-    // the renderer picks the camera up.
+    // the renderer picks the camera up. The walk/gravity impulses ride the
+    // per-tick loop below (apply_walk inside tick), not the frame rate.
     updateMouseLook(minecraft);
-    apply_walk(minecraft);
 
     // Java: Camera.setup(BlockGetter, Entity, ...) - the camera rides the local
     // player's entity: eye position + rotation (the renderer reads it below)
