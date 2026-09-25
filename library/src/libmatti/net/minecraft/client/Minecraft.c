@@ -1218,12 +1218,14 @@ void LIBMATTI_MC_Minecraft_Run(LIBMATTI_MC_Minecraft *minecraft)
     // Java: this.gameThread = Thread.currentThread(); priority bump >4 cores.
     LOG("Running Minecraft (skeleton)");
 
-    // Java: boolean flag = false; while (this.running) { runTick(!flag); flag = true; }
+    // Java's run(): boolean flag = false; while (running) { runTick(!flag) } -
+    // the flag only flips inside the OOM catch, so EVERY frame runs
+    // runTick(true) (renderLevelInMainMenu is the first-frame special case;
+    // the old loop-tail flip shape no longer exists in 1.21.11).
     int flag = 0;
     while (minecraft->running)
     {
         runTick(minecraft, !flag);
-        flag = 1;
     }
 
     // Java: Minecraft.run falls out of the loop; destroy runs at the caller.
