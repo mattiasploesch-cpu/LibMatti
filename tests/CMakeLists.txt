@@ -81,6 +81,11 @@ add_test(NAME itemstack COMMAND test_itemstack)
 matti_test(test_level level/LevelHarness.c)
 add_test(NAME level COMMAND test_level)
 
+# entity: the P5.1 core - EntityType registry, Entity base (pos/rot/bbox, tags,
+# NBT round trip), vanilla entity constants, Level add/remove/query
+matti_test(test_entity entity/EntityHarness.c)
+add_test(NAME entity COMMAND test_entity)
+
 # ao: the P4.4 AO kernel over a real level (BlockColors providers, shade table,
 # the tesselate paths through the dispatcher)
 matti_test(test_ao ao/AoHarness.c)

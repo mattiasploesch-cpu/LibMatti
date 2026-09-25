@@ -1,5 +1,6 @@
 // Port of net.minecraft.world.level.Level (the in-memory part).
 
+#include "libmatti/net/minecraft/world/entity/Entity.h"
 #include "libmatti/net/minecraft/world/level/Level.h"
 
 #include "libmatti/net/minecraft/core/BlockPos.h"
@@ -242,10 +243,97 @@ int LIBMATTI_MC_Level_GetChunkCount(struct LIBMATTI_MC_Level *level)
     return level->chunkCount;
 }
 
+// ---------------------------------------------------------------------------
+// Java: the entity surface (the EntityLookup/TransientEntitySectionManager pair
+// flattened into the level until the P5 tick loop needs the per-section maps)
+// ---------------------------------------------------------------------------
+
+// the entity-count helper (the count lives in the struct as an int)
+static int entityCount_of(struct LIBMATTI_MC_Level *level)
+{
+    return level->entityCount;
+}
+
+// Java: public boolean addFreshEntity(Entity) - the accepted-entity tail
+bool LIBMATTI_MC_Level_AddEntity(struct LIBMATTI_MC_Level *level, struct LIBMATTI_MC_Entity *entity)
+{
+    if (level == NULL || entity == NULL)
+        return false;
+    if (entityCount_of(level) >= level->entityCapacity)
+    {
+        int next = level->entityCapacity > 0 ? level->entityCapacity * 2 : 16;
+        struct LIBMATTI_MC_Entity **grown = realloc(level->entities, (size_t) next * sizeof(struct LIBMATTI_MC_Entity *));
+        if (grown == NULL)
+            return false;
+        level->entities = grown;
+        level->entityCapacity = next;
+    }
+    level->entities[level->entityCount++] = entity;
+    entity->level = level; // Java: entity.setLevel + entity.setAddedToLevel
+    return true;
+}
+
+// Java: the removal dispatch - drops the entity from the level list (the
+// RemovalReason was set through Entity.setRemoved by the caller)
+bool LIBMATTI_MC_Level_RemoveEntity(struct LIBMATTI_MC_Level *level, struct LIBMATTI_MC_Entity *entity)
+{
+    if (level == NULL || entity == NULL)
+        return false;
+    for (int i = 0; i < level->entityCount; i++)
+    {
+        if (level->entities[i] == entity)
+        {
+            memmove(&level->entities[i], &level->entities[i + 1],
+                    (size_t) (level->entityCount - i - 1) * sizeof(struct LIBMATTI_MC_Entity *));
+            level->entityCount--;
+            return true;
+        }
+    }
+    return false;
+}
+
+int LIBMATTI_MC_Level_GetEntityCount(struct LIBMATTI_MC_Level *level)
+{
+    return level != NULL ? level->entityCount : 0;
+}
+
+struct LIBMATTI_MC_Entity *LIBMATTI_MC_Level_GetEntity(struct LIBMATTI_MC_Level *level, int index)
+{
+    if (level == NULL || index < 0 || index >= level->entityCount)
+        return NULL;
+    return level->entities[index];
+}
+
+// Java: getEntities(Entity, AABB, Predicate) - the box-overlap scan
+int LIBMATTI_MC_Level_GetEntitiesInBox(struct LIBMATTI_MC_Level *level, double minX, double minY, double minZ,
+                                       double maxX, double maxY, double maxZ,
+                                       struct LIBMATTI_MC_Entity **out, int outCapacity)
+{
+    if (level == NULL || out == NULL)
+        return 0;
+    int found = 0;
+    for (int i = 0; i < level->entityCount && found < outCapacity; i++)
+    {
+        const LIBMATTI_MC_AABB *bb = LIBMATTI_MC_Entity_GetBoundingBox(level->entities[i]);
+        if (bb == NULL)
+            continue;
+        // Java: AABB.intersects - the interval overlap on all three axes
+        if (bb->maxX < minX || bb->minX > maxX)
+            continue;
+        if (bb->maxY < minY || bb->minY > maxY)
+            continue;
+        if (bb->maxZ < minZ || bb->minZ > maxZ)
+            continue;
+        out[found++] = level->entities[i];
+    }
+    return found;
+}
+
 void LIBMATTI_MC_Level_Free(struct LIBMATTI_MC_Level *level)
 {
     for (int i = 0; i < level->chunkCount; i++)
         LIBMATTI_MC_LevelChunk_Free(level->chunks[i].chunk);
     free(level->chunks);
+    free(level->entities);
     free(level);
 }
