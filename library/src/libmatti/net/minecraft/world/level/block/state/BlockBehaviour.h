@@ -87,6 +87,10 @@ typedef struct LIBMATTI_MC_BlockBehaviour_Properties
     LIBMATTI_MC_BlockBehaviour_StatePredicate emissiveRendering;
     // Java: boolean dynamicShape
     int dynamicShape;
+    // Java: the EntityBlock vtable (NeoForge's ExtendableBlockEntity paths set
+    // it; NULL = the block is not an EntityBlock). A forward pointer to avoid
+    // a circular include.
+    void *entityBlock;
 } LIBMATTI_MC_BlockBehaviour_Properties;
 
 // Java: private Properties() + public static Properties of()

@@ -6,6 +6,7 @@
 #include "libmatti/net/minecraft/server/bootstrap/VanillaBlocks.h"
 #include "libmatti/net/minecraft/world/level/Level.h"
 #include "libmatti/net/minecraft/world/level/block/Block.h"
+#include "libmatti/net/minecraft/world/level/block/EntityBlock.h"
 #include "libmatti/net/minecraft/world/level/levelgen/Heightmap.h"
 
 #include <stdlib.h>
@@ -90,15 +91,17 @@ LIBMATTI_MC_BlockState *LIBMATTI_MC_LevelChunk_SetBlockState(LIBMATTI_MC_LevelCh
     return oldState;
 }
 
-// Java: BlockState.hasBlockEntity() = getBlock() instanceof EntityBlock - the port
-// keeps an EntityBlock registry-free approximation: the state's block must be in
-// some BlockEntityType's validBlocks set
+// Java: BlockState.hasBlockEntity() = getBlock() instanceof EntityBlock - the
+// port asks the block's EntityBlock vtable first; vanilla blocks that carry no
+// vtable yet fall back to the BlockEntityType validBlocks scan (the Java
+// equivalent of the concrete vanilla EntityBlock implementations).
 static bool state_has_block_entity(LIBMATTI_MC_BlockState *state)
 {
+    void *block = LIBMATTI_MC_BlockState_GetBlock(state);
+    if (LIBMATTI_MC_EntityBlock_HasBlockEntity((LIBMATTI_MC_Block *) block))
+        return true;
     for (int i = 0; i < 49; i++)
     {
-        // the 49 vanilla types are static-lifetime entries
-        extern const LIBMATTI_MC_BlockEntityType *LIBMATTI_MC_BlockEntityType_AccessIndex(int);
         const LIBMATTI_MC_BlockEntityType *type = LIBMATTI_MC_BlockEntityType_AccessIndex(i);
         if (type != NULL && LIBMATTI_MC_BlockEntityType_IsValid(type, state))
             return true;
@@ -110,12 +113,16 @@ static LIBMATTI_MC_BlockEntity *create_block_entity(LIBMATTI_MC_LevelChunk *chun
 {
     // Java: private createBlockEntity - the state's EntityBlock.newBlockEntity
     LIBMATTI_MC_BlockState *state = LIBMATTI_MC_LevelChunk_GetBlockState(chunk, pos);
-    if (!state_has_block_entity(state))
-        return NULL;
-    // the vanilla path: find the type whose validBlocks contain this block
+    if (state_has_block_entity(state))
+    {
+        LIBMATTI_MC_BlockEntity *entity = LIBMATTI_MC_EntityBlock_NewBlockEntity(
+                (LIBMATTI_MC_Block *) LIBMATTI_MC_BlockState_GetBlock(state), pos, state);
+        if (entity != NULL)
+            return entity;
+    }
+    // the vanilla fallback: the type whose validBlocks contain this block
     for (int i = 0; i < 49; i++)
     {
-        extern const LIBMATTI_MC_BlockEntityType *LIBMATTI_MC_BlockEntityType_AccessIndex(int);
         const LIBMATTI_MC_BlockEntityType *type = LIBMATTI_MC_BlockEntityType_AccessIndex(i);
         if (type != NULL && LIBMATTI_MC_BlockEntityType_IsValid(type, state))
             return LIBMATTI_MC_BlockEntityType_Create(type, pos, state);
