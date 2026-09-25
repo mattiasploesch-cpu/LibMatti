@@ -121,6 +121,9 @@ int LIBMATTI_GLFW_glfwGetError(const char **description);
 int LIBMATTI_GLFW_glfwWindowShouldClose(long window);
 // Java: public static int glfwGetKey(long window, int key)
 int LIBMATTI_GLFW_glfwGetKey(long window, int key);
+// Java: public static int glfwGetMouseButton(long window, int button) - the
+// mouse-button state the attack/use handlers poll (GLFW_PRESS/GLFW_RELEASE)
+int LIBMATTI_GLFW_glfwGetMouseButton(long window, int button);
 // Java: public static void glfwSetInputMode(long window, int mode, int value)
 void LIBMATTI_GLFW_glfwSetInputMode(long window, int mode, int value);
 // Java: public static void glfwGetCursorPos(long window, double[] xpos, double[] ypos)

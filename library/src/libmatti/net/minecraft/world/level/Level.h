@@ -7,6 +7,7 @@
 
 #include "libmatti/net/minecraft/core/BlockPos.h"
 #include "libmatti/net/minecraft/world/phys/AABB.h"
+#include "libmatti/net/minecraft/world/phys/BlockHitResult.h"
 #include "libmatti/net/minecraft/resources/ResourceKey.h"
 #include "libmatti/net/minecraft/world/level/BlockGetter.h"
 #include "libmatti/net/minecraft/world/level/ChunkPos.h"
@@ -148,6 +149,19 @@ int LIBMATTI_MC_Level_GetBlockCollisions(struct LIBMATTI_MC_Level *level, double
 // Java: CollisionGetter.noCollision(Entity, AABB) - true when no block collision
 // shape intersects the box (the block-only check; entities ride the entity scan)
 bool LIBMATTI_MC_Level_NoBlockCollision(struct LIBMATTI_MC_Level *level, const LIBMATTI_MC_AABB *box);
+
+// Java: BlockGetter.clip(ClipContext) - the DDA ray cast over the level's block
+// states (P5.4). The context carries the ray + the clip modes; the hit returns
+// the entry face and the location, no hit returns the Java miss (the ray end
+// plus the approximate nearest of the reverse ray).
+struct LIBMATTI_MC_ClipContext;
+LIBMATTI_MC_BlockHitResult LIBMATTI_MC_Level_Clip(struct LIBMATTI_MC_Level *level,
+                                                  struct LIBMATTI_MC_ClipContext *context);
+// Java: the per-cell clip lambda (BlockGetter.clipWithState shape) - the single
+// position's full-cube clip, exposed for the harness and the pick debug.
+LIBMATTI_MC_BlockHitResult LIBMATTI_MC_Level_ClipWithState(LIBMATTI_MC_Level *level, const LIBMATTI_MC_Vec3 *from,
+                                                           const LIBMATTI_MC_Vec3 *to, const LIBMATTI_MC_BlockPos *pos,
+                                                           const LIBMATTI_MC_BlockState *state);
 
 #ifdef __cplusplus
 }
