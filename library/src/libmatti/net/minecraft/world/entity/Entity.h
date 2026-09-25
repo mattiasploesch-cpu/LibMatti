@@ -89,7 +89,23 @@ typedef struct LIBMATTI_MC_Entity
     bool noGravity;
     // Java: the first tick flag (EntitiesStatefulSection)
     bool firstTick;
+    // Java: protected boolean horizontalCollision / verticalCollision /
+    // verticalCollisionBelow / minorHorizontalCollision (the move() results)
+    bool horizontalCollision;
+    bool verticalCollision;
+    bool verticalCollisionBelow;
+    bool minorHorizontalCollision;
 } LIBMATTI_MC_Entity;
+
+// Java: public enum MoverType - the movement dispatch the move() switch reads
+typedef enum LIBMATTI_MC_MoverType
+{
+    LIBMATTI_MC_MoverType_SELF,
+    LIBMATTI_MC_MoverType_PLAYER,
+    LIBMATTI_MC_MoverType_PISTON,
+    LIBMATTI_MC_MoverType_SHULKER_BOX,
+    LIBMATTI_MC_MoverType_SHULKER,
+} LIBMATTI_MC_MoverType;
 
 // Java: protected Entity(EntityType<?>, Level) - the subclass entry; sets the
 // id + uuid, positions at origin with the type's dimensions
@@ -158,6 +174,23 @@ void LIBMATTI_MC_Entity_SetDeltaMovement(LIBMATTI_MC_Entity *entity, const LIBMA
 // Java: public boolean onGround() / setOnGround(boolean)
 bool LIBMATTI_MC_Entity_OnGround(const LIBMATTI_MC_Entity *entity);
 void LIBMATTI_MC_Entity_SetOnGround(LIBMATTI_MC_Entity *entity, bool onGround);
+// Java: public final boolean horizontalCollision / verticalCollision (the
+// collision flags the last move() computed)
+bool LIBMATTI_MC_Entity_HorizontalCollision(const LIBMATTI_MC_Entity *entity);
+bool LIBMATTI_MC_Entity_VerticalCollision(const LIBMATTI_MC_Entity *entity);
+bool LIBMATTI_MC_Entity_VerticalCollisionBelow(const LIBMATTI_MC_Entity *entity);
+// Java: public void move(MoverType, Vec3) - the collide path: the per-axis
+// Shapes.collide over the level's block collisions, the collision flags, the
+// on-ground state and the motion reset on horizontal hits
+void LIBMATTI_MC_Entity_Move(LIBMATTI_MC_Entity *entity, LIBMATTI_MC_MoverType moverType, const LIBMATTI_MC_Vec3 *movement);
+// Java: private Vec3 collide(Vec3) -> collideBoundingBox - the per-axis sweep
+// (axisStepOrder: |x| < |z| ? YZX : YXZ); returns the clipped movement
+void LIBMATTI_MC_Entity_Collide(const LIBMATTI_MC_Entity *entity, const LIBMATTI_MC_Vec3 *movement, LIBMATTI_MC_Vec3 *out);
+// Java: public static Vec3 collideBoundingBox(Entity, Vec3, AABB, Level, List) -
+// the static sweep against the level's block collisions
+void LIBMATTI_MC_Entity_CollideBoundingBox(const LIBMATTI_MC_Entity *entity, const LIBMATTI_MC_Vec3 *movement,
+                                           const LIBMATTI_MC_AABB *box, struct LIBMATTI_MC_Level *level,
+                                           LIBMATTI_MC_Vec3 *out);
 // Java: public double getFallDistance() / setFallDistance(double)
 float LIBMATTI_MC_Entity_GetFallDistance(const LIBMATTI_MC_Entity *entity);
 void LIBMATTI_MC_Entity_SetFallDistance(LIBMATTI_MC_Entity *entity, float fallDistance);
@@ -168,6 +201,9 @@ void LIBMATTI_MC_Entity_SetInvulnerable(LIBMATTI_MC_Entity *entity, bool invulne
 // Java: public boolean isNoGravity() / setNoGravity(boolean)
 bool LIBMATTI_MC_Entity_IsNoGravity(const LIBMATTI_MC_Entity *entity);
 void LIBMATTI_MC_Entity_SetNoGravity(LIBMATTI_MC_Entity *entity, bool noGravity);
+// Java: public boolean isNoPhysics() / the setter the spectator/ghost paths use
+bool LIBMATTI_MC_Entity_IsNoPhysics(const LIBMATTI_MC_Entity *entity);
+void LIBMATTI_MC_Entity_SetNoPhysics(LIBMATTI_MC_Entity *entity, bool noPhysics);
 // Java: public boolean isSilent() / isVisualFire / isGlowing
 bool LIBMATTI_MC_Entity_IsSilent(const LIBMATTI_MC_Entity *entity);
 bool LIBMATTI_MC_Entity_IsGlowing(const LIBMATTI_MC_Entity *entity);

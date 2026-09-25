@@ -1,6 +1,8 @@
 // Port of net.minecraft.client.Camera (implementation).
 // setRotation builds JOML's rotationYXZ(PI - yRot, -xRot, 0) through the
-// port's identity + rotateAxis pair (qY * qX, with the zero Z term), and
+// port's identity + rotateAxis pair. RotateAxis PRE-multiplies (q = axisQ*q),
+// so the X pitch term must be applied FIRST and the Y yaw term LAST to yield
+// the rotationYXZ product qY·qX (the zero Z term drops out), and
 // the basis vectors rotate through the standard q*v*q*-1 sandwich - the
 // same math Vector3f.rotate(Quaternionfc, Vector3f) performs.
 
@@ -72,11 +74,17 @@ void LIBMATTI_MC_Camera_SetRotation(LIBMATTI_MC_Camera *camera, float yRot, floa
     camera->yRot = yRot;
     camera->xRot = xRot;
     // Java: this.rotation.rotationYXZ((float) Math.PI - yRot * rad, -xRot * rad, 0)
+    // = RY(PI - yRot) * RX(-xRot). RotateAxis PRE-multiplies (q = axisQ * q),
+    // so the pitch about X goes in FIRST and the yaw about Y LAST - the yaw
+    // must sit on the LEFT of the product (the outermost world-space turn).
+    // The previous order (yaw first, pitch second) built RX*RY instead, which
+    // pitches around the WORLD X axis: at yaw 90/270 the pitch vanished and
+    // the horizon rolled to the side when looking down.
     LIBMATTI_JOML_Quaternionf_Identity(&camera->rotation);
     LIBMATTI_JOML_Quaternionf_RotateAxis(&camera->rotation,
-                                         (float) M_PI - yRot * ((float) M_PI / 180.0f), 0.0f, 1.0f, 0.0f);
-    LIBMATTI_JOML_Quaternionf_RotateAxis(&camera->rotation,
                                          -xRot * ((float) M_PI / 180.0f), 1.0f, 0.0f, 0.0f);
+    LIBMATTI_JOML_Quaternionf_RotateAxis(&camera->rotation,
+                                         (float) M_PI - yRot * ((float) M_PI / 180.0f), 0.0f, 1.0f, 0.0f);
     // Java: FORWARDS.rotate(this.rotation, this.forwards) - the CONSTANTS
     // rotate INTO the fields, so every call starts from the unit axes again
     // (rotating the fields in place would compose with the previous frame).

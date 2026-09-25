@@ -6,6 +6,7 @@
 #define MATTICRAFT_MC_WORLD_LEVEL_LEVEL_H
 
 #include "libmatti/net/minecraft/core/BlockPos.h"
+#include "libmatti/net/minecraft/world/phys/AABB.h"
 #include "libmatti/net/minecraft/resources/ResourceKey.h"
 #include "libmatti/net/minecraft/world/level/BlockGetter.h"
 #include "libmatti/net/minecraft/world/level/ChunkPos.h"
@@ -136,6 +137,17 @@ struct LIBMATTI_MC_Entity *LIBMATTI_MC_Level_GetEntity(struct LIBMATTI_MC_Level 
 int LIBMATTI_MC_Level_GetEntitiesInBox(struct LIBMATTI_MC_Level *level, double minX, double minY, double minZ,
                                        double maxX, double maxY, double maxZ,
                                        struct LIBMATTI_MC_Entity **out, int outCapacity);
+
+// Java: CollisionGetter.getBlockCollisions(Entity, AABB) - the block shapes the
+// box overlaps, each as the full-block AABB (the VoxelShape port collapses to
+// full cubes; air/no-collision blocks are skipped). out receives malloc'd
+// AABBs the caller frees. Returns the count (capped at outCapacity).
+int LIBMATTI_MC_Level_GetBlockCollisions(struct LIBMATTI_MC_Level *level, double minX, double minY, double minZ,
+                                         double maxX, double maxY, double maxZ,
+                                         LIBMATTI_MC_AABB **out, int outCapacity);
+// Java: CollisionGetter.noCollision(Entity, AABB) - true when no block collision
+// shape intersects the box (the block-only check; entities ride the entity scan)
+bool LIBMATTI_MC_Level_NoBlockCollision(struct LIBMATTI_MC_Level *level, const LIBMATTI_MC_AABB *box);
 
 #ifdef __cplusplus
 }

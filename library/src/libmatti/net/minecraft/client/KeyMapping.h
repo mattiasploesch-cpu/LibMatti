@@ -57,9 +57,11 @@ typedef struct LIBMATTI_MC_KeyMapping
     // Java: private boolean isDown / private int clickCount
     bool isDown;
     int clickCount;
-    // Java: ToggleKeyMapping - the flag + the provider (NULL = plain mapping)
+    // Java: ToggleKeyMapping - the flag + the needsToggle provider (the toggle
+    // option, default off; NULL = plain mapping). Java: setDown flips the state
+    // only when needsToggle() is true, isDown() stays the plain field.
     bool isToggle;
-    bool (*shouldIsDown)(void);
+    bool (*needsToggle)(void);
 } LIBMATTI_MC_KeyMapping;
 
 // Java: public KeyMapping(String, int, Category) - KEYSYM default
@@ -73,7 +75,7 @@ LIBMATTI_MC_KeyMapping *LIBMATTI_MC_KeyMapping_NewOrdered(LIBMATTI_MC_InputConst
 // Java: ToggleKeyMapping(name, key, category, toggleGetter, needsToggle) - the
 // port folds the needsToggle flag away (the provider answers isDown)
 LIBMATTI_MC_KeyMapping *LIBMATTI_MC_KeyMapping_NewToggle(const char *name, int key, LIBMATTI_MC_KeyMappingCategory category,
-                                                         bool (*shouldIsDown)(void));
+                                                         bool (*needsToggle)(void));
 void LIBMATTI_MC_KeyMapping_Free(LIBMATTI_MC_KeyMapping *mapping);
 
 // Java: private void registerMapping(Key) / public static void resetMapping() -

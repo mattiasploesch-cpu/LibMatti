@@ -34,6 +34,7 @@
 #include "libmatti/net/minecraft/client/resources/model/SpriteGetter.h"
 #include "libmatti/net/minecraft/client/renderer/chunk/ChunkSectionLayer.h"
 #include "libmatti/net/minecraft/core/BlockPos.h"
+#include "libmatti/net/minecraft/util/Mth.h"
 #include "libmatti/net/minecraft/server/bootstrap/VanillaBlocks.h"
 #include "libmatti/net/minecraft/Bootstrap.h"
 #include "libmatti/org/joml/Matrix4f.h"
@@ -497,16 +498,25 @@ LIBMATTI_MC_Minecraft *LIBMATTI_MC_Minecraft_New(const LIBMATTI_MC_GameConfig *c
             minecraft->cloudRenderer != NULL ? 1 : 0);
     }
 
+    // Java: this.options = new Options(this, ...) - the Options constructor
+    // creates the vanilla KeyMappings (key.forward/key.left/...) BEFORE the
+    // LocalPlayer/KeyboardInput read them through the Options fields. Without
+    // this the accessors return NULL and every IsDown() answers false - the
+    // move vector stays (0, 0) and the player never walks (the mouse-look does
+    // not touch the mappings, which is why turning still worked).
+    LIBMATTI_MC_KeyMapping_CreateVanillaMappings();
+
     // Java: this.player = new LocalPlayer(this, this.level, ...) - the session
-    // profile name rides the GameConfig user; the spawn eyes the platform from
-    // the old skeleton spot (yaw 180 faces north, feet 65 + the 1.62 eye
-    // height), the camera initialises below from the entity
+    // profile name rides the GameConfig user. The spawn rides the platform
+    // centre (the 16x16 slab spans x/z 0..15 at y 64, top face 65) - since the
+    // P5.3 physics the player collides, so an off-platform spawn falls into
+    // the void; yaw 180 faces north over the slab, pitch 20 looks slightly down
     minecraft->localPlayer = LIBMATTI_MC_LocalPlayer_New(minecraft->level,
                                                          config->user.name ? config->user.name : "Player", NULL);
     if (minecraft->localPlayer != NULL)
     {
         LIBMATTI_MC_Entity *entity = &minecraft->localPlayer->player.base.base;
-        LIBMATTI_MC_Entity_SetPos(entity, 8.0, 65.0, 24.0);
+        LIBMATTI_MC_Entity_SetPos(entity, 8.0, 65.0, 8.0);
         LIBMATTI_MC_Entity_SetRot(entity, 180.0f, 20.0f);
         LIBMATTI_MC_Level_AddEntity(minecraft->level, entity);
     }
@@ -525,6 +535,8 @@ static void minecraft_demo_tick(void)
 
 MATTI_MIXIN_TARGET("matticraft::demo::tick", minecraft_demo_tick)
 
+static void apply_walk(LIBMATTI_MC_Minecraft *minecraft);
+
 static void tick(LIBMATTI_MC_Minecraft *minecraft)
 {
     MattiMixinResult result = MATTI_MIXIN_PASS;
@@ -541,6 +553,12 @@ static void tick(LIBMATTI_MC_Minecraft *minecraft)
                                                          (LIBMATTI_MC_Level *) minecraft->level,
                                                          (long long) (LIBMATTI_GLFW_glfwGetTime() * 1000.0));
     }
+
+    // Java: this.tick() runs the player through LocalPlayer.tick -> aiStep ->
+    // travel: the per-TICK input poll + walk/gravity impulse (20 Hz, not the
+    // per-frame rate - the tick loop above repeats this body for every
+    // accumulated tick).
+    apply_walk(minecraft);
 }
 
 // Java: private void renderTitleLine(...) - the skeleton draws the game title
@@ -714,11 +732,12 @@ static void updateMouseLook(LIBMATTI_MC_Minecraft *minecraft)
     minecraft->mouseLookEnabled = 1;
 }
 
-// Java: KeyboardInput.tick + the player movement - the KeyMapping statics
-// answer isDown (the GLFW keys poll through the KeyMapping.Set path), the
-// LocalPlayer builds the Input record + move vector, and the walk rides the
-// move vector in the player's yaw plane (the P5.3 physics replaces the flat
-// step with the acceleration/collision pass).
+// Java: LocalPlayer.aiStep -> the travel impulse - the input move vector turns
+// into the walk acceleration in the entity's yaw plane (Java: xxa * cos(yawRad)
+// - zza * sin(yawRad) over the movedRelative basis); the port folds the
+// LivingEntity friction into a flat per-frame walk speed scaled by the abilities
+// walking speed. The gravity rides Java's LivingEntity.aiStep default (-0.08
+// per tick, * 0.98 the drag), the jump the vanilla +0.42 impulse.
 static void apply_walk(LIBMATTI_MC_Minecraft *minecraft)
 {
     if (minecraft->window == 0 || minecraft->localPlayer == NULL) return;
@@ -744,24 +763,62 @@ static void apply_walk(LIBMATTI_MC_Minecraft *minecraft)
 
     // Java: LocalPlayer.tick -> input.tick() - the Input record + move vector
     LIBMATTI_MC_LocalPlayer_TickInput(minecraft->localPlayer);
+    const LIBMATTI_MC_Input *presses = LIBMATTI_MC_LocalPlayer_GetKeyPresses(minecraft->localPlayer);
+
+    // Java: the jump - onGround && keyJump.isDown() -> jumpFromGround() (+0.42
+    // the vanilla impulse, sprint adds the horizontal boost)
+    if (presses->jump && LIBMATTI_MC_Entity_OnGround(entity))
+    {
+        LIBMATTI_MC_Vec3 jump = {entity->dx, 0.42, entity->dz};
+        LIBMATTI_MC_Entity_SetDeltaMovement(entity, &jump);
+    }
 
     // the walk: the move vector (x = strafe, +1 = LEFT like Java's input
-    // convention, y = forward impulse) in the player entity's yaw plane; a flat
-    // step per frame keeps the skeleton input frame-bound (the P5.3 physics
-    // port takes the entity move over)
+    // convention, y = forward impulse) in the player entity's yaw plane, onto
+    // the delta movement (the friction keeps the speed bounded between frames)
     LIBMATTI_MC_Vec2 move = LIBMATTI_MC_LocalPlayer_GetMoveVector(minecraft->localPlayer);
-    if (move.x == 0.0f && move.y == 0.0f)
-        return;
     float yawRad = entity->yRot * ((float) M_PI / 180.0f);
-    // forward = (-sin yaw, cos yaw) like the camera basis; right = forward
-    // turned -90 degrees around +Y = (-cos yaw, -sin yaw); the strafe rides
-    // the LEFT vector (Java: getInputVector rotates xxa = +1 into the left)
+    // forward = (-sin yaw, cos yaw) like the camera basis; the strafe rides the
+    // LEFT vector (Java: getInputVector rotates xxa = +1 into the left)
     float fwdX = -(float) sin(yawRad), fwdZ = (float) cos(yawRad);
     float rightX = -(float) cos(yawRad), rightZ = -(float) sin(yawRad);
-    float step = 0.25f;
-    float dx = (fwdX * move.y - rightX * move.x) * step;
-    float dz = (fwdZ * move.y - rightZ * move.x) * step;
-    LIBMATTI_MC_Entity_SetPos(entity, entity->x + dx, entity->y, entity->z + dz);
+    // Java: the travel speed - 0.1 (the walk speed) * the move vector length;
+    // the sprint rides the 1.3 multiplier
+    float speed = 0.1f * (float) LIBMATTI_MC_Mth_Length(move.x, move.y);
+    if (presses->sprint)
+        speed *= 1.3f;
+    float accelX = (fwdX * move.y - rightX * move.x) * speed;
+    float accelZ = (fwdZ * move.y - rightZ * move.x) * speed;
+    // Java: LivingEntity.travel - the friction is the move-through block's
+    // slipperiness (0.6 default) * the entity inertia 0.91 = 0.546 ON THE
+    // GROUND, the raw 0.91 in the air; the steady-state walk speed is
+    // accel/(1 - friction) = 0.1/0.454 = 0.22 blocks/tick (4.4 m/s, vanilla).
+    // The old flat 0.91 ran the physics per FRAME and 14x too fast.
+    float friction = LIBMATTI_MC_Entity_OnGround(entity) ? 0.546f : 0.91f;
+    LIBMATTI_MC_Vec3 next = {entity->dx * friction + accelX,
+                             entity->dy * 0.98 - 0.08,
+                             entity->dz * friction + accelZ};
+    LIBMATTI_MC_Entity_SetDeltaMovement(entity, &next);
+
+    // Java: this.move(MoverType.SELF, this.getDeltaMovement()) - the collide
+    // path clips the motion against the level's blocks (the P5.3 port)
+    LIBMATTI_MC_Entity_Move(entity, LIBMATTI_MC_MoverType_SELF, &next);
+
+    // MATTI_DEBUG_POS - the per-second position/onGround trace (the input/
+    // physics smoke runs grep it to prove the walk actually moves the player).
+    static int debugPos = -1;
+    if (debugPos < 0)
+        debugPos = getenv("MATTI_DEBUG_POS") != NULL;
+    if (debugPos)
+    {
+        static int posFrame = 0;
+        if (posFrame++ % 20 == 0)
+            fprintf(stderr, "[POS] x=%.2f y=%.2f z=%.2f onGround=%d move=(%.2f,%.2f) fwdMap=%d rawW=%d\n",
+                    entity->x, entity->y, entity->z,
+                    LIBMATTI_MC_Entity_OnGround(entity), move.x, move.y,
+                    LIBMATTI_MC_KeyMapping_Forward() != NULL,
+                    LIBMATTI_GLFW_glfwGetKey(minecraft->window, LIBMATTI_GLFW_KEY_W));
+    }
 }
 
 // Java: private void runTick(boolean renderLevelInMainMenu) - the loop body.
@@ -783,9 +840,9 @@ static void runTick(LIBMATTI_MC_Minecraft *minecraft, int runGameTime)
     int ticks = LIBMATTI_MC_DeltaTracker_AdvanceTime(minecraft->deltaTracker, nowMs, runGameTime);
 
     // Java: MouseHandler - the mouse-look input runs every frame, before
-    // the renderer picks the camera up.
+    // the renderer picks the camera up. The walk/gravity impulses ride the
+    // per-tick loop below (apply_walk inside tick), not the frame rate.
     updateMouseLook(minecraft);
-    apply_walk(minecraft);
 
     // Java: Camera.setup(BlockGetter, Entity, ...) - the camera rides the local
     // player's entity: eye position + rotation (the renderer reads it below)
@@ -1197,12 +1254,14 @@ void LIBMATTI_MC_Minecraft_Run(LIBMATTI_MC_Minecraft *minecraft)
     // Java: this.gameThread = Thread.currentThread(); priority bump >4 cores.
     LOG("Running Minecraft (skeleton)");
 
-    // Java: boolean flag = false; while (this.running) { runTick(!flag); flag = true; }
+    // Java's run(): boolean flag = false; while (running) { runTick(!flag) } -
+    // the flag only flips inside the OOM catch, so EVERY frame runs
+    // runTick(true) (renderLevelInMainMenu is the first-frame special case;
+    // the old loop-tail flip shape no longer exists in 1.21.11).
     int flag = 0;
     while (minecraft->running)
     {
         runTick(minecraft, !flag);
-        flag = 1;
     }
 
     // Java: Minecraft.run falls out of the loop; destroy runs at the caller.

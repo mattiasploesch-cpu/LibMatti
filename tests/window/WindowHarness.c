@@ -3,6 +3,7 @@
 // closing the window (Java: the same public stop() the GLFW close callback
 // reaches through window.shouldClose() -> stop()).
 
+#include "libmatti/java/lang/System.h"
 #include "libmatti/net/minecraft/client/DeltaTracker.h"
 #include "libmatti/net/minecraft/client/Minecraft.h"
 #include "libmatti/net/minecraft/client/main/GameConfig.h"
@@ -66,18 +67,23 @@ static void test_option_parsing_flags(void)
 
 static void test_delta_tracker_cadence(void)
 {
-    // Java: new DeltaTracker.Timer(20.0F, 0L, ...) - 50 ms per tick.
+    // Java: new DeltaTracker.Timer(20.0F, 0L, ...) - 50 ms per tick. The port
+    // seeds lastMs with the construction-time epoch, so the harness syncs the
+    // baseline first (a typical no-op advance) and then advances in exact
+    // +ms steps from there.
     LIBMATTI_MC_DeltaTracker *tracker = LIBMATTI_MC_DeltaTracker_Timer_New(20.0f, NULL);
+    long long now = LIBMATTI_JL_System_CurrentTimeMillis();
+    (void) LIBMATTI_MC_DeltaTracker_AdvanceTime(tracker, now, 1);
 
-    // First advance from lastMs=0: 2000 ms elapsed at 50 ms/tick = 40 ticks.
-    int ticks = LIBMATTI_MC_DeltaTracker_AdvanceTime(tracker, 2000, 1);
+    // 2000 ms elapsed at 50 ms/tick = 40 ticks.
+    int ticks = LIBMATTI_MC_DeltaTracker_AdvanceTime(tracker, now + 2000, 1);
     CHECK(ticks == 40);
     // Residual stays in the tracker (the fractional part after 40 whole ticks).
     CHECK(LIBMATTI_MC_DeltaTracker_GetGameTimeDeltaPartialTick(tracker, 1) >= 0.0f
           && LIBMATTI_MC_DeltaTracker_GetGameTimeDeltaPartialTick(tracker, 1) < 1.0f);
 
     // 30 ms later: no whole tick yet, residual 0.6.
-    ticks = LIBMATTI_MC_DeltaTracker_AdvanceTime(tracker, 2030, 1);
+    ticks = LIBMATTI_MC_DeltaTracker_AdvanceTime(tracker, now + 2030, 1);
     CHECK(ticks == 0);
     CHECK(LIBMATTI_MC_DeltaTracker_GetGameTimeDeltaPartialTick(tracker, 1) > 0.55f
           && LIBMATTI_MC_DeltaTracker_GetGameTimeDeltaPartialTick(tracker, 1) < 0.65f);
@@ -98,7 +104,7 @@ static void test_delta_tracker_cadence(void)
     CHECK(realtime >= 0.0f && realtime <= 7.0f);
 
     // Java: advanceTime(timeMs, false) only advances realtime.
-    ticks = LIBMATTI_MC_DeltaTracker_AdvanceTime(tracker, 5000, 0);
+    ticks = LIBMATTI_MC_DeltaTracker_AdvanceTime(tracker, now + 5000, 0);
     CHECK(ticks == 0);
 
     LIBMATTI_MC_DeltaTracker_Free(tracker);
@@ -110,11 +116,20 @@ static void test_delta_tracker_cadence(void)
 
 static void test_delta_tracker_first_frame_clamp(void)
 {
-    // Java: (int) float saturates (JLS 5.1.3). The constructor stores lastMs=0,
-    // so the first advance sees the full epoch as delta (Util.getMillis() is a
-    // real epoch value ~1.7e12) and must clamp, not wrap negative.
+    // The constructor seeds lastMs with the construction-time epoch: a
+    // realistic first frame (~16 ms) stays a small delta instead of the
+    // epoch-magnitude delta (1.7e12 ms / 50 = 3.6e10 ticks) whose float
+    // residual poisoning killed every later tick count.
     LIBMATTI_MC_DeltaTracker *tracker = LIBMATTI_MC_DeltaTracker_Timer_New(20.0f, NULL);
-    int ticks = LIBMATTI_MC_DeltaTracker_AdvanceTime(tracker, 1700000000000LL, 1);
+    long long now = LIBMATTI_JL_System_CurrentTimeMillis();
+    int ticks = LIBMATTI_MC_DeltaTracker_AdvanceTime(tracker, now + 16, 1);
+    CHECK(ticks == 0);
+    CHECK(LIBMATTI_MC_DeltaTracker_GetGameTimeDeltaPartialTick(tracker, 1) > 0.0f
+          && LIBMATTI_MC_DeltaTracker_GetGameTimeDeltaPartialTick(tracker, 1) < 1.0f);
+
+    // Java: (int) float saturates at Integer.MAX_VALUE (JLS 5.1.3) - the clamp
+    // path itself stays reachable through a synthetic epoch-magnitude advance.
+    ticks = LIBMATTI_MC_DeltaTracker_AdvanceTime(tracker, now + 9000000000000LL, 1);
     CHECK(ticks == 2147483647);
     LIBMATTI_MC_DeltaTracker_Free(tracker);
 }

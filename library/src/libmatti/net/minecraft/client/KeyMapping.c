@@ -31,13 +31,13 @@ static bool vanilla_toggle_false(void)
 // the typed toggle constructor the mouse-bound use/attack ride
 static LIBMATTI_MC_KeyMapping *mapping_new_toggle_typed(LIBMATTI_MC_InputConstants_Type type, const char *name, int key,
                                                         LIBMATTI_MC_KeyMappingCategory category,
-                                                        bool (*shouldIsDown)(void))
+                                                        bool (*needsToggle)(void))
 {
     LIBMATTI_MC_KeyMapping *mapping = mapping_new(name, type, key, category, 0);
     if (mapping == NULL)
         return NULL;
     mapping->isToggle = true;
-    mapping->shouldIsDown = shouldIsDown != NULL ? shouldIsDown : vanilla_toggle_false;
+    mapping->needsToggle = needsToggle != NULL ? needsToggle : vanilla_toggle_false;
     return mapping;
 }
 
@@ -119,14 +119,14 @@ LIBMATTI_MC_KeyMapping *LIBMATTI_MC_KeyMapping_NewOrdered(LIBMATTI_MC_InputConst
 }
 
 LIBMATTI_MC_KeyMapping *LIBMATTI_MC_KeyMapping_NewToggle(const char *name, int key, LIBMATTI_MC_KeyMappingCategory category,
-                                                         bool (*shouldIsDown)(void))
+                                                         bool (*needsToggle)(void))
 {
     LIBMATTI_MC_KeyMapping *mapping = mapping_new(name, LIBMATTI_MC_InputConstants_KEYSYM, key, category, 0);
     if (mapping == NULL)
         return NULL;
     // Java: ToggleKeyMapping stores the provider; needsToggle defaults to true
     mapping->isToggle = true;
-    mapping->shouldIsDown = shouldIsDown != NULL ? shouldIsDown : vanilla_toggle_false;
+    mapping->needsToggle = needsToggle != NULL ? needsToggle : vanilla_toggle_false;
     return mapping;
 }
 
@@ -192,13 +192,12 @@ void LIBMATTI_MC_KeyMapping_ReleaseAll(void)
         LIBMATTI_MC_KeyMapping_Release(allMappings[i]);
 }
 
-// Java: public boolean isDown() - ToggleKeyMapping overrides it with the provider
+// Java: public boolean isDown() - ToggleKeyMapping does NOT override it (the
+// provider answers needsToggle, see SetDown below), so the plain field wins
 bool LIBMATTI_MC_KeyMapping_IsDown(const LIBMATTI_MC_KeyMapping *mapping)
 {
     if (mapping == NULL)
         return false;
-    if (mapping->isToggle && mapping->shouldIsDown != NULL)
-        return mapping->shouldIsDown() && mapping->isDown;
     return mapping->isDown;
 }
 
@@ -220,11 +219,23 @@ void LIBMATTI_MC_KeyMapping_Release(LIBMATTI_MC_KeyMapping *mapping)
     LIBMATTI_MC_KeyMapping_SetDown(mapping, false);
 }
 
-// Java: public void setDown(boolean p_90846_)
+// Java: public void setDown(boolean p_90846_) / ToggleKeyMapping.setDown - the
+// provider answers "is toggle MODE on" (the toggleCrouch/toggleSprint option,
+// default off): only then a press flips the state, otherwise the physical key
+// passes through like every mapping
 void LIBMATTI_MC_KeyMapping_SetDown(LIBMATTI_MC_KeyMapping *mapping, bool down)
 {
-    if (mapping != NULL)
+    if (mapping == NULL)
+        return;
+    if (mapping->isToggle && mapping->needsToggle != NULL && mapping->needsToggle())
+    {
+        if (down)
+            mapping->isDown = !mapping->isDown;
+    }
+    else
+    {
         mapping->isDown = down;
+    }
 }
 
 const char *LIBMATTI_MC_KeyMapping_GetName(const LIBMATTI_MC_KeyMapping *mapping)

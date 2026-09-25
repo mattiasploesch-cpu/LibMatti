@@ -2,6 +2,8 @@
 
 #include "libmatti/net/minecraft/client/DeltaTracker.h"
 
+#include "libmatti/java/lang/System.h"
+
 #include <stdlib.h>
 
 static LIBMATTI_MC_DeltaTracker zeroTracker = {0.0f, NULL, 0.0f, 0.0f, 0.0f, 0.0f, 0, 0, 0, 0, 0.0f};
@@ -24,6 +26,14 @@ LIBMATTI_MC_DeltaTracker *LIBMATTI_MC_DeltaTracker_Timer_New(float tickRate, LIB
     tracker->msPerTick = 1000.0f / tickRate;
     tracker->targetMsptProvider = targetMsptProvider;
     tracker->fixedValue = -1.0f;
+    // Java passes lastMs = 0 and Util.getMillis() is an epoch value - Java's
+    // first advanceGameTime also sees the huge delta, but Java's (int) cast
+    // saturates and the residual then recovers (Java's float residual has the
+    // same precision loss). The port instead seeds lastMs with the current
+    // time: the first frame's delta stays a real frame length (the port keeps
+    // no other Java-observed behaviour from the epoch-magnitude first delta).
+    tracker->lastMs = LIBMATTI_JL_System_CurrentTimeMillis();
+    tracker->lastUiMs = tracker->lastMs;
     return tracker;
 }
 
