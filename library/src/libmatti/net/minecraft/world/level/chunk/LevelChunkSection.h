@@ -8,6 +8,7 @@
 #define MATTICRAFT_MC_WORLD_LEVEL_CHUNK_LEVELCHUNKSECTION_H
 
 #include "libmatti/net/minecraft/world/level/block/state/BlockState.h"
+#include "libmatti/net/minecraft/world/level/chunk/PalettedContainer.h"
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -28,9 +29,9 @@ typedef struct LIBMATTI_MC_LevelChunkSection
     int16_t nonEmptyBlockCount;
     int16_t tickingBlockCount;
     int16_t tickingFluidCount;
-    // Java: private final PalettedContainer<BlockState> states - the port's plain
-    // array, indexed x + z * 16 + y * 256 like Java's index layout
-    LIBMATTI_MC_BlockState *states[LIBMATTI_MC_LevelChunkSection_SECTION_SIZE];
+    // Java: private final PalettedContainer<BlockState> states - the palette +
+    // BitStorage port (SINGLE_VALUE/LINEAR/GLOBAL like Java's strategies)
+    LIBMATTI_MC_PalettedContainer *states;
 } LIBMATTI_MC_LevelChunkSection;
 
 // Java: public LevelChunkSection() through PalettedContainerFactory - all air
@@ -41,6 +42,8 @@ int LIBMATTI_MC_LevelChunkSection_Index(int x, int y, int z);
 LIBMATTI_MC_BlockState *LIBMATTI_MC_LevelChunkSection_GetBlockState(const LIBMATTI_MC_LevelChunkSection *section, int x, int y, int z);
 // Java: public BlockState setBlockState(int x, int y, int z, BlockState) - returns the old state
 LIBMATTI_MC_BlockState *LIBMATTI_MC_LevelChunkSection_SetBlockState(LIBMATTI_MC_LevelChunkSection *section, int x, int y, int z, LIBMATTI_MC_BlockState *state);
+// the PalettedContainer access (Java: the field read through the section)
+LIBMATTI_MC_PalettedContainer *LIBMATTI_MC_LevelChunkSection_GetStates(const LIBMATTI_MC_LevelChunkSection *section);
 // Java: public boolean hasOnlyAir()
 bool LIBMATTI_MC_LevelChunkSection_HasOnlyAir(const LIBMATTI_MC_LevelChunkSection *section);
 // Java: public boolean isRandomlyTicking() / isRandomlyTickingBlocks() / isRandomlyTickingFluids()
