@@ -15,6 +15,8 @@
 #include "libmatti/matti/mixin/MixinHookTable.h"
 #include "libmatti/matti_mixin.h"
 #include "libmatti/net/minecraft/client/Camera.h"
+#include "libmatti/net/minecraft/client/KeyMapping.h"
+#include "libmatti/net/minecraft/client/player/LocalPlayer.h"
 #include "libmatti/net/minecraft/client/renderer/culling/Frustum.h"
 #include "libmatti/net/minecraft/client/renderer/SkyRenderer.h"
 #include "libmatti/net/minecraft/client/renderer/CloudRenderer.h"
@@ -138,6 +140,15 @@ struct LIBMATTI_MC_Minecraft
     // Java: private final CloudRenderer cloudRenderer (LevelRenderer)
     LIBMATTI_MC_CloudRenderer *cloudRenderer;
     LIBMATTI_MC_TextureAtlas *celestialsAtlas;
+
+    // Java: public LocalPlayer player (the P5.2 port) - the camera rides its
+    // entity position/rotation; the skeleton keeps the mouse-look state here
+    // (Java: MouseHandler + the smooth-camera fields)
+    LIBMATTI_MC_LocalPlayer *localPlayer;
+    int mouseLookInitialized;
+    int mouseLookEnabled;
+    double lastCursorX;
+    double lastCursorY;
 };
 
 // Java: GameRenderer.renderLevel - "Matrix4f matrix4f1 = new Matrix4f()
@@ -486,6 +497,20 @@ LIBMATTI_MC_Minecraft *LIBMATTI_MC_Minecraft_New(const LIBMATTI_MC_GameConfig *c
             minecraft->cloudRenderer != NULL ? 1 : 0);
     }
 
+    // Java: this.player = new LocalPlayer(this, this.level, ...) - the session
+    // profile name rides the GameConfig user; the spawn eyes the platform from
+    // the old skeleton spot (yaw 180 faces north, feet 65 + the 1.62 eye
+    // height), the camera initialises below from the entity
+    minecraft->localPlayer = LIBMATTI_MC_LocalPlayer_New(minecraft->level,
+                                                         config->user.name ? config->user.name : "Player", NULL);
+    if (minecraft->localPlayer != NULL)
+    {
+        LIBMATTI_MC_Entity *entity = &minecraft->localPlayer->player.base.base;
+        LIBMATTI_MC_Entity_SetPos(entity, 8.0, 65.0, 24.0);
+        LIBMATTI_MC_Entity_SetRot(entity, 180.0f, 20.0f);
+        LIBMATTI_MC_Level_AddEntity(minecraft->level, entity);
+    }
+
     return minecraft;
 }
 
@@ -653,72 +678,90 @@ static LIBMATTI_FML_SimpleFont *load_font(void)
 }
 
 // Java: MouseHandler.onMove - the mouse-look. The cursor is captured
-// (GLFW_CURSOR_DISABLED) and its per-frame delta turns xRot (pitch) /
-// yRot (yaw); xRot is clamped to +-90 like Java's Mth.clampTo90. The
-// enabled flag absorbs the first frame: the fresh grab reports the jump
-// to the window centre as one huge delta that must not turn the camera.
-static int mouseLookInitialized = 0;
-static int mouseLookEnabled = 0;
-static double lastCursorX = 0.0, lastCursorY = 0.0;
-
+// (GLFW_CURSOR_DISABLED) and its per-frame delta turns the LOCAL PLAYER's
+// entity rotation through Entity.turn (0.15 sensitivity, the +-90 pitch
+// clamp) - the camera follows the entity. The enabled flag absorbs the first
+// frame: the fresh grab reports the jump to the window centre as one huge
+// delta that must not turn the camera.
 static void updateMouseLook(LIBMATTI_MC_Minecraft *minecraft)
 {
-    if (minecraft->window == 0) return;
+    if (minecraft->window == 0 || minecraft->localPlayer == NULL) return;
 
-    if (!mouseLookInitialized)
+    if (!minecraft->mouseLookInitialized)
     {
-        mouseLookInitialized = 1;
+        minecraft->mouseLookInitialized = 1;
         LIBMATTI_GLFW_glfwSetInputMode(minecraft->window, LIBMATTI_GLFW_CURSOR,
                                        LIBMATTI_GLFW_CURSOR_DISABLED);
     }
     if (LIBMATTI_GLFW_glfwGetKey(minecraft->window, LIBMATTI_GLFW_KEY_ESCAPE))
     {
-        if (mouseLookEnabled)
+        if (minecraft->mouseLookEnabled)
             LIBMATTI_MC_Minecraft_Stop(minecraft);
     }
 
     double cx = 0.0, cy = 0.0;
     LIBMATTI_GLFW_glfwGetCursorPos(minecraft->window, &cx, &cy);
-    if (mouseLookEnabled)
+    if (minecraft->mouseLookEnabled)
     {
-        float dx = (float) (cx - lastCursorX);
-        float dy = (float) (cy - lastCursorY);
-        // Java: MouseHandler.turnPlayer - xRot = clamp(xRot - dy*sens, +-90),
-        // yRot += dx*sens; negative pitch looks UP (the camera convention).
-        float sens = 0.15f;
-        float yaw = minecraft->camera.yRot + dx * sens;
-        float pitch = minecraft->camera.xRot - dy * sens;
-        if (pitch > 90.0f) pitch = 90.0f;
-        if (pitch < -90.0f) pitch = -90.0f;
-        LIBMATTI_MC_Camera_SetRotation(&minecraft->camera, yaw, pitch);
+        float dx = (float) (cx - minecraft->lastCursorX);
+        float dy = (float) (cy - minecraft->lastCursorY);
+        // Java: MouseHandler.turnPlayer -> entity.turn(dx, -dy); the negative
+        // pitch looks UP (the camera convention).
+        LIBMATTI_MC_Entity_Turn(&minecraft->localPlayer->player.base.base, (double) dx, (double) -dy);
     }
-    lastCursorX = cx;
-    lastCursorY = cy;
-    mouseLookEnabled = 1;
+    minecraft->lastCursorX = cx;
+    minecraft->lastCursorY = cy;
+    minecraft->mouseLookEnabled = 1;
 }
 
-// The walk: WASD in the camera's yaw plane (the player direction Java's
-// input moves along); a flat step per frame keeps the skeleton input
-// frame-bound like the rest of the input port.
+// Java: KeyboardInput.tick + the player movement - the KeyMapping statics
+// answer isDown (the GLFW keys poll through the KeyMapping.Set path), the
+// LocalPlayer builds the Input record + move vector, and the walk rides the
+// move vector in the player's yaw plane (the P5.3 physics replaces the flat
+// step with the acceleration/collision pass).
 static void apply_walk(LIBMATTI_MC_Minecraft *minecraft)
 {
-    if (minecraft->window == 0) return;
-    float yawRad = minecraft->camera.yRot * ((float) M_PI / 180.0f);
+    if (minecraft->window == 0 || minecraft->localPlayer == NULL) return;
+    LIBMATTI_MC_Entity *entity = &minecraft->localPlayer->player.base.base;
+
+    // Java: KeyMapping.set(key, glfwGetKey(window, key) == GLFW_PRESS) - the
+    // skeleton polls the movement keys before the input tick (the real client
+    // feeds the same pair through the key callbacks)
+    LIBMATTI_MC_KeyMapping_Set(LIBMATTI_MC_InputConstants_KEYSYM, 87,
+                               LIBMATTI_GLFW_glfwGetKey(minecraft->window, LIBMATTI_GLFW_KEY_W) == LIBMATTI_GLFW_PRESS);
+    LIBMATTI_MC_KeyMapping_Set(LIBMATTI_MC_InputConstants_KEYSYM, 83,
+                               LIBMATTI_GLFW_glfwGetKey(minecraft->window, LIBMATTI_GLFW_KEY_S) == LIBMATTI_GLFW_PRESS);
+    LIBMATTI_MC_KeyMapping_Set(LIBMATTI_MC_InputConstants_KEYSYM, 65,
+                               LIBMATTI_GLFW_glfwGetKey(minecraft->window, LIBMATTI_GLFW_KEY_A) == LIBMATTI_GLFW_PRESS);
+    LIBMATTI_MC_KeyMapping_Set(LIBMATTI_MC_InputConstants_KEYSYM, 68,
+                               LIBMATTI_GLFW_glfwGetKey(minecraft->window, LIBMATTI_GLFW_KEY_D) == LIBMATTI_GLFW_PRESS);
+    LIBMATTI_MC_KeyMapping_Set(LIBMATTI_MC_InputConstants_KEYSYM, 32,
+                               LIBMATTI_GLFW_glfwGetKey(minecraft->window, LIBMATTI_GLFW_KEY_SPACE) == LIBMATTI_GLFW_PRESS);
+    LIBMATTI_MC_KeyMapping_Set(LIBMATTI_MC_InputConstants_KEYSYM, 340,
+                               LIBMATTI_GLFW_glfwGetKey(minecraft->window, LIBMATTI_GLFW_KEY_LEFT_SHIFT) == LIBMATTI_GLFW_PRESS);
+    LIBMATTI_MC_KeyMapping_Set(LIBMATTI_MC_InputConstants_KEYSYM, 341,
+                               LIBMATTI_GLFW_glfwGetKey(minecraft->window, LIBMATTI_GLFW_KEY_LEFT_CONTROL) == LIBMATTI_GLFW_PRESS);
+
+    // Java: LocalPlayer.tick -> input.tick() - the Input record + move vector
+    LIBMATTI_MC_LocalPlayer_TickInput(minecraft->localPlayer);
+
+    // the walk: the move vector (x = strafe, +1 = LEFT like Java's input
+    // convention, y = forward impulse) in the player entity's yaw plane; a flat
+    // step per frame keeps the skeleton input frame-bound (the P5.3 physics
+    // port takes the entity move over)
+    LIBMATTI_MC_Vec2 move = LIBMATTI_MC_LocalPlayer_GetMoveVector(minecraft->localPlayer);
+    if (move.x == 0.0f && move.y == 0.0f)
+        return;
+    float yawRad = entity->yRot * ((float) M_PI / 180.0f);
     // forward = (-sin yaw, cos yaw) like the camera basis; right = forward
-    // turned -90 degrees around +Y = (-cos yaw, -sin yaw).
+    // turned -90 degrees around +Y = (-cos yaw, -sin yaw); the strafe rides
+    // the LEFT vector (Java: getInputVector rotates xxa = +1 into the left)
     float fwdX = -(float) sin(yawRad), fwdZ = (float) cos(yawRad);
     float rightX = -(float) cos(yawRad), rightZ = -(float) sin(yawRad);
     float step = 0.25f;
-    float dx = 0.0f, dz = 0.0f;
-    if (LIBMATTI_GLFW_glfwGetKey(minecraft->window, LIBMATTI_GLFW_KEY_W)) { dx += fwdX * step; dz += fwdZ * step; }
-    if (LIBMATTI_GLFW_glfwGetKey(minecraft->window, LIBMATTI_GLFW_KEY_S)) { dx -= fwdX * step; dz -= fwdZ * step; }
-    if (LIBMATTI_GLFW_glfwGetKey(minecraft->window, LIBMATTI_GLFW_KEY_D)) { dx += rightX * step; dz += rightZ * step; }
-    if (LIBMATTI_GLFW_glfwGetKey(minecraft->window, LIBMATTI_GLFW_KEY_A)) { dx -= rightX * step; dz -= rightZ * step; }
-    if (dx != 0.0f || dz != 0.0f)
-        LIBMATTI_MC_Camera_SetPosition(&minecraft->camera,
-                                       minecraft->camera.x + dx,
-                                       minecraft->camera.y,
-                                       minecraft->camera.z + dz);
+    float dx = (fwdX * move.y - rightX * move.x) * step;
+    float dz = (fwdZ * move.y - rightZ * move.x) * step;
+    LIBMATTI_MC_Entity_SetPos(entity, entity->x + dx, entity->y, entity->z + dz);
 }
 
 // Java: private void runTick(boolean renderLevelInMainMenu) - the loop body.
@@ -743,6 +786,15 @@ static void runTick(LIBMATTI_MC_Minecraft *minecraft, int runGameTime)
     // the renderer picks the camera up.
     updateMouseLook(minecraft);
     apply_walk(minecraft);
+
+    // Java: Camera.setup(BlockGetter, Entity, ...) - the camera rides the local
+    // player's entity: eye position + rotation (the renderer reads it below)
+    if (minecraft->localPlayer != NULL)
+    {
+        LIBMATTI_MC_Entity *entity = &minecraft->localPlayer->player.base.base;
+        LIBMATTI_MC_Camera_SetRotation(&minecraft->camera, entity->yRot, entity->xRot);
+        LIBMATTI_MC_Camera_SetPosition(&minecraft->camera, entity->x, entity->y + LIBMATTI_MC_Entity_GetEyeHeight(entity), entity->z);
+    }
 
     // Java: if (renderLevelInMainMenu) { ... for (l = 0; l < min(10, k); l++) tick(); }
     if (runGameTime)
@@ -1170,6 +1222,18 @@ int LIBMATTI_MC_Minecraft_IsRunning(const LIBMATTI_MC_Minecraft *minecraft)
 void LIBMATTI_MC_Minecraft_Destroy(LIBMATTI_MC_Minecraft *minecraft)
 {
     if (minecraft == NULL) return;
+
+    // Java: this.player = null - the local player leaves the level list and
+    // frees (the port's level entities are borrowed pointers)
+    if (minecraft->localPlayer != NULL)
+    {
+        if (minecraft->level != NULL)
+            LIBMATTI_MC_Level_RemoveEntity(minecraft->level, &minecraft->localPlayer->player.base.base);
+        LIBMATTI_MC_LocalPlayer_Free(minecraft->localPlayer);
+        minecraft->localPlayer = NULL;
+    }
+    // Java: Options - the static KeyMapping table releases
+    LIBMATTI_MC_KeyMapping_ReleaseAll();
 
     // Java: this.close() -> levelRenderer.close() -> the section dispatcher's
     // sections and compiled meshes free with the level.
