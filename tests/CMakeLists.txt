@@ -92,6 +92,11 @@ add_test(NAME entity COMMAND test_entity)
 matti_test(test_player player/PlayerHarness.c)
 add_test(NAME player COMMAND test_player)
 
+# physics: the P5.3 core - the block-collision scan (AABB vs BlockStates),
+# noBlockCollision, the per-axis collide sweep and the Entity move path
+matti_test(test_physics physics/PhysicsHarness.c)
+add_test(NAME physics COMMAND test_physics)
+
 # ao: the P4.4 AO kernel over a real level (BlockColors providers, shade table,
 # the tesselate paths through the dispatcher)
 matti_test(test_ao ao/AoHarness.c)

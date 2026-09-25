@@ -333,6 +333,34 @@ void LIBMATTI_MC_Entity_SetNoGravity(LIBMATTI_MC_Entity *entity, bool noGravity)
         entity->noGravity = noGravity;
 }
 
+// Java: public boolean isNoPhysics() / setNoPhysics - the ghost/spectator gate
+bool LIBMATTI_MC_Entity_IsNoPhysics(const LIBMATTI_MC_Entity *entity)
+{
+    return entity != NULL && entity->noPhysics;
+}
+
+void LIBMATTI_MC_Entity_SetNoPhysics(LIBMATTI_MC_Entity *entity, bool noPhysics)
+{
+    if (entity != NULL)
+        entity->noPhysics = noPhysics;
+}
+
+// Java: the horizontalCollision / verticalCollision getters
+bool LIBMATTI_MC_Entity_HorizontalCollision(const LIBMATTI_MC_Entity *entity)
+{
+    return entity != NULL && entity->horizontalCollision;
+}
+
+bool LIBMATTI_MC_Entity_VerticalCollision(const LIBMATTI_MC_Entity *entity)
+{
+    return entity != NULL && entity->verticalCollision;
+}
+
+bool LIBMATTI_MC_Entity_VerticalCollisionBelow(const LIBMATTI_MC_Entity *entity)
+{
+    return entity != NULL && entity->verticalCollisionBelow;
+}
+
 bool LIBMATTI_MC_Entity_IsSilent(const LIBMATTI_MC_Entity *entity)
 {
     return entity != NULL && entity->silent;
@@ -443,6 +471,215 @@ const char *const *LIBMATTI_MC_Entity_GetTags(const LIBMATTI_MC_Entity *entity, 
     if (outCount != NULL)
         *outCount = entity != NULL ? entity->tagCount : 0;
     return entity != NULL ? (const char *const *) entity->tags : NULL;
+}
+
+// ---------------------------------------------------------------------------
+// Java: the collide path (Entity.collideBoundingBox -> collectColliders ->
+// collideWithShapes -> Shapes.collide). The sweep walks the three axes in
+// axisStepOrder (|x| < |z| ? YZX : YXZ - Y first, then the smaller horizontal
+// axis first) and clips the movement against every block shape the swept box
+// overlaps, exactly like Shapes.collide's per-shape reduction.
+// ---------------------------------------------------------------------------
+
+// Java: Math.abs(p_193139_) < 1.0E-7 -> 0.0 (the epsilon the collide paths share)
+#define COLLIDE_EPSILON 1.0e-7
+
+// Java: Direction.axisStepOrder(Vec3) - |x| < |z| ? YZX : YXZ
+static void axis_step_order(const LIBMATTI_MC_Vec3 *movement, int *axes)
+{
+    if (fabs(movement->x) < fabs(movement->z))
+    {
+        // YZX_AXIS_ORDER
+        axes[0] = 1;
+        axes[1] = 2;
+        axes[2] = 0;
+    }
+    else
+    {
+        // YXZ_AXIS_ORDER
+        axes[0] = 1;
+        axes[1] = 0;
+        axes[2] = 2;
+    }
+}
+
+static double box_min(const LIBMATTI_MC_AABB *box, int axis)
+{
+    return axis == 0 ? box->minX : (axis == 1 ? box->minY : box->minZ);
+}
+
+static double box_max(const LIBMATTI_MC_AABB *box, int axis)
+{
+    return axis == 0 ? box->maxX : (axis == 1 ? box->maxY : box->maxZ);
+}
+
+// Java: Shapes.collide(Axis, AABB, Iterable<VoxelShape>, double) - the movement
+// on one axis reduces against every shape; the shapes arrive as the swept AABBs
+// the level scan produced (the port's VoxelShape stand-in)
+static double collide_axis(int axis, const LIBMATTI_MC_AABB *box, LIBMATTI_MC_AABB **shapes, int shapeCount, double movement)
+{
+    for (int i = 0; i < shapeCount; i++)
+    {
+        // Java: if (Math.abs(p_193139_) < 1.0E-7) return 0.0
+        if (fabs(movement) < COLLIDE_EPSILON)
+            return 0.0;
+        const LIBMATTI_MC_AABB *shape = shapes[i];
+        // Java: VoxelShape.collideX - the other two axes must overlap first
+        int axisA = (axis + 1) % 3;
+        int axisB = (axis + 2) % 3;
+        if (box_max(shape, axisA) <= box_min(box, axisA) + COLLIDE_EPSILON
+            || box_min(shape, axisA) >= box_max(box, axisA) - COLLIDE_EPSILON)
+            continue;
+        if (box_max(shape, axisB) <= box_min(box, axisB) + COLLIDE_EPSILON
+            || box_min(shape, axisB) >= box_max(box, axisB) - COLLIDE_EPSILON)
+            continue;
+        // Java: the positive walk - the nearest shape face ahead of box.max(axis)
+        if (movement > 0.0)
+        {
+            double d2 = box_min(shape, axis) - box_max(box, axis);
+            if (d2 >= -COLLIDE_EPSILON)
+                movement = fmin(movement, d2);
+        }
+        else if (movement < 0.0)
+        {
+            // Java: the negative walk - the nearest face behind box.min(axis)
+            double d3 = box_max(shape, axis) - box_min(box, axis);
+            if (d3 <= COLLIDE_EPSILON)
+                movement = fmax(movement, d3);
+        }
+    }
+    return movement;
+}
+
+// Java: public static Vec3 collideBoundingBox(Entity, Vec3, AABB, Level, List)
+void LIBMATTI_MC_Entity_CollideBoundingBox(const LIBMATTI_MC_Entity *entity, const LIBMATTI_MC_Vec3 *movement,
+                                           const LIBMATTI_MC_AABB *box, struct LIBMATTI_MC_Level *level,
+                                           LIBMATTI_MC_Vec3 *out)
+{
+    if (out == NULL)
+        return;
+    out->x = 0.0;
+    out->y = 0.0;
+    out->z = 0.0;
+    if (movement == NULL || box == NULL || level == NULL)
+        return;
+
+    // Java: collectColliders - the swept box expandTowards(movement) bounds the
+    // block scan (the entity/world-border collisions ride later phases)
+    LIBMATTI_MC_AABB *swept = LIBMATTI_MC_AABB_ExpandTowards(box, movement);
+    if (swept == NULL)
+        return;
+    // the scan bounds grow one block over the swept box (the epsilon slack of
+    // the BlockCollisions walk)
+    LIBMATTI_MC_AABB *shapes[128];
+    int shapeCount = LIBMATTI_MC_Level_GetBlockCollisions(level, swept->minX - 1.0, swept->minY - 1.0, swept->minZ - 1.0,
+                                                          swept->maxX + 1.0, swept->maxY + 1.0, swept->maxZ + 1.0,
+                                                          shapes, (int) (sizeof(shapes) / sizeof(shapes[0])));
+    free(swept);
+    if (shapeCount == 0)
+    {
+        // Java: collideWithShapes returns the movement when the list is empty
+        *out = *movement;
+        return;
+    }
+
+    // Java: collideWithShapes - vec3 accumulates the per-axis clip over the moved
+    // box (the box rides the already-clipped axes)
+    int axes[3];
+    axis_step_order(movement, axes);
+    double x = 0.0, y = 0.0, z = 0.0;
+    for (int i = 0; i < 3; i++)
+    {
+        int axis = axes[i];
+        double d0 = axis == 0 ? movement->x : (axis == 1 ? movement->y : movement->z);
+        if (d0 == 0.0)
+            continue;
+        LIBMATTI_MC_AABB *moved = LIBMATTI_MC_AABB_Move3(box, x, y, z);
+        if (moved == NULL)
+            break;
+        double d1 = collide_axis(axis, moved, shapes, shapeCount, d0);
+        free(moved);
+        if (axis == 0)
+            x = d1;
+        else if (axis == 1)
+            y = d1;
+        else
+            z = d1;
+    }
+    for (int i = 0; i < shapeCount; i++)
+        free(shapes[i]);
+    out->x = x;
+    out->y = y;
+    out->z = z;
+}
+
+// Java: private Vec3 collide(Vec3) - the entity box sweeps the movement
+void LIBMATTI_MC_Entity_Collide(const LIBMATTI_MC_Entity *entity, const LIBMATTI_MC_Vec3 *movement, LIBMATTI_MC_Vec3 *out)
+{
+    if (out == NULL)
+        return;
+    out->x = 0.0;
+    out->y = 0.0;
+    out->z = 0.0;
+    if (entity == NULL || movement == NULL)
+        return;
+    // Java: vec3 = p_20273_.lengthSqr() == 0.0 ? p_20273_ : collideBoundingBox(...)
+    if (movement->x == 0.0 && movement->y == 0.0 && movement->z == 0.0)
+    {
+        *out = *movement;
+        return;
+    }
+    const LIBMATTI_MC_AABB *box = LIBMATTI_MC_Entity_GetBoundingBox(entity);
+    LIBMATTI_MC_Entity_CollideBoundingBox(entity, movement, box, entity->level, out);
+}
+
+// Java: public void move(MoverType, Vec3)
+void LIBMATTI_MC_Entity_Move(LIBMATTI_MC_Entity *entity, LIBMATTI_MC_MoverType moverType, const LIBMATTI_MC_Vec3 *movement)
+{
+    if (entity == NULL || movement == NULL)
+        return;
+    (void) moverType;
+    // Java: if (this.noPhysics) setPos(x + dx, y + dy, z + dz) + the flags false
+    if (entity->noPhysics)
+    {
+        LIBMATTI_MC_Entity_SetPos(entity, entity->x + movement->x, entity->y + movement->y, entity->z + movement->z);
+        entity->horizontalCollision = false;
+        entity->verticalCollision = false;
+        entity->verticalCollisionBelow = false;
+        entity->minorHorizontalCollision = false;
+        return;
+    }
+
+    // Java: Vec3 vec3 = this.collide(p_19974_) - the clipped movement
+    LIBMATTI_MC_Vec3 clipped;
+    LIBMATTI_MC_Entity_Collide(entity, movement, &clipped);
+    double lengthSqr = clipped.x * clipped.x + clipped.y * clipped.y + clipped.z * clipped.z;
+    // Java: if (d0 > 1.0E-7 || p_19974_.lengthSqr() - d0 < 1.0E-7) setPos(position.add(vec3))
+    double moveSqr = movement->x * movement->x + movement->y * movement->y + movement->z * movement->z;
+    if (lengthSqr > 1.0e-7 || moveSqr - lengthSqr < 1.0e-7)
+        LIBMATTI_MC_Entity_SetPos(entity, entity->x + clipped.x, entity->y + clipped.y, entity->z + clipped.z);
+
+    // Java: boolean flag = !Mth.equal(p_19974_.x, vec3.x); flag1 = !equal(z)
+    bool flag = fabs(movement->x - clipped.x) >= 1.0e-5;
+    bool flag1 = fabs(movement->z - clipped.z) >= 1.0e-5;
+    entity->horizontalCollision = flag || flag1;
+    // Java: if (Math.abs(p_19974_.y) > 0.0 || authoritative) - the vertical flags
+    if (fabs(movement->y) > 0.0)
+    {
+        entity->verticalCollision = movement->y != clipped.y;
+        entity->verticalCollisionBelow = entity->verticalCollision && movement->y < 0.0;
+        // Java: setOnGroundWithMovement(verticalCollisionBelow, horizontalCollision, vec3)
+        LIBMATTI_MC_Entity_SetOnGround(entity, entity->verticalCollisionBelow);
+    }
+
+    // Java: if (this.horizontalCollision) setDeltaMovement(flag ? 0 : dx, dy, flag1 ? 0 : dz)
+    if (entity->horizontalCollision)
+    {
+        LIBMATTI_MC_Vec3 motion;
+        LIBMATTI_MC_Entity_GetDeltaMovement(entity, &motion);
+        LIBMATTI_MC_Vec3 reset = {flag ? 0.0 : motion.x, motion.y, flag1 ? 0.0 : motion.z};
+        LIBMATTI_MC_Entity_SetDeltaMovement(entity, &reset);
+    }
 }
 
 // Java: private void computeSpeed() - the walk-speed bookkeeping (the port
