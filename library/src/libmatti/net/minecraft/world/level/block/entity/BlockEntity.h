@@ -4,6 +4,7 @@
 #define MATTICRAFT_MC_WORLD_LEVEL_BLOCKENTITY_BLOCKENTITY_H
 
 #include "libmatti/net/minecraft/core/BlockPos.h"
+#include "libmatti/net/minecraft/nbt/CompoundTag.h"
 #include "libmatti/net/minecraft/world/level/block/entity/BlockEntityType.h"
 #include "libmatti/net/minecraft/world/level/block/state/BlockState.h"
 
@@ -59,6 +60,29 @@ void LIBMATTI_MC_BlockEntity_ClearRemoved(LIBMATTI_MC_BlockEntity *blockEntity);
 // Java: public void setBlockState(BlockState) - the state refresh (NeoForge calls
 // it when the backing block changes)
 void LIBMATTI_MC_BlockEntity_SetBlockState(LIBMATTI_MC_BlockEntity *blockEntity, LIBMATTI_MC_BlockState *state);
+
+// Java: private void saveMetadata(CompoundTag) - id + keepPacked bookkeeping
+void LIBMATTI_MC_BlockEntity_SaveMetadata(LIBMATTI_MC_BlockEntity *blockEntity, LIBMATTI_MC_Nbt_CompoundTag *tag);
+// Java: public final CompoundTag saveWithFullMetadata() - metadata + position + custom data
+LIBMATTI_MC_Nbt_CompoundTag *LIBMATTI_MC_BlockEntity_SaveWithFullMetadata(LIBMATTI_MC_BlockEntity *blockEntity);
+// Java: public final CompoundTag saveWithId() - metadata + custom data (no position)
+LIBMATTI_MC_Nbt_CompoundTag *LIBMATTI_MC_BlockEntity_SaveWithId(LIBMATTI_MC_BlockEntity *blockEntity);
+// Java: public CompoundTag saveCustomOnly() - only saveAdditional's custom data
+LIBMATTI_MC_Nbt_CompoundTag *LIBMATTI_MC_BlockEntity_SaveCustomOnly(LIBMATTI_MC_BlockEntity *blockEntity);
+// Java: public CompoundTag saveWithoutMetadata() - custom data + no metadata
+LIBMATTI_MC_Nbt_CompoundTag *LIBMATTI_MC_BlockEntity_SaveWithoutMetadata(LIBMATTI_MC_BlockEntity *blockEntity);
+// Java: protected abstract void saveAdditional(CompoundTag) - the subclass hook
+void LIBMATTI_MC_BlockEntity_SaveAdditional(LIBMATTI_MC_BlockEntity *blockEntity, LIBMATTI_MC_Nbt_CompoundTag *tag);
+// Java: public final void loadWithComponents(CompoundTag) - the load entry
+void LIBMATTI_MC_BlockEntity_LoadWithComponents(LIBMATTI_MC_BlockEntity *blockEntity, LIBMATTI_MC_Nbt_CompoundTag *tag);
+// Java: protected void loadAdditional(CompoundTag) - the subclass hook
+void LIBMATTI_MC_BlockEntity_LoadAdditional(LIBMATTI_MC_BlockEntity *blockEntity, LIBMATTI_MC_Nbt_CompoundTag *tag);
+// Java: public static BlockEntity loadStatic(Level, BlockPos, BlockState, CompoundTag) -
+// reads the id, builds through the type's factory and loads the data
+LIBMATTI_MC_BlockEntity *LIBMATTI_MC_BlockEntity_LoadStatic(struct LIBMATTI_MC_Level *level,
+                                                             const LIBMATTI_MC_BlockPos *pos,
+                                                             LIBMATTI_MC_BlockState *state,
+                                                             LIBMATTI_MC_Nbt_CompoundTag *tag);
 
 #ifdef __cplusplus
 }
