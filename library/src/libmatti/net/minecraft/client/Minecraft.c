@@ -499,15 +499,16 @@ LIBMATTI_MC_Minecraft *LIBMATTI_MC_Minecraft_New(const LIBMATTI_MC_GameConfig *c
     }
 
     // Java: this.player = new LocalPlayer(this, this.level, ...) - the session
-    // profile name rides the GameConfig user; the spawn eyes the platform from
-    // the old skeleton spot (yaw 180 faces north, feet 65 + the 1.62 eye
-    // height), the camera initialises below from the entity
+    // profile name rides the GameConfig user. The spawn rides the platform
+    // centre (the 16x16 slab spans x/z 0..15 at y 64, top face 65) - since the
+    // P5.3 physics the player collides, so an off-platform spawn falls into
+    // the void; yaw 180 faces north over the slab, pitch 20 looks slightly down
     minecraft->localPlayer = LIBMATTI_MC_LocalPlayer_New(minecraft->level,
                                                          config->user.name ? config->user.name : "Player", NULL);
     if (minecraft->localPlayer != NULL)
     {
         LIBMATTI_MC_Entity *entity = &minecraft->localPlayer->player.base.base;
-        LIBMATTI_MC_Entity_SetPos(entity, 8.0, 65.0, 24.0);
+        LIBMATTI_MC_Entity_SetPos(entity, 8.0, 65.0, 8.0);
         LIBMATTI_MC_Entity_SetRot(entity, 180.0f, 20.0f);
         LIBMATTI_MC_Level_AddEntity(minecraft->level, entity);
     }
