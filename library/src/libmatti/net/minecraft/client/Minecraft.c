@@ -34,6 +34,7 @@
 #include "libmatti/net/minecraft/client/resources/model/SpriteGetter.h"
 #include "libmatti/net/minecraft/client/renderer/chunk/ChunkSectionLayer.h"
 #include "libmatti/net/minecraft/core/BlockPos.h"
+#include "libmatti/net/minecraft/util/Mth.h"
 #include "libmatti/net/minecraft/server/bootstrap/VanillaBlocks.h"
 #include "libmatti/net/minecraft/Bootstrap.h"
 #include "libmatti/org/joml/Matrix4f.h"
@@ -714,11 +715,12 @@ static void updateMouseLook(LIBMATTI_MC_Minecraft *minecraft)
     minecraft->mouseLookEnabled = 1;
 }
 
-// Java: KeyboardInput.tick + the player movement - the KeyMapping statics
-// answer isDown (the GLFW keys poll through the KeyMapping.Set path), the
-// LocalPlayer builds the Input record + move vector, and the walk rides the
-// move vector in the player's yaw plane (the P5.3 physics replaces the flat
-// step with the acceleration/collision pass).
+// Java: LocalPlayer.aiStep -> the travel impulse - the input move vector turns
+// into the walk acceleration in the entity's yaw plane (Java: xxa * cos(yawRad)
+// - zza * sin(yawRad) over the movedRelative basis); the port folds the
+// LivingEntity friction into a flat per-frame walk speed scaled by the abilities
+// walking speed. The gravity rides Java's LivingEntity.aiStep default (-0.08
+// per tick, * 0.98 the drag), the jump the vanilla +0.42 impulse.
 static void apply_walk(LIBMATTI_MC_Minecraft *minecraft)
 {
     if (minecraft->window == 0 || minecraft->localPlayer == NULL) return;
@@ -744,24 +746,42 @@ static void apply_walk(LIBMATTI_MC_Minecraft *minecraft)
 
     // Java: LocalPlayer.tick -> input.tick() - the Input record + move vector
     LIBMATTI_MC_LocalPlayer_TickInput(minecraft->localPlayer);
+    const LIBMATTI_MC_Input *presses = LIBMATTI_MC_LocalPlayer_GetKeyPresses(minecraft->localPlayer);
+
+    // Java: the jump - onGround && keyJump.isDown() -> jumpFromGround() (+0.42
+    // the vanilla impulse, sprint adds the horizontal boost)
+    if (presses->jump && LIBMATTI_MC_Entity_OnGround(entity))
+    {
+        LIBMATTI_MC_Vec3 jump = {entity->dx, 0.42, entity->dz};
+        LIBMATTI_MC_Entity_SetDeltaMovement(entity, &jump);
+    }
 
     // the walk: the move vector (x = strafe, +1 = LEFT like Java's input
-    // convention, y = forward impulse) in the player entity's yaw plane; a flat
-    // step per frame keeps the skeleton input frame-bound (the P5.3 physics
-    // port takes the entity move over)
+    // convention, y = forward impulse) in the player entity's yaw plane, onto
+    // the delta movement (the friction keeps the speed bounded between frames)
     LIBMATTI_MC_Vec2 move = LIBMATTI_MC_LocalPlayer_GetMoveVector(minecraft->localPlayer);
-    if (move.x == 0.0f && move.y == 0.0f)
-        return;
     float yawRad = entity->yRot * ((float) M_PI / 180.0f);
-    // forward = (-sin yaw, cos yaw) like the camera basis; right = forward
-    // turned -90 degrees around +Y = (-cos yaw, -sin yaw); the strafe rides
-    // the LEFT vector (Java: getInputVector rotates xxa = +1 into the left)
+    // forward = (-sin yaw, cos yaw) like the camera basis; the strafe rides the
+    // LEFT vector (Java: getInputVector rotates xxa = +1 into the left)
     float fwdX = -(float) sin(yawRad), fwdZ = (float) cos(yawRad);
     float rightX = -(float) cos(yawRad), rightZ = -(float) sin(yawRad);
-    float step = 0.25f;
-    float dx = (fwdX * move.y - rightX * move.x) * step;
-    float dz = (fwdZ * move.y - rightZ * move.x) * step;
-    LIBMATTI_MC_Entity_SetPos(entity, entity->x + dx, entity->y, entity->z + dz);
+    // Java: the travel speed - 0.1 (the walk speed) * the move vector length;
+    // the sprint rides the 1.3 multiplier
+    float speed = 0.1f * (float) LIBMATTI_MC_Mth_Length(move.x, move.y);
+    if (presses->sprint)
+        speed *= 1.3f;
+    float accelX = (fwdX * move.y - rightX * move.x) * speed;
+    float accelZ = (fwdZ * move.y - rightZ * move.x) * speed;
+    // Java: the friction - getDeltaMovement().multiply(0.91, 0.98, 0.91) per
+    // tick folds into the added impulse below (the drift decays)
+    LIBMATTI_MC_Vec3 next = {entity->dx * 0.91 + accelX,
+                             entity->dy * 0.98 - 0.08,
+                             entity->dz * 0.91 + accelZ};
+    LIBMATTI_MC_Entity_SetDeltaMovement(entity, &next);
+
+    // Java: this.move(MoverType.SELF, this.getDeltaMovement()) - the collide
+    // path clips the motion against the level's blocks (the P5.3 port)
+    LIBMATTI_MC_Entity_Move(entity, LIBMATTI_MC_MoverType_SELF, &next);
 }
 
 // Java: private void runTick(boolean renderLevelInMainMenu) - the loop body.

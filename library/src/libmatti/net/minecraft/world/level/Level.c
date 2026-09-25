@@ -1,7 +1,11 @@
 // Port of net.minecraft.world.level.Level (the in-memory part).
 
+#include <math.h>
+
 #include "libmatti/net/minecraft/world/entity/Entity.h"
 #include "libmatti/net/minecraft/world/level/Level.h"
+
+#include "libmatti/net/minecraft/world/level/block/state/BlockBehaviour.h"
 
 #include "libmatti/net/minecraft/core/BlockPos.h"
 #include "libmatti/net/minecraft/server/bootstrap/VanillaBlocks.h"
@@ -327,6 +331,64 @@ int LIBMATTI_MC_Level_GetEntitiesInBox(struct LIBMATTI_MC_Level *level, double m
         out[found++] = level->entities[i];
     }
     return found;
+}
+
+// ---------------------------------------------------------------------------
+// Java: CollisionGetter - the block-collision scan. The BlockCollisions iterator
+// walks every position the box overlaps and yields the collision shapes; the
+// port yields full-block AABBs (the VoxelShape port collapses to cubes) for
+// every state with properties.hasCollision set (air rides the same gate).
+// ---------------------------------------------------------------------------
+int LIBMATTI_MC_Level_GetBlockCollisions(struct LIBMATTI_MC_Level *level, double minX, double minY, double minZ,
+                                         double maxX, double maxY, double maxZ,
+                                         LIBMATTI_MC_AABB **out, int outCapacity)
+{
+    if (level == NULL || out == NULL)
+        return 0;
+    // Java: the walk bounds floor to the int grid (the BlockCollisions ctor
+    // clamps into the world); the port keeps the plain floor sweep
+    int x0 = (int) floor(minX - 1.0e-7);
+    int y0 = (int) floor(minY - 1.0e-7);
+    int z0 = (int) floor(minZ - 1.0e-7);
+    int x1 = (int) floor(maxX + 1.0e-7);
+    int y1 = (int) floor(maxY + 1.0e-7);
+    int z1 = (int) floor(maxZ + 1.0e-7);
+    int found = 0;
+    LIBMATTI_MC_BlockPos pos = {{0, 0, 0}};
+    for (int y = y0; y <= y1 && found < outCapacity; y++)
+    {
+        for (int z = z0; z <= z1 && found < outCapacity; z++)
+        {
+            for (int x = x0; x <= x1 && found < outCapacity; x++)
+            {
+                pos.base.x = x;
+                pos.base.y = y;
+                pos.base.z = z;
+                LIBMATTI_MC_BlockState *state = LIBMATTI_MC_Level_GetBlockState(level, &pos);
+                if (state == NULL)
+                    continue;
+                const LIBMATTI_MC_Block *block = (const LIBMATTI_MC_Block *) LIBMATTI_MC_BlockState_GetBlock(state);
+                if (block == NULL || block->properties == NULL || !block->properties->hasCollision)
+                    continue;
+                // Java: the shape yields its bounding boxes; the full block is the
+                // unit cube of the position
+                LIBMATTI_MC_AABB *shape = LIBMATTI_MC_AABB_New(x, y, z, x + 1.0, y + 1.0, z + 1.0);
+                if (shape != NULL)
+                    out[found++] = shape;
+            }
+        }
+    }
+    return found;
+}
+
+// Java: CollisionGetter.noBlockCollision - no block collision shape intersects
+bool LIBMATTI_MC_Level_NoBlockCollision(struct LIBMATTI_MC_Level *level, const LIBMATTI_MC_AABB *box)
+{
+    if (level == NULL || box == NULL)
+        return true;
+    LIBMATTI_MC_AABB *hits[1];
+    return LIBMATTI_MC_Level_GetBlockCollisions(level, box->minX, box->minY, box->minZ,
+                                                box->maxX, box->maxY, box->maxZ, hits, 1) == 0;
 }
 
 void LIBMATTI_MC_Level_Free(struct LIBMATTI_MC_Level *level)
