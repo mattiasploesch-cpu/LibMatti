@@ -86,6 +86,12 @@ add_test(NAME level COMMAND test_level)
 matti_test(test_entity entity/EntityHarness.c)
 add_test(NAME entity COMMAND test_entity)
 
+# player: the P5.2 core - KeyMapping registry (bind/isDown/click), the Input
+# record + move vector (KeyboardInput), the Player entity (abilities/food/NBT)
+# and the LocalPlayer wiring
+matti_test(test_player player/PlayerHarness.c)
+add_test(NAME player COMMAND test_player)
+
 # ao: the P4.4 AO kernel over a real level (BlockColors providers, shade table,
 # the tesselate paths through the dispatcher)
 matti_test(test_ao ao/AoHarness.c)

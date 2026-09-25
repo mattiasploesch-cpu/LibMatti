@@ -99,7 +99,7 @@ Vor P0 fertig (frühere Meilensteine, nicht Teil des Plans):
 | # | Was                                                              | Status |
 |---|------------------------------------------------------------------|--------|
 | 1 | Entity-Hierarchie + EntityType-Registry                          | ✅     |
-| 2 | Player/LocalPlayer, Input/KeyMapping (GLFW-Port liefert die Tasten) | ⬜   |
+| 2 | Player/LocalPlayer, Input/KeyMapping (GLFW-Port liefert die Tasten) | ✅   |
 | 3 | Physik/Kollision (AABB-Sweep gegen BlockStates)                   | ⬜     |
 | 4 | Raycast/HitResult (Block klicken)                                 | ⬜     |
 | 5 | GameRenderer/HUD (Crosshair, Hotbar)                              | ⬜     |
@@ -189,4 +189,5 @@ Run-Configurations (CLion): **runClient** (der eine Client mit allem), **build m
 4. ~~**P0-Rest:** java.util-Lücken~~ ✅ erledigt — UUID (Bits, Version/Variant, Name-UUID via MD5, Random-UUID, kanonischer String-Roundtrip), BitSet (long[]-Worte, Grow, and/or/xor/andNot, cardinality/nextSetBit, toLongArray), Collections.unmodifiableList/Map/Set (Read-Views, Mutatoren fail-fast mit UnsupportedOperationException).
 5. ~~**P2-Nachtrag:** PalettedContainer, EntityBlock, BlockEntity-NBT~~ ✅ erledigt — PalettedContainer + SimpleBitStorage (SINGLE_VALUE/LINEAR/GLOBAL-Strategien, Bits-Wachstum, Pack/Unpack) in LevelChunkSection; EntityBlock-VTable am Block (newBlockEntity + Typ-Slot, Valid-Blocks-Scan als Vanilla-Fallback); BlockEntity-NBT (saveMetadata/saveWithFullMetadata/saveWithId/saveCustomOnly/loadStatic über NbtIo).
 6. ~~**P5.1:** Entity-Hierarchie + EntityType-Registry~~ ✅ erledigt — EntityAttachments/EntityDimensions/MobCategory, Entity-Basis (Pos/Rot/BBox, Tags, NBT-Roundtrip, Removal-Lifecycle), EntityType-Builder + Registry, 13 Vanilla-Typen, Level-Entity-Surface (Add/Remove/GetEntitiesInBox); entity-Harness grün.
-7. **Run-Configs/CI:** Stable-Release (workflow_dispatch: AppImage, Portable-Zip, Dev-SDK, `.matti`-Mods, Changelog, SHA256SUMS) steht — siehe `.github/WORKFLOWS.md` für alle Actions.
+7. ~~**P5.2:** Player/LocalPlayer, Input/KeyMapping~~ ✅ erledigt — Abilities, FoodData/FoodConstants (Eat/Exhaustion/NBT), Player-Struct (Health-Clamp, abilities/food Defaults, Player-NBT mit XpP/Score/abilities-Subtag), KeyMapping-Registry (ALL/MAP-Tabellen, Set/Click/ReleaseAll, Vanilla-Bindings mit Mouse-Typen), Input-Record + Vec2 (MoveVector-Normalize), LocalPlayer (KeyboardInput-Tick 1:1, Java-Strafe-Konvention +1 links); Client fährt Camera/Position über die LocalPlayer-Entity (Mouse-Look über Entity.turn), player-Harness grün.
+8. **Run-Configs/CI:** Stable-Release (workflow_dispatch: AppImage, Portable-Zip, Dev-SDK, `.matti`-Mods, Changelog, SHA256SUMS) steht — siehe `.github/WORKFLOWS.md` für alle Actions.
