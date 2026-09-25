@@ -2,6 +2,7 @@
 
 #include "libmatti/net/minecraft/world/entity/VanillaEntities.h"
 
+#include "libmatti/net/minecraft/util/Mth.h"
 #include "libmatti/net/minecraft/world/entity/EntityType.h"
 
 #include <stdlib.h>
@@ -22,6 +23,151 @@
     }
 
 DEFINE_SIMPLE_CTOR(LIBMATTI_MC_Player_New, LIBMATTI_MC_Player)
+
+// ---------------------------------------------------------------------------
+// Java: public class Player extends LivingEntity - the surface the game port
+// drives before the inventory/XP/hunger-tick ports land (P6)
+// ---------------------------------------------------------------------------
+
+// Java: public Player(Level p_36114_, GameProfile p_36115_) - the port takes
+// the profile name; the field initializers ride. The LocalPlayer embeds the
+// struct and runs the same tail (C has no constructor chaining).
+void LIBMATTI_MC_Player_Init(LIBMATTI_MC_Player *player, struct LIBMATTI_MC_Level *level, const char *name)
+{
+    if (player == NULL)
+        return;
+    // Java: protected LivingEntity(EntityType, Level) - the defaults: maxHealth
+    // 20.0f, health = maxHealth
+    LIBMATTI_MC_Entity_Init(&player->base.base, LIBMATTI_MC_EntityType_PLAYER(), level);
+    player->base.maxHealth = 20.0f;
+    player->base.health = 20.0f;
+    player->name = name != NULL ? strdup(name) : NULL;
+    // Java: public final Abilities abilities = new Abilities()
+    LIBMATTI_MC_Abilities_Init(&player->abilities);
+    // Java: public final FoodData foodData = new FoodData()
+    LIBMATTI_MC_FoodData_Init(&player->foodData);
+}
+
+LIBMATTI_MC_Player *LIBMATTI_MC_Player_Create(struct LIBMATTI_MC_Level *level, const char *name)
+{
+    LIBMATTI_MC_Player *player = calloc(1, sizeof(LIBMATTI_MC_Player));
+    if (player == NULL)
+        return NULL;
+    LIBMATTI_MC_Player_Init(player, level, name);
+    return player;
+}
+
+void LIBMATTI_MC_Player_Free(LIBMATTI_MC_Player *player)
+{
+    if (player == NULL)
+        return;
+    LIBMATTI_MC_Entity_Free(&player->base.base);
+    free(player->name);
+    // the embedded struct is freed by the owner (Create allocates, the
+    // LocalPlayer's calloc'd struct owns the memory)
+    free(player);
+}
+
+const char *LIBMATTI_MC_Player_GetName(const LIBMATTI_MC_Player *player)
+{
+    return player != NULL ? player->name : NULL;
+}
+
+float LIBMATTI_MC_Player_GetHealth(const LIBMATTI_MC_Player *player)
+{
+    return player != NULL ? player->base.health : 0.0f;
+}
+
+// Java: public void setHealth(float) - clamped to [0, maxHealth]
+void LIBMATTI_MC_Player_SetHealth(LIBMATTI_MC_Player *player, float health)
+{
+    if (player == NULL)
+        return;
+    player->base.health = LIBMATTI_MC_Mth_Clamp(health, 0.0f, player->base.maxHealth);
+}
+
+LIBMATTI_MC_Abilities *LIBMATTI_MC_Player_GetAbilities(LIBMATTI_MC_Player *player)
+{
+    return player != NULL ? &player->abilities : NULL;
+}
+
+LIBMATTI_MC_FoodData *LIBMATTI_MC_Player_GetFoodData(LIBMATTI_MC_Player *player)
+{
+    return player != NULL ? &player->foodData : NULL;
+}
+
+int LIBMATTI_MC_Player_GetScore(const LIBMATTI_MC_Player *player)
+{
+    return player != NULL ? player->score : 0;
+}
+
+void LIBMATTI_MC_Player_SetScore(LIBMATTI_MC_Player *player, int score)
+{
+    if (player != NULL)
+        player->score = score;
+}
+
+// Java: addAdditionalSaveData - the player keys over the Entity save (the
+// inventory/enderchest lists ride the P6 item port)
+void LIBMATTI_MC_Player_SaveWithoutId(LIBMATTI_MC_Player *player, LIBMATTI_MC_Nbt_CompoundTag *tag)
+{
+    if (player == NULL || tag == NULL)
+        return;
+    // Java: super.addAdditionalSaveData + NbtUtils.addCurrentDataVersion
+    LIBMATTI_MC_Entity_SaveWithoutId(&player->base.base, tag);
+    LIBMATTI_MC_Nbt_CompoundTag_PutInt(tag, "SelectedItemSlot", 0);
+    LIBMATTI_MC_Nbt_CompoundTag_PutShort(tag, "SleepTimer", (int16_t) 0);
+    LIBMATTI_MC_Nbt_CompoundTag_PutFloat(tag, "XpP", player->experienceProgress);
+    LIBMATTI_MC_Nbt_CompoundTag_PutInt(tag, "XpLevel", player->experienceLevel);
+    LIBMATTI_MC_Nbt_CompoundTag_PutInt(tag, "XpTotal", player->totalExperience);
+    LIBMATTI_MC_Nbt_CompoundTag_PutInt(tag, "Score", player->score);
+    // Java: this.foodData.addAdditionalSaveData(p_406026_)
+    LIBMATTI_MC_FoodData_AddAdditionalSaveData(&player->foodData, tag);
+    // Java: p_406026_.store("abilities", Abilities.Packed.CODEC, this.abilities.pack())
+    {
+        LIBMATTI_MC_Nbt_CompoundTag *abilities = LIBMATTI_MC_Nbt_CompoundTag_New();
+        LIBMATTI_MC_Nbt_CompoundTag_PutBoolean(abilities, "invulnerable", player->abilities.invulnerable);
+        LIBMATTI_MC_Nbt_CompoundTag_PutBoolean(abilities, "flying", player->abilities.flying);
+        LIBMATTI_MC_Nbt_CompoundTag_PutBoolean(abilities, "mayfly", player->abilities.mayfly);
+        LIBMATTI_MC_Nbt_CompoundTag_PutBoolean(abilities, "instabuild", player->abilities.instabuild);
+        LIBMATTI_MC_Nbt_CompoundTag_PutBoolean(abilities, "mayBuild", player->abilities.mayBuild);
+        LIBMATTI_MC_Nbt_CompoundTag_PutFloat(abilities, "flySpeed", player->abilities.flyingSpeed);
+        LIBMATTI_MC_Nbt_CompoundTag_PutFloat(abilities, "walkSpeed", player->abilities.walkingSpeed);
+        LIBMATTI_MC_Nbt_CompoundTag_Put(tag, "abilities", (LIBMATTI_MC_Nbt_Tag *) abilities);
+    }
+}
+
+// Java: readAdditionalSaveData
+void LIBMATTI_MC_Player_Load(LIBMATTI_MC_Player *player, LIBMATTI_MC_Nbt_CompoundTag *tag)
+{
+    if (player == NULL || tag == NULL)
+        return;
+    // Java: super.readAdditionalSaveData
+    LIBMATTI_MC_Entity_Load(&player->base.base, tag);
+    player->experienceProgress = LIBMATTI_MC_Nbt_CompoundTag_GetFloatOr(tag, "XpP", 0.0f);
+    player->experienceLevel = LIBMATTI_MC_Nbt_CompoundTag_GetIntOr(tag, "XpLevel", 0);
+    player->totalExperience = LIBMATTI_MC_Nbt_CompoundTag_GetIntOr(tag, "XpTotal", 0);
+    player->score = LIBMATTI_MC_Nbt_CompoundTag_GetIntOr(tag, "Score", 0);
+    // Java: this.foodData.readAdditionalSaveData(p_410352_)
+    LIBMATTI_MC_FoodData_ReadAdditionalSaveData(&player->foodData, tag);
+    // Java: p_410352_.read("abilities", Abilities.Packed.CODEC).ifPresent(this.abilities::apply) -
+    // the missing key keeps the defaults (getCompoundOrEmpty is fresh + empty)
+    {
+        LIBMATTI_MC_Nbt_CompoundTag *abilities = LIBMATTI_MC_Nbt_CompoundTag_GetCompoundOrEmpty(tag, "abilities");
+        if (abilities != NULL && LIBMATTI_MC_Nbt_CompoundTag_Contains(abilities, "mayBuild"))
+        {
+            player->abilities.invulnerable = LIBMATTI_MC_Nbt_CompoundTag_GetBooleanOr(abilities, "invulnerable", false);
+            player->abilities.flying = LIBMATTI_MC_Nbt_CompoundTag_GetBooleanOr(abilities, "flying", false);
+            player->abilities.mayfly = LIBMATTI_MC_Nbt_CompoundTag_GetBooleanOr(abilities, "mayfly", false);
+            player->abilities.instabuild = LIBMATTI_MC_Nbt_CompoundTag_GetBooleanOr(abilities, "instabuild", false);
+            player->abilities.mayBuild = LIBMATTI_MC_Nbt_CompoundTag_GetBooleanOr(abilities, "mayBuild", true);
+            player->abilities.flyingSpeed = LIBMATTI_MC_Nbt_CompoundTag_GetFloatOr(abilities, "flySpeed", 0.05f);
+            player->abilities.walkingSpeed = LIBMATTI_MC_Nbt_CompoundTag_GetFloatOr(abilities, "walkSpeed", 0.1f);
+        }
+    }
+    // Java: this.getAttribute(MOVEMENT_SPEED).setBaseValue(abilities.getWalkingSpeed())
+    //       - the attribute map lands with the P5.3 physics port
+}
 DEFINE_SIMPLE_CTOR(LIBMATTI_MC_ItemEntity_New, LIBMATTI_MC_ItemEntity)
 DEFINE_SIMPLE_CTOR(LIBMATTI_MC_FallingBlockEntity_New, LIBMATTI_MC_FallingBlockEntity)
 DEFINE_SIMPLE_CTOR(LIBMATTI_MC_PrimedTnt_New, LIBMATTI_MC_PrimedTnt)

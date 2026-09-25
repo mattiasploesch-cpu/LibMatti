@@ -40,6 +40,27 @@
 #define LIBMATTI_GLFW_KEY_D 68
 #define LIBMATTI_GLFW_KEY_W 87
 #define LIBMATTI_GLFW_KEY_ESCAPE 256
+// the GLFW key codes the vanilla KeyMappings bind (Java: the Options defaults)
+#define LIBMATTI_GLFW_KEY_LEFT_SHIFT 340
+#define LIBMATTI_GLFW_KEY_LEFT_CONTROL 341
+#define LIBMATTI_GLFW_KEY_E 69
+#define LIBMATTI_GLFW_KEY_Q 81
+#define LIBMATTI_GLFW_KEY_T 84
+#define LIBMATTI_GLFW_KEY_1 49
+#define LIBMATTI_GLFW_KEY_2 50
+#define LIBMATTI_GLFW_KEY_3 51
+#define LIBMATTI_GLFW_KEY_4 52
+#define LIBMATTI_GLFW_KEY_5 53
+#define LIBMATTI_GLFW_KEY_6 54
+#define LIBMATTI_GLFW_KEY_7 55
+#define LIBMATTI_GLFW_KEY_8 56
+#define LIBMATTI_GLFW_KEY_9 57
+// the GLFW mouse-button codes (Java: InputConstants.Type.MOUSE)
+#define LIBMATTI_GLFW_MOUSE_BUTTON_1 0
+#define LIBMATTI_GLFW_MOUSE_BUTTON_2 1
+#define LIBMATTI_GLFW_MOUSE_BUTTON_3 2
+#define LIBMATTI_GLFW_PRESS 1
+#define LIBMATTI_GLFW_RELEASE 0
 
 // Java: public static boolean glfwInit()
 int LIBMATTI_GLFW_glfwInit(void);
