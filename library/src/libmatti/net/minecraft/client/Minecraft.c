@@ -34,7 +34,10 @@
 #include "libmatti/net/minecraft/client/resources/model/SpriteGetter.h"
 #include "libmatti/net/minecraft/client/renderer/chunk/ChunkSectionLayer.h"
 #include "libmatti/net/minecraft/core/BlockPos.h"
+#include "libmatti/net/minecraft/core/SectionPos.h"
 #include "libmatti/net/minecraft/util/Mth.h"
+#include "libmatti/net/minecraft/world/level/ClipContext.h"
+#include "libmatti/net/minecraft/world/phys/BlockHitResult.h"
 #include "libmatti/net/minecraft/server/bootstrap/VanillaBlocks.h"
 #include "libmatti/net/minecraft/Bootstrap.h"
 #include "libmatti/org/joml/Matrix4f.h"
@@ -150,6 +153,12 @@ struct LIBMATTI_MC_Minecraft
     int mouseLookEnabled;
     double lastCursorX;
     double lastCursorY;
+    // Java: public HitResult hitResult - the crosshair pick (the P5.4 port); the
+    // mouse-button edge state rides beside it (Java: the GameSettings attack/use
+    // KeyMappings + MouseHandler's event feeding).
+    LIBMATTI_MC_BlockHitResult hitResult;
+    int attackDown;
+    int useDown;
 };
 
 // Java: GameRenderer.renderLevel - "Matrix4f matrix4f1 = new Matrix4f()
@@ -521,6 +530,12 @@ LIBMATTI_MC_Minecraft *LIBMATTI_MC_Minecraft_New(const LIBMATTI_MC_GameConfig *c
         LIBMATTI_MC_Level_AddEntity(minecraft->level, entity);
     }
 
+    // Java: this.hitResult = BlockHitResult.createMiss(...) - the shared miss
+    // the renderer reads until the first pick lands.
+    minecraft->hitResult = LIBMATTI_MC_BlockHitResult_DefaultMiss();
+    minecraft->attackDown = 0;
+    minecraft->useDown = 0;
+
     return minecraft;
 }
 
@@ -536,6 +551,8 @@ static void minecraft_demo_tick(void)
 MATTI_MIXIN_TARGET("matticraft::demo::tick", minecraft_demo_tick)
 
 static void apply_walk(LIBMATTI_MC_Minecraft *minecraft);
+static void handle_block_interaction(LIBMATTI_MC_Minecraft *minecraft);
+static void dirty_sections_around(LIBMATTI_MC_Minecraft *minecraft, const LIBMATTI_MC_BlockPos *pos);
 
 static void tick(LIBMATTI_MC_Minecraft *minecraft)
 {
@@ -559,6 +576,11 @@ static void tick(LIBMATTI_MC_Minecraft *minecraft)
     // per-frame rate - the tick loop above repeats this body for every
     // accumulated tick).
     apply_walk(minecraft);
+
+    // Java: startUseItem/continueAttack ride the tick loop (the multi/hold
+    // semantics run at tick rate) - the block interaction acts on the pick
+    // the renderer refreshed this frame.
+    handle_block_interaction(minecraft);
 }
 
 // Java: private void renderTitleLine(...) - the skeleton draws the game title
@@ -821,6 +843,111 @@ static void apply_walk(LIBMATTI_MC_Minecraft *minecraft)
     }
 }
 
+// MATTI_DEBUG_PICK - the crosshair trace (the pick smoke greps the hit block +
+// face to prove the ray reaches the aimed block).
+static void debug_pick(LIBMATTI_MC_Minecraft *minecraft)
+{
+    static int debugPick = -1;
+    if (debugPick < 0)
+        debugPick = getenv("MATTI_DEBUG_PICK") != NULL;
+    if (!debugPick)
+        return;
+    static int pickFrame = 0;
+    if (pickFrame++ % 20 != 0)
+        return;
+    const LIBMATTI_MC_BlockHitResult *hit = &minecraft->hitResult;
+    if (hit->type == LIBMATTI_MC_HitResult_BLOCK)
+        fprintf(stderr, "[PICK] block=(%d,%d,%d) face=%s loc=(%.2f,%.2f,%.2f)\n",
+                hit->blockPos.base.x, hit->blockPos.base.y, hit->blockPos.base.z,
+                LIBMATTI_MC_Direction_GetName(hit->direction),
+                hit->location.x, hit->location.y, hit->location.z);
+    else
+        fprintf(stderr, "[PICK] miss\n");
+}
+
+// Java: the attack/use mouse edge handling (MouseHandler feeds the events into
+// the KeyMappings, Minecraft.startUseItem / continueAttack act on them) - the
+// port polls the buttons and acts on the press edges.
+static void handle_block_interaction(LIBMATTI_MC_Minecraft *minecraft)
+{
+    if (minecraft->window == 0 || minecraft->localPlayer == NULL || minecraft->level == NULL)
+    {
+        minecraft->attackDown = 0;
+        minecraft->useDown = 0;
+        return;
+    }
+
+    const LIBMATTI_MC_BlockHitResult *hit = &minecraft->hitResult;
+    LIBMATTI_MC_Level *level = (LIBMATTI_MC_Level *) minecraft->level;
+
+    // Java: continueAttack - left click breaks the aimed block (the creative
+    // instant-break path; hold-repeat rides the same poll per tick)
+    int attacking = LIBMATTI_GLFW_glfwGetMouseButton(minecraft->window, LIBMATTI_GLFW_MOUSE_BUTTON_1) == LIBMATTI_GLFW_PRESS;
+    if (attacking && !minecraft->attackDown)
+    {
+        if (hit->type == LIBMATTI_MC_HitResult_BLOCK)
+        {
+            if (LIBMATTI_MC_Level_DestroyBlock(level, &hit->blockPos, false))
+                dirty_sections_around(minecraft, &hit->blockPos);
+        }
+    }
+    minecraft->attackDown = attacking;
+
+    // Java: startUseItem - right click places against the hit face (the
+    // creative block-in-hand path: the block next to the entry face; BlockItem
+    // canPlace rejects the hit cell itself, so the inside hit skips like here).
+    int using = LIBMATTI_GLFW_glfwGetMouseButton(minecraft->window, LIBMATTI_GLFW_MOUSE_BUTTON_2) == LIBMATTI_GLFW_PRESS;
+    if (using && !minecraft->useDown)
+    {
+        if (hit->type == LIBMATTI_MC_HitResult_BLOCK && !hit->inside)
+        {
+            LIBMATTI_MC_Direction face = hit->direction;
+            LIBMATTI_MC_BlockPos placePos = {{hit->blockPos.base.x + LIBMATTI_MC_Direction_GetStepX(face),
+                                              hit->blockPos.base.y + LIBMATTI_MC_Direction_GetStepY(face),
+                                              hit->blockPos.base.z + LIBMATTI_MC_Direction_GetStepZ(face)}};
+            LIBMATTI_MC_BlockState *stone = LIBMATTI_MC_Block_DefaultBlockState(
+                LIBMATTI_MC_VanillaBlocks_GetByName("STONE"));
+            if (LIBMATTI_MC_Level_SetBlock(level, &placePos, stone, LIBMATTI_MC_Level_UPDATE_CLIENTS))
+            {
+                dirty_sections_around(minecraft, &placePos);
+                static int debugPlace = -1;
+                if (debugPlace < 0)
+                    debugPlace = getenv("MATTI_DEBUG_PICK") != NULL;
+                if (debugPlace)
+                    fprintf(stderr, "[PLACE] pos=(%d,%d,%d)\n",
+                            placePos.base.x, placePos.base.y, placePos.base.z);
+            }
+        }
+    }
+    minecraft->useDown = using;
+}
+
+// Java: the sections re-mesh when a block changes inside them (LevelRenderer
+// blockChanged -> setSectionDirty). The port walks the registered sections and
+// flags the ones overlapping the position's 3x3x3 block neighbourhood (Java's
+// markAndRebuildBlocks spans the faces the change can bleed into).
+static void dirty_sections_around(LIBMATTI_MC_Minecraft *minecraft, const LIBMATTI_MC_BlockPos *pos)
+{
+    if (minecraft->sectionDispatcher == NULL)
+        return;
+    LIBMATTI_MC_SectionRenderDispatcher *dispatcher = minecraft->sectionDispatcher;
+    int minX = pos->base.x - 1, minY = pos->base.y - 1, minZ = pos->base.z - 1;
+    int maxX = pos->base.x + 1, maxY = pos->base.y + 1, maxZ = pos->base.z + 1;
+    for (int i = 0; i < dispatcher->sectionCount; i++)
+    {
+        LIBMATTI_MC_RenderSection *section = dispatcher->sections[i];
+        const LIBMATTI_MC_Vec3i *origin = &section->sectionPos->base;
+        int sx = LIBMATTI_MC_Vec3i_GetX(origin) * LIBMATTI_MC_SectionPos_SECTION_SIZE;
+        int sy = LIBMATTI_MC_Vec3i_GetY(origin) * LIBMATTI_MC_SectionPos_SECTION_SIZE;
+        int sz = LIBMATTI_MC_Vec3i_GetZ(origin) * LIBMATTI_MC_SectionPos_SECTION_SIZE;
+        if (maxX < sx || minX >= sx + LIBMATTI_MC_SectionPos_SECTION_SIZE
+            || maxY < sy || minY >= sy + LIBMATTI_MC_SectionPos_SECTION_SIZE
+            || maxZ < sz || minZ >= sz + LIBMATTI_MC_SectionPos_SECTION_SIZE)
+            continue;
+        LIBMATTI_MC_RenderSection_SetDirty(section, 1);
+    }
+}
+
 // Java: private void runTick(boolean renderLevelInMainMenu) - the loop body.
 // Everything the game does inside (screens, packets, sounds) collapses into the
 // three statements the loop structure owns: advanceTime, tick, render+swap.
@@ -851,6 +978,23 @@ static void runTick(LIBMATTI_MC_Minecraft *minecraft, int runGameTime)
         LIBMATTI_MC_Entity *entity = &minecraft->localPlayer->player.base.base;
         LIBMATTI_MC_Camera_SetRotation(&minecraft->camera, entity->yRot, entity->xRot);
         LIBMATTI_MC_Camera_SetPosition(&minecraft->camera, entity->x, entity->y + LIBMATTI_MC_Entity_GetEyeHeight(entity), entity->z);
+
+        // Java: GameRenderer.pick - the crosshair ray from the eye along the
+        // view vector over the CREATIVE reach (4.5 blocks). The context rides
+        // the COLLIDER block mode (the outline shape equals the cube here) and
+        // the NONE fluid mode (the port has no fluids).
+        if (minecraft->level != NULL)
+        {
+            LIBMATTI_MC_Vec3 eye = {entity->x, entity->y + LIBMATTI_MC_Entity_GetEyeHeight(entity), entity->z};
+            LIBMATTI_MC_Vec3 end = {eye.x + minecraft->camera.forwards.x * 4.5,
+                                    eye.y + minecraft->camera.forwards.y * 4.5,
+                                    eye.z + minecraft->camera.forwards.z * 4.5};
+            LIBMATTI_MC_ClipContext context = LIBMATTI_MC_ClipContext_New(
+                &eye, &end, LIBMATTI_MC_ClipContext_Block_COLLIDER,
+                LIBMATTI_MC_ClipContext_Fluid_NONE, NULL, NULL);
+            minecraft->hitResult = LIBMATTI_MC_Level_Clip((LIBMATTI_MC_Level *) minecraft->level, &context);
+            debug_pick(minecraft);
+        }
     }
 
     // Java: if (renderLevelInMainMenu) { ... for (l = 0; l < min(10, k); l++) tick(); }

@@ -43,6 +43,7 @@ static void (*glfw_swap_interval)(int) = NULL;
 static void (*glfw_swap_buffers)(unsigned long) = NULL;
 static int (*glfw_get_error)(const char **) = NULL;
 static int (*glfw_window_should_close)(unsigned long) = NULL;
+static int (*glfw_get_mouse_button)(unsigned long, int) = NULL;
 static int (*glfw_get_key)(unsigned long, int) = NULL;
 static void (*glfw_set_input_mode)(unsigned long, int, int) = NULL;
 static void (*glfw_get_cursor_pos)(unsigned long, double *, double *) = NULL;
@@ -321,6 +322,15 @@ int LIBMATTI_GLFW_glfwGetKey(long window, int key)
     GLFW_DLSYM(get_key, "glfwGetKey");
     if (glfw_get_key == NULL) return 0;
     return glfw_get_key((unsigned long) window, key);
+}
+
+int LIBMATTI_GLFW_glfwGetMouseButton(long window, int button)
+{
+    ensure_library();
+    if (glfw_lib == NULL) return 0;
+    GLFW_DLSYM(get_mouse_button, "glfwGetMouseButton");
+    if (glfw_get_mouse_button == NULL) return 0;
+    return glfw_get_mouse_button((unsigned long) window, button);
 }
 
 void LIBMATTI_GLFW_glfwSetInputMode(long window, int mode, int value)
