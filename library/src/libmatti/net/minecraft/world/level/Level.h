@@ -15,6 +15,8 @@
 #include "libmatti/net/minecraft/world/level/block/state/BlockState.h"
 #include "libmatti/net/minecraft/world/level/chunk/LevelChunk.h"
 
+struct LIBMATTI_MC_Entity;
+
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -61,6 +63,11 @@ typedef struct LIBMATTI_MC_Level
     } *chunks;
     int chunkCount;
     int chunkCapacity;
+    // Java: private final EntityLookup entityLookup (the entitiesById map) - the
+    // port keeps a growable pointer array until the P5 tick loop needs the map
+    struct LIBMATTI_MC_Entity **entities;
+    int entityCount;
+    int entityCapacity;
 } LIBMATTI_MC_Level;
 
 // Java: Level(...) - the port takes the height range + the dimension key; the
@@ -118,6 +125,17 @@ void LIBMATTI_MC_Level_UpdateNeighborsAt(struct LIBMATTI_MC_Level *level, const 
 // the number of loaded chunks (the test surface)
 int LIBMATTI_MC_Level_GetChunkCount(struct LIBMATTI_MC_Level *level);
 void LIBMATTI_MC_Level_Free(struct LIBMATTI_MC_Level *level);
+
+// Java: the entity surface - addEntity (addFreshEntity's tail), getEntities and
+// the removal dispatch; the entities are borrowed (the spawner owns them)
+bool LIBMATTI_MC_Level_AddEntity(struct LIBMATTI_MC_Level *level, struct LIBMATTI_MC_Entity *entity);
+bool LIBMATTI_MC_Level_RemoveEntity(struct LIBMATTI_MC_Level *level, struct LIBMATTI_MC_Entity *entity);
+int LIBMATTI_MC_Level_GetEntityCount(struct LIBMATTI_MC_Level *level);
+struct LIBMATTI_MC_Entity *LIBMATTI_MC_Level_GetEntity(struct LIBMATTI_MC_Level *level, int index);
+// Java: getEntities(Class, AABB, Predicate) - the box-overlap filter (NULL box/predicate = all)
+int LIBMATTI_MC_Level_GetEntitiesInBox(struct LIBMATTI_MC_Level *level, double minX, double minY, double minZ,
+                                       double maxX, double maxY, double maxZ,
+                                       struct LIBMATTI_MC_Entity **out, int outCapacity);
 
 #ifdef __cplusplus
 }

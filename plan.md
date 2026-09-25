@@ -98,7 +98,7 @@ Vor P0 fertig (frühere Meilensteine, nicht Teil des Plans):
 
 | # | Was                                                              | Status |
 |---|------------------------------------------------------------------|--------|
-| 1 | Entity-Hierarchie + EntityType-Registry                          | ⬜     |
+| 1 | Entity-Hierarchie + EntityType-Registry                          | ✅     |
 | 2 | Player/LocalPlayer, Input/KeyMapping (GLFW-Port liefert die Tasten) | ⬜   |
 | 3 | Physik/Kollision (AABB-Sweep gegen BlockStates)                   | ⬜     |
 | 4 | Raycast/HitResult (Block klicken)                                 | ⬜     |
@@ -188,4 +188,5 @@ Run-Configurations (CLion): **runClient** (der eine Client mit allem), **build m
 3. ~~P4.5 Himmel/Sonne/Mond/Wolken~~ ✅ erledigt — Sky-Disc (Day/Night-Farbe), Sunrise/Sunset-Fan, Sonne/Mond-Phasen über die prozedurale Celestials-Atlas, Sterne, CloudRenderer (FANCY-Zellen, Zeit-Drift); kamera-relatives Rendern über die Rotation-only View wie Java (PR #12/#14).
 4. ~~**P0-Rest:** java.util-Lücken~~ ✅ erledigt — UUID (Bits, Version/Variant, Name-UUID via MD5, Random-UUID, kanonischer String-Roundtrip), BitSet (long[]-Worte, Grow, and/or/xor/andNot, cardinality/nextSetBit, toLongArray), Collections.unmodifiableList/Map/Set (Read-Views, Mutatoren fail-fast mit UnsupportedOperationException).
 5. ~~**P2-Nachtrag:** PalettedContainer, EntityBlock, BlockEntity-NBT~~ ✅ erledigt — PalettedContainer + SimpleBitStorage (SINGLE_VALUE/LINEAR/GLOBAL-Strategien, Bits-Wachstum, Pack/Unpack) in LevelChunkSection; EntityBlock-VTable am Block (newBlockEntity + Typ-Slot, Valid-Blocks-Scan als Vanilla-Fallback); BlockEntity-NBT (saveMetadata/saveWithFullMetadata/saveWithId/saveCustomOnly/loadStatic über NbtIo).
-6. **Run-Configs/CI:** Stable-Release (workflow_dispatch: AppImage, Portable-Zip, Dev-SDK, `.matti`-Mods, Changelog, SHA256SUMS) steht — siehe `.github/WORKFLOWS.md` für alle Actions.
+6. ~~**P5.1:** Entity-Hierarchie + EntityType-Registry~~ ✅ erledigt — EntityAttachments/EntityDimensions/MobCategory, Entity-Basis (Pos/Rot/BBox, Tags, NBT-Roundtrip, Removal-Lifecycle), EntityType-Builder + Registry, 13 Vanilla-Typen, Level-Entity-Surface (Add/Remove/GetEntitiesInBox); entity-Harness grün.
+7. **Run-Configs/CI:** Stable-Release (workflow_dispatch: AppImage, Portable-Zip, Dev-SDK, `.matti`-Mods, Changelog, SHA256SUMS) steht — siehe `.github/WORKFLOWS.md` für alle Actions.
