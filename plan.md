@@ -113,7 +113,7 @@ Vor P0 fertig (frühere Meilensteine, nicht Teil des Plans):
 
 | # | Was                                                                        | Status |
 |---|----------------------------------------------------------------------------|--------|
-| 1 | Menu/Slot-System (MenuType, AbstractContainerMenu)                          | ⬜     |
+| 1 | Menu/Slot-System (MenuType, AbstractContainerMenu)                          | ✅     |
 | 2 | Screen-Hierarchie (Screen, Button, TextField — passt zum Mixin-Hook-System) | ⬜     |
 | 3 | Inventory/Hotbar-Daten, ItemRenderer                                        | ⬜     |
 | 4 | Pause/Options-Screen (options.txt über ConfigTracker — Config-Arbeit zahlt sich hier aus) | ⬜ |

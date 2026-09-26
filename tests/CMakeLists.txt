@@ -115,6 +115,13 @@ add_test(NAME hud COMMAND test_hud)
 matti_test(test_sound sound/SoundHarness.c)
 add_test(NAME sound COMMAND test_sound)
 
+# inventory: the P6.1 core - SimpleContainer storage, Slot semantics
+# (safeInsert/safeTake/tryRemove), the MenuType registry (25 vanilla types)
+# and the AbstractContainerMenu click semantics (PICKUP/QUICK_MOVE/CLONE/
+# THROW/PICKUP_ALL/QUICK_CRAFT)
+matti_test(test_inventory inventory/InventoryHarness.c)
+add_test(NAME inventory COMMAND test_inventory)
+
 # ao: the P4.4 AO kernel over a real level (BlockColors providers, shade table,
 # the tesselate paths through the dispatcher)
 matti_test(test_ao ao/AoHarness.c)
