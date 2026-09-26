@@ -2,7 +2,8 @@
 // batcher the Java GuiGraphics blits ride (Java's GuiGraphics.drawSpecial over
 // the RenderPipelines GUI_TEXTURED path). The shader folds the y-down screen
 // pixels the layout unit produces into the clip space like the font shader
-// (position / screenSize * 2 - 1, the y negated).
+// (position / screenSize * 2 - 1 straight, no y negation - the FBO blit
+// flips once for every pass, so the HUD shares the font's y-down space).
 
 #include "libmatti/net/minecraft/client/gui/GuiRenderer.h"
 
@@ -14,7 +15,9 @@
 #include <string.h>
 
 // Java: position_color_tex.vsh - the screen-space transform the font shader
-// carries (position / screenSize * 2 - 1, the y-down pixels negated on y).
+// carries (position / screenSize * 2 - 1, no y negation - the layout's y-down
+// pixels map straight onto the pass space; the negation pushed the hotbar to
+// the TOP of the window).
 static const char *GUI_VERT =
     "#version 150\n"
     "uniform vec2 screenSize;\n"
@@ -25,7 +28,7 @@ static const char *GUI_VERT =
     "out vec2 vtxUv0;\n"
     "void main() {\n"
     "    vec2 ndc = position.xy / screenSize * 2.0 - 1.0;\n"
-    "    gl_Position = vec4(ndc.x, -ndc.y, 0.0, 1.0);\n"
+    "    gl_Position = vec4(ndc.x, ndc.y, 0.0, 1.0);\n"
     "    vtxColor = color;\n"
     "    vtxUv0 = uv0;\n"
     "}\n";

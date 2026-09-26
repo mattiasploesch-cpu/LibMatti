@@ -129,6 +129,13 @@ void LIBMATTI_GLFW_glfwSetInputMode(long window, int mode, int value);
 // Java: public static void glfwGetCursorPos(long window, double[] xpos, double[] ypos)
 void LIBMATTI_GLFW_glfwGetCursorPos(long window, double *xpos, double *ypos);
 
+// Java: GLFW.glfwSetScrollCallback(long, GLFWScrollCallback) - the wheel
+// steps ride the callback; the client uses the gesture-poll pair below (the
+// install binds the internal accumulator, the poll drains + resets it).
+void LIBMATTI_GLFW_glfwSetScrollCallback(long window, void (*callback)(long, double, double));
+void LIBMATTI_GLFW_glfwInstallScrollGesturePolling(void);
+int LIBMATTI_GLFW_glfwPollScrollGesture(double *xoffset, double *yoffset);
+
 void LIBMATTI_GLFW_glfwTerminate(void);
 
 void LIBMATTI_GLFW_glfwSetWindowShouldClose(long window, int value);

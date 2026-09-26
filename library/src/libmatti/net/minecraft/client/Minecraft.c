@@ -577,6 +577,11 @@ LIBMATTI_MC_Minecraft *LIBMATTI_MC_Minecraft_New(const LIBMATTI_MC_GameConfig *c
     minecraft->attackDown = 0;
     minecraft->useDown = 0;
 
+    // Java: MouseHandler registers the scroll callback at window init - the
+    // gesture accumulator feeds the hotbar wheel the tick polls (the install
+    // binds the internal polling callback on the live window).
+    LIBMATTI_GLFW_glfwInstallScrollGesturePolling();
+
     // Java: this.gui = new Gui(this) - the HUD renderer compiles with the GL
     // context up (the constructor opened the window); a NULL renderer leaves
     // the HUD off like the font path gates the title line.
@@ -1206,6 +1211,29 @@ static void handle_hotbar_keys(LIBMATTI_MC_Minecraft *minecraft)
                 minecraft->hotbarSelected = slot;
                 // Java: Gui.tick - the 10s (200 tick) highlight fade restarts
                 // on every selection change.
+                minecraft->toolHighlightTimer = 200;
+                minecraft->toolHighlight = minecraft->hotbarItems[slot];
+            }
+        }
+    }
+
+    // Java: MouseHandler.onScroll -> Minecraft.handleProfiling/major scroll -
+    // the wheel steps the hotbar selection (each notch = one slot, like the
+    // GLFW y gesture the MouseHandler accumulates).
+    double scrollX = 0.0, scrollY = 0.0;
+    while (LIBMATTI_GLFW_glfwPollScrollGesture(&scrollX, &scrollY))
+    {
+        (void) scrollX;
+        if (scrollY != 0.0)
+        {
+            int slot = minecraft->hotbarSelected + (scrollY > 0.0 ? -1 : 1);
+            if (slot < 0)
+                slot = HOTBAR_SIZE - 1;
+            else if (slot >= HOTBAR_SIZE)
+                slot = 0;
+            if (minecraft->hotbarSelected != slot)
+            {
+                minecraft->hotbarSelected = slot;
                 minecraft->toolHighlightTimer = 200;
                 minecraft->toolHighlight = minecraft->hotbarItems[slot];
             }
