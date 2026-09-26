@@ -29,6 +29,8 @@
 #include "libmatti/net/minecraft/client/renderer/chunk/SectionRenderDispatcher.h"
 #include "libmatti/net/minecraft/client/renderer/chunk/SectionShader.h"
 #include "libmatti/net/minecraft/client/resources/model/ModelManager.h"
+#include "libmatti/net/minecraft/client/sounds/SoundEngine.h"
+#include "libmatti/net/minecraft/world/level/block/state/BlockState.h"
 #include "libmatti/net/minecraft/server/bootstrap/VanillaAssetLoader.h"
 #include "libmatti/net/minecraft/client/renderer/block/BlockRenderDispatcher.h"
 #include "libmatti/net/minecraft/server/bootstrap/VanillaBlockModels.h"
@@ -172,6 +174,9 @@ struct LIBMATTI_MC_Minecraft
     // Java: this.gui = new Gui(this) - the HUD the frame draws after the world
     // (the P5.5 port: the batcher renders, the hotbar data lives here).
     LIBMATTI_MC_GuiRenderer *guiRenderer;
+    // Java: this.soundManager = new SoundManager(this.options) - the P5.6
+    // sound engine over the LIBMATTI_OAL wrapper (the reload boots lazily).
+    LIBMATTI_MC_SoundEngine *soundEngine;
     // Java: Inventory.selectedSlot + the 9 hotbar ItemStacks (the port builds
     // them once from the vanilla block items - the creative palette).
     int hotbarSelected;
@@ -576,6 +581,11 @@ LIBMATTI_MC_Minecraft *LIBMATTI_MC_Minecraft_New(const LIBMATTI_MC_GameConfig *c
     minecraft->hitResult = LIBMATTI_MC_BlockHitResult_DefaultMiss();
     minecraft->attackDown = 0;
     minecraft->useDown = 0;
+
+    // Java: this.soundManager = new SoundManager(this.options) - the engine
+    // boots on the first reload (the play/reload calls lazy-init it).
+    minecraft->soundEngine = LIBMATTI_MC_SoundEngine_New();
+    LIBMATTI_MC_SoundEngine_Reload(minecraft->soundEngine);
 
     // Java: MouseHandler registers the scroll callback at window init - the
     // gesture accumulator feeds the hotbar wheel the tick polls (the install
@@ -1126,8 +1136,30 @@ static void handle_block_interaction(LIBMATTI_MC_Minecraft *minecraft)
     {
         if (hit->type == LIBMATTI_MC_HitResult_BLOCK)
         {
+            // Java: Level.destroyBlock -> level.playSound(player, pos,
+            // state.getSoundType().getBreakSound(), SoundSource.BLOCKS,
+            // (soundType.volume + 1) / 2, soundType.pitch * 0.8) - the state
+            // rides the pre-destroy lookup.
+            LIBMATTI_MC_BlockState *breakState = LIBMATTI_MC_Level_GetBlockState(level, &hit->blockPos);
+            const LIBMATTI_MC_SoundType *breakSoundType = NULL;
+            if (breakState != NULL)
+            {
+                LIBMATTI_MC_Block *breakBlock = (LIBMATTI_MC_Block *) LIBMATTI_MC_BlockState_GetBlock(breakState);
+                if (breakBlock != NULL && breakBlock->properties != NULL)
+                    breakSoundType = breakBlock->properties->soundType;
+            }
             if (LIBMATTI_MC_Level_DestroyBlock(level, &hit->blockPos, false))
+            {
                 dirty_sections_around(minecraft, &hit->blockPos);
+                if (minecraft->soundEngine != NULL && breakSoundType != NULL)
+                    LIBMATTI_MC_SoundEngine_Play(
+                        minecraft->soundEngine,
+                        LIBMATTI_MC_SoundType_GetBreakSound(breakSoundType),
+                        (float) hit->blockPos.base.x + 0.5f, (float) hit->blockPos.base.y + 0.5f,
+                        (float) hit->blockPos.base.z + 0.5f,
+                        (LIBMATTI_MC_SoundType_GetVolume(breakSoundType) + 1.0f) / 2.0f,
+                        LIBMATTI_MC_SoundType_GetPitch(breakSoundType) * 0.8f);
+            }
         }
     }
     minecraft->attackDown = attacking;
@@ -1176,6 +1208,26 @@ static void handle_block_interaction(LIBMATTI_MC_Minecraft *minecraft)
             if (LIBMATTI_MC_Level_SetBlock(level, &placePos, placeState, LIBMATTI_MC_Level_UPDATE_CLIENTS))
             {
                 dirty_sections_around(minecraft, &placePos);
+                // Java: BlockItem.place -> level.playSound(..., soundType.getPlaceSound(),
+                // SoundSource.BLOCKS, (soundType.volume + 1) / 2, soundType.pitch)
+                // - the state the cell carries after the placement.
+                LIBMATTI_MC_BlockState *placedState = LIBMATTI_MC_Level_GetBlockState(level, &placePos);
+                const LIBMATTI_MC_SoundType *placeSoundType = NULL;
+                if (placedState != NULL)
+                {
+                    LIBMATTI_MC_Block *placedBlock = (LIBMATTI_MC_Block *) LIBMATTI_MC_BlockState_GetBlock(placedState);
+                    if (placedBlock != NULL && placedBlock->properties != NULL)
+                        placeSoundType = placedBlock->properties->soundType;
+                }
+                if (minecraft->soundEngine != NULL && placeSoundType != NULL)
+                    LIBMATTI_MC_SoundEngine_Play(
+                        minecraft->soundEngine,
+                        LIBMATTI_MC_SoundType_GetPlaceSound(placeSoundType),
+                        (float) placePos.base.x + 0.5f, (float) placePos.base.y + 0.5f,
+                        (float) placePos.base.z + 0.5f,
+                        (LIBMATTI_MC_SoundType_GetVolume(placeSoundType) + 1.0f) / 2.0f,
+                        LIBMATTI_MC_SoundType_GetPitch(placeSoundType));
+
                 static int debugPlace = -1;
                 if (debugPlace < 0)
                     debugPlace = getenv("MATTI_DEBUG_PICK") != NULL;
@@ -1313,6 +1365,23 @@ static void runTick(LIBMATTI_MC_Minecraft *minecraft, int runGameTime)
                 LIBMATTI_MC_ClipContext_Fluid_NONE, NULL, NULL);
             minecraft->hitResult = LIBMATTI_MC_Level_Clip((LIBMATTI_MC_Level *) minecraft->level, &context);
             debug_pick(minecraft);
+        }
+
+        // Java: SoundEngine.tick -> Listener.setTransform(camera.position(),
+        // forwards, up) - the listener rides the camera every frame.
+        if (minecraft->soundEngine != NULL)
+        {
+            LIBMATTI_MC_ListenerTransform transform;
+            transform.position[0] = (float) minecraft->camera.x;
+            transform.position[1] = (float) minecraft->camera.y;
+            transform.position[2] = (float) minecraft->camera.z;
+            transform.forward[0] = minecraft->camera.forwards.x;
+            transform.forward[1] = minecraft->camera.forwards.y;
+            transform.forward[2] = minecraft->camera.forwards.z;
+            transform.up[0] = minecraft->camera.up.x;
+            transform.up[1] = minecraft->camera.up.y;
+            transform.up[2] = minecraft->camera.up.z;
+            LIBMATTI_MC_SoundEngine_Tick(minecraft->soundEngine, &transform);
         }
     }
 
@@ -1771,6 +1840,14 @@ void LIBMATTI_MC_Minecraft_Destroy(LIBMATTI_MC_Minecraft *minecraft)
         LIBMATTI_MC_LocalPlayer_Free(minecraft->localPlayer);
         minecraft->localPlayer = NULL;
     }
+    // Java: this.soundManager = null - the engine stops + closes the AL
+    // context before the window dies (the P5.6 teardown order).
+    if (minecraft->soundEngine != NULL)
+    {
+        LIBMATTI_MC_SoundEngine_Free(minecraft->soundEngine);
+        minecraft->soundEngine = NULL;
+    }
+
     // Java: Options - the static KeyMapping table releases
     LIBMATTI_MC_KeyMapping_ReleaseAll();
 

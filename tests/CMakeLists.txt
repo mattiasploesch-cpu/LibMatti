@@ -109,6 +109,12 @@ add_test(NAME pick COMMAND test_pick)
 matti_test(test_hud hud/HudHarness.c)
 add_test(NAME hud COMMAND test_hud)
 
+# sound: the P5.6 core - the SoundEngine stack over the LIBMATTI_OAL_*
+# wrapper (library/channel/boot lifecycle, headless no-op tolerance) and
+# the SoundEvents resolve cache the SoundTypes ride
+matti_test(test_sound sound/SoundHarness.c)
+add_test(NAME sound COMMAND test_sound)
+
 # ao: the P4.4 AO kernel over a real level (BlockColors providers, shade table,
 # the tesselate paths through the dispatcher)
 matti_test(test_ao ao/AoHarness.c)

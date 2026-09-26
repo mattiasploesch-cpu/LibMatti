@@ -103,7 +103,7 @@ Vor P0 fertig (frühere Meilensteine, nicht Teil des Plans):
 | 3 | Physik/Kollision (AABB-Sweep gegen BlockStates)                     | ✅     |
 | 4 | Raycast/HitResult (Block klicken)                                   | ✅     |
 | 5 | GameRenderer/HUD (Crosshair, Hotbar)                                | ✅     |
-| 6 | Sound-Engine (OpenAL-Binding)                                       | ⬜     |
+| 6 | Sound-Engine (OpenAL-Binding)                                       | ✅     |
 
 **Ziel:** du läufst durch die Welt, setzt/brichst Blöcke — der „es ist Minecraft“-Moment.
 
