@@ -283,6 +283,25 @@ float LIBMATTI_MC_Minecraft_GetTickTargetMillis(float msPerTick)
     return msPerTick;
 }
 
+// Java: Minecraft.setScreen(new InventoryScreen(player)) - the open path the
+// E edge and the MATTI_OPEN_INVENTORY smoke hook share (the releaseAll tail
+// + the container layout over the current window size).
+static void open_inventory_screen(LIBMATTI_MC_Minecraft *minecraft)
+{
+    if (minecraft->inventoryScreen != NULL)
+        return;
+    LIBMATTI_MC_KeyMapping_ReleaseAll();
+    LIBMATTI_MC_Player *player =
+        minecraft->localPlayer != NULL ? &minecraft->localPlayer->player : NULL;
+    minecraft->inventoryScreen = LIBMATTI_MC_InventoryScreen_New(minecraft, player, minecraft->playerInventory);
+    if (minecraft->inventoryScreen != NULL)
+    {
+        int sw = 0, sh = 0;
+        LIBMATTI_GLFW_glfwGetFramebufferSize(minecraft->window, &sw, &sh);
+        LIBMATTI_MC_AbstractContainerScreen_Layout(&minecraft->inventoryScreen->base, sw / 2, sh / 2);
+    }
+}
+
 // Java: private String createTitle() - "Minecraft*" + version name; the
 // modification check and server suffix are game-port content.
 static char *createTitle(const LIBMATTI_MC_Minecraft *minecraft)
@@ -712,25 +731,23 @@ static void tick(LIBMATTI_MC_Minecraft *minecraft)
             else
             {
                 // Java: setScreen(new InventoryScreen(player)) -> init(w, h)
-                // over the CURRENT window size (the gui-scale-2 layout space
-                // the HUD renders in). Java's setScreen tail releases the key
-                // states (KeyMapping.releaseAll) - the walk input stops with
-                // the screen up, the physics keep running without input.
-                LIBMATTI_MC_KeyMapping_ReleaseAll();
-                LIBMATTI_MC_Player *player =
-                    minecraft->localPlayer != NULL ? &minecraft->localPlayer->player : NULL;
-                minecraft->inventoryScreen = LIBMATTI_MC_InventoryScreen_New(minecraft, player, minecraft->playerInventory);
-                if (minecraft->inventoryScreen != NULL)
-                {
-                    int sw = 0, sh = 0;
-                    LIBMATTI_GLFW_glfwGetFramebufferSize(minecraft->window, &sw, &sh);
-                    LIBMATTI_MC_Screen_Resize(&minecraft->inventoryScreen->base.base,
-                                              sw / 2, sh / 2);
-                }
+                // over the CURRENT window size. The shared open path rides the
+                // releaseAll tail (KeyMapping.releaseAll - the walk input stops
+                // with the screen up) + the container layout that CENTERS the
+                // 176x166 image (Screen_Resize alone never touches
+                // leftPos/topPos - the panel sat in the corner and the slot
+                // hits missed by the offset).
+                open_inventory_screen(minecraft);
             }
         }
         inventoryWasDown = inventoryDown;
     }
+
+    // The MATTI_OPEN_INVENTORY smoke hook: the deterministic open for the
+    // headless screenshots (the E key rides the real input path, but the X
+    // synthetic-key delivery is unreliable for the pixel verification).
+    if (minecraft->inventoryScreen == NULL && getenv("MATTI_OPEN_INVENTORY") != NULL)
+        open_inventory_screen(minecraft);
 
     // Java: the open screen ticks (Minecraft.runTick -> screen.tick())
     if (minecraft->inventoryScreen != NULL)
