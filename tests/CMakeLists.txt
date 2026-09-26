@@ -122,6 +122,11 @@ add_test(NAME sound COMMAND test_sound)
 matti_test(test_inventory inventory/InventoryHarness.c)
 add_test(NAME inventory COMMAND test_inventory)
 
+# widgets: the P6.2 core - the Screen lifecycle (init/resize/ESC close),
+# the AbstractWidget geometry/state gates and the Button/EditBox behaviour
+matti_test(test_widgets widgets/WidgetHarness.c)
+add_test(NAME widgets COMMAND test_widgets)
+
 # ao: the P4.4 AO kernel over a real level (BlockColors providers, shade table,
 # the tesselate paths through the dispatcher)
 matti_test(test_ao ao/AoHarness.c)

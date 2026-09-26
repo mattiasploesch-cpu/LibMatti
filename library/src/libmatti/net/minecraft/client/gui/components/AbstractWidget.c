@@ -137,6 +137,15 @@ void LIBMATTI_MC_AbstractWidget_Render(LIBMATTI_MC_AbstractWidget *widget, int m
 bool LIBMATTI_MC_AbstractWidget_MouseClicked(LIBMATTI_MC_AbstractWidget *widget, double mouseX, double mouseY,
                                              int button, bool isRelease)
 {
+    if (widget != NULL && widget->mouseClicked != NULL)
+        return widget->mouseClicked(widget, mouseX, mouseY, button, isRelease);
+    return LIBMATTI_MC_AbstractWidget_MouseClickedBase(widget, mouseX, mouseY, button, isRelease);
+}
+
+// the base dispatch (the hit test + the onClick release firing)
+bool LIBMATTI_MC_AbstractWidget_MouseClickedBase(LIBMATTI_MC_AbstractWidget *widget, double mouseX, double mouseY,
+                                                 int button, bool isRelease)
+{
     if (widget == NULL || !widget->active || !widget->visible)
         return false;
     if (!LIBMATTI_MC_AbstractWidget_ContainsPoint(widget, mouseX, mouseY))

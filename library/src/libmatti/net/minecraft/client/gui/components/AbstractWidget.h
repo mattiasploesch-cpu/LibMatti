@@ -22,6 +22,10 @@ typedef struct LIBMATTI_MC_AbstractWidget
     void (*renderWidget)(struct LIBMATTI_MC_AbstractWidget *widget, int mouseX, int mouseY, float partialTick);
     // Java: public void onClick(MouseButtonEvent, boolean) - default no-op
     void (*onClick)(struct LIBMATTI_MC_AbstractWidget *widget, double mouseX, double mouseY, int button);
+    // Java: public boolean mouseClicked(MouseButtonEvent, boolean) - the
+    // subclass override (AbstractButton arms the press); NULL = the base
+    bool (*mouseClicked)(struct LIBMATTI_MC_AbstractWidget *widget, double mouseX, double mouseY,
+                         int button, bool isRelease);
     // Java: public boolean keyPressed(KeyEvent) - EditBox consumes, default false
     bool (*keyPressed)(struct LIBMATTI_MC_AbstractWidget *widget, int keyCode, int scanCode, int modifiers);
     // Java: public boolean charTyped(CharacterEvent) - EditBox consumes
@@ -77,10 +81,15 @@ bool LIBMATTI_MC_AbstractWidget_ContainsPoint(const LIBMATTI_MC_AbstractWidget *
 // (invisible widgets render nothing, inactive widgets ride the alpha)
 void LIBMATTI_MC_AbstractWidget_Render(LIBMATTI_MC_AbstractWidget *widget, int mouseX, int mouseY, float partialTick);
 
-// Java: public boolean mouseClicked(MouseButtonEvent, boolean) - the hit test
-// + active gate ride here, the vtable's onClick fires on release (isRelease)
+// Java: public boolean mouseClicked(MouseButtonEvent, boolean) - the vtable
+// override first (AbstractButton), else the base: hit test + active gate,
+// the vtable's onClick fires on release
 bool LIBMATTI_MC_AbstractWidget_MouseClicked(LIBMATTI_MC_AbstractWidget *widget, double mouseX, double mouseY,
                                              int button, bool isRelease);
+// the base dispatch the vtable override chains through (the hit test + the
+// onClick release firing without the override)
+bool LIBMATTI_MC_AbstractWidget_MouseClickedBase(LIBMATTI_MC_AbstractWidget *widget, double mouseX, double mouseY,
+                                                 int button, bool isRelease);
 // Java: public boolean keyPressed / charTyped - the vtable pass
 bool LIBMATTI_MC_AbstractWidget_KeyPress(LIBMATTI_MC_AbstractWidget *widget, int keyCode, int scanCode, int modifiers);
 bool LIBMATTI_MC_AbstractWidget_CharTyped(LIBMATTI_MC_AbstractWidget *widget, unsigned int codePoint, int modifiers);
