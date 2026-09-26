@@ -49,10 +49,13 @@ else()
     target_link_libraries(embed_resources PRIVATE z)
 endif()
 
+# the resource tree rides the DEPENDS (the blob re-packs when a texture/JSON
+# changes - without it the stale blob ships and new assets are "missing")
+file(GLOB_RECURSE LIBMATTI_RESOURCE_FILES CONFIGURE_DEPENDS "${LIBMATTI_RESOURCES_DIR}/*")
 add_custom_command(
         OUTPUT "${LIBMATTI_EMBED_DATA_C}" "${LIBMATTI_EMBED_DATA_H}" "${LIBMATTI_EMBED_BLOB}"
         COMMAND $<TARGET_FILE:embed_resources> "${LIBMATTI_RESOURCES_DIR}" "${LIBMATTI_EMBED_GENERATED_DIR}"
-        DEPENDS embed_resources "${LIBMATTI_EMBED_TOOL}"
+        DEPENDS embed_resources "${LIBMATTI_EMBED_TOOL}" ${LIBMATTI_RESOURCE_FILES}
         COMMENT "Packing library/resources into the embedded resource blob"
         VERBATIM
 )

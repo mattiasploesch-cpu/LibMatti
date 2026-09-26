@@ -73,8 +73,12 @@ LIBMATTI_MC_TextureContents *LIBMATTI_MC_TextureContents_Load(
     const LIBMATTI_MC_MultiPackResourceManager *resourceManager, const LIBMATTI_MC_Identifier *resourceId)
 {
     // Java: Resource resource = resourceManager.getResourceOrThrow(location)
-    LIBMATTI_MC_Resource *resource =
-        LIBMATTI_MC_MultiPackResourceManager_GetResource(resourceManager, resourceId->namespace, resourceId->path);
+    // the NULL manager rides the missing contents (the TextureManager boots
+    // before the asset reload wired the embedded pack in - no crash, the
+    // magenta fallback shows instead)
+    LIBMATTI_MC_Resource *resource = resourceManager == NULL
+        ? NULL
+        : LIBMATTI_MC_MultiPackResourceManager_GetResource(resourceManager, resourceId->namespace, resourceId->path);
     if (resource == NULL)
         return NULL;
 

@@ -136,9 +136,13 @@ LIBMATTI_MC_AbstractTexture *LIBMATTI_MC_TextureManager_GetTexture(LIBMATTI_MC_T
     if (texture != NULL)
         return texture;
 
-    // Java: SimpleTexture + registerAndLoad
+    // Java: SimpleTexture + registerAndLoad. The lazy load rides the
+    // manager's resourceManager - when the boot has not wired the embedded
+    // pack yet, the load returns the missing contents (the magenta fallback)
+    // instead of walking a NULL manager.
     texture = LIBMATTI_MC_SimpleTexture_New(location);
-    LIBMATTI_MC_TextureManager_RegisterAndLoad(manager, location, texture);
+    if (manager->resourceManager != NULL)
+        LIBMATTI_MC_TextureManager_RegisterAndLoad(manager, location, texture);
     return texture;
 }
 

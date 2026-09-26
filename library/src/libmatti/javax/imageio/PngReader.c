@@ -69,16 +69,6 @@ static int channels_of(unsigned int colorType)
     }
 }
 
-// Java: the palette image channel count depends on the tRNS length
-static int palette_channels(int bitDepth, int trnsCount)
-{
-    int samples = 1;
-    // Java: getImageTypes - the tRNS adds a second (alpha) band
-    if (trnsCount > 0) samples = 2;
-    (void) bitDepth;
-    return samples;
-}
-
 // Java: the bytes per sample of a bit depth (16-bit samples occupy two bytes)
 static int sample_bytes(int bitDepth)
 {
@@ -420,7 +410,11 @@ unsigned char *LIBMATTI_JXI_PngReader_Decode(const unsigned char *data, size_t l
     inflateEnd(&stream);
 
     // Java: the pass loop - a non-interlaced image is one pass with a single geometry
-    int imageChannels = colorTypeValue == 3 ? palette_channels(bitDepth, trnsCount) : channels;
+    // the scanline geometry rides channels_of(colorType) - a palette stream carries
+    // ONE index sample per pixel on the wire; the tRNS chunk is only the emit-time
+    // alpha lookup (the vanilla GUI/skin palette PNGs decode again - the doubled
+    // geometry aborted the unfilter on every tRNS palette image).
+    int imageChannels = channels;
     size_t lineBytes = scanline_bytes(widthValue, imageChannels, bitDepth);
     size_t rawPosition = 0;
 
