@@ -175,6 +175,19 @@ void LIBMATTI_MC_ReloadableTexture_DoLoad(LIBMATTI_MC_AbstractTexture *texture, 
     texture->texture = LIBMATTI_B3D_GlStateManager_GenTexture();
     texture->textureView = texture->texture;
     LIBMATTI_MC_Texture_WriteToTexture(texture->texture, image);
+    // Java: the GpuSampler (address mode + filter) rides the draw through the
+    // sampler cache; GL has no sampler objects in the port - the parameters
+    // bake into the texture object here. A fresh GL name defaults MIN_FILTER
+    // to NEAREST_MIPMAP_LINEAR: without mipmaps the texture is INCOMPLETE and
+    // samples (0,0,0,1) - the black panel rect the inventory screen showed.
+    LIBMATTI_GL_glTexParameteri(LIBMATTI_GL_GL_TEXTURE_2D, LIBMATTI_GL_GL_TEXTURE_MIN_FILTER,
+                                texture->filterLinear ? LIBMATTI_GL_GL_LINEAR : LIBMATTI_GL_GL_NEAREST);
+    LIBMATTI_GL_glTexParameteri(LIBMATTI_GL_GL_TEXTURE_2D, LIBMATTI_GL_GL_TEXTURE_MAG_FILTER,
+                                texture->filterLinear ? LIBMATTI_GL_GL_LINEAR : LIBMATTI_GL_GL_NEAREST);
+    LIBMATTI_GL_glTexParameteri(LIBMATTI_GL_GL_TEXTURE_2D, LIBMATTI_GL_GL_TEXTURE_WRAP_S,
+                                texture->addressModeClamp ? LIBMATTI_GL_GL_CLAMP_TO_EDGE : LIBMATTI_GL_GL_REPEAT);
+    LIBMATTI_GL_glTexParameteri(LIBMATTI_GL_GL_TEXTURE_2D, LIBMATTI_GL_GL_TEXTURE_WRAP_T,
+                                texture->addressModeClamp ? LIBMATTI_GL_GL_CLAMP_TO_EDGE : LIBMATTI_GL_GL_REPEAT);
 }
 
 // Java: ReloadableTexture.apply(TextureContents) - the sampler comes from the
@@ -254,6 +267,14 @@ LIBMATTI_MC_Identifier *LIBMATTI_MC_MissingTextureAtlasSprite_GetLocation(void)
 void LIBMATTI_MC_Texture_WriteToTexture(unsigned int glTexture, const LIBMATTI_B3D_NativeImage *image)
 {
     LIBMATTI_GL_glPixelStorei(LIBMATTI_GL_GL_UNPACK_ALIGNMENT, 1);
+    // the bind resets the manager's cache through unit 0 first: the cache may
+    // believe this name is already bound (GL reuses names after deletes, the
+    // raw world-pass binds bypass the cache) and would SKIP the bind - the
+    // upload lands on a FOREIGN texture and the new object stays empty
+    // (samples black). The terrain atlas learned this first (its inline
+    // re-bind); the reset makes every lazy upload correct.
+    LIBMATTI_B3D_GlStateManager_ActiveTexture(LIBMATTI_GL_GL_TEXTURE0);
+    LIBMATTI_B3D_GlStateManager_BindTexture(0);
     LIBMATTI_B3D_GlStateManager_BindTexture(glTexture);
     LIBMATTI_GL_glTexImage2D(LIBMATTI_GL_GL_TEXTURE_2D, 0, LIBMATTI_GL_GL_RGBA8,
                              image->width, image->height, 0,
