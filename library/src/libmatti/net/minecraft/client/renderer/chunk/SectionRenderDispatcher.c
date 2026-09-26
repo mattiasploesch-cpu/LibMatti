@@ -248,15 +248,17 @@ static void upload_quad_indices(LayerVao *vao, int quadCount)
         {
             unsigned short base = (unsigned short) (q * 4);
             unsigned short *target = indices + q * 6;
-            // Java: the shared quads->triangles indices (0,1,2, 2,3,1) - the
-            // second triangle keeps the first one's winding (with (2,1,3) the
-            // winding flips and backface culling drops half the terrain).
+            // Java: ShapeIndexBuffer.fillBuffer - the shared quads->triangles
+            // indices (0,1,2, 2,3,0). The quad corners walk the perimeter, so
+            // both triangles share the v0-v2 diagonal; an index onto v1 there
+            // overlaps the two triangles and leaves the opposite-corner hole
+            // (the top-centre gap on every face).
             target[0] = base;
             target[1] = base + 1;
             target[2] = base + 2;
             target[3] = base + 2;
             target[4] = base + 3;
-            target[5] = base + 1;
+            target[5] = base;
         }
         LIBMATTI_GL_glBindBuffer(LIBMATTI_GL_GL_ELEMENT_ARRAY_BUFFER, vao->ibo);
         LIBMATTI_GL_glBufferData(LIBMATTI_GL_GL_ELEMENT_ARRAY_BUFFER, bytes, indices,
