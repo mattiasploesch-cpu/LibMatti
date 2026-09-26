@@ -97,6 +97,36 @@ add_test(NAME player COMMAND test_player)
 matti_test(test_physics physics/PhysicsHarness.c)
 add_test(NAME physics COMMAND test_physics)
 
+# pick: the P5.4 core - the level ray cast (BlockGetter.clip over the
+# traverseBlocks DDA), the per-cell cube clip with the entry face, the reach
+# cutoff and the ClipContext shape gate
+matti_test(test_pick pick/PickHarness.c)
+add_test(NAME pick COMMAND test_pick)
+
+# hud: the P5.5 core - the Gui layout unit (crosshair/hotbar rects out of
+# Gui.java), the POSITION_COLOR_TEXTURE quad packing and the hotbar item
+# palette the client drives
+matti_test(test_hud hud/HudHarness.c)
+add_test(NAME hud COMMAND test_hud)
+
+# sound: the P5.6 core - the SoundEngine stack over the LIBMATTI_OAL_*
+# wrapper (library/channel/boot lifecycle, headless no-op tolerance) and
+# the SoundEvents resolve cache the SoundTypes ride
+matti_test(test_sound sound/SoundHarness.c)
+add_test(NAME sound COMMAND test_sound)
+
+# inventory: the P6.1 core - SimpleContainer storage, Slot semantics
+# (safeInsert/safeTake/tryRemove), the MenuType registry (25 vanilla types)
+# and the AbstractContainerMenu click semantics (PICKUP/QUICK_MOVE/CLONE/
+# THROW/PICKUP_ALL/QUICK_CRAFT)
+matti_test(test_inventory inventory/InventoryHarness.c)
+add_test(NAME inventory COMMAND test_inventory)
+
+# widgets: the P6.2 core - the Screen lifecycle (init/resize/ESC close),
+# the AbstractWidget geometry/state gates and the Button/EditBox behaviour
+matti_test(test_widgets widgets/WidgetHarness.c)
+add_test(NAME widgets COMMAND test_widgets)
+
 # ao: the P4.4 AO kernel over a real level (BlockColors providers, shade table,
 # the tesselate paths through the dispatcher)
 matti_test(test_ao ao/AoHarness.c)

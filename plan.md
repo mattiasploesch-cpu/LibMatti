@@ -1,4 +1,4 @@
-# Plan: Minecraft-Port (net.minecraft.*) in Phasen
+    # Plan: Minecraft-Port (net.minecraft.*) in Phasen
 
 > **Status-Marker:** ✅ fertig · 🟨 teilweise · ⬜ offen
 > Stand: 23.09.2026 — Build grün, ctest 22/22, `runClient` bootet FML vollständig (Mods, Configs, Mixins, Registries, Vanilla-Bootstrap), rendert die Welt-Ladeansicht mit Titel, Progress-Bar und gebackenem Terrain, cullt Sections per Frustum (Camera + FrustumIntersection 1:1 JOML) und rendert über den BlockRenderDispatcher mit AO + Tinting; Stable-Release-Pipeline (AppImage, Portable-Zip, Dev-SDK) per `workflow_dispatch` verfügbar.
@@ -96,14 +96,14 @@ Vor P0 fertig (frühere Meilensteine, nicht Teil des Plans):
 
 ## P5 — Spieler & Interaktion
 
-| # | Was                                                              | Status |
-|---|------------------------------------------------------------------|--------|
-| 1 | Entity-Hierarchie + EntityType-Registry                          | ✅     |
-| 2 | Player/LocalPlayer, Input/KeyMapping (GLFW-Port liefert die Tasten) | ✅   |
-| 3 | Physik/Kollision (AABB-Sweep gegen BlockStates)                   | ✅     |
-| 4 | Raycast/HitResult (Block klicken)                                 | ⬜     |
-| 5 | GameRenderer/HUD (Crosshair, Hotbar)                              | ⬜     |
-| 6 | Sound-Engine (OpenAL-Binding)                                     | ⬜     |
+| # | Was                                                                 | Status |
+|---|---------------------------------------------------------------------|--------|
+| 1 | Entity-Hierarchie + EntityType-Registry                             | ✅     |
+| 2 | Player/LocalPlayer, Input/KeyMapping (GLFW-Port liefert die Tasten) | ✅     |
+| 3 | Physik/Kollision (AABB-Sweep gegen BlockStates)                     | ✅     |
+| 4 | Raycast/HitResult (Block klicken)                                   | ✅     |
+| 5 | GameRenderer/HUD (Crosshair, Hotbar)                                | ✅     |
+| 6 | Sound-Engine (OpenAL-Binding)                                       | ✅     |
 
 **Ziel:** du läufst durch die Welt, setzt/brichst Blöcke — der „es ist Minecraft“-Moment.
 
@@ -113,8 +113,8 @@ Vor P0 fertig (frühere Meilensteine, nicht Teil des Plans):
 
 | # | Was                                                                        | Status |
 |---|----------------------------------------------------------------------------|--------|
-| 1 | Menu/Slot-System (MenuType, AbstractContainerMenu)                          | ⬜     |
-| 2 | Screen-Hierarchie (Screen, Button, TextField — passt zum Mixin-Hook-System) | ⬜     |
+| 1 | Menu/Slot-System (MenuType, AbstractContainerMenu)                          | ✅     |
+| 2 | Screen-Hierarchie (Screen, Button, TextField — passt zum Mixin-Hook-System) | ✅     |
 | 3 | Inventory/Hotbar-Daten, ItemRenderer                                        | ⬜     |
 | 4 | Pause/Options-Screen (options.txt über ConfigTracker — Config-Arbeit zahlt sich hier aus) | ⬜ |
 
@@ -190,5 +190,6 @@ Run-Configurations (CLion): **runClient** (der eine Client mit allem), **build m
 5. ~~**P2-Nachtrag:** PalettedContainer, EntityBlock, BlockEntity-NBT~~ ✅ erledigt — PalettedContainer + SimpleBitStorage (SINGLE_VALUE/LINEAR/GLOBAL-Strategien, Bits-Wachstum, Pack/Unpack) in LevelChunkSection; EntityBlock-VTable am Block (newBlockEntity + Typ-Slot, Valid-Blocks-Scan als Vanilla-Fallback); BlockEntity-NBT (saveMetadata/saveWithFullMetadata/saveWithId/saveCustomOnly/loadStatic über NbtIo).
 6. ~~**P5.1:** Entity-Hierarchie + EntityType-Registry~~ ✅ erledigt — EntityAttachments/EntityDimensions/MobCategory, Entity-Basis (Pos/Rot/BBox, Tags, NBT-Roundtrip, Removal-Lifecycle), EntityType-Builder + Registry, 13 Vanilla-Typen, Level-Entity-Surface (Add/Remove/GetEntitiesInBox); entity-Harness grün.
 7. ~~**P5.2:** Player/LocalPlayer, Input/KeyMapping~~ ✅ erledigt — Abilities, FoodData/FoodConstants (Eat/Exhaustion/NBT), Player-Struct (Health-Clamp, abilities/food Defaults, Player-NBT mit XpP/Score/abilities-Subtag), KeyMapping-Registry (ALL/MAP-Tabellen, Set/Click/ReleaseAll, Vanilla-Bindings mit Mouse-Typen), Input-Record + Vec2 (MoveVector-Normalize), LocalPlayer (KeyboardInput-Tick 1:1, Java-Strafe-Konvention +1 links); Client fährt Camera/Position über die LocalPlayer-Entity (Mouse-Look über Entity.turn), player-Harness grün.
-8. ~~**P5.3:** Physik/Kollision~~ ✅ erledigt — Level-Blockkollisionen (GetBlockCollisions/NoBlockCollision über hasCollision-Gate), Entity-Collide-Sweep (axisStepOrder |x|<|z| ? YZX : YXZ, Shapes.collide-Reduktion per Achse), Entity_Move (MoverType, noPhysics-Pfad, Collision-Flags, On-Ground, Horizontal-Motion-Reset); Client läuft auf Gravity (-0.08·0.98, Friction 0.91) + Vanilla-Jump (+0.42) über Entity_Move, physics-Harness grün.
-9. **Run-Configs/CI:** Stable-Release (workflow_dispatch: AppImage, Portable-Zip, Dev-SDK, `.matti`-Mods, Changelog, SHA256SUMS) steht — siehe `.github/WORKFLOWS.md` für alle Actions.
+8. ~~**P5.3:** Physik/Kollision~~ ✅ erledigt — Level-Blockkollisionen (GetBlockCollisions/NoBlockCollision über hasCollision-Gate), Entity-Collide-Sweep (axisStepOrder |x|<|z| ? YZX : YXZ, Shapes.collide-Reduktion per Achse), Entity_Move (MoverType, noPhysics-Pfad, Collision-Flags, On-Ground, Horizontal-Motion-Reset); Client läuft auf Gravity (-0.08·0.98) + Vanilla-Jump (+0.42) über Entity_Move mit Slipperiness-Friction (0.546 am Boden / 0.91 in der Luft) pro Tick, physics-Harness grün; Client-Bugfixes: DeltaTracker-Epochen-Seed, runTick-flag, Vanilla-KeyMappings im Client (P5.3-Bugs behoben, xdotool-verifiziert).
+9. ~~**P5.4:** Raycast/HitResult~~ ✅ erledigt — BlockHitResult (Miss/Block/Entity-Typ, Face-Direction, Inside-Pfad wie VoxelShape.clip), ClipContext (Block/Fluid-Modi, Shape-Getter), Level_Clip (BlockGetter.traverseBlocks-DDA 1:1 mit ±1e-7-Lerp, per-Zelle AABB-Clip über die hasCollision-Gate), Client: Crosshair-Pick pro Frame (Reach 4.5, Creative), Linksklick bricht den anvisierten Block, Rechtsklick platziert an der Entry-Face, Section-Re-Mesh um die Änderung; pick-Harness 27 Checks grün, Client-Interaktion per xdotool-Mausklick verifiziert (Break → Loch in der Plattform, Place → neuer Block vom Pick getroffen).
+10. **Run-Configs/CI:** Stable-Release (workflow_dispatch: AppImage, Portable-Zip, Dev-SDK, `.matti`-Mods, Changelog, SHA256SUMS) steht — siehe `.github/WORKFLOWS.md` für alle Actions.
