@@ -1,4 +1,4 @@
-# Plan: Minecraft-Port (net.minecraft.*) in Phasen
+    # Plan: Minecraft-Port (net.minecraft.*) in Phasen
 
 > **Status-Marker:** ✅ fertig · 🟨 teilweise · ⬜ offen
 > Stand: 23.09.2026 — Build grün, ctest 22/22, `runClient` bootet FML vollständig (Mods, Configs, Mixins, Registries, Vanilla-Bootstrap), rendert die Welt-Ladeansicht mit Titel, Progress-Bar und gebackenem Terrain, cullt Sections per Frustum (Camera + FrustumIntersection 1:1 JOML) und rendert über den BlockRenderDispatcher mit AO + Tinting; Stable-Release-Pipeline (AppImage, Portable-Zip, Dev-SDK) per `workflow_dispatch` verfügbar.
@@ -114,7 +114,7 @@ Vor P0 fertig (frühere Meilensteine, nicht Teil des Plans):
 | # | Was                                                                        | Status |
 |---|----------------------------------------------------------------------------|--------|
 | 1 | Menu/Slot-System (MenuType, AbstractContainerMenu)                          | ✅     |
-| 2 | Screen-Hierarchie (Screen, Button, TextField — passt zum Mixin-Hook-System) | ⬜     |
+| 2 | Screen-Hierarchie (Screen, Button, TextField — passt zum Mixin-Hook-System) | ✅     |
 | 3 | Inventory/Hotbar-Daten, ItemRenderer                                        | ⬜     |
 | 4 | Pause/Options-Screen (options.txt über ConfigTracker — Config-Arbeit zahlt sich hier aus) | ⬜ |
 
