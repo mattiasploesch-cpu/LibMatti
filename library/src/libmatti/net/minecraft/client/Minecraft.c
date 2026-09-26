@@ -1014,7 +1014,10 @@ static void apply_walk(LIBMATTI_MC_Minecraft *minecraft)
     const LIBMATTI_MC_Input *presses = LIBMATTI_MC_LocalPlayer_GetKeyPresses(minecraft->localPlayer);
 
     // Java: the jump - onGround && keyJump.isDown() -> jumpFromGround() (+0.42
-    // the vanilla impulse, sprint adds the horizontal boost)
+    // the vanilla impulse, sprint adds the horizontal boost). The impulse
+    // RIDES the delta movement: the travel below re-READS it (the old code
+    // computed "next" from the pre-jump motion and SetDeltaMovement overwrote
+    // the impulse in the same tick - the player never left the ground).
     if (presses->jump && LIBMATTI_MC_Entity_OnGround(entity))
     {
         LIBMATTI_MC_Vec3 jump = {entity->dx, 0.42, entity->dz};
@@ -1043,14 +1046,19 @@ static void apply_walk(LIBMATTI_MC_Minecraft *minecraft)
     // accel/(1 - friction) = 0.1/0.454 = 0.22 blocks/tick (4.4 m/s, vanilla).
     // The old flat 0.91 ran the physics per FRAME and 14x too fast.
     float friction = LIBMATTI_MC_Entity_OnGround(entity) ? 0.546f : 0.91f;
-    LIBMATTI_MC_Vec3 next = {entity->dx * friction + accelX,
-                             entity->dy * 0.98 - 0.08,
-                             entity->dz * friction + accelZ};
-    LIBMATTI_MC_Entity_SetDeltaMovement(entity, &next);
+    // Java: handleRelativeFrictionAndCalculateMovement -> move() FIRST (the
+    // box sweeps the current motion), then travelInAir folds gravity AFTER the
+    // move: d0 = dy - 0.08 (the attribute gravity), d0 *= 0.98 (the vertical
+    // inertia). The old order (gravity before the move) shaved the jump arc's
+    // first tick - the 0.81-block peak instead of the vanilla 1.2522.
+    LIBMATTI_MC_Vec3 current;
+    LIBMATTI_MC_Entity_GetDeltaMovement(entity, &current);
+    LIBMATTI_MC_Entity_Move(entity, LIBMATTI_MC_MoverType_SELF, &current);
 
-    // Java: this.move(MoverType.SELF, this.getDeltaMovement()) - the collide
-    // path clips the motion against the level's blocks (the P5.3 port)
-    LIBMATTI_MC_Entity_Move(entity, LIBMATTI_MC_MoverType_SELF, &next);
+    LIBMATTI_MC_Vec3 next = {current.x * friction + accelX,
+                             (current.y - 0.08) * 0.98,
+                             current.z * friction + accelZ};
+    LIBMATTI_MC_Entity_SetDeltaMovement(entity, &next);
 
     // MATTI_DEBUG_POS - the per-second position/onGround trace (the input/
     // physics smoke runs grep it to prove the walk actually moves the player).
