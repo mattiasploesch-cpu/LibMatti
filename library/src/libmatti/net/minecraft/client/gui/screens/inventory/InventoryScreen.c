@@ -32,7 +32,9 @@ void LIBMATTI_MC_InventoryScreen_Free(LIBMATTI_MC_InventoryScreen *screen)
 {
     if (screen == NULL)
         return;
-    // the menu dies through the base cleanup (the menu tail rides
-    // AbstractContainerScreen_Free's removed() path)
+    // the menu/children die through the base cleanup; the SUBCLASS struct
+    // (the allocation the base rides in) dies here - the base free no longer
+    // frees the struct itself (the interior-pointer SIGSEGV fix)
     LIBMATTI_MC_AbstractContainerScreen_Free(&screen->base);
+    free(screen);
 }

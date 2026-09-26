@@ -33,6 +33,10 @@ void LIBMATTI_MC_AbstractContainerScreen_Free(LIBMATTI_MC_AbstractContainerScree
 {
     if (screen == NULL)
         return;
+    // Java: the teardown rides removed() + the menu close. The struct itself
+    // rides the SUBCLASS allocation (C has no destructor chaining) - freeing
+    // the base pointer here would free an interior pointer of the
+    // InventoryScreen allocation (the SIGSEGV on the first close).
     LIBMATTI_MC_Screen_Cleanup(&screen->base);
     // Java: the menu dies with the screen close (Minecraft.setScreen(null)
     // runs removed() -> menu.removed(player))
@@ -42,7 +46,6 @@ void LIBMATTI_MC_AbstractContainerScreen_Free(LIBMATTI_MC_AbstractContainerScree
         LIBMATTI_MC_AbstractContainerMenu_Free(screen->menu);
         screen->menu = NULL;
     }
-    free(screen);
 }
 
 void LIBMATTI_MC_AbstractContainerScreen_Layout(LIBMATTI_MC_AbstractContainerScreen *screen, int width, int height)
