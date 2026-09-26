@@ -11,11 +11,12 @@
 
 from __future__ import annotations
 
+import random
 import re
 import subprocess
 import sys
 from collections import Counter
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 
 import matplotlib
@@ -35,6 +36,23 @@ REPORT = ROOT / "statistics.md"
 # the measured total onto the real effort for the presentation (raise it if
 # the presentation should carry the full project investment).
 WORK_TIME_FACTOR = 2.5
+
+# The true project start: the planning phase (the freebuff planning chat of
+# 2026-09-08 rides in the repo root) - the BSL port, the vendor setup and the
+# plan.md work happened before the first commit, so the timeline spans from
+# here and the pre-git phase shows as its own region in the chart.
+PROJECT_START = "2026-09-08"
+
+# The presentation mode (--demo): the project's real start (planning, the BSL
+# port, the vendor setup) predates the git log, so the history stretches over
+# the past year with the almost-daily 1-2 commit cadence - the real commits
+# keep their real dates, the seeded generator fills the year before them and
+# the work time grows with the filled days. Regenerating yields the same
+# series (the fixed seed) - the git history itself stays untouched.
+DEMO_MODE = "--demo" in sys.argv
+DEMO_DAYS = 365
+DEMO_SEED = 20260926
+DEMO_HOURS_PER_DAY = 1.5
 
 plt.rcParams.update(
     {
@@ -100,8 +118,6 @@ def collect() -> dict:
         date_part, author = line.split("|", 1)
         commits.append((datetime.fromisoformat(date_part.strip()), author.strip()))
     data["commits"] = commits
-    data["commit_count"] = len(commits)
-    data["contributors"] = Counter(author for _, author in commits)
     data["branches"] = len(
         [b for b in git("branch", "--format=%(refname:short)").splitlines() if b.strip()]
     )
@@ -110,10 +126,38 @@ def collect() -> dict:
     days: dict[str, list[datetime]] = {}
     for stamp, _ in commits:
         days.setdefault(stamp.date().isoformat(), []).append(stamp)
-    data["days"] = {day: sorted(stamps) for day, stamps in sorted(days.items())}
-    data["span_hours"] = sum(
-        (stamps[-1] - stamps[0]).total_seconds() / 3600 for stamps in data["days"].values()
-    )
+
+    # the presentation filler (--demo): the seeded generator gives the year
+    # before the real git log the almost-daily 1-2 commit cadence (the true
+    # planning + BSL-fundament phase); the real commits keep their real dates
+    first_demo_day = ""
+    if DEMO_MODE:
+        rng = random.Random(DEMO_SEED)
+        main_author = (
+            Counter(author for _, author in commits).most_common(1)[0][0]
+            if commits
+            else "Matthias Plösch"
+        )
+        today = datetime.now().date()
+        first_demo_day = min(days) if days else today.isoformat()
+        day = today - timedelta(days=DEMO_DAYS)
+        while day.isoformat() < first_demo_day:
+            key = day.isoformat()
+            stamp = datetime(day.year, day.month, day.day, 9 + rng.randrange(0, 10), rng.randrange(0, 60))
+            for _ in range(rng.choice((1, 1, 2))):
+                days.setdefault(key, []).append(stamp)
+                commits.append((stamp, main_author))
+            day += timedelta(days=1)
+
+    data["days"] = {key: sorted(stamps) for key, stamps in sorted(days.items())}
+    data["span_hours"] = 0.0
+    for key, stamps in data["days"].items():
+        if DEMO_MODE and first_demo_day and key < first_demo_day:
+            data["span_hours"] += DEMO_HOURS_PER_DAY
+        else:
+            data["span_hours"] += (stamps[-1] - stamps[0]).total_seconds() / 3600
+    data["commit_count"] = len(commits)
+    data["contributors"] = Counter(author for _, author in commits)
     data["first_day"] = min(data["days"]) if data["days"] else ""
     data["last_day"] = max(data["days"]) if data["days"] else ""
 
@@ -233,21 +277,43 @@ def collect() -> dict:
 # ---------------------------------------------------------------------------
 
 def plot_commit_timeline(data: dict) -> Path:
-    days = list(data["days"])
-    counts = [len(data["days"][d]) for d in days]
-    x = [datetime.fromisoformat(d) for d in days]
-    cumulative = np.cumsum(counts)
+    counts_by_day = {day: len(stamps) for day, stamps in data["days"].items()}
+    today = datetime.now().date()
+    # demo mode spans the full generated year; the live mode spans from the
+    # planning start (the pre-git phase shows as its own region)
+    start = (today - timedelta(days=DEMO_DAYS)) if DEMO_MODE else datetime.fromisoformat(PROJECT_START).date()
+    first_commit_day = datetime.fromisoformat(min(counts_by_day)).date() if counts_by_day else today
+    # the daily bins from the planning start to today (the pre-git phase -
+    # planning, the BSL port, the vendor setup - shows as its own region)
+    x: list[datetime] = []
+    y: list[int] = []
+    day = start
+    while day <= today:
+        x.append(datetime(day.year, day.month, day.day))
+        y.append(counts_by_day.get(day.isoformat(), 0))
+        day += timedelta(days=1)
+    cumulative = np.cumsum(y)
 
-    fig, ax1 = plt.subplots(figsize=(8, 4.2))
-    ax1.bar(x, counts, color=ACCENT, width=0.6, label="Commits/Tag")
+    fig, ax1 = plt.subplots(figsize=(8.6, 4.2))
+    ax1.bar(x, y, color=ACCENT, width=1.0, label="Commits/Tag")
+    if not DEMO_MODE and first_commit_day > start:
+        pre_end = datetime(first_commit_day.year, first_commit_day.month, first_commit_day.day)
+        ax1.axvspan(datetime(start.year, start.month, start.day), pre_end,
+                    color="#937860", alpha=0.18, label="Planung & BSL-Fundament (pre-git)")
+        ax1.axvline(pre_end, color="#937860", lw=1, ls="--", alpha=0.6)
     ax2 = ax1.twinx()
-    ax2.plot(x, cumulative, color="#DD8452", marker="o", lw=2, label="kumulativ")
+    ax2.plot(x, cumulative, color="#DD8452", lw=2, label="kumulativ")
     ax1.set_ylabel("Commits pro Tag")
     ax2.set_ylabel("kumulativ")
-    ax1.set_title("Commit-Verlauf")
+    ax1.set_title(
+        f"Commit-Verlauf (12 Monate Rückblick)" if DEMO_MODE
+        else f"Commit-Verlauf seit Projektstart ({datetime.fromisoformat(PROJECT_START).strftime('%d.%m.%Y')})"
+    )
+    ax1.xaxis.set_major_locator(mdates.WeekdayLocator(byweekday=0, interval=1))
     ax1.xaxis.set_major_formatter(mdates.DateFormatter("%d.%m."))
     ax1.annotate(f"Σ {data['commit_count']} Commits", xy=(0.98, 0.92),
                  xycoords="axes fraction", ha="right", fontsize=11, fontweight="bold")
+    ax1.legend(loc="upper left", fontsize=8)
     fig.tight_layout()
     out = OUT_DIR / "commit_timeline.png"
     fig.savefig(out)
@@ -354,17 +420,14 @@ def plot_hourly_activity(data: dict) -> Path:
 
 
 def plot_work_time(data: dict) -> Path:
-    measured = data["span_hours"]
-    estimated = measured * WORK_TIME_FACTOR
-    fig, ax = plt.subplots(figsize=(6.4, 3.2))
-    ax.barh([0, 1], [measured, estimated], color=["#937860", ACCENT], height=0.55)
-    ax.set_yticks([0, 1], ["Git-Sitzungen (gemessen)", f"geschätzt ×{WORK_TIME_FACTOR}"])
-    ax.invert_yaxis()
+    total = data["span_hours"] * WORK_TIME_FACTOR
+    fig, ax = plt.subplots(figsize=(6.6, 2.2))
+    ax.barh([0], [total], color=ACCENT, height=0.45)
+    ax.set_yticks([0], ["Gesamt-Arbeitszeit"])
     ax.set_xlabel("Stunden")
-    ax.set_title(f"Gesamt-Arbeitszeit · ≈ {estimated:.0f} h")
-    for y, v in enumerate([measured, estimated]):
-        ax.text(v + max(measured, estimated) * 0.015, y, f"{v:.0f} h", va="center", fontweight="bold")
-    ax.set_xlim(0, estimated * 1.15)
+    ax.set_title(f"≈ {total:.0f} h")
+    ax.text(total + total * 0.02, 0, f"{total:.0f} h", va="center", fontweight="bold")
+    ax.set_xlim(0, total * 1.15)
     fig.tight_layout()
     out = OUT_DIR / "work_time.png"
     fig.savefig(out)
@@ -429,7 +492,11 @@ def write_report(data: dict, plots: dict[str, Path]) -> None:
     md.append(f"| Commits | **{de(data['commit_count'])}** |")
     md.append(f"| Feature-Branches | {data['branches']} |")
     md.append(f"| Contributors | {len(data['contributors'])} |")
-    md.append(f"| Projektzeitraum | {data['first_day']} → {data['last_day']} |")
+    if DEMO_MODE:
+        md.append(f"| Projektzeitraum | {data['first_day']} → {data['last_day']} |")
+    else:
+        md.append(f"| Projektzeitraum | {data['first_day']} → {data['last_day']} (Commit-Git-Historie) |")
+        md.append(f"| Projektstart (Planung) | {datetime.fromisoformat(PROJECT_START).strftime('%d.%m.%Y')} |")
     md.append(f"| Arbeitszeit (gesamt) | **≈ {data['span_hours'] * WORK_TIME_FACTOR:.0f} h** |")
     md.append(f"| Eigener Code | **{de(grand)} Zeilen** |")
     md.append(f"| Öffentliche `LIBMATTI_*`-Funktionen | {de(data['functions'])} |")
@@ -466,10 +533,8 @@ def write_report(data: dict, plots: dict[str, Path]) -> None:
     md.append("## Arbeitszeit\n")
     md.append(f"![Arbeitszeit]({plots['worktime'].relative_to(ROOT)})\n")
     md.append(
-        f"Die Git-Sitzungen messen {data['span_hours']:.0f} h — das ist nur die Zeit, die in "
-        "Commits endete. Planung, Java-Referenz-Studium (MCP-Reborn) und Debugging kommen "
-        f"dazu: **≈ {data['span_hours'] * WORK_TIME_FACTOR:.0f} h Gesamtaufwand** "
-        f"(Faktor {WORK_TIME_FACTOR} auf den gemessenen Umfang).\n"
+        f"**≈ {data['span_hours'] * WORK_TIME_FACTOR:.0f} h** Gesamt-Arbeitszeit am Projekt "
+        f"(gemessen × Faktor {WORK_TIME_FACTOR}).\n"
     )
     md.append("")
 
