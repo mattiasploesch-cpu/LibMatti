@@ -20,17 +20,27 @@ void LIBMATTI_MC_Screen_Init(LIBMATTI_MC_Screen *screen, struct LIBMATTI_MC_Mine
     screen->canBeClosed = true; // Java: shouldCloseOnEsc() -> true
 }
 
-void LIBMATTI_MC_Screen_Free(LIBMATTI_MC_Screen *screen)
+void LIBMATTI_MC_Screen_Cleanup(LIBMATTI_MC_Screen *screen)
 {
     if (screen == NULL)
         return;
+    // Java: clearWidgets - the children die, the title stays (the screen
+    // object outlives the resize)
     if (screen->children != NULL)
     {
         for (int i = 0; i < screen->childCount; i++)
             LIBMATTI_MC_AbstractWidget_Free(screen->children[i]);
         free(screen->children);
+        screen->children = NULL;
+        screen->childCount = 0;
     }
-    free(screen->title);
+}
+
+void LIBMATTI_MC_Screen_Free(LIBMATTI_MC_Screen *screen)
+{
+    if (screen == NULL)
+        return;
+    LIBMATTI_MC_Screen_Cleanup(screen);
     free(screen);
 }
 
@@ -43,11 +53,7 @@ void LIBMATTI_MC_Screen_Resize(LIBMATTI_MC_Screen *screen, int width, int height
     screen->height = height;
     if (screen->children != NULL)
     {
-        for (int i = 0; i < screen->childCount; i++)
-            LIBMATTI_MC_AbstractWidget_Free(screen->children[i]);
-        free(screen->children);
-        screen->children = NULL;
-        screen->childCount = 0;
+        LIBMATTI_MC_Screen_Cleanup(screen);
         screen->childCapacity = 0;
     }
     if (screen->init != NULL)

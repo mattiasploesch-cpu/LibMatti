@@ -64,7 +64,8 @@ typedef struct LIBMATTI_MC_Screen
 void LIBMATTI_MC_Screen_Init(LIBMATTI_MC_Screen *screen, struct LIBMATTI_MC_Minecraft *minecraft,
                              const char *title);
 // the typed free (frees the children + the title; the subclass struct rides
-// the caller's allocation)
+// the caller's allocation and is NOT freed - the heap variant frees it)
+void LIBMATTI_MC_Screen_Cleanup(LIBMATTI_MC_Screen *screen);
 void LIBMATTI_MC_Screen_Free(LIBMATTI_MC_Screen *screen);
 
 // Java: public final void init(int width, int height) - the resize entry

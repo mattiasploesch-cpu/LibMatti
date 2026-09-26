@@ -516,6 +516,13 @@ LIBMATTI_MC_Minecraft *LIBMATTI_MC_Minecraft_New(const LIBMATTI_MC_GameConfig *c
         {
             minecraft->modelManager = LIBMATTI_MC_VanillaAssetLoader_GetModelManager();
             blockAtlas = LIBMATTI_MC_ModelManager_GetAtlas(minecraft->modelManager);
+            // Java: the ctor built the TextureManager over this.resourceManager
+            // - the port wires the embedded-pack manager in after the reload
+            // (the lazy SimpleTexture loads - the GUI panel/skin textures -
+            // resolve through the pack instead of the NULL-manager fallback).
+            if (minecraft->textureManager != NULL)
+                minecraft->textureManager->resourceManager =
+                    LIBMATTI_MC_VanillaAssetLoader_GetResourceManager();
             fprintf(stderr, "[ASSETS] embedded pack active (%d entries)\n",
                     (int) LIBMATTI_MC_VanillaAssetLoader_PackEntryCount());
         }
@@ -671,8 +678,10 @@ static void tick(LIBMATTI_MC_Minecraft *minecraft)
 
     // Java: startUseItem/continueAttack ride the tick loop (the multi/hold
     // semantics run at tick rate) - the block interaction acts on the pick
-    // the renderer refreshed this frame.
-    handle_block_interaction(minecraft);
+    // the renderer refreshed this frame. With a screen open the clicks route
+    // to the screen (MouseHandler.onPress gates the game keys).
+    if (minecraft->inventoryScreen == NULL)
+        handle_block_interaction(minecraft);
 
     // Java: the hotbar keys ride the same poll (Inventory.selectedSlot).
     handle_hotbar_keys(minecraft);
@@ -704,7 +713,10 @@ static void tick(LIBMATTI_MC_Minecraft *minecraft)
             {
                 // Java: setScreen(new InventoryScreen(player)) -> init(w, h)
                 // over the CURRENT window size (the gui-scale-2 layout space
-                // the HUD renders in)
+                // the HUD renders in). Java's setScreen tail releases the key
+                // states (KeyMapping.releaseAll) - the walk input stops with
+                // the screen up, the physics keep running without input.
+                LIBMATTI_MC_KeyMapping_ReleaseAll();
                 LIBMATTI_MC_Player *player =
                     minecraft->localPlayer != NULL ? &minecraft->localPlayer->player : NULL;
                 minecraft->inventoryScreen = LIBMATTI_MC_InventoryScreen_New(minecraft, player, minecraft->playerInventory);
@@ -1208,11 +1220,12 @@ static void updateMouseLook(LIBMATTI_MC_Minecraft *minecraft)
     LIBMATTI_GLFW_glfwSetInputMode(minecraft->window, LIBMATTI_GLFW_CURSOR,
                                    LIBMATTI_GLFW_CURSOR_DISABLED);
 
-    if (LIBMATTI_GLFW_glfwGetKey(minecraft->window, LIBMATTI_GLFW_KEY_ESCAPE))
-    {
-        if (minecraft->mouseLookEnabled)
-            LIBMATTI_MC_Minecraft_Stop(minecraft);
-    }
+    // Java: ESC with no screen opens the pause menu (1.21.11 keyPressed ->
+    // pause) - it NEVER quits the game. The skeleton's stop-on-ESC poll dies
+    // here: a lost key RELEASE (the X focus glitch drops synthetic releases)
+    // replays a phantom press edge later and stopped the client mid-game.
+    // The window-close button still stops through glfwWindowShouldClose;
+    // the pause screen lands with P6.4.
 
     double cx = 0.0, cy = 0.0;
     LIBMATTI_GLFW_glfwGetCursorPos(minecraft->window, &cx, &cy);
