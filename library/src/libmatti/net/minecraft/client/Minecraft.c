@@ -29,6 +29,7 @@
 #include "libmatti/net/minecraft/client/renderer/chunk/SectionRenderDispatcher.h"
 #include "libmatti/net/minecraft/client/renderer/chunk/SectionShader.h"
 #include "libmatti/net/minecraft/client/resources/model/ModelManager.h"
+#include "libmatti/net/minecraft/server/bootstrap/VanillaAssetLoader.h"
 #include "libmatti/net/minecraft/client/renderer/block/BlockRenderDispatcher.h"
 #include "libmatti/net/minecraft/server/bootstrap/VanillaBlockModels.h"
 #include "libmatti/net/minecraft/server/bootstrap/VanillaBlockTextures.h"
@@ -222,8 +223,10 @@ static const LIBMATTI_MC_QuadCollection *model_for_block(void *userdata, const L
     if (key == NULL)
         return NULL;
     // Java: ResourceKey.location() - the identifier directly (no ToString parse).
+    // The registry keys the baked models by the namespaced ModelResourceLocation
+    // ("minecraft:block/<path>", the VanillaModels convention).
     char modelId[128];
-    snprintf(modelId, sizeof(modelId), "block/%s", LIBMATTI_MC_Identifier_GetPath(key->identifier));
+    snprintf(modelId, sizeof(modelId), "minecraft:block/%s", LIBMATTI_MC_Identifier_GetPath(key->identifier));
     const LIBMATTI_MC_QuadCollection *model = LIBMATTI_MC_ModelManager_GetModel(manager, modelId);
     return model;
 }
@@ -489,23 +492,36 @@ LIBMATTI_MC_Minecraft *LIBMATTI_MC_Minecraft_New(const LIBMATTI_MC_GameConfig *c
         minecraft->sectionDispatcher = LIBMATTI_MC_SectionRenderDispatcher_New();
 
         // Java: the bootstrap order - MODEL_ATLAS (the block textures stitch
-        // first) then ModelBakery (the models bake against it). The atlas is
-        // procedural in the port (VanillaBlockTextures), the models embedded
-        // (VanillaModels) - headless-safe, no resource pack on disk.
-        LIBMATTI_MC_TextureAtlas *blockAtlas = LIBMATTI_MC_VanillaBlockTextures_Bootstrap(1024);
-        minecraft->modelManager = LIBMATTI_MC_ModelManager_New(blockAtlas);
-        if (LIBMATTI_MC_VanillaBlockModels_Bootstrap(minecraft->modelManager))
+        // first) then ModelBakery (the models bake against it). The assets
+        // ride the embedded pack (the gzip blob in the executable): the loader
+        // runs the SpriteSourceList -> SpriteLoader -> ModelBakery pipeline
+        // over the RAM-only pack, driven entirely by the pack's JSON + PNGs.
+        // A missing blob (or a failed stitch) falls back to the procedural
+        // atlas + the embedded cube models so the demo keeps rendering.
+        LIBMATTI_MC_TextureAtlas *blockAtlas = NULL;
+        if (LIBMATTI_MC_VanillaAssetLoader_Load())
         {
-            LIBMATTI_MC_SectionRenderDispatcher_SetModelResolver(
-                minecraft->sectionDispatcher,
-                (const LIBMATTI_MC_QuadCollection * (*)(void *, const LIBMATTI_MC_Block *))
-                    model_for_block,
-                minecraft->modelManager);
-            // Java: the sprite-rect resolver rides on the same atlas - the
-            // compiler maps the block's model sprite for the face UVs.
-            LIBMATTI_MC_SectionRenderDispatcher_SetSpriteResolver(
-                minecraft->sectionDispatcher, sprite_rect_for_block, minecraft->modelManager);
+            minecraft->modelManager = LIBMATTI_MC_VanillaAssetLoader_GetModelManager();
+            blockAtlas = LIBMATTI_MC_ModelManager_GetAtlas(minecraft->modelManager);
+            fprintf(stderr, "[ASSETS] embedded pack active (%d entries)\n",
+                    (int) LIBMATTI_MC_VanillaAssetLoader_PackEntryCount());
         }
+        else
+        {
+            blockAtlas = LIBMATTI_MC_VanillaBlockTextures_Bootstrap(1024);
+            minecraft->modelManager = LIBMATTI_MC_ModelManager_New(blockAtlas);
+            LIBMATTI_MC_VanillaBlockModels_Bootstrap(minecraft->modelManager);
+            fprintf(stderr, "[ASSETS] procedural fallback active\n");
+        }
+        LIBMATTI_MC_SectionRenderDispatcher_SetModelResolver(
+            minecraft->sectionDispatcher,
+            (const LIBMATTI_MC_QuadCollection * (*)(void *, const LIBMATTI_MC_Block *))
+                model_for_block,
+            minecraft->modelManager);
+        // Java: the sprite-rect resolver rides on the same atlas - the
+        // compiler maps the block's model sprite for the face UVs.
+        LIBMATTI_MC_SectionRenderDispatcher_SetSpriteResolver(
+            minecraft->sectionDispatcher, sprite_rect_for_block, minecraft->modelManager);
 
         // Java: this.blockRenderer = new BlockRenderDispatcher(blockModelShaper,
         // materials, blockColors) - created with the model manager so the
