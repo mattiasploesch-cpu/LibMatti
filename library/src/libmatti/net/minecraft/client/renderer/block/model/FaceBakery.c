@@ -255,12 +255,19 @@ static void recalculate_winding(float positions[4][3], float uvs[4][2], LIBMATTI
         if (positions[i][2] > maxZ) maxZ = positions[i][2];
     }
 
+    // Java: FaceInfo$VertexInfo.select(from, to) over the quad's own bounds -
+    // the extent picks read the per-axis min/max ARRAYS (a scalar pair here
+    // made extent_select read past the floats into stack garbage and the WEST
+    // face came back corner-swapped - the one-triangle-per-side hole).
+    float min[3] = {minX, minY, minZ};
+    float max[3] = {maxX, maxY, maxZ};
+
     const FaceVertexInfo *row = FACE_INFO[direction];
     for (int k = 0; k < 4; k++)
     {
-        float x = extent_select(row[k].x, &minX, &maxX);
-        float y = extent_select(row[k].y, &minY, &maxY);
-        float z = extent_select(row[k].z, &minZ, &maxZ);
+        float x = extent_select(row[k].x, min, max);
+        float y = extent_select(row[k].y, min, max);
+        float z = extent_select(row[k].z, min, max);
         int j = find_vertex(positions, k, x, y, z);
         if (j == -1)
             return; // Java throws; the port keeps the quad as-is.

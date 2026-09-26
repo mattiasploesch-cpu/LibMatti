@@ -97,6 +97,18 @@ add_test(NAME player COMMAND test_player)
 matti_test(test_physics physics/PhysicsHarness.c)
 add_test(NAME physics COMMAND test_physics)
 
+# pick: the P5.4 core - the level ray cast (BlockGetter.clip over the
+# traverseBlocks DDA), the per-cell cube clip with the entry face, the reach
+# cutoff and the ClipContext shape gate
+matti_test(test_pick pick/PickHarness.c)
+add_test(NAME pick COMMAND test_pick)
+
+# hud: the P5.5 core - the Gui layout unit (crosshair/hotbar rects out of
+# Gui.java), the POSITION_COLOR_TEXTURE quad packing and the hotbar item
+# palette the client drives
+matti_test(test_hud hud/HudHarness.c)
+add_test(NAME hud COMMAND test_hud)
+
 # ao: the P4.4 AO kernel over a real level (BlockColors providers, shade table,
 # the tesselate paths through the dispatcher)
 matti_test(test_ao ao/AoHarness.c)

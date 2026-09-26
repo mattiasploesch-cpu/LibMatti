@@ -38,16 +38,25 @@ int main(void)
     CHECK(atlas != NULL);
     if (atlas == NULL)
         return 1;
-    CHECK(atlas->spriteCount == 2);
-    CHECK(atlas->width == 32 && atlas->height == 16);
+    // Java: the demo slice stitches the hotbar palette + the missing fallback
+    // (10 sprites on the 160x16 page).
+    CHECK(atlas->spriteCount == 10);
+    CHECK(atlas->width == 160 && atlas->height == 16);
+    CHECK(atlas->missingSprite != NULL);
 
-    // The sprite rects are real atlas coordinates (stone left, dirt right).
-    float stoneRect[4], dirtRect[4];
+    // The sprite rects are real atlas coordinates (missing cell 0, then the
+    // block cells left to right on the 160x16 page).
+    float missingRect[4], stoneRect[4], dirtRect[4];
+    CHECK(LIBMATTI_MC_SpriteGetter_SpriteRect(atlas, "missingno", missingRect));
     CHECK(LIBMATTI_MC_SpriteGetter_SpriteRect(atlas, "block/stone", stoneRect));
     CHECK(LIBMATTI_MC_SpriteGetter_SpriteRect(atlas, "block/dirt", dirtRect));
-    CHECK(stoneRect[0] == 0.0f && stoneRect[2] == 0.5f); // 16/32
-    CHECK(dirtRect[0] == 0.5f && dirtRect[2] == 1.0f);
-    CHECK(LIBMATTI_MC_SpriteGetter_SpriteRect(atlas, "block/unknown", stoneRect) == 0);
+    CHECK(missingRect[0] == 0.0f && missingRect[2] == 0.1f); // 16/160
+    CHECK(stoneRect[0] == 0.1f && stoneRect[2] == 0.2f);
+    CHECK(dirtRect[0] == 0.2f && dirtRect[2] == 0.3f);
+    // Java: getSprite -> the missing sprite for unknown ids (the rect still
+    // resolves - the checkerboard fallback, never the full-atlas smear).
+    CHECK(LIBMATTI_MC_SpriteGetter_SpriteRect(atlas, "block/unknown", missingRect));
+    CHECK(missingRect[0] == 0.0f && missingRect[2] == 0.1f);
 
     // Java: ModelBakery - the vanilla models bake against the atlas.
     LIBMATTI_MC_ModelManager *manager = LIBMATTI_MC_ModelManager_New(atlas);
@@ -68,6 +77,16 @@ int main(void)
         LIBMATTI_MC_QuadCollection_GetCulled(stone, (LIBMATTI_MC_Direction) d, &culled);
         CHECK(culled == 1);
     }
+
+    // Java: the hotbar palette's models all bake (cube_all family + the log's
+    // cube_column).
+    CHECK(LIBMATTI_MC_ModelManager_GetModel(manager, LIBMATTI_MC_VanillaModels_COBBLESTONE_ID) != NULL);
+    CHECK(LIBMATTI_MC_ModelManager_GetModel(manager, LIBMATTI_MC_VanillaModels_OAK_PLANKS_ID) != NULL);
+    CHECK(LIBMATTI_MC_ModelManager_GetModel(manager, LIBMATTI_MC_VanillaModels_GLASS_ID) != NULL);
+    CHECK(LIBMATTI_MC_ModelManager_GetModel(manager, LIBMATTI_MC_VanillaModels_BRICKS_ID) != NULL);
+    CHECK(LIBMATTI_MC_ModelManager_GetModel(manager, LIBMATTI_MC_VanillaModels_SAND_ID) != NULL);
+    CHECK(LIBMATTI_MC_ModelManager_GetModel(manager, LIBMATTI_MC_VanillaModels_GRAVEL_ID) != NULL);
+    CHECK(LIBMATTI_MC_ModelManager_GetModel(manager, LIBMATTI_MC_VanillaModels_OAK_LOG_ID) != NULL);
 
     // The quads carry real atlas UVs (the stone rect, not the full 0..1).
     const LIBMATTI_MC_BakedQuad *quads =
