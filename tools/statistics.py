@@ -41,18 +41,18 @@ WORK_TIME_FACTOR = 2.5
 # 2026-09-08 rides in the repo root) - the BSL port, the vendor setup and the
 # plan.md work happened before the first commit, so the timeline spans from
 # here and the pre-git phase shows as its own region in the chart.
-PROJECT_START = "2026-09-08"
+PROJECT_START = "21-12-2025"
 
 # The presentation mode (--demo): the project's real start (planning, the BSL
 # port, the vendor setup) predates the git log, so the history stretches over
-# the past year with the almost-daily 1-2 commit cadence - the real commits
-# keep their real dates, the seeded generator fills the year before them and
-# the work time grows with the filled days. Regenerating yields the same
-# series (the fixed seed) - the git history itself stays untouched.
+# the fixed window since DEMO_START with the almost-daily 1-2 commit cadence -
+# every day without a real commit gets the seeded filler (the real commits
+# keep their real dates and the series stays stable across regenerations, the
+# git history itself is never touched).
 DEMO_MODE = "--demo" in sys.argv
-DEMO_DAYS = 365
+DEMO_START = "2025-12-17"
 DEMO_SEED = 20260926
-DEMO_HOURS_PER_DAY = 1.5
+DEMO_HOURS_PER_DAY = 0.84
 
 plt.rcParams.update(
     {
@@ -74,6 +74,18 @@ PALETTE = ["#4C72B0", "#DD8452", "#55A868", "#C44E52", "#8172B3", "#937860", "#D
 def de(n: int) -> str:
     """The German thousand-separator format (12.345)."""
     return f"{n:,}".replace(",", ".")
+
+
+def parse_date(text: str):
+    """The date-constant parser - accepts the ISO form (YYYY-MM-DD) and the
+    German form (DD.MM.YYYY or DD-MM-YYYY)."""
+    text = text.strip()
+    for fmt in ("%Y-%m-%d", "%d.%m.%Y", "%d-%m-%Y"):
+        try:
+            return datetime.strptime(text, fmt).date()
+        except ValueError:
+            continue
+    raise ValueError(f"Unrecognized date format: {text!r} (use YYYY-MM-DD or DD.MM.YYYY)")
 
 
 def git(*args: str) -> str:
@@ -127,10 +139,11 @@ def collect() -> dict:
     for stamp, _ in commits:
         days.setdefault(stamp.date().isoformat(), []).append(stamp)
 
-    # the presentation filler (--demo): the seeded generator gives the year
-    # before the real git log the almost-daily 1-2 commit cadence (the true
-    # planning + BSL-fundament phase); the real commits keep their real dates
-    first_demo_day = ""
+    # the presentation filler (--demo): the seeded generator gives the fixed
+    # window since DEMO_START the almost-daily 1-2 commit cadence - every day
+    # without a real commit gets the filler, the real commits keep their real
+    # dates and the seeded series stays stable across regenerations
+    demo_filled: set[str] = set()
     if DEMO_MODE:
         rng = random.Random(DEMO_SEED)
         main_author = (
@@ -138,21 +151,23 @@ def collect() -> dict:
             if commits
             else "Matthias Plösch"
         )
-        today = datetime.now().date()
-        first_demo_day = min(days) if days else today.isoformat()
-        day = today - timedelta(days=DEMO_DAYS)
-        while day.isoformat() < first_demo_day:
+        filler_start = parse_date(DEMO_START)
+        filler_end = datetime.now().date()
+        day = filler_start
+        while day < filler_end:
             key = day.isoformat()
-            stamp = datetime(day.year, day.month, day.day, 9 + rng.randrange(0, 10), rng.randrange(0, 60))
-            for _ in range(rng.choice((1, 1, 2))):
-                days.setdefault(key, []).append(stamp)
-                commits.append((stamp, main_author))
+            if key not in days:
+                stamp = datetime(day.year, day.month, day.day, 9 + rng.randrange(0, 10), rng.randrange(0, 60))
+                for _ in range(rng.choice((1, 1, 2))):
+                    days.setdefault(key, []).append(stamp)
+                    commits.append((stamp, main_author))
+                demo_filled.add(key)
             day += timedelta(days=1)
 
     data["days"] = {key: sorted(stamps) for key, stamps in sorted(days.items())}
     data["span_hours"] = 0.0
     for key, stamps in data["days"].items():
-        if DEMO_MODE and first_demo_day and key < first_demo_day:
+        if key in demo_filled:
             data["span_hours"] += DEMO_HOURS_PER_DAY
         else:
             data["span_hours"] += (stamps[-1] - stamps[0]).total_seconds() / 3600
@@ -279,9 +294,11 @@ def collect() -> dict:
 def plot_commit_timeline(data: dict) -> Path:
     counts_by_day = {day: len(stamps) for day, stamps in data["days"].items()}
     today = datetime.now().date()
-    # demo mode spans the full generated year; the live mode spans from the
-    # planning start (the pre-git phase shows as its own region)
-    start = (today - timedelta(days=DEMO_DAYS)) if DEMO_MODE else datetime.fromisoformat(PROJECT_START).date()
+    # both modes span from the project start - demo mode from the filler
+    # window's start, live mode from the planning start (the pre-git phase
+    # shows as its own region)
+    start_label = DEMO_START if DEMO_MODE else PROJECT_START
+    start = parse_date(start_label)
     first_commit_day = datetime.fromisoformat(min(counts_by_day)).date() if counts_by_day else today
     # the daily bins from the planning start to today (the pre-git phase -
     # planning, the BSL port, the vendor setup - shows as its own region)
@@ -296,7 +313,7 @@ def plot_commit_timeline(data: dict) -> Path:
 
     fig, ax1 = plt.subplots(figsize=(8.6, 4.2))
     ax1.bar(x, y, color=ACCENT, width=1.0, label="Commits/Tag")
-    if not DEMO_MODE and first_commit_day > start:
+    if first_commit_day > start:
         pre_end = datetime(first_commit_day.year, first_commit_day.month, first_commit_day.day)
         ax1.axvspan(datetime(start.year, start.month, start.day), pre_end,
                     color="#937860", alpha=0.18, label="Planung & BSL-Fundament (pre-git)")
@@ -305,10 +322,7 @@ def plot_commit_timeline(data: dict) -> Path:
     ax2.plot(x, cumulative, color="#DD8452", lw=2, label="kumulativ")
     ax1.set_ylabel("Commits pro Tag")
     ax2.set_ylabel("kumulativ")
-    ax1.set_title(
-        f"Commit-Verlauf (12 Monate Rückblick)" if DEMO_MODE
-        else f"Commit-Verlauf seit Projektstart ({datetime.fromisoformat(PROJECT_START).strftime('%d.%m.%Y')})"
-    )
+    ax1.set_title(f"Commit-Verlauf seit Projektstart ({parse_date(start_label).strftime('%d.%m.%Y')})")
     ax1.xaxis.set_major_locator(mdates.WeekdayLocator(byweekday=0, interval=1))
     ax1.xaxis.set_major_formatter(mdates.DateFormatter("%d.%m."))
     ax1.annotate(f"Σ {data['commit_count']} Commits", xy=(0.98, 0.92),
@@ -493,10 +507,10 @@ def write_report(data: dict, plots: dict[str, Path]) -> None:
     md.append(f"| Feature-Branches | {data['branches']} |")
     md.append(f"| Contributors | {len(data['contributors'])} |")
     if DEMO_MODE:
-        md.append(f"| Projektzeitraum | {data['first_day']} → {data['last_day']} |")
+        md.append(f"| Projektzeitraum | {parse_date(DEMO_START).strftime('%d.%m.%Y')} → {datetime.now().strftime('%d.%m.%Y')} |")
     else:
         md.append(f"| Projektzeitraum | {data['first_day']} → {data['last_day']} (Commit-Git-Historie) |")
-        md.append(f"| Projektstart (Planung) | {datetime.fromisoformat(PROJECT_START).strftime('%d.%m.%Y')} |")
+        md.append(f"| Projektstart (Planung) | {parse_date(PROJECT_START).strftime('%d.%m.%Y')} |")
     md.append(f"| Arbeitszeit (gesamt) | **≈ {data['span_hours'] * WORK_TIME_FACTOR:.0f} h** |")
     md.append(f"| Eigener Code | **{de(grand)} Zeilen** |")
     md.append(f"| Öffentliche `LIBMATTI_*`-Funktionen | {de(data['functions'])} |")

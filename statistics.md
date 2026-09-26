@@ -1,6 +1,6 @@
 # Matticraft / LibMatti — Projekt-Statistiken
 
-> Live generiert am 26.09.2026, 13:44 · Stand: Branch `feat/p5.5-gamerenderer-hud` · Commit `ea4bd349`
+> Live generiert am 26.09.2026, 14:05 · Stand: Branch `feat/p5.5-gamerenderer-hud` · Commit `1647d761`
 
 > Diese Datei wird von `tools/statistics.py` erzeugt (Live-Daten aus Git, Quellbaum und Build-Output) — **nicht von Hand editieren**.
 
@@ -8,12 +8,13 @@
 
 | Metrik | Wert |
 |---|---:|
-| Commits | **39** |
+| Commits | **42** |
 | Feature-Branches | 12 |
 | Contributors | 3 |
-| Projektzeitraum | 2026-09-21 → 2026-09-25 |
-| Arbeitszeit (gesamt) | **≈ 135 h** |
-| Eigener Code | **179.162 Zeilen** |
+| Projektzeitraum | 2026-09-21 → 2026-09-26 (Commit-Git-Historie) |
+| Projektstart (Planung) | 21.12.2025 |
+| Arbeitszeit (gesamt) | **≈ 136 h** |
+| Eigener Code | **179.241 Zeilen** |
 | Öffentliche `LIBMATTI_*`-Funktionen | 5.131 |
 | `typedef struct`-Definitionen | 780 |
 | Tests | 27 Programme · 337 Assertions |
@@ -27,9 +28,9 @@
 
 | Contributor | Commits | Anteil |
 |---|---:|---:|
-| Matthias Plösch | 23 | 59 % |
-| mattiasploesch-cpu | 15 | 38 % |
-| dependabot[bot] | 1 | 3 % |
+| Matthias Plösch | 26 | 62 % |
+| mattiasploesch-cpu | 15 | 36 % |
+| dependabot[bot] | 1 | 2 % |
 
 ## Code-Umfang
 
@@ -42,16 +43,16 @@
 | Library `.c` | 634 | 137.822 |
 | Library `.h` | 667 | 32.679 |
 | Tests | 31 | 4.356 |
-| Tools | 9 | 1.829 |
+| Tools | 9 | 1.908 |
 | Client | 5 | 413 |
 | Mods | 6 | 2.063 |
-| **Gesamt** | **1.352** | **179.162** |
+| **Gesamt** | **1.352** | **179.241** |
 
 ## Arbeitszeit
 
 ![Arbeitszeit](docs/stats/work_time.png)
 
-Die Git-Sitzungen messen 54 h — das ist nur die Zeit, die in Commits endete. Planung, Java-Referenz-Studium (MCP-Reborn) und Debugging kommen dazu: **≈ 135 h Gesamtaufwand** (Faktor 2.5 auf den gemessenen Umfang).
+**≈ 136 h** Gesamt-Arbeitszeit am Projekt (gemessen × Faktor 2.5).
 
 
 ## Embedded Resource-Pack
