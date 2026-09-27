@@ -30,7 +30,9 @@
 #include "libmatti/net/minecraft/client/renderer/chunk/SectionShader.h"
 #include "libmatti/net/minecraft/client/resources/model/ModelManager.h"
 #include "libmatti/net/minecraft/client/sounds/SoundEngine.h"
+#include "libmatti/net/minecraft/client/gui/screens/Screen.h"
 #include "libmatti/net/minecraft/client/gui/screens/inventory/InventoryScreen.h"
+#include "libmatti/net/minecraft/client/renderer/entity/ItemRenderer.h"
 #include "libmatti/net/minecraft/world/level/block/state/BlockState.h"
 #include "libmatti/net/minecraft/server/bootstrap/VanillaAssetLoader.h"
 #include "libmatti/net/minecraft/client/renderer/block/BlockRenderDispatcher.h"
@@ -179,10 +181,10 @@ struct LIBMATTI_MC_Minecraft
     // Java: this.soundManager = new SoundManager(this.options) - the P5.6
     // sound engine over the LIBMATTI_OAL wrapper (the reload boots lazily).
     LIBMATTI_MC_SoundEngine *soundEngine;
-    // Java: Inventory.selectedSlot + the 9 hotbar ItemStacks (the port builds
-    // them once from the vanilla block items - the creative palette).
+    // Java: Inventory.selectedSlot - the hotbar row itself rides the player
+    // inventory container (the slots 0..8 the Inventory.items layout puts
+    // first; one owner, the menu slots mirror the same stacks).
     int hotbarSelected;
-    LIBMATTI_MC_ItemStack *hotbarItems[HOTBAR_SIZE];
     // Java: Gui.tick - the toolHighlightTimer (10s fade after a hotbar switch)
     // + lastToolHighlight (the name it renders).
     int toolHighlightTimer;
@@ -639,15 +641,17 @@ LIBMATTI_MC_Minecraft *LIBMATTI_MC_Minecraft_New(const LIBMATTI_MC_GameConfig *c
         fprintf(stderr, "[GUI] renderer unavailable - HUD stays off\n");
 
     // Java: the creative inventory's hotbar defaults - the port builds the 9
-    // stacks once from the vanilla block items (the palette the right click
-    // places from).
+    // stacks once into the player inventory's hotbar row (the container slots
+    // 0..8 the Inventory.items layout puts first - the palette the right click
+    // places from and the inventory menu mirrors).
     static const char *const hotbarBlocks[HOTBAR_SIZE] = {
         "STONE", "DIRT", "COBBLESTONE", "OAK_PLANKS", "GLASS",
         "BRICKS", "SAND", "GRAVEL", "OAK_LOG"};
     for (int slot = 0; slot < HOTBAR_SIZE; slot++)
     {
         LIBMATTI_MC_Item *item = LIBMATTI_MC_VanillaItems_GetByName(hotbarBlocks[slot]);
-        minecraft->hotbarItems[slot] = item != NULL ? LIBMATTI_MC_ItemStack_NewWithCount(item, 64) : NULL;
+        LIBMATTI_MC_Container_SetItem(minecraft->playerInventory, slot,
+                                      item != NULL ? LIBMATTI_MC_ItemStack_NewWithCount(item, 64) : NULL);
     }
     minecraft->hotbarSelected = 0;
     minecraft->toolHighlightTimer = 0;
@@ -711,14 +715,25 @@ static void tick(LIBMATTI_MC_Minecraft *minecraft)
     // press edge. ESC closes through the Screen's keyPressed contract.
     {
         static int inventoryWasDown = 0;
+        static int escapeWasDown = 0;
         int inventoryDown = LIBMATTI_GLFW_glfwGetKey(minecraft->window, LIBMATTI_GLFW_KEY_E) == LIBMATTI_GLFW_PRESS;
         int escapeDown = LIBMATTI_GLFW_glfwGetKey(minecraft->window, LIBMATTI_GLFW_KEY_ESCAPE) == LIBMATTI_GLFW_PRESS;
         if (minecraft->inventoryScreen != NULL)
         {
-            // Java: the screen's keyPressed first (the ESC/onClose contract)
-            if (escapeDown)
-                LIBMATTI_MC_Screen_KeyPress(&minecraft->inventoryScreen->base.base, 256, 0, 0);
+            // Java: screen.keyPressed(ESC) -> shouldCloseOnEsc() -> onClose() ->
+            // setScreen(null). The port's Screen_OnClose is a stub (the client
+            // owns the pointer), so the client translates the ESC branch
+            // itself: the shouldCloseOnEsc gate + the removed()/free tail the
+            // E-toggle shares. The edge guard keeps a held ESC single-fire.
+            if (escapeDown && !escapeWasDown
+                && LIBMATTI_MC_Screen_ShouldCloseOnEsc(&minecraft->inventoryScreen->base.base))
+            {
+                LIBMATTI_MC_Screen_Removed(&minecraft->inventoryScreen->base.base);
+                LIBMATTI_MC_InventoryScreen_Free(minecraft->inventoryScreen);
+                minecraft->inventoryScreen = NULL;
+            }
         }
+        escapeWasDown = escapeDown;
         if (inventoryDown && !inventoryWasDown)
         {
             if (minecraft->inventoryScreen != NULL)
@@ -885,65 +900,19 @@ static void render_hud(LIBMATTI_MC_Minecraft *minecraft, int width, int height)
 
     // Java: the hotbar (182x22 at w/2-91, h-22) - the dark bar with the 9
     // slot cells (the widget texture's insets the flat fallback shades in).
-    LIBMATTI_MC_GuiLayout_HotbarRect(guiWidth, guiHeight, &x, &y, &w, &h);
-    LIBMATTI_MC_GuiRenderer_BlitQuad(minecraft->guiRenderer, (float) x * scale, (float) y * scale,
-                                     (float) w * scale, (float) h * scale,
-                                     0.0f, 0.0f, 1.0f, 1.0f, 0xA0202020u);
-    // Java: the widget's slot insets - the cell shading separates the 9 slots
-    // (the sprite carries the borders; the port shades one cell quad each).
+    // Java: Gui.renderHotbar - the row rides the ItemRenderer port now (the
+    // widget blit + cell shading + item sprites + selection frame one module).
+    LIBMATTI_MC_TextureAtlas *atlas = minecraft->modelManager != NULL
+        ? LIBMATTI_MC_ModelManager_GetAtlas(minecraft->modelManager)
+        : NULL;
+    // Java: Inventory.items - the hotbar row IS the container's first 9 slots
+    // (the borrowed row the ItemRenderer draws).
+    LIBMATTI_MC_ItemStack *hotbarRow[HOTBAR_SIZE];
     for (int slot = 0; slot < HOTBAR_SIZE; slot++)
-    {
-        LIBMATTI_MC_GuiLayout_HotbarSlotRect(guiWidth, guiHeight, slot, &x, &y, &w, &h);
-        LIBMATTI_MC_GuiRenderer_BlitQuad(minecraft->guiRenderer, (float) (x - 1) * scale, (float) (y - 1) * scale,
-                                         (float) (w + 2) * scale, (float) (h + 2) * scale,
-                                         0.0f, 0.0f, 1.0f, 1.0f, 0x50000000u);
-    }
-    LIBMATTI_MC_GuiRenderer_Flush(minecraft->guiRenderer, (float) guiWidth * scale, (float) guiHeight * scale);
-
-    // Java: renderSlot - the 16x16 item quad per cell with the item's model
-    // sprite (the atlas texture the terrain renders through).
-    if (atlasTexture != 0)
-        LIBMATTI_MC_GuiRenderer_SetTexture(minecraft->guiRenderer, atlasTexture);
-    for (int slot = 0; slot < HOTBAR_SIZE; slot++)
-    {
-        const LIBMATTI_MC_ItemStack *stack = minecraft->hotbarItems[slot];
-        if (stack == NULL)
-            continue;
-        LIBMATTI_MC_Item *item = LIBMATTI_MC_ItemStack_GetItem(stack);
-        if (item == NULL || item->block == NULL)
-            continue;
-
-        float uv[4] = {0.0f, 0.0f, 1.0f, 1.0f};
-        LIBMATTI_MC_TextureAtlas *atlas = LIBMATTI_MC_ModelManager_GetAtlas(minecraft->modelManager);
-        LIBMATTI_MC_ResourceKey *key = LIBMATTI_MC_Block_GetKey((const LIBMATTI_MC_Block *) item->block);
-        if (atlas == NULL || key == NULL)
-            continue;
-        char textureId[128];
-        snprintf(textureId, sizeof(textureId), "block/%s", LIBMATTI_MC_Identifier_GetPath(key->identifier));
-        if (!LIBMATTI_MC_SpriteGetter_SpriteRect(atlas, textureId, uv))
-        {
-            // Java: the missingSprite fallback (the checkerboard).
-            if (!LIBMATTI_MC_SpriteGetter_SpriteRect(atlas, "missingno", uv))
-                continue;
-        }
-
-        LIBMATTI_MC_GuiLayout_HotbarSlotRect(guiWidth, guiHeight, slot, &x, &y, &w, &h);
-        // Java: the item sprite fills the cell (the 16x16 sprite at the
-        // scaled slot rect).
-        LIBMATTI_MC_GuiRenderer_BlitQuad(minecraft->guiRenderer, (float) x * scale, (float) y * scale,
-                                         (float) w * scale, (float) h * scale,
-                                         uv[0], uv[1], uv[2], uv[3], 0xFFFFFFFFu);
-    }
-    LIBMATTI_MC_GuiRenderer_Flush(minecraft->guiRenderer, (float) guiWidth * scale, (float) guiHeight * scale);
-    LIBMATTI_MC_GuiRenderer_SetTexture(minecraft->guiRenderer, 0);
-
-    // Java: the 24x23 selection frame over the selected slot (AFTER the items
-    // - the white frame overlaps the cell and the item like the vanilla path).
-    LIBMATTI_MC_GuiLayout_HotbarSelectionRect(guiWidth, guiHeight, minecraft->hotbarSelected, &x, &y, &w, &h);
-    LIBMATTI_MC_GuiRenderer_BlitQuad(minecraft->guiRenderer, (float) x * scale, (float) y * scale,
-                                     (float) w * scale, (float) h * scale,
-                                     0.0f, 0.0f, 1.0f, 1.0f, 0xE0FFFFFFu);
-    LIBMATTI_MC_GuiRenderer_Flush(minecraft->guiRenderer, (float) guiWidth * scale, (float) guiHeight * scale);
+        hotbarRow[slot] = LIBMATTI_MC_Container_GetItem(minecraft->playerInventory, slot);
+    LIBMATTI_MC_ItemRenderer_RenderHotbar(minecraft->guiRenderer, minecraft->font, atlas,
+                                          hotbarRow, HOTBAR_SIZE, minecraft->hotbarSelected,
+                                          (float) guiWidth, (float) guiHeight, scale);
 
     // Java: renderSelectedItemName - the name line (hover name of the selected
     // stack) centred over the hotbar, fading with the toolHighlightTimer.
@@ -999,10 +968,15 @@ static void render_hud(LIBMATTI_MC_Minecraft *minecraft, int width, int height)
         int px = container->leftPos, py = container->topPos;
 
         // Java: renderBackground - the blurred darkened background (the
-        // gradient the vanilla screen dim rides).
+        // gradient the vanilla screen dim rides). The dim flushes IMMEDIATELY:
+        // the GetTexture below may generate+bind the panel texture, and a
+        // batch spanning both would sample the 256x256 page over the whole
+        // screen (the black filler regions spread across the frame - the
+        // "black rectangle" bug).
         LIBMATTI_MC_GuiRenderer_BlitQuad(minecraft->guiRenderer, 0.0f, 0.0f,
                                          (float) guiWidth * scale, (float) guiHeight * scale,
                                          0.0f, 0.0f, 1.0f, 1.0f, 0x80001018u);
+        LIBMATTI_MC_GuiRenderer_Flush(minecraft->guiRenderer, (float) guiWidth * scale, (float) guiHeight * scale);
 
         // Java: InventoryScreen.render -> super.render - the container panel
         // texture (the embedded pack's gui/container/inventory.png over the
@@ -1042,33 +1016,20 @@ static void render_hud(LIBMATTI_MC_Minecraft *minecraft, int width, int height)
         }
 
         // Java: renderSlot - the item quad per filled slot over the panel (the
-        // atlas the hotbar samples; the sprite resolution rides the block key
-        // path). The slot coords are panel-relative like the texture.
+        // ItemRenderer port renders the sprite + the count text; the slot
+        // coords are panel-relative like the texture).
         LIBMATTI_MC_AbstractContainerMenu *menu = container->menu;
-        if (atlasTexture != 0)
-            LIBMATTI_MC_GuiRenderer_SetTexture(minecraft->guiRenderer, atlasTexture);
+        if (atlas != NULL)
+            LIBMATTI_MC_GuiRenderer_SetTexture(minecraft->guiRenderer, atlas->base.texture);
         for (int i = 0; i < menu->slotCount; i++)
         {
             LIBMATTI_MC_Slot *slot = menu->slots[i];
             const LIBMATTI_MC_ItemStack *stack = LIBMATTI_MC_Slot_GetItem(slot);
             if (LIBMATTI_MC_ItemStack_IsEmpty(stack))
                 continue;
-            LIBMATTI_MC_Item *item = LIBMATTI_MC_ItemStack_GetItem(stack);
-            if (item == NULL || item->block == NULL || minecraft->modelManager == NULL)
-                continue;
-            LIBMATTI_MC_TextureAtlas *atlas = LIBMATTI_MC_ModelManager_GetAtlas(minecraft->modelManager);
-            LIBMATTI_MC_ResourceKey *key = LIBMATTI_MC_Block_GetKey((const LIBMATTI_MC_Block *) item->block);
-            if (atlas == NULL || key == NULL)
-                continue;
-            float uv[4] = {0.0f, 0.0f, 1.0f, 1.0f};
-            char textureId[128];
-            snprintf(textureId, sizeof(textureId), "block/%s", LIBMATTI_MC_Identifier_GetPath(key->identifier));
-            if (!LIBMATTI_MC_SpriteGetter_SpriteRect(atlas, textureId, uv))
-                LIBMATTI_MC_SpriteGetter_SpriteRect(atlas, "missingno", uv);
             int cellX = px + slot->x, cellY = py + slot->y;
-            LIBMATTI_MC_GuiRenderer_BlitQuad(minecraft->guiRenderer, (float) cellX * scale, (float) cellY * scale,
-                                             16.0f * scale, 16.0f * scale,
-                                             uv[0], uv[1], uv[2], uv[3], 0xFFFFFFFFu);
+            LIBMATTI_MC_ItemRenderer_RenderGuiItem(minecraft->guiRenderer, minecraft->font, atlas, stack,
+                                                   (float) cellX * scale, (float) cellY * scale, scale);
         }
         LIBMATTI_MC_GuiRenderer_Flush(minecraft->guiRenderer, (float) guiWidth * scale, (float) guiHeight * scale);
 
@@ -1510,7 +1471,8 @@ static void handle_block_interaction(LIBMATTI_MC_Minecraft *minecraft)
                 minecraft->useDown = using;
                 return; // Java: the canPlace rejection - no placement, no face skip
             }
-            LIBMATTI_MC_ItemStack *stack = minecraft->hotbarItems[minecraft->hotbarSelected];
+            LIBMATTI_MC_ItemStack *stack =
+                LIBMATTI_MC_Container_GetItem(minecraft->playerInventory, minecraft->hotbarSelected);
             LIBMATTI_MC_Item *item = stack != NULL ? LIBMATTI_MC_ItemStack_GetItem(stack) : NULL;
             // Java: BlockItem.block - the port exposes the field directly (no
             // getter the Item.h surface carries).
@@ -1578,7 +1540,7 @@ static void handle_hotbar_keys(LIBMATTI_MC_Minecraft *minecraft)
                 // Java: Gui.tick - the 10s (200 tick) highlight fade restarts
                 // on every selection change.
                 minecraft->toolHighlightTimer = 200;
-                minecraft->toolHighlight = minecraft->hotbarItems[slot];
+                minecraft->toolHighlight = LIBMATTI_MC_Container_GetItem(minecraft->playerInventory, slot);
             }
         }
     }
@@ -1601,7 +1563,7 @@ static void handle_hotbar_keys(LIBMATTI_MC_Minecraft *minecraft)
             {
                 minecraft->hotbarSelected = slot;
                 minecraft->toolHighlightTimer = 200;
-                minecraft->toolHighlight = minecraft->hotbarItems[slot];
+                minecraft->toolHighlight = LIBMATTI_MC_Container_GetItem(minecraft->playerInventory, slot);
             }
         }
     }
@@ -2199,14 +2161,8 @@ void LIBMATTI_MC_Minecraft_Destroy(LIBMATTI_MC_Minecraft *minecraft)
         LIBMATTI_MC_GuiRenderer_Free(minecraft->guiRenderer);
         minecraft->guiRenderer = NULL;
     }
-    for (int slot = 0; slot < HOTBAR_SIZE; slot++)
-    {
-        if (minecraft->hotbarItems[slot] != NULL)
-        {
-            LIBMATTI_MC_ItemStack_Free(minecraft->hotbarItems[slot]);
-            minecraft->hotbarItems[slot] = NULL;
-        }
-    }
+    // (the hotbar stacks ride the playerInventory container - its Free above
+    // releases them; the port keeps one owner)
 
     // Java: public void destroy() { LOGGER.info("Stopping!"); ... }
     LOG("Stopping!");
