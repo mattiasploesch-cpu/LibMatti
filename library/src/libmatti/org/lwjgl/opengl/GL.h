@@ -130,6 +130,12 @@ void LIBMATTI_GL_glTexSubImage2D(unsigned int target, int level, int xoffset, in
 void LIBMATTI_GL_glTexParameteri(unsigned int target, unsigned int pname, int param);
 void LIBMATTI_GL_glTexParameterf(unsigned int target, unsigned int pname, float param);
 int LIBMATTI_GL_glGetTexLevelParameteri(unsigned int target, int level, unsigned int pname);
+
+// Java: GL11.glGetTexImage - the debug/texel-verification readback path.
+void LIBMATTI_GL_glGetTexImage(unsigned int target, int level, unsigned int format, unsigned int type, void *pixels);
+
+// Java: GL11.glGetIntegerv - the pipeline-state queries (unpack store etc.).
+int LIBMATTI_GL_glGetIntegerv(unsigned int pname, int *params);
 // Java: GL31
 void LIBMATTI_GL_glCopyBufferSubData(unsigned int readTarget, unsigned int writeTarget, long readOffset, long writeOffset, long size);
 void LIBMATTI_GL_glTexBuffer(unsigned int target, unsigned int internalformat, unsigned int buffer);

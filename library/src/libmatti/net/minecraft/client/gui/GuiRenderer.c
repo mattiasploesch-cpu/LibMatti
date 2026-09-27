@@ -285,6 +285,17 @@ void LIBMATTI_MC_GuiRenderer_Flush(LIBMATTI_MC_GuiRenderer *renderer, float scre
     if (renderer == NULL || renderer->vertexCount == 0)
         return;
 
+    // MATTI_GUI_DEBUG: the draw audit - first quad per flush with texture
+    // name + uv (the draw-path instrument the panel-content hunt rides).
+    if (getenv("MATTI_GUI_DEBUG") != NULL)
+    {
+        const LIBMATTI_MC_GuiVertex *v = renderer->vertices;
+        fprintf(stderr, "[GUIDEBUG] flush tex=%u quads=%zu first-quad pos=(%.1f,%.1f) size=(%.1f,%.1f) uv=(%.4f,%.4f)..(%.4f,%.4f) screen=(%.0f,%.0f)\n",
+                renderer->boundTexture, renderer->vertexCount / 6,
+                v[0].x, v[0].y, v[4].x - v[0].x, v[4].y - v[0].y,
+                v[0].u, v[0].v, v[4].u, v[4].v, screenSizeX, screenSizeY);
+    }
+
     LIBMATTI_GL_glUseProgram(renderer->program);
     if (renderer->screenSizeLocation >= 0)
         LIBMATTI_GL_glUniform2f(renderer->screenSizeLocation, screenSizeX, screenSizeY);
