@@ -30,6 +30,7 @@ static unsigned long (*glfw_get_primary_monitor)(void) = NULL;
 static const struct GLFWvidmode *(*glfw_get_video_mode)(unsigned long) = NULL;
 static void (*glfw_get_monitor_pos)(unsigned long, int *, int *) = NULL;
 static void (*glfw_get_window_size)(unsigned long, int *, int *) = NULL;
+static void (*glfw_set_window_size)(unsigned long, int, int) = NULL;
 static unsigned long (*glfw_set_window_size_callback)(unsigned long, void *) = NULL;
 static void (*glfw_maximize_window)(unsigned long) = NULL;
 static void (*glfw_set_window_pos)(unsigned long, int, int) = NULL;
@@ -223,6 +224,14 @@ void LIBMATTI_GLFW_glfwSetWindowPos(long window, int xpos, int ypos)
     if (glfw_lib == NULL) return;
     GLFW_DLSYM(set_window_pos, "glfwSetWindowPos");
     if (glfw_set_window_pos != NULL) glfw_set_window_pos((unsigned long) window, xpos, ypos);
+}
+
+void LIBMATTI_GLFW_glfwSetWindowSize(long window, int width, int height)
+{
+    ensure_library();
+    if (glfw_lib == NULL) return;
+    GLFW_DLSYM(set_window_size, "glfwSetWindowSize");
+    if (glfw_set_window_size != NULL) glfw_set_window_size((unsigned long) window, width, height);
 }
 
 void LIBMATTI_GLFW_glfwShowWindow(long window)

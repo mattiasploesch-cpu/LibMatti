@@ -95,6 +95,10 @@ void LIBMATTI_GLFW_glfwSetWindowSizeCallback(long window, LIBMATTI_GLFW_WindowSi
 void LIBMATTI_GLFW_glfwMaximizeWindow(long window);
 // Java: public static void glfwSetWindowPos(long window, int xpos, int ypos)
 void LIBMATTI_GLFW_glfwSetWindowPos(long window, int xpos, int ypos);
+// Java: public static void glfwSetWindowSize(long window, int width, int height)
+// - the resize the deterministic smoke hook drives (the framebuffer-size
+// change the re-layout rides).
+void LIBMATTI_GLFW_glfwSetWindowSize(long window, int width, int height);
 // Java: public static void glfwGetWindowPos(long window, int[] xpos, int[] ypos)
 void LIBMATTI_GLFW_glfwGetWindowPos(long window, int *xpos, int *ypos);
 // Java: public static void glfwSetWindowTitle(long window, String title)

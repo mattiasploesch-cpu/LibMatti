@@ -272,6 +272,18 @@ static void sprite_rect_for_block(void *userdata, const LIBMATTI_MC_Block *block
 // Java: public static Minecraft getInstance()
 static LIBMATTI_MC_Minecraft *instance = NULL;
 
+// Java: Window.calculateScale - the auto guiScale (the 0 = auto default
+// scales while width / (320 * (scale + 1)) fits and height / (240 * (scale +
+// 1)) fits). The skeleton pins no options guiScale yet, so the calc runs
+// every caller (the layout/mouse/text coords all ride the same factor).
+static int gui_scale(int width, int height)
+{
+    int scale = 1;
+    while (scale < 8 && width / (320 * (scale + 1)) != 0 && height / (240 * (scale + 1)) != 0)
+        scale++;
+    return scale;
+}
+
 LIBMATTI_MC_Minecraft *LIBMATTI_MC_Minecraft_GetInstance(void)
 {
     return instance;
@@ -300,7 +312,8 @@ static void open_inventory_screen(LIBMATTI_MC_Minecraft *minecraft)
     {
         int sw = 0, sh = 0;
         LIBMATTI_GLFW_glfwGetFramebufferSize(minecraft->window, &sw, &sh);
-        LIBMATTI_MC_AbstractContainerScreen_Layout(&minecraft->inventoryScreen->base, sw / 2, sh / 2);
+        int gui = gui_scale(sw, sh);
+        LIBMATTI_MC_AbstractContainerScreen_Layout(&minecraft->inventoryScreen->base, sw / gui, sh / gui);
     }
 }
 
@@ -771,9 +784,42 @@ static void tick(LIBMATTI_MC_Minecraft *minecraft)
     if (minecraft->inventoryScreen == NULL && getenv("MATTI_OPEN_INVENTORY") != NULL)
         open_inventory_screen(minecraft);
 
+    // The MATTI_RESIZE_AT smoke hook: the deterministic resize for the
+    // headless verification (MATTI_RESIZE_AT=<tick>_<w>x<h> - the window
+    // size rides the live framebuffer the loop reads every frame). The tick
+    // counter is the hook's own (the frames field resets with the FPS timer).
+    {
+        const char *resizeAt = getenv("MATTI_RESIZE_AT");
+        if (resizeAt != NULL)
+        {
+            static int resizeDone = 0;
+            static int resizeTick = 0;
+            int atTick = 0, rw = 0, rh = 0;
+            resizeTick++;
+            if (sscanf(resizeAt, "%d_%dx%d", &atTick, &rw, &rh) == 3 && !resizeDone
+                && resizeTick >= atTick)
+            {
+                resizeDone = 1;
+                fprintf(stderr, "[RESIZE] tick %d -> %dx%d\n", atTick, rw, rh);
+                LIBMATTI_GLFW_glfwSetWindowSize(minecraft->window, rw, rh);
+            }
+        }
+    }
+
     // Java: the open screen ticks (Minecraft.runTick -> screen.tick())
     if (minecraft->inventoryScreen != NULL)
+    {
+        // Java: Window event -> screen.resize(w, h) - the open screen rides
+        // the LIVE window size (the panel recenters when the window/fullscreen
+        // changes; the stale layout sat in the top-right corner after a
+        // resize). The layout is idempotent, so the tick re-runs it every
+        // frame like the render pass re-reads the framebuffer size.
+        int sw = 0, sh = 0;
+        LIBMATTI_GLFW_glfwGetFramebufferSize(minecraft->window, &sw, &sh);
+        int gui = gui_scale(sw, sh);
+        LIBMATTI_MC_AbstractContainerScreen_Layout(&minecraft->inventoryScreen->base, sw / gui, sh / gui);
         LIBMATTI_MC_Screen_Tick(&minecraft->inventoryScreen->base.base);
+    }
 
     // Java: Gui.tick - the 10s name fade decays per tick (the timer only runs
     // while the HUD shows it).
@@ -867,9 +913,11 @@ static void render_hud(LIBMATTI_MC_Minecraft *minecraft, int width, int height)
         return;
 
     // Java: Window.getGuiScale - the layout space the Gui math runs over and
-    // the scale the blits multiply with (the port pins guiScale 2).
-    const int guiWidth = width / 2, guiHeight = height / 2;
-    const float scale = 2.0f;
+    // the scale the blits multiply with (the auto scale the calculateScale
+    // loop derives from the window size).
+    int gui = gui_scale(width, height);
+    const int guiWidth = width / gui, guiHeight = height / gui;
+    const float scale = (float) gui;
     if (guiWidth < 1 || guiHeight < 1)
         return;
 
@@ -943,7 +991,11 @@ static void render_hud(LIBMATTI_MC_Minecraft *minecraft, int width, int height)
                 LIBMATTI_FML_SimpleFont_DisplayText shadow[1] = {{buffer, 0x40000000u | ((unsigned) alpha)}};
                 LIBMATTI_FML_SimpleFont_DisplayText text[1] = {{buffer, 0x00FFFFFFu | ((unsigned) alpha << 24)}};
                 LIBMATTI_GL_glUseProgram(minecraft->fontProgram);
-                LIBMATTI_GL_glUniform2f(minecraft->fontScreenSizeLocation, 854.0f, 480.0f);
+                // Java: the name line rides the live gui size (the hardcoded
+                // 854x480 garbled the glyphs at other window sizes - the same
+                // class the label path fixed).
+                LIBMATTI_GL_glUniform2f(minecraft->fontScreenSizeLocation, (float) guiWidth * scale,
+                                        (float) guiHeight * scale);
                 LIBMATTI_B3D_GlStateManager_ActiveTexture(LIBMATTI_GL_GL_TEXTURE0);
                 LIBMATTI_B3D_GlStateManager_BindTexture((int) LIBMATTI_FML_SimpleFont_TextureId(minecraft->font));
                 LIBMATTI_GL_glUniform1i(LIBMATTI_GL_glGetUniformLocation(minecraft->fontProgram, "tex"), 0);
@@ -1408,13 +1460,17 @@ static void handle_block_interaction(LIBMATTI_MC_Minecraft *minecraft)
         {
             double cx = 0.0, cy = 0.0;
             LIBMATTI_GLFW_glfwGetCursorPos(minecraft->window, &cx, &cy);
-            // the gui-scale halves the window coords into the layout space
+            // Java: screen.mouseX = mousePos.x() / guiScale - the layout coords
+            // the click routing rides (the same factor the HUD layout uses).
+            int sw = 0, sh = 0;
+            LIBMATTI_GLFW_glfwGetFramebufferSize(minecraft->window, &sw, &sh);
+            int gui = gui_scale(sw, sh);
             LIBMATTI_MC_AbstractContainerScreen *container = &minecraft->inventoryScreen->base;
             int button = LIBMATTI_GLFW_glfwGetMouseButton(minecraft->window, LIBMATTI_GLFW_MOUSE_BUTTON_2) == LIBMATTI_GLFW_PRESS
                              ? 1
                              : 0;
             LIBMATTI_MC_Player *player = &minecraft->localPlayer->player;
-            LIBMATTI_MC_AbstractContainerScreen_MouseClickedScreen(container, cx / 2.0, cy / 2.0, button, player);
+            LIBMATTI_MC_AbstractContainerScreen_MouseClickedScreen(container, cx / (double) gui, cy / (double) gui, button, player);
         }
         screenMouseWasDown = down;
         minecraft->attackDown = 0;
