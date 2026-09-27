@@ -466,6 +466,9 @@ LIBMATTI_MC_Minecraft *LIBMATTI_MC_Minecraft_New(const LIBMATTI_MC_GameConfig *c
         minecraft->fontProgram = LIBMATTI_FML_FontShader_Compile(&minecraft->fontScreenSizeLocation);
         if (minecraft->fontProgram == 0)
             LOG("Font shader compile failed; title rendering disabled");
+        else
+            LIBMATTI_MC_ItemRenderer_AttachFont(minecraft->fontProgram, minecraft->fontScreenSizeLocation,
+                                                LIBMATTI_GL_glGetUniformLocation(minecraft->fontProgram, "tex"));
         // Java: LoadingScreenRenderer ctor - the fixed 854x480 layout buffer
         minecraft->framebuffer = LIBMATTI_FML_EarlyFramebuffer_New(854, 480);
     }
@@ -639,6 +642,10 @@ LIBMATTI_MC_Minecraft *LIBMATTI_MC_Minecraft_New(const LIBMATTI_MC_GameConfig *c
     minecraft->guiRenderer = LIBMATTI_MC_GuiRenderer_New();
     if (minecraft->guiRenderer == NULL)
         fprintf(stderr, "[GUI] renderer unavailable - HUD stays off\n");
+
+    // Java: this.itemRenderer = new ItemRenderer(this) - the GUI item icons
+    // (the isometric icon page bakes lazily on the first draw).
+    LIBMATTI_MC_ItemRenderer_Init(minecraft);
 
     // Java: the creative inventory's hotbar defaults - the port builds the 9
     // stacks once into the player inventory's hotbar row (the container slots
@@ -1016,22 +1023,36 @@ static void render_hud(LIBMATTI_MC_Minecraft *minecraft, int width, int height)
         }
 
         // Java: renderSlot - the item quad per filled slot over the panel (the
-        // ItemRenderer port renders the sprite + the count text; the slot
-        // coords are panel-relative like the texture).
+        // ItemRenderer port renders the icon; the slot coords are
+        // panel-relative like the texture) + the counts over the flushed
+        // icons (the renderItemDecorations order).
         LIBMATTI_MC_AbstractContainerMenu *menu = container->menu;
         if (atlas != NULL)
-            LIBMATTI_MC_GuiRenderer_SetTexture(minecraft->guiRenderer, atlas->base.texture);
-        for (int i = 0; i < menu->slotCount; i++)
         {
-            LIBMATTI_MC_Slot *slot = menu->slots[i];
-            const LIBMATTI_MC_ItemStack *stack = LIBMATTI_MC_Slot_GetItem(slot);
-            if (LIBMATTI_MC_ItemStack_IsEmpty(stack))
-                continue;
-            int cellX = px + slot->x, cellY = py + slot->y;
-            LIBMATTI_MC_ItemRenderer_RenderGuiItem(minecraft->guiRenderer, minecraft->font, atlas, stack,
-                                                   (float) cellX * scale, (float) cellY * scale, scale);
+            for (int i = 0; i < menu->slotCount; i++)
+            {
+                LIBMATTI_MC_Slot *slot = menu->slots[i];
+                const LIBMATTI_MC_ItemStack *stack = LIBMATTI_MC_Slot_GetItem(slot);
+                if (LIBMATTI_MC_ItemStack_IsEmpty(stack))
+                    continue;
+                int cellX = px + slot->x, cellY = py + slot->y;
+                LIBMATTI_MC_ItemRenderer_RenderGuiItem(minecraft->guiRenderer, atlas, stack,
+                                                       (float) cellX * scale, (float) cellY * scale, scale);
+            }
+            LIBMATTI_MC_GuiRenderer_Flush(minecraft->guiRenderer, (float) guiWidth * scale,
+                                          (float) guiHeight * scale);
+            for (int i = 0; i < menu->slotCount; i++)
+            {
+                LIBMATTI_MC_Slot *slot = menu->slots[i];
+                const LIBMATTI_MC_ItemStack *stack = LIBMATTI_MC_Slot_GetItem(slot);
+                if (LIBMATTI_MC_ItemStack_IsEmpty(stack))
+                    continue;
+                int cellX = px + slot->x, cellY = py + slot->y;
+                LIBMATTI_MC_ItemRenderer_RenderGuiCount(minecraft->font, stack,
+                                                        (float) cellX * scale, (float) cellY * scale, scale,
+                                                        (float) guiWidth * scale, (float) guiHeight * scale);
+            }
         }
-        LIBMATTI_MC_GuiRenderer_Flush(minecraft->guiRenderer, (float) guiWidth * scale, (float) guiHeight * scale);
 
         // Java: InventoryScreen.renderBg's entity - the player figure in the
         // panel's left half (renderEntityInInventory). The entity renderer
@@ -2161,6 +2182,8 @@ void LIBMATTI_MC_Minecraft_Destroy(LIBMATTI_MC_Minecraft *minecraft)
         LIBMATTI_MC_GuiRenderer_Free(minecraft->guiRenderer);
         minecraft->guiRenderer = NULL;
     }
+    // Java: this.itemRenderer = null - the icon page closes with the batcher.
+    LIBMATTI_MC_ItemRenderer_Free();
     // (the hotbar stacks ride the playerInventory container - its Free above
     // releases them; the port keeps one owner)
 
