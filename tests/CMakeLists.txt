@@ -127,6 +127,13 @@ add_test(NAME inventory COMMAND test_inventory)
 matti_test(test_widgets widgets/WidgetHarness.c)
 add_test(NAME widgets COMMAND test_widgets)
 
+# options: the P6.4 core - the Options store (the vanilla key:value
+# options.txt round-trip over FMLPaths.GAMEDIR), the PauseScreen (the
+# vanilla 3-button layout, isPauseScreen, the flag contract) and the
+# OptionsScreen (the 10% step rows, the live setters, the Done contract)
+matti_test(test_options options/OptionsHarness.c)
+add_test(NAME options COMMAND test_options)
+
 # ao: the P4.4 AO kernel over a real level (BlockColors providers, shade table,
 # the tesselate paths through the dispatcher)
 matti_test(test_ao ao/AoHarness.c)

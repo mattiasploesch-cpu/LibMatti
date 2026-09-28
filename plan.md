@@ -116,7 +116,7 @@ Vor P0 fertig (frühere Meilensteine, nicht Teil des Plans):
 | 1 | Menu/Slot-System (MenuType, AbstractContainerMenu)                          | ✅     |
 | 2 | Screen-Hierarchie (Screen, Button, TextField — passt zum Mixin-Hook-System) | ✅     |
 | 3 | Inventory/Hotbar-Daten, ItemRenderer                                        | ✅     |
-| 4 | Pause/Options-Screen (options.txt über ConfigTracker — Config-Arbeit zahlt sich hier aus) | ⬜ |
+| 4 | Pause/Options-Screen (options.txt als eigener key:value-Store — vanilla options.txt ist kein TOML, daher kein ConfigTracker) | ✅ |
 
 ────────────────────────────────────────────────────────────────────────────────
 

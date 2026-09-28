@@ -31,7 +31,11 @@
 #include "libmatti/net/minecraft/client/resources/model/ModelManager.h"
 #include "libmatti/net/minecraft/client/sounds/SoundEngine.h"
 #include "libmatti/net/minecraft/client/gui/screens/Screen.h"
+#include "libmatti/net/minecraft/client/gui/screens/PauseScreen.h"
+#include "libmatti/net/minecraft/client/gui/screens/OptionsScreen.h"
 #include "libmatti/net/minecraft/client/gui/screens/inventory/InventoryScreen.h"
+#include "libmatti/net/minecraft/client/gui/components/Button.h"
+#include "libmatti/net/minecraft/client/Options.h"
 #include "libmatti/net/minecraft/client/renderer/entity/ItemRenderer.h"
 #include "libmatti/net/minecraft/world/level/block/state/BlockState.h"
 #include "libmatti/net/minecraft/server/bootstrap/VanillaAssetLoader.h"
@@ -192,6 +196,20 @@ struct LIBMATTI_MC_Minecraft
     // Java: Minecraft.screen - the @Nullable Screen the input/render ride
     // (the P6.2 port: the InventoryScreen the E key toggles; NULL = closed).
     LIBMATTI_MC_InventoryScreen *inventoryScreen;
+    // Java: Minecraft.screen (P6.4): the pause menu + its options sub-screen
+    // (ESC with no screen opens the pause; the pause button opens options).
+    LIBMATTI_MC_PauseScreen *pauseScreen;
+    LIBMATTI_MC_OptionsScreen *optionsScreen;
+    // Java: private final Options options - the game settings store (the
+    // P6.4 port: options.txt over the vanilla key:value format).
+    LIBMATTI_MC_Options options;
+    // the open pause screen blocks the attack/use edge (the render pass
+    // routes the clicks; the screenMouseWasDown edge guard rides the same
+    // frame the block decision is read)
+    int screenMouseWasDown;
+    // the MATTI_OPEN_PAUSE smoke hook (the deterministic open for the
+    // headless verification)
+    int smokePauseRequested;
     // the player-inventory container the inventory screen's menu binds
     // (36 slots + the armor 34..37 + offhand 40 range the menu slots index)
     LIBMATTI_MC_Container *playerInventory;
@@ -272,12 +290,24 @@ static void sprite_rect_for_block(void *userdata, const LIBMATTI_MC_Block *block
 // Java: public static Minecraft getInstance()
 static LIBMATTI_MC_Minecraft *instance = NULL;
 
+// the P6.4 tails (the tick body routes through them; the render pass clicks
+// the menu widgets through the screen's children)
+static void tick_pause_screen(LIBMATTI_MC_Minecraft *minecraft);
+static void tick_options_screen(LIBMATTI_MC_Minecraft *minecraft);
+static void route_pause_clicks(LIBMATTI_MC_Minecraft *minecraft);
+static void apply_fullscreen_option(LIBMATTI_MC_Minecraft *minecraft);
+
 // Java: Window.calculateScale - the auto guiScale (the 0 = auto default
 // scales while width / (320 * (scale + 1)) fits and height / (240 * (scale +
-// 1)) fits). The skeleton pins no options guiScale yet, so the calc runs
-// every caller (the layout/mouse/text coords all ride the same factor).
+// 1)) fits). The options guiScale pins the factor when non-zero (the
+// OptionsScreen's later guiScale row drives it); the calc covers the auto
+// default. Every caller (layout/mouse/text) rides the same factor.
 static int gui_scale(int width, int height)
 {
+    LIBMATTI_MC_Minecraft *minecraft = LIBMATTI_MC_Minecraft_GetInstance();
+    int pinned = minecraft != NULL && minecraft->options.guiScale > 0 ? minecraft->options.guiScale : 0;
+    if (pinned > 0)
+        return pinned;
     int scale = 1;
     while (scale < 8 && width / (320 * (scale + 1)) != 0 && height / (240 * (scale + 1)) != 0)
         scale++;
@@ -465,6 +495,12 @@ LIBMATTI_MC_Minecraft *LIBMATTI_MC_Minecraft_New(const LIBMATTI_MC_GameConfig *c
     }
 
     LOG("Backend library: LWJGL version (port), OpenGL context acquired");
+
+    // Java: this.options = new Options(this); this.options.load(); - the
+    // settings load right after the window exists (the FML paths already
+    // initialized through the loader: options.txt resolves in the GAMEDIR).
+    LIBMATTI_MC_Options_Init(&minecraft->options);
+    LIBMATTI_MC_Options_Load(&minecraft->options);
 
     // Java (Minecraft ctor): this.textureManager = new TextureManager(this.resourceManager);
     // The ctor registers the missing texture (see TextureManager_New).
@@ -660,6 +696,11 @@ LIBMATTI_MC_Minecraft *LIBMATTI_MC_Minecraft_New(const LIBMATTI_MC_GameConfig *c
     // (the isometric icon page bakes lazily on the first draw).
     LIBMATTI_MC_ItemRenderer_Init(minecraft);
 
+    // Java: the options drive the window mode (Window.setMode over
+    // options.fullscreen) - the port polls the flag every frame like the
+    // real game's window events (apply_fullscreen_option below).
+    apply_fullscreen_option(minecraft);
+
     // Java: the creative inventory's hotbar defaults - the port builds the 9
     // stacks once into the player inventory's hotbar row (the container slots
     // 0..8 the Inventory.items layout puts first - the palette the right click
@@ -695,6 +736,11 @@ static void apply_walk(LIBMATTI_MC_Minecraft *minecraft);
 static void handle_block_interaction(LIBMATTI_MC_Minecraft *minecraft);
 static void handle_hotbar_keys(LIBMATTI_MC_Minecraft *minecraft);
 static void dirty_sections_around(LIBMATTI_MC_Minecraft *minecraft, const LIBMATTI_MC_BlockPos *pos);
+// the P6.4 tails (defined after tick; the tick body routes through them)
+static void tick_pause_screen(LIBMATTI_MC_Minecraft *minecraft);
+static void tick_options_screen(LIBMATTI_MC_Minecraft *minecraft);
+// the window-mode poll (the ctor + the render loop drive it)
+static void apply_fullscreen_option(LIBMATTI_MC_Minecraft *minecraft);
 
 static void tick(LIBMATTI_MC_Minecraft *minecraft)
 {
@@ -722,8 +768,10 @@ static void tick(LIBMATTI_MC_Minecraft *minecraft)
     // Java: startUseItem/continueAttack ride the tick loop (the multi/hold
     // semantics run at tick rate) - the block interaction acts on the pick
     // the renderer refreshed this frame. With a screen open the clicks route
-    // to the screen (MouseHandler.onPress gates the game keys).
-    if (minecraft->inventoryScreen == NULL)
+    // to the screen (MouseHandler.onPress gates the game keys) - the pause
+    // screens swallow them entirely (nothing to click in the world).
+    if (minecraft->inventoryScreen == NULL && minecraft->pauseScreen == NULL
+        && minecraft->optionsScreen == NULL)
         handle_block_interaction(minecraft);
 
     // Java: the hotbar keys ride the same poll (Inventory.selectedSlot).
@@ -751,6 +799,35 @@ static void tick(LIBMATTI_MC_Minecraft *minecraft)
                 LIBMATTI_MC_Screen_Removed(&minecraft->inventoryScreen->base.base);
                 LIBMATTI_MC_InventoryScreen_Free(minecraft->inventoryScreen);
                 minecraft->inventoryScreen = NULL;
+            }
+        }
+        else if (minecraft->optionsScreen != NULL)
+        {
+            // Java: OptionsScreen.keyPressed(ESC) -> onClose -> setScreen(lastScreen)
+            // - the Done flag carries the same return.
+            if (escapeDown && !escapeWasDown)
+                minecraft->optionsScreen->done = true;
+        }
+        else if (minecraft->pauseScreen != NULL)
+        {
+            // Java: PauseScreen.keyPressed(ESC) -> onClose -> back to the game
+            if (escapeDown && !escapeWasDown)
+                minecraft->pauseScreen->backToGame = true;
+        }
+        else if (escapeDown && !escapeWasDown)
+        {
+            // Java: keyPressed(ESC) with no screen -> setScreen(new PauseScreen())
+            // (the pause menu never quits the game - the quit rides its button).
+            minecraft->pauseScreen = LIBMATTI_MC_PauseScreen_New(minecraft);
+            if (minecraft->pauseScreen != NULL)
+            {
+                int sw = 0, sh = 0;
+                LIBMATTI_GLFW_glfwGetFramebufferSize(minecraft->window, &sw, &sh);
+                int gui = gui_scale(sw, sh);
+                LIBMATTI_MC_Screen_Resize(&minecraft->pauseScreen->base, sw / gui, sh / gui);
+                // Java: KeyMapping.releaseAll - the walk input stops (the
+                // shared open path the inventory screen rides)
+                LIBMATTI_MC_KeyMapping_ReleaseAll();
             }
         }
         escapeWasDown = escapeDown;
@@ -781,8 +858,28 @@ static void tick(LIBMATTI_MC_Minecraft *minecraft)
     // The MATTI_OPEN_INVENTORY smoke hook: the deterministic open for the
     // headless screenshots (the E key rides the real input path, but the X
     // synthetic-key delivery is unreliable for the pixel verification).
-    if (minecraft->inventoryScreen == NULL && getenv("MATTI_OPEN_INVENTORY") != NULL)
+    if (minecraft->inventoryScreen == NULL && minecraft->pauseScreen == NULL
+        && getenv("MATTI_OPEN_INVENTORY") != NULL)
         open_inventory_screen(minecraft);
+
+    // The MATTI_OPEN_PAUSE smoke hook: the deterministic pause open (the ESC
+    // edge rides the real input path; the hook keeps the verification
+    // deterministic over xvfb).
+    if (getenv("MATTI_OPEN_PAUSE") != NULL)
+    {
+        if (minecraft->inventoryScreen == NULL && minecraft->pauseScreen == NULL)
+        {
+            minecraft->pauseScreen = LIBMATTI_MC_PauseScreen_New(minecraft);
+            if (minecraft->pauseScreen != NULL)
+            {
+                int sw = 0, sh = 0;
+                LIBMATTI_GLFW_glfwGetFramebufferSize(minecraft->window, &sw, &sh);
+                int gui = gui_scale(sw, sh);
+                LIBMATTI_MC_Screen_Resize(&minecraft->pauseScreen->base, sw / gui, sh / gui);
+                LIBMATTI_MC_KeyMapping_ReleaseAll();
+            }
+        }
+    }
 
     // The MATTI_RESIZE_AT smoke hook: the deterministic resize for the
     // headless verification (MATTI_RESIZE_AT=<tick>_<w>x<h> - the window
@@ -820,11 +917,99 @@ static void tick(LIBMATTI_MC_Minecraft *minecraft)
         LIBMATTI_MC_AbstractContainerScreen_Layout(&minecraft->inventoryScreen->base, sw / gui, sh / gui);
         LIBMATTI_MC_Screen_Tick(&minecraft->inventoryScreen->base.base);
     }
+    tick_pause_screen(minecraft);
+    tick_options_screen(minecraft);
+
+    // Java: the pause screens freeze the tick loop (Minecraft.runTick gates
+    // the game tick on the screen's isPauseScreen) - the walk/gravity
+    // impulses stop while the menu rides the render pass.
+    if (minecraft->pauseScreen != NULL || minecraft->optionsScreen != NULL)
+    {
+        LIBMATTI_MC_DeltaTracker_UpdatePauseState(minecraft->deltaTracker, 1);
+        minecraft->pause = 1;
+    }
+    else
+    {
+        LIBMATTI_MC_DeltaTracker_UpdatePauseState(minecraft->deltaTracker, 0);
+        minecraft->pause = 0;
+    }
 
     // Java: Gui.tick - the 10s name fade decays per tick (the timer only runs
     // while the HUD shows it).
     if (minecraft->toolHighlightTimer > 0)
         minecraft->toolHighlightTimer--;
+
+    // Java: SoundEngine -> SoundSource.MASTER rides the options slider (the
+    // volume folds into every channel gain at the next play).
+    if (minecraft->soundEngine != NULL)
+        LIBMATTI_MC_SoundEngine_SetVolume(minecraft->soundEngine,
+                                          LIBMATTI_MC_Options_GetMasterVolume(&minecraft->options));
+}
+
+// Java: Minecraft.handleKeybinds - the pause-menu poll (the client-side
+// contract the Smoke hook shares: the ESC edge opens the screen in tick,
+// this tail resolves the flags the buttons set).
+static void tick_pause_screen(LIBMATTI_MC_Minecraft *minecraft)
+{
+    if (minecraft->pauseScreen == NULL)
+        return;
+    LIBMATTI_MC_PauseScreen *pause = minecraft->pauseScreen;
+    // Java: the resize event rebuilds through Screen.resize (the open screen
+    // rides the live window size)
+    int sw = 0, sh = 0;
+    LIBMATTI_GLFW_glfwGetFramebufferSize(minecraft->window, &sw, &sh);
+    int gui = gui_scale(sw, sh);
+    if (pause->base.width != sw / gui || pause->base.height != sh / gui)
+        LIBMATTI_MC_Screen_Resize(&pause->base, sw / gui, sh / gui);
+    LIBMATTI_MC_Screen_Tick(&pause->base);
+
+    if (pause->backToGame || pause->quitToTitle)
+    {
+        // Java: setScreen(null) -> removed(); the QUIT keeps stopping through
+        // the stop flag (Save and Quit -> minecraft.stop())
+        LIBMATTI_MC_Screen_Removed(&pause->base);
+        LIBMATTI_MC_PauseScreen_Free(pause);
+        minecraft->pauseScreen = NULL;
+        // Java: the close flushes options.txt (Options.save rides
+        // the screen close in the port)
+        LIBMATTI_MC_Options_Save(&minecraft->options);
+    }
+    else if (pause->openOptions)
+    {
+        // Java: setScreen(new OptionsScreen(this, this.options)) - the pause
+        // screen stays alive below (the return target)
+        pause->openOptions = false;
+        minecraft->optionsScreen = LIBMATTI_MC_OptionsScreen_New(minecraft, &minecraft->options);
+        if (minecraft->optionsScreen != NULL)
+            LIBMATTI_MC_Screen_Resize(&minecraft->optionsScreen->base, sw / gui, sh / gui);
+    }
+
+    if (pause->quitToTitle)
+        LIBMATTI_MC_Minecraft_Stop(minecraft);
+}
+
+// Java: Minecraft.handleKeybinds - the options-screen poll (Done -> back to
+// the pause screen; the ESC close rides the same flag)
+static void tick_options_screen(LIBMATTI_MC_Minecraft *minecraft)
+{
+    if (minecraft->optionsScreen == NULL)
+        return;
+    LIBMATTI_MC_OptionsScreen *options = minecraft->optionsScreen;
+    int sw = 0, sh = 0;
+    LIBMATTI_GLFW_glfwGetFramebufferSize(minecraft->window, &sw, &sh);
+    int gui = gui_scale(sw, sh);
+    if (options->base.width != sw / gui || options->base.height != sh / gui)
+        LIBMATTI_MC_Screen_Resize(&options->base, sw / gui, sh / gui);
+    LIBMATTI_MC_Screen_Tick(&options->base);
+
+    if (options->done)
+    {
+        // Java: setScreen(this.lastScreen) - back to the pause menu
+        LIBMATTI_MC_Screen_Removed(&options->base);
+        LIBMATTI_MC_OptionsScreen_Free(options);
+        minecraft->optionsScreen = NULL;
+        LIBMATTI_MC_Options_Save(&minecraft->options);
+    }
 }
 
 // Java: private void renderTitleLine(...) - the skeleton draws the game title
@@ -863,6 +1048,134 @@ static void shot_after(LIBMATTI_MC_Minecraft *minecraft, const char *phase)
     free(pixels);
     fprintf(stderr, "[PHASE] wrote %s\n", path);
     LIBMATTI_MC_Minecraft_Stop(minecraft);
+}
+
+// Java: PauseScreen.render / OptionsScreen.render - the overlay the client
+// folds into the render pass (the GuiRenderer + font ride the client). The
+// background dim flushes immediately (the batch must not span the white/panel
+// texture groups), the title sits at height/4 - 15 + 20 like the real game's
+// widget-centered heading, the buttons ride the Screen's children (the
+// widget's flat fallback tint: grey, hover brightens).
+static void render_pause_overlay(LIBMATTI_MC_Minecraft *minecraft, int guiWidth, int guiHeight, float scale)
+{
+    LIBMATTI_MC_Screen *screen = NULL;
+    if (minecraft->optionsScreen != NULL)
+        screen = &minecraft->optionsScreen->base;
+    else if (minecraft->pauseScreen != NULL)
+        screen = &minecraft->pauseScreen->base;
+    if (screen == NULL)
+        return;
+
+    // Java: renderBackground - the darkened backdrop (the flat dim instead of
+    // the blurred world - the blur shader lands with the video settings port)
+    LIBMATTI_MC_GuiRenderer_BlitQuad(minecraft->guiRenderer, 0.0f, 0.0f,
+                                     (float) guiWidth * scale, (float) guiHeight * scale,
+                                     0.0f, 0.0f, 1.0f, 1.0f, 0x90001018u);
+    LIBMATTI_MC_GuiRenderer_SetTexture(minecraft->guiRenderer, 0);
+    LIBMATTI_MC_GuiRenderer_Flush(minecraft->guiRenderer, (float) guiWidth * scale, (float) guiHeight * scale);
+
+    // Java: the flat fallback draws the widgets (grey shade, hover brightens);
+    // the press state tints the active button (Button_IsPressed). The cursor
+    // scales into the layout space once (the render pass's hover coords).
+    double cursorX = 0.0, cursorY = 0.0;
+    LIBMATTI_GLFW_glfwGetCursorPos(minecraft->window, &cursorX, &cursorY);
+    int fw = 0, fh = 0;
+    LIBMATTI_GLFW_glfwGetFramebufferSize(minecraft->window, &fw, &fh);
+    int guiFactor = gui_scale(fw, fh);
+    int mouseX = (int) (cursorX / guiFactor), mouseY = (int) (cursorY / guiFactor);
+    for (int i = 0; i < screen->childCount; i++)
+        LIBMATTI_MC_AbstractWidget_Render(screen->children[i], mouseX, mouseY, 0.0f);
+
+    // Java: AbstractButton.renderWidget - the vanilla sprite shade + the
+    // centred label. The widget renderer keeps no GuiRenderer handle, so the
+    // client draws the flat fallback over the Screen's children (the same
+    // fold the panel texture rides): grey shade, hover brightens, the press
+    // darkens, the label in the E0E0E0 with the 0.25 alpha shadow.
+    for (int i = 0; i < screen->childCount; i++)
+    {
+        LIBMATTI_MC_Button *button = (LIBMATTI_MC_Button *) screen->children[i];
+        unsigned tint = 0xFF7D7D7Du;
+        if (LIBMATTI_MC_Button_IsPressed(button))
+            tint = 0xFF5F5F5Fu;
+        else if (button->base.isHovered)
+            tint = 0xFFA9A9A9u;
+        LIBMATTI_MC_GuiRenderer_BlitQuad(minecraft->guiRenderer,
+                                         (float) LIBMATTI_MC_AbstractWidget_GetX(&button->base) * scale,
+                                         (float) LIBMATTI_MC_AbstractWidget_GetY(&button->base) * scale,
+                                         (float) LIBMATTI_MC_AbstractWidget_GetWidth(&button->base) * scale,
+                                         (float) LIBMATTI_MC_AbstractWidget_GetHeight(&button->base) * scale,
+                                         0.0f, 0.0f, 1.0f, 1.0f, tint);
+    }
+    // Java: renderDirtBackground's order - the dim stays behind the labels:
+    // the button shading flushes BEFORE the font pass.
+    LIBMATTI_MC_GuiRenderer_Flush(minecraft->guiRenderer, (float) guiWidth * scale, (float) guiHeight * scale);
+
+    // Java: the labels ride the font pass after the widget shade (the
+    // renderDirtBackground order keeps the dim behind the text)
+    if (minecraft->font != NULL && minecraft->fontProgram != 0)
+    {
+        LIBMATTI_GL_glUseProgram(minecraft->fontProgram);
+        LIBMATTI_GL_glUniform2f(minecraft->fontScreenSizeLocation, (float) guiWidth * scale,
+                                (float) guiHeight * scale);
+        LIBMATTI_B3D_GlStateManager_ActiveTexture(LIBMATTI_GL_GL_TEXTURE0);
+        LIBMATTI_B3D_GlStateManager_BindTexture((int) LIBMATTI_FML_SimpleFont_TextureId(minecraft->font));
+        LIBMATTI_GL_glUniform1i(LIBMATTI_GL_glGetUniformLocation(minecraft->fontProgram, "tex"), 0);
+        for (int i = 0; i < screen->childCount; i++)
+        {
+            LIBMATTI_MC_AbstractWidget *widget = screen->children[i];
+            const char *label = LIBMATTI_MC_AbstractWidget_GetMessage(widget);
+            if (label == NULL)
+                continue;
+            int labelWidth = LIBMATTI_FML_SimpleFont_StringWidth(minecraft->font, label);
+            // Java: drawCenteredString over the widget box - the pen centres
+            // against the SCALED box while the glyph advance rides the pack's
+            // fixed pixel size (StringWidth reports pixels; the SimpleFont
+            // batcher scales the pen positions only, like the HUD name line).
+            float labelX = (float) LIBMATTI_MC_AbstractWidget_GetX(widget) * scale
+                           + ((float) LIBMATTI_MC_AbstractWidget_GetWidth(widget) * scale - (float) labelWidth) / 2.0f;
+            float labelY = ((float) LIBMATTI_MC_AbstractWidget_GetY(widget)
+                            + ((float) LIBMATTI_MC_AbstractWidget_GetHeight(widget) - 8.0f) / 2.0f) * scale;
+            // Java: the vanilla 8-unit font box centres the label - the
+            // Monocraft pack's glyph ink starts ~9px below the pen, so the
+            // pen rides up by the ink offset to land the same box.
+            labelY -= 9.0f;
+            LIBMATTI_FML_SimpleFont_DisplayText shadow[1] = {{label, 0x40000000u}};
+            LIBMATTI_FML_SimpleFont_DrawTexts(minecraft->font, labelX + scale, labelY + scale, shadow, 1);
+            LIBMATTI_FML_SimpleFont_DisplayText text[1] = {{label, 0xFFE0E0E0u}};
+            LIBMATTI_FML_SimpleFont_DrawTexts(minecraft->font, labelX, labelY, text, 1);
+        }
+        LIBMATTI_GL_glUseProgram(0);
+    }
+
+    // Java: renderTitleText - "Game Menu" / "Options" centred at
+    // height/4 - 15 + 20 (the widget row top), white with the 0.25 alpha
+    // shadow.
+    if (minecraft->font != NULL && minecraft->fontProgram != 0)
+    {
+        const char *title = LIBMATTI_MC_Screen_GetTitle(screen);
+        if (title != NULL)
+        {
+            LIBMATTI_GL_glUseProgram(minecraft->fontProgram);
+            LIBMATTI_GL_glUniform2f(minecraft->fontScreenSizeLocation, (float) guiWidth * scale,
+                                    (float) guiHeight * scale);
+            LIBMATTI_B3D_GlStateManager_ActiveTexture(LIBMATTI_GL_GL_TEXTURE0);
+            LIBMATTI_B3D_GlStateManager_BindTexture((int) LIBMATTI_FML_SimpleFont_TextureId(minecraft->font));
+            LIBMATTI_GL_glUniform1i(LIBMATTI_GL_glGetUniformLocation(minecraft->fontProgram, "tex"), 0);
+            int textWidth = LIBMATTI_FML_SimpleFont_StringWidth(minecraft->font, title);
+            // Java: renderTitleText - drawCenteredString over the layout
+            // width, the text top at height/4 - 15 (the pen centres against
+            // the scaled width, the glyph advance stays the pack's fixed
+            // pixel size; the ink offset rides the same 9px correction as
+            // the widget labels).
+            float textX = ((float) guiWidth * scale - (float) textWidth) / 2.0f;
+            float textY = (float) (screen->height / 4 - 15) * scale - 9.0f;
+            LIBMATTI_FML_SimpleFont_DisplayText shadow[1] = {{title, 0x40000000u}};
+            LIBMATTI_FML_SimpleFont_DrawTexts(minecraft->font, textX + scale, textY + scale, shadow, 1);
+            LIBMATTI_FML_SimpleFont_DisplayText text[1] = {{title, 0xFFFFFFFFu}};
+            LIBMATTI_FML_SimpleFont_DrawTexts(minecraft->font, textX, textY, text, 1);
+            LIBMATTI_GL_glUseProgram(0);
+        }
+    }
 }
 
 static void render_title(LIBMATTI_MC_Minecraft *minecraft, int width, int height)
@@ -1175,6 +1488,9 @@ static void render_hud(LIBMATTI_MC_Minecraft *minecraft, int width, int height)
         }
     }
 
+    // Java: Screen.render over the frame - the pause/options overlay rides
+    // the HUD pass (the world keeps rendering behind the dim like the real
+    // game's pause).
     LIBMATTI_B3D_GlStateManager_DisableBlend();
 }
 
@@ -1259,8 +1575,9 @@ static void updateMouseLook(LIBMATTI_MC_Minecraft *minecraft)
     // Java: the open screen releases the mouse (MouseHandler:onRelease) and
     // the camera stops turning; the cursor shows for the slot hover/clicks.
     // ESC only stops the game while NO screen is open (the screen's keyPressed
-    // handles it first).
-    if (minecraft->inventoryScreen != NULL)
+    // handles it first). The pause screens ride the same gate.
+    if (minecraft->inventoryScreen != NULL || minecraft->pauseScreen != NULL
+        || minecraft->optionsScreen != NULL)
     {
         LIBMATTI_GLFW_glfwSetInputMode(minecraft->window, LIBMATTI_GLFW_CURSOR,
                                        LIBMATTI_GLFW_CURSOR_NORMAL);
@@ -1292,11 +1609,17 @@ static void updateMouseLook(LIBMATTI_MC_Minecraft *minecraft)
         }
         float dx = (float) (cx - minecraft->lastCursorX);
         float dy = (float) (cy - minecraft->lastCursorY);
-        // Java: MouseHandler.turnPlayer -> entity.turn(dx, dy) - the raw cursor
-        // delta passes through unmodified (MouseHandler.java:392); Java's turn
+        // Java: MouseHandler.turnPlayer folds the options sensitivity into the
+        // delta: d2 = sensitivity * 0.6 + 0.2, d3 = d2^3 * 8.0, and the turn
+        // multiplies with d3 (Entity.turn keeps its fixed 0.15). The default
+        // 0.5 gives d3 = 1.0 - the behaviour rides unchanged without options.
+        float sensitivity = LIBMATTI_MC_Options_GetSensitivity(&minecraft->options);
+        double d2 = (double) sensitivity * 0.6 + 0.2;
+        double d3 = d2 * d2 * d2 * 8.0;
+        // Java: MouseHandler.turnPlayer -> entity.turn(dx, dy) - Java's turn
         // ADDS the pitch (moving the mouse up lowers xRot and the camera
         // SetRotation's -xRot raises the view). The old -dy inverted the axis.
-        LIBMATTI_MC_Entity_Turn(&minecraft->localPlayer->player.base.base, (double) dx, (double) dy);
+        LIBMATTI_MC_Entity_Turn(&minecraft->localPlayer->player.base.base, (double) dx * d3, (double) dy * d3);
     }
     else
     {
@@ -1312,6 +1635,65 @@ static void updateMouseLook(LIBMATTI_MC_Minecraft *minecraft)
 // LivingEntity friction into a flat per-frame walk speed scaled by the abilities
 // walking speed. The gravity rides Java's LivingEntity.aiStep default (-0.08
 // per tick, * 0.98 the drag), the jump the vanilla +0.42 impulse.
+// Java: Screen.mouseClicked - the render pass routes the cursor through the
+// Screen's children (the widgets answer the press/release edges; the base
+// dispatch fires onClick on the release). The port folds the routing into the
+// per-frame pass like the rest of the client input (the tick opens/closes the
+// screens, the render clicks them).
+static void route_pause_clicks(LIBMATTI_MC_Minecraft *minecraft)
+{
+    LIBMATTI_MC_Screen *screen = NULL;
+    if (minecraft->optionsScreen != NULL)
+        screen = &minecraft->optionsScreen->base;
+    else if (minecraft->pauseScreen != NULL)
+        screen = &minecraft->pauseScreen->base;
+    if (screen == NULL)
+    {
+        minecraft->screenMouseWasDown = 0;
+        return;
+    }
+
+    int down = LIBMATTI_GLFW_glfwGetMouseButton(minecraft->window, LIBMATTI_GLFW_MOUSE_BUTTON_1) == LIBMATTI_GLFW_PRESS;
+    double cx = 0.0, cy = 0.0;
+    LIBMATTI_GLFW_glfwGetCursorPos(minecraft->window, &cx, &cy);
+    int sw = 0, sh = 0;
+    LIBMATTI_GLFW_glfwGetFramebufferSize(minecraft->window, &sw, &sh);
+    int gui = gui_scale(sw, sh);
+    double mouseX = cx / (double) gui, mouseY = cy / (double) gui;
+
+    for (int i = 0; i < screen->childCount; i++)
+        LIBMATTI_MC_AbstractWidget_MouseClicked(screen->children[i], mouseX, mouseY, 0, down);
+    minecraft->screenMouseWasDown = down;
+}// Java: Window.setMode - the fullscreen flag polls every frame (the port's
+// window-events stand-in; the flag rides options.fullscreen).
+static void apply_fullscreen_option(LIBMATTI_MC_Minecraft *minecraft)
+{
+    if (minecraft->window == 0)
+        return;
+    static int appliedFullscreen = -1;
+    if (appliedFullscreen < 0)
+        appliedFullscreen = minecraft->options.fullscreen;
+    if (minecraft->options.fullscreen == appliedFullscreen)
+        return;
+    appliedFullscreen = minecraft->options.fullscreen;
+    if (minecraft->options.fullscreen)
+    {
+        // Java: Window.setMode -> glfwSetWindowMonitor(monitor) - the port
+        // carries the windowed-mode sizes (the video-mode switch lands with
+        // the real setMode port)
+        int width = minecraft->config.display.width;
+        int height = minecraft->config.display.height;
+        LIBMATTI_GLFW_glfwSetWindowSize(minecraft->window, width, height);
+    }
+    else
+    {
+        LIBMATTI_GLFW_glfwSetWindowSize(minecraft->window, minecraft->config.display.width,
+                                        minecraft->config.display.height);
+        LIBMATTI_GLFW_glfwSetWindowPos(minecraft->window, 0, 0);
+    }
+    fprintf(stderr, "[OPTIONS] fullscreen -> %d\n", appliedFullscreen);
+}
+
 static void apply_walk(LIBMATTI_MC_Minecraft *minecraft)
 {
     if (minecraft->window == 0 || minecraft->localPlayer == NULL) return;
@@ -1451,12 +1833,23 @@ static void handle_block_interaction(LIBMATTI_MC_Minecraft *minecraft)
 
     // Java: the open screen swallows the mouse (Minecraft.runTick gates the
     // mouse-handling on screen != null; the screen rides the click routing).
+    // Java: the pause screens swallow the game clicks entirely (the render
+    // pass routes the menu clicks; the game buttons park)
+    if (minecraft->pauseScreen != NULL || minecraft->optionsScreen != NULL)
+    {
+        minecraft->screenMouseWasDown =
+            LIBMATTI_GLFW_glfwGetMouseButton(minecraft->window, LIBMATTI_GLFW_MOUSE_BUTTON_1) == LIBMATTI_GLFW_PRESS
+            || LIBMATTI_GLFW_glfwGetMouseButton(minecraft->window, LIBMATTI_GLFW_MOUSE_BUTTON_2) == LIBMATTI_GLFW_PRESS;
+        minecraft->attackDown = 0;
+        minecraft->useDown = 0;
+        return;
+    }
+
     if (minecraft->inventoryScreen != NULL)
     {
-        static int screenMouseWasDown = 0;
         int down = LIBMATTI_GLFW_glfwGetMouseButton(minecraft->window, LIBMATTI_GLFW_MOUSE_BUTTON_1) == LIBMATTI_GLFW_PRESS
                    || LIBMATTI_GLFW_glfwGetMouseButton(minecraft->window, LIBMATTI_GLFW_MOUSE_BUTTON_2) == LIBMATTI_GLFW_PRESS;
-        if (down && !screenMouseWasDown)
+        if (down && !minecraft->screenMouseWasDown)
         {
             double cx = 0.0, cy = 0.0;
             LIBMATTI_GLFW_glfwGetCursorPos(minecraft->window, &cx, &cy);
@@ -1472,7 +1865,7 @@ static void handle_block_interaction(LIBMATTI_MC_Minecraft *minecraft)
             LIBMATTI_MC_Player *player = &minecraft->localPlayer->player;
             LIBMATTI_MC_AbstractContainerScreen_MouseClickedScreen(container, cx / (double) gui, cy / (double) gui, button, player);
         }
-        screenMouseWasDown = down;
+        minecraft->screenMouseWasDown = down;
         minecraft->attackDown = 0;
         minecraft->useDown = 0;
         return;
@@ -1738,12 +2131,21 @@ static void runTick(LIBMATTI_MC_Minecraft *minecraft, int runGameTime)
         }
     }
 
-    // Java: if (renderLevelInMainMenu) { ... for (l = 0; l < min(10, k); l++) tick(); }
-    if (runGameTime)
+    // Java: if (renderLevelInMainMenu) { ... for (l = 0; l < min(10, k); l++)
+    // tick(); } - the pause freezes the GAME tick (the screen tail runs below,
+    // outside the frozen loop like the real game's runTick order).
+    if (runGameTime && minecraft->pauseScreen == NULL && minecraft->optionsScreen == NULL)
     {
         int max = ticks < 10 ? ticks : 10;
         for (int l = 0; l < max; l++)
             tick(minecraft);
+    }
+    else if (runGameTime && (minecraft->pauseScreen != NULL || minecraft->optionsScreen != NULL))
+    {
+        // Java: the paused screens still tick (Minecraft.tick calls
+        // screen.tick() before the pause gate hits the game body)
+        tick_pause_screen(minecraft);
+        tick_options_screen(minecraft);
     }
 
     // Java: profilerfiller.push("gameRenderer"); gameRenderer.render(deltaTracker, ...);
@@ -1751,6 +2153,10 @@ static void runTick(LIBMATTI_MC_Minecraft *minecraft, int runGameTime)
     // the LoadingScreenRenderer pipeline (renderToScreen): resize the layout FBO
     // to the window framebuffer, render the layout bottom-up into it, blit it
     // (vertically flipped, aspect-fitted) onto the window, then swap.
+    // Java: the window-events poll rides the frame (Window.setMode over the
+    // options flag; the port's stand-in re-reads options.fullscreen).
+    apply_fullscreen_option(minecraft);
+
     if (!minecraft->noRender)
     {
         // Java: glfwMakeContextCurrent + the context check like LWJGL requires
@@ -2057,6 +2463,15 @@ static void runTick(LIBMATTI_MC_Minecraft *minecraft, int runGameTime)
                         shot_after(minecraft, "hud");
                     }
 
+                    // Java: Minecraft.runTick's render tail - the open screen
+                    // overlays the frame (Screen.render over the world + HUD,
+                    // the game keeps rendering behind it). The overlay folds
+                    // the pause/options render into the pass.
+                    if (minecraft->pauseScreen != NULL || minecraft->optionsScreen != NULL)
+                        render_pause_overlay(minecraft, width / gui_scale(width, height),
+                                             height / gui_scale(width, height),
+                                             (float) gui_scale(width, height));
+
                     // The MATTI_SCREENSHOT debug hook: reads the layout FBO's
                     // back buffer into a PPM once (the renderer verification).
                     // The FBO carries the window framebuffer's size (Resize
@@ -2166,6 +2581,10 @@ void LIBMATTI_MC_Minecraft_Run(LIBMATTI_MC_Minecraft *minecraft)
         runTick(minecraft, !flag);
     }
 
+    // Java: the final save rides the shutdown (Minecraft.close's Options
+    // tail) - the port keeps the flush-on-exit the pause close also runs.
+    LIBMATTI_MC_Options_Save(&minecraft->options);
+
     // Java: Minecraft.run falls out of the loop; destroy runs at the caller.
 }
 
@@ -2202,6 +2621,16 @@ void LIBMATTI_MC_Minecraft_Destroy(LIBMATTI_MC_Minecraft *minecraft)
     }
 
     // Java: Options - the static KeyMapping table releases
+    if (minecraft->optionsScreen != NULL)
+    {
+        LIBMATTI_MC_OptionsScreen_Free(minecraft->optionsScreen);
+        minecraft->optionsScreen = NULL;
+    }
+    if (minecraft->pauseScreen != NULL)
+    {
+        LIBMATTI_MC_PauseScreen_Free(minecraft->pauseScreen);
+        minecraft->pauseScreen = NULL;
+    }
     if (minecraft->inventoryScreen != NULL)
     {
         LIBMATTI_MC_InventoryScreen_Free(minecraft->inventoryScreen);
