@@ -147,32 +147,55 @@ static void test_pause_screen(void)
 
     // Java: the resize builds the widgets (the first init)
     LIBMATTI_MC_Screen_Resize(&pause->base, 427, 240);
-    check(pause->base.childCount == 3, "the vanilla 3-button layout");
+    check(pause->base.childCount == 8, "the vanilla 1.21.11 8-button layout");
     check(pause->base.isPauseScreen != NULL && pause->base.isPauseScreen(&pause->base),
           "isPauseScreen answers true");
 
-    // Java: the bounds - 204 wide at width/2 - 102, the rows at height/4 + 8/72/96
-    int expectX = 427 / 2 - 102;
-    check(LIBMATTI_MC_AbstractWidget_GetX(pause->base.children[0]) == expectX, "the buttons centre at width/2 - 102");
-    check(LIBMATTI_MC_AbstractWidget_GetWidth(pause->base.children[0]) == 204, "the button width 204");
-    check(LIBMATTI_MC_AbstractWidget_GetY(pause->base.children[0]) == 240 / 4 + 8, "Back to Game at height/4 + 8");
-    check(LIBMATTI_MC_AbstractWidget_GetY(pause->base.children[1]) == 240 / 4 + 72, "Options at height/4 + 72");
-    check(LIBMATTI_MC_AbstractWidget_GetY(pause->base.children[2]) == 240 / 4 + 96, "Quit at height/4 + 96");
+    // Java: the grid bounds - the FrameLayout align (0.5, 0.25) over the
+    // 204x170 grid: gridX = width/2 - 102, gridY = (height - 170) * 0.25, the
+    // rows at gridY + 50 + row * 24 (the 4px cell padding rides the stride).
+    // 427x240: gridX 111, gridY 17.
+    int gridX = 427 / 2 - 102;
+    int gridY = (int) ((float) (240 - 170) * 0.25f);
+    check(LIBMATTI_MC_AbstractWidget_GetX(pause->base.children[0]) == gridX + 4,
+          "Back to Game at gridX + 4");
+    check(LIBMATTI_MC_AbstractWidget_GetWidth(pause->base.children[0]) == 204,
+          "the full button width 204");
+    check(LIBMATTI_MC_AbstractWidget_GetY(pause->base.children[0]) == gridY + 50,
+          "Back to Game at gridY + 50 (the title band rides above)");
+    check(LIBMATTI_MC_AbstractWidget_GetX(pause->base.children[2]) == gridX + 110,
+          "the right column at gridX + 110");
+    check(LIBMATTI_MC_AbstractWidget_GetY(pause->base.children[5]) == gridY + 50 + 3 * 24,
+          "Options in the third half row");
+    check(LIBMATTI_MC_AbstractWidget_GetY(pause->base.children[7]) == gridY + 50 + 4 * 24,
+          "Quit in the last row");
+    check(LIBMATTI_MC_AbstractWidget_GetWidth(pause->base.children[7]) == 204,
+          "the quit span rides 204");
     check(strcmp(LIBMATTI_MC_AbstractWidget_GetMessage(pause->base.children[0]), "Back to Game") == 0,
           "the Back to Game label");
-    check(strcmp(LIBMATTI_MC_AbstractWidget_GetMessage(pause->base.children[2]), "Save and Quit to Title") == 0,
+    check(strcmp(LIBMATTI_MC_AbstractWidget_GetMessage(pause->base.children[7]), "Save and Quit to Title") == 0,
           "the quit label");
+
+    // Java: the screens-that-do-not-exist-yet stay inactive (the disabled
+    // sprite + the eaten press) - only Back to Game / Options / Quit answer
+    check(pause->base.children[0]->active && pause->base.children[5]->active
+              && pause->base.children[7]->active,
+          "the three wired buttons stay active");
+    check(!pause->base.children[1]->active && !pause->base.children[2]->active
+              && !pause->base.children[3]->active && !pause->base.children[4]->active
+              && !pause->base.children[6]->active,
+          "Advancements/Statistics/Feedback/Bugs/LAN render disabled");
 
     // Java: the resize rebuilds (the stale widgets die, the layout re-runs)
     LIBMATTI_MC_Screen_Resize(&pause->base, 320, 240);
-    check(pause->base.childCount == 3, "the resize rebuilds exactly 3 widgets");
-    check(LIBMATTI_MC_AbstractWidget_GetX(pause->base.children[0]) == 320 / 2 - 102,
-          "the resize re-centres the buttons");
+    check(pause->base.childCount == 8, "the resize rebuilds exactly 8 widgets");
+    check(LIBMATTI_MC_AbstractWidget_GetX(pause->base.children[0]) == 320 / 2 - 102 + 4,
+          "the resize re-centres the grid");
 
     // Java: the button presses set the flags (the onClick release edge)
     LIBMATTI_MC_Button *back = (LIBMATTI_MC_Button *) pause->base.children[0];
-    LIBMATTI_MC_Button *options = (LIBMATTI_MC_Button *) pause->base.children[1];
-    LIBMATTI_MC_Button *quit = (LIBMATTI_MC_Button *) pause->base.children[2];
+    LIBMATTI_MC_Button *options = (LIBMATTI_MC_Button *) pause->base.children[5];
+    LIBMATTI_MC_Button *quit = (LIBMATTI_MC_Button *) pause->base.children[7];
     check(!pause->backToGame && !pause->openOptions && !pause->quitToTitle, "the flags start false");
     LIBMATTI_MC_Button_Press(back);
     check(pause->backToGame, "Back to Game sets the flag");

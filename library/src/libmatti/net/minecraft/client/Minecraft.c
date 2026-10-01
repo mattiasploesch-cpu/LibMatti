@@ -37,6 +37,7 @@
 #include "libmatti/net/minecraft/client/gui/components/Button.h"
 #include "libmatti/net/minecraft/client/Options.h"
 #include "libmatti/net/minecraft/client/renderer/entity/ItemRenderer.h"
+#include "libmatti/com/mojang/blaze3d/platform/NativeImage.h"
 #include "libmatti/net/minecraft/world/level/block/state/BlockState.h"
 #include "libmatti/net/minecraft/server/bootstrap/VanillaAssetLoader.h"
 #include "libmatti/net/minecraft/client/renderer/block/BlockRenderDispatcher.h"
@@ -1050,14 +1051,408 @@ static void shot_after(LIBMATTI_MC_Minecraft *minecraft, const char *phase)
     LIBMATTI_MC_Minecraft_Stop(minecraft);
 }
 
-// Java: PauseScreen.render / OptionsScreen.render - the overlay the client
-// folds into the render pass (the GuiRenderer + font ride the client). The
-// background dim flushes immediately (the batch must not span the white/panel
-// texture groups), the title sits at height/4 - 15 + 20 like the real game's
-// widget-centered heading, the buttons ride the Screen's children (the
-// widget's flat fallback tint: grey, hover brightens).
+// ---------------------------------------------------------------------------
+// The pause/options overlay (Java: Screen.renderWithTooltipAndSubtitles over
+// the runTick render tail). The 1.21.11 render order: the world blurs behind
+// the screen (the GUI blur pass the port folds into a down-sampled
+// framebuffer copy), the menu_background tiles dim it, the widgets draw the
+// vanilla sprites (the nine-slice button.png family), the font rides the
+// classic ascii.png glyphs (the 8x8 bitmap font the FontRenderer texture
+// carries - NOT the earlydisplay Monocraft pack the load screen uses).
+// ---------------------------------------------------------------------------
+
+// the shared overlay ui state (the textures the overlay draws + the blur
+// scratch; lazily built, freed with the Minecraft instance)
+static unsigned int matti_ui_button_tex[3];   // [0]=button, [1]=highlighted, [2]=disabled
+static unsigned int matti_ui_font_tex;        // ascii.png (the 128x128 page)
+static unsigned int matti_ui_menubg_tex;      // menu_background.png (16x16)
+static unsigned int matti_ui_blur_tex;        // the down-sampled frame copy
+static int matti_ui_blur_tex_w, matti_ui_blur_tex_h;
+static unsigned char *matti_ui_readback;      // the frame readback buffer
+static int matti_ui_readback_cap;
+static unsigned char *matti_ui_small;         // the down-sampled pixels
+static int matti_ui_small_cap;
+static LIBMATTI_B3D_NativeImage *matti_ui_font_image; // kept for the metrics audit
+static bool matti_ui_font_tex_valid;          // the font page made it up
+static bool matti_ui_textures_attempted;      // the one-shot load gate
+
+// Java: Font.width over the classic bitmap font - the width table (the ink
+// width in px; the draw adds the 1px advance). The table rides the classic
+// font metrics (verified against ascii.png in the harness).
+static const unsigned char matti_ascii_widths[256] = {
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 1, 3, 5, 5, 5, 5, 1, 3, 3, 3, 5, 1, 5, 1, 5,
+    5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 1, 1, 4, 5, 4, 5,
+    6, 5, 5, 5, 5, 5, 5, 5, 5, 3, 5, 5, 5, 5, 5, 5,
+    5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 3, 5, 3, 5, 5,
+    5, 5, 5, 5, 5, 4, 5, 5, 1, 5, 4, 2, 5, 5, 5, 5,
+    5, 5, 5, 3, 5, 5, 5, 5, 5, 5, 3, 1, 3, 6, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 5, 0, 0, 5, 0, 0, 0, 0, 0, 0, 4, 4, 0, 0, 0,
+    5, 0, 0, 0, 6, 6, 7, 8, 8, 5, 5, 5, 7, 7, 5, 7,
+    7, 7, 7, 7, 5, 5, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
+    8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
+    8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
+    8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 5, 8,
+    8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 5, 0,
+    6, 5, 5, 5, 7, 4, 5, 6, 4, 5, 0, 6, 4, 4, 5, 0};
+
+// Java: the gui textures load through the TextureManager's SimpleTexture
+// path (the embedded pack carries them). The direct NativeImage load here
+// mirrors the same pipeline without the reload wiring (the overlay textures
+// upload once and stay for the session).
+static unsigned int matti_ui_load_png(const char *resourcePath)
+{
+    const LIBMATTI_MC_MultiPackResourceManager *manager =
+        LIBMATTI_MC_VanillaAssetLoader_GetResourceManager();
+    if (manager == NULL)
+        return 0;
+    LIBMATTI_MC_Resource *resource = LIBMATTI_MC_MultiPackResourceManager_GetResource(
+        manager, "minecraft", resourcePath);
+    if (resource == NULL)
+        return 0;
+    size_t length = 0;
+    unsigned char *bytes = LIBMATTI_MC_Resource_Open(resource, &length);
+    if (bytes == NULL)
+    {
+        LIBMATTI_MC_Resource_Free(resource);
+        return 0;
+    }
+    LIBMATTI_B3D_NativeImage *image = LIBMATTI_B3D_NativeImage_Read(bytes, length);
+    LIBMATTI_MC_Resource_Free(resource);
+    if (image == NULL)
+        return 0;
+    unsigned int tex = 0;
+    LIBMATTI_GL_glGenTextures(1, &tex);
+    LIBMATTI_B3D_GlStateManager_BindTexture((int) tex);
+    LIBMATTI_GL_glTexParameteri(LIBMATTI_GL_GL_TEXTURE_2D, LIBMATTI_GL_GL_TEXTURE_MIN_FILTER, LIBMATTI_GL_GL_NEAREST);
+    LIBMATTI_GL_glTexParameteri(LIBMATTI_GL_GL_TEXTURE_2D, LIBMATTI_GL_GL_TEXTURE_MAG_FILTER, LIBMATTI_GL_GL_NEAREST);
+    LIBMATTI_GL_glTexParameteri(LIBMATTI_GL_GL_TEXTURE_2D, LIBMATTI_GL_GL_TEXTURE_WRAP_S, LIBMATTI_GL_GL_CLAMP_TO_EDGE);
+    LIBMATTI_GL_glTexParameteri(LIBMATTI_GL_GL_TEXTURE_2D, LIBMATTI_GL_GL_TEXTURE_WRAP_T, LIBMATTI_GL_GL_CLAMP_TO_EDGE);
+    LIBMATTI_GL_glPixelStorei(LIBMATTI_GL_GL_UNPACK_ALIGNMENT, 1);
+    LIBMATTI_GL_glTexImage2D(LIBMATTI_GL_GL_TEXTURE_2D, 0, LIBMATTI_GL_GL_RGBA, image->width, image->height,
+                             0, LIBMATTI_GL_GL_RGBA, LIBMATTI_GL_GL_UNSIGNED_BYTE, image->pixels);
+    free(image->pixels);
+    free(image);
+    return tex;
+}
+
+// the lazy texture build (the first overlay frame)
+static void matti_ui_ensure_textures(LIBMATTI_MC_Minecraft *minecraft)
+{
+    (void) minecraft;
+    if (matti_ui_textures_attempted)
+        return;
+    matti_ui_textures_attempted = true;
+    matti_ui_button_tex[0] = matti_ui_load_png("textures/gui/sprites/widget/button.png");
+    matti_ui_button_tex[1] = matti_ui_load_png("textures/gui/sprites/widget/button_highlighted.png");
+    matti_ui_button_tex[2] = matti_ui_load_png("textures/gui/sprites/widget/button_disabled.png");
+    matti_ui_menubg_tex = matti_ui_load_png("textures/gui/menu_background.png");
+    // the font page stays (the metrics audit + the potential re-upload ride
+    // the session)
+    const LIBMATTI_MC_MultiPackResourceManager *manager =
+        LIBMATTI_MC_VanillaAssetLoader_GetResourceManager();
+    if (manager != NULL)
+    {
+        LIBMATTI_MC_Resource *resource = LIBMATTI_MC_MultiPackResourceManager_GetResource(
+            manager, "minecraft", "textures/font/ascii.png");
+        if (resource != NULL)
+        {
+            size_t length = 0;
+            unsigned char *bytes = LIBMATTI_MC_Resource_Open(resource, &length);
+            if (bytes != NULL)
+            {
+                matti_ui_font_image = LIBMATTI_B3D_NativeImage_Read(bytes, length);
+                LIBMATTI_MC_Resource_Free(resource);
+                if (matti_ui_font_image != NULL)
+                {
+                    unsigned int tex = 0;
+                    LIBMATTI_GL_glGenTextures(1, &tex);
+                    LIBMATTI_B3D_GlStateManager_BindTexture((int) tex);
+                    LIBMATTI_GL_glTexParameteri(LIBMATTI_GL_GL_TEXTURE_2D, LIBMATTI_GL_GL_TEXTURE_MIN_FILTER, LIBMATTI_GL_GL_NEAREST);
+                    LIBMATTI_GL_glTexParameteri(LIBMATTI_GL_GL_TEXTURE_2D, LIBMATTI_GL_GL_TEXTURE_MAG_FILTER, LIBMATTI_GL_GL_NEAREST);
+                    LIBMATTI_GL_glTexParameteri(LIBMATTI_GL_GL_TEXTURE_2D, LIBMATTI_GL_GL_TEXTURE_WRAP_S, LIBMATTI_GL_GL_CLAMP_TO_EDGE);
+                    LIBMATTI_GL_glTexParameteri(LIBMATTI_GL_GL_TEXTURE_2D, LIBMATTI_GL_GL_TEXTURE_WRAP_T, LIBMATTI_GL_GL_CLAMP_TO_EDGE);
+                    LIBMATTI_GL_glPixelStorei(LIBMATTI_GL_GL_UNPACK_ALIGNMENT, 1);
+                    LIBMATTI_GL_glTexImage2D(LIBMATTI_GL_GL_TEXTURE_2D, 0, LIBMATTI_GL_GL_RGBA,
+                                             matti_ui_font_image->width, matti_ui_font_image->height,
+                                             0, LIBMATTI_GL_GL_RGBA, LIBMATTI_GL_GL_UNSIGNED_BYTE,
+                                             matti_ui_font_image->pixels);
+                    matti_ui_font_tex = tex;
+                }
+            }
+        }
+    }
+    matti_ui_font_tex_valid = matti_ui_font_image != NULL;
+    fprintf(stderr, "[OVERLAY] textures: button=%u highlighted=%u disabled=%u menu=%u font=%u (%s)\n",
+            matti_ui_button_tex[0], matti_ui_button_tex[1], matti_ui_button_tex[2], matti_ui_menubg_tex,
+            matti_ui_font_tex, matti_ui_font_tex_valid ? "ok" : "missing");
+}
+
+// the overlay textures die with the game (Destroy tail)
+static void matti_ui_free_textures(void)
+{
+    if (matti_ui_readback != NULL)
+    {
+        free(matti_ui_readback);
+        matti_ui_readback = NULL;
+    }
+    matti_ui_readback_cap = 0;
+    if (matti_ui_small != NULL)
+    {
+        free(matti_ui_small);
+        matti_ui_small = NULL;
+    }
+    matti_ui_small_cap = 0;
+    if (matti_ui_font_image != NULL)
+    {
+        free(matti_ui_font_image->pixels);
+        free(matti_ui_font_image);
+        matti_ui_font_image = NULL;
+    }
+    matti_ui_font_tex_valid = false;
+}
+
+// Java: Font.width - the ink width sum + the 1px advance, the trailing
+// spacing dies
+static int matti_gui_ascii_width(const char *text)
+{
+    if (text == NULL)
+        return 0;
+    int w = 0;
+    for (const unsigned char *p = (const unsigned char *) text; *p != '\0'; p++)
+    {
+        unsigned char c = *p;
+        if (c < 32 || c > 127)
+            c = '?';
+        w += matti_ascii_widths[c] + 1;
+    }
+    return w > 0 ? w - 1 : 0;
+}
+
+// Java: the glyph quad (the 8x8 cell over the ascii.png page, ASCII 32..127
+// in the left 8 columns - the layout the classic font page carries)
+static void matti_gui_draw_ascii_char(LIBMATTI_MC_Minecraft *minecraft, unsigned char c,
+                                      float x, float y, float scale, unsigned int argb)
+{
+    if (c < 32 || c > 127)
+        c = '?';
+    int gx = (int) (c % 16) * 8;
+    int gy = (int) (c / 16) * 8;
+    LIBMATTI_MC_GuiRenderer_BlitQuad(minecraft->guiRenderer, x, y,
+                                     8.0f * scale, 8.0f * scale,
+                                     (float) gx / 128.0f, (float) gy / 128.0f,
+                                     (float) (gx + 8) / 128.0f, (float) (gy + 8) / 128.0f,
+                                     argb);
+}
+
+// Java: drawString - the shadow pass (+1 gui unit, the vanilla shadow folds
+// the colour by 4: (argb & 0xFCFCFCFC) >> 2 over the same alpha) then the
+// text pass at the pen; both ride the GUI batcher with the font page bound
+// (the caller flushes the sprite batch first).
+static void matti_gui_draw_ascii(LIBMATTI_MC_Minecraft *minecraft, const char *text,
+                                 float x, float y, float scale, unsigned int argb)
+{
+    if (text == NULL || minecraft->guiRenderer == NULL)
+        return;
+    unsigned int shadowRGB = (argb & 0x00FCFCFCu) >> 2;
+    unsigned int shadow = shadowRGB | (argb & 0xFF000000u);
+    for (int pass = 0; pass < 2; pass++)
+    {
+        float penX = pass == 0 ? x + scale : x;
+        float penY = pass == 0 ? y + scale : y;
+        for (const unsigned char *p = (const unsigned char *) text; *p != '\0'; p++)
+        {
+            unsigned char c = *p;
+            if (c < 32 || c > 127)
+                c = '?';
+            matti_gui_draw_ascii_char(minecraft, c, penX, penY, scale, pass == 0 ? shadow : argb);
+            penX += (float) (matti_ascii_widths[c] + 1) * scale;
+        }
+    }
+}
+
+// Java: AbstractWidget.renderSprite - the nine-slice re-pack over the
+// 200x20 button sprite (the mcmeta nine_slice border=3): the corners ride
+// the 3px border, the edges stretch, the centre stretches both ways.
+static void matti_gui_blit_button_sprite(LIBMATTI_MC_Minecraft *minecraft, unsigned int tex,
+                                         int x, int y, int w, int h, float scale)
+{
+    if (tex == 0 || minecraft->guiRenderer == NULL)
+        return;
+    const float TW = 200.0f, TH = 20.0f;
+    float s = scale;
+    float x0 = (float) x * s, y0 = (float) y * s;
+    float x1 = (float) (x + w) * s, y1 = (float) (y + h) * s;
+    float bw = 3.0f * s; // the border in screen px
+    struct
+    {
+        float rx0, ry0, rx1, ry1; // the dest rect (screen px)
+        float su0, sv0, su1, sv1; // the sprite uv
+    } q[9] = {
+        // the corners (fixed 3x3 sprite -> 3x3 gui)
+        {x0, y0, x0 + bw, y0 + bw, 0.0f, 0.0f, 3.0f / TW, 3.0f / TH},
+        {x1 - bw, y0, x1, y0 + bw, 197.0f / TW, 0.0f, 1.0f, 3.0f / TH},
+        {x0, y1 - bw, x0 + bw, y1, 0.0f, 17.0f / TH, 3.0f / TW, 1.0f},
+        {x1 - bw, y1 - bw, x1, y1, 197.0f / TW, 17.0f / TH, 1.0f, 1.0f},
+        // the top/bottom edges (the long axis stretches)
+        {x0 + bw, y0, x1 - bw, y0 + bw, 3.0f / TW, 0.0f, 197.0f / TW, 3.0f / TH},
+        {x0 + bw, y1 - bw, x1 - bw, y1, 3.0f / TW, 17.0f / TH, 197.0f / TW, 1.0f},
+        // the left/right edges (the short axis stretches)
+        {x0, y0 + bw, x0 + bw, y1 - bw, 0.0f, 3.0f / TH, 3.0f / TW, 17.0f / TH},
+        {x1 - bw, y0 + bw, x1, y1 - bw, 197.0f / TW, 3.0f / TH, 1.0f, 17.0f / TH},
+        // the centre (both axes stretch)
+        {x0 + bw, y0 + bw, x1 - bw, y1 - bw, 3.0f / TW, 3.0f / TH, 197.0f / TW, 17.0f / TH},
+    };
+    for (int i = 0; i < 9; i++)
+    {
+        LIBMATTI_MC_GuiRenderer_BlitQuad(minecraft->guiRenderer, q[i].rx0, q[i].ry0,
+                                         q[i].rx1 - q[i].rx0, q[i].ry1 - q[i].ry0,
+                                         q[i].su0, q[i].sv0, q[i].su1, q[i].sv1, 0xFFFFFFFFu);
+    }
+}
+
+// Java: Screen.renderBackground (the 1.21.x in-world pause path) - the world
+// blurs behind the screen and the menu_background tiles dim the copy. The
+// port blurs through a 1/8 down-sampled framebuffer copy (glReadPixels ->
+// the small texture -> the screen-filling LINEAR quads), the menu tile rides
+// over it (the alpha-tiled dim), the text keeps its contrast.
+static void render_pause_background(LIBMATTI_MC_Minecraft *minecraft, float sw, float sh, float scale)
+{
+    if (minecraft->guiRenderer == NULL)
+        return;
+
+    int fw = 0, fh = 0;
+    LIBMATTI_GLFW_glfwGetFramebufferSize(minecraft->window, &fw, &fh);
+    if (fw <= 0 || fh <= 0)
+        return;
+
+    int smallW = fw / 8 > 2 ? fw / 8 : 2;
+    int smallH = fh / 8 > 2 ? fh / 8 : 2;
+    if (matti_ui_blur_tex == 0)
+    {
+        LIBMATTI_GL_glGenTextures(1, &matti_ui_blur_tex);
+        matti_ui_blur_tex_w = 0;
+        matti_ui_blur_tex_h = 0;
+    }
+    // the readback rides the full frame, the small buffer the down-sample
+    int readNeed = fw * fh * 4;
+    if (matti_ui_readback_cap < readNeed)
+    {
+        unsigned char *grown = realloc(matti_ui_readback, (size_t) readNeed);
+        if (grown == NULL)
+            return;
+        matti_ui_readback = grown;
+        matti_ui_readback_cap = readNeed;
+    }
+    int smallNeed = smallW * smallH * 4;
+    if (matti_ui_small_cap < smallNeed)
+    {
+        unsigned char *grown = realloc(matti_ui_small, (size_t) smallNeed);
+        if (grown == NULL)
+            return;
+        matti_ui_small = grown;
+        matti_ui_small_cap = smallNeed;
+    }
+
+    // the frame copy: the readback rides the CURRENT framebuffer (the render
+    // pass draws into the layout FBO the BlitToScreen samples). The readback
+    // targets the READ binding, not the write one - bind the layout FBO (the
+    // bound WRITE target) as READ like the MATTI_SCREENSHOT hook does, or the
+    // copy samples the window's default framebuffer (black) and the blur
+    // quadruples the black.
+    LIBMATTI_B3D_GlStateManager_BindFramebuffer(36008,
+                                                (unsigned int) LIBMATTI_B3D_GlStateManager_GetFrameBuffer(36009));
+    LIBMATTI_GL_glPixelStorei(LIBMATTI_GL_GL_PACK_ALIGNMENT, 1);
+    LIBMATTI_GL_glReadPixels(0, 0, fw, fh, LIBMATTI_GL_GL_RGBA, LIBMATTI_GL_GL_UNSIGNED_BYTE,
+                             matti_ui_readback);
+    // down-sample 8x8 (the box average over the readback)
+    int step = fw / smallW;
+    for (int y = 0; y < smallH; y++)
+    {
+        for (int x = 0; x < smallW; x++)
+        {
+            unsigned int r = 0, g = 0, b = 0, a = 0;
+            int count = 0;
+            for (int sy = 0; sy < step && y * step + sy < fh; sy++)
+            {
+                for (int sx = 0; sx < step && x * step + sx < fw; sx++)
+                {
+                    const unsigned char *px = matti_ui_readback + ((y * step + sy) * fw + (x * step + sx)) * 4;
+                    r += px[0];
+                    g += px[1];
+                    b += px[2];
+                    a += px[3];
+                    count++;
+                }
+            }
+            unsigned char *out = matti_ui_small + (y * smallW + x) * 4;
+            out[0] = (unsigned char) (r / count);
+            out[1] = (unsigned char) (g / count);
+            out[2] = (unsigned char) (b / count);
+            out[3] = (unsigned char) (a / count);
+        }
+    }
+    LIBMATTI_B3D_GlStateManager_ActiveTexture(LIBMATTI_GL_GL_TEXTURE0);
+    LIBMATTI_B3D_GlStateManager_BindTexture((int) matti_ui_blur_tex);
+    if (matti_ui_blur_tex_w != smallW || matti_ui_blur_tex_h != smallH)
+    {
+        LIBMATTI_GL_glTexParameteri(LIBMATTI_GL_GL_TEXTURE_2D, LIBMATTI_GL_GL_TEXTURE_MIN_FILTER, LIBMATTI_GL_GL_LINEAR);
+        LIBMATTI_GL_glTexParameteri(LIBMATTI_GL_GL_TEXTURE_2D, LIBMATTI_GL_GL_TEXTURE_MAG_FILTER, LIBMATTI_GL_GL_LINEAR);
+        LIBMATTI_GL_glTexParameteri(LIBMATTI_GL_GL_TEXTURE_2D, LIBMATTI_GL_GL_TEXTURE_WRAP_S, LIBMATTI_GL_GL_CLAMP_TO_EDGE);
+        LIBMATTI_GL_glTexParameteri(LIBMATTI_GL_GL_TEXTURE_2D, LIBMATTI_GL_GL_TEXTURE_WRAP_T, LIBMATTI_GL_GL_CLAMP_TO_EDGE);
+    LIBMATTI_GL_glPixelStorei(LIBMATTI_GL_GL_UNPACK_ALIGNMENT, 1);
+        LIBMATTI_GL_glTexImage2D(LIBMATTI_GL_GL_TEXTURE_2D, 0, LIBMATTI_GL_GL_RGBA, smallW, smallH,
+                                 0, LIBMATTI_GL_GL_RGBA, LIBMATTI_GL_GL_UNSIGNED_BYTE, matti_ui_small);
+        matti_ui_blur_tex_w = smallW;
+        matti_ui_blur_tex_h = smallH;
+    }
+    else
+    {
+        LIBMATTI_GL_glPixelStorei(LIBMATTI_GL_GL_UNPACK_ALIGNMENT, 1);
+        LIBMATTI_GL_glTexSubImage2D(LIBMATTI_GL_GL_TEXTURE_2D, 0, 0, 0, smallW, smallH,
+                                    LIBMATTI_GL_GL_RGBA, LIBMATTI_GL_GL_UNSIGNED_BYTE, matti_ui_small);
+    }
+
+    // the blurred copy over the screen (the 4x LINEAR up-scale carries the
+    // blur; the dim rides the menu tile + the flat guard below)
+    LIBMATTI_MC_GuiRenderer_SetTexture(minecraft->guiRenderer, matti_ui_blur_tex);
+    LIBMATTI_MC_GuiRenderer_BlitQuad(minecraft->guiRenderer, 0.0f, 0.0f, sw, sh,
+                                     0.0f, 0.0f, 1.0f, 1.0f, 0xFFFFFFFFu);
+    LIBMATTI_MC_GuiRenderer_Flush(minecraft->guiRenderer, sw, sh);
+
+    // Java: renderMenuBackground - the menu_background tile tiles the blurred
+    // copy (the 16x16 texture repeats over the screen; the 0.25-alpha dim
+    // sits IN the tile - the texture's own shading).
+    if (matti_ui_menubg_tex != 0)
+    {
+        LIBMATTI_MC_GuiRenderer_SetTexture(minecraft->guiRenderer, matti_ui_menubg_tex);
+        float tile = 16.0f * scale;
+        int tilesX = (int) (sw / tile) + 1;
+        int tilesY = (int) (sh / tile) + 1;
+        for (int ty = 0; ty < tilesY; ty++)
+        {
+            for (int tx = 0; tx < tilesX; tx++)
+            {
+                LIBMATTI_MC_GuiRenderer_BlitQuad(minecraft->guiRenderer,
+                                                 (float) tx * tile, (float) ty * tile,
+                                                 tile, tile,
+                                                 0.0f, 0.0f, 1.0f, 1.0f, 0xFFFFFFFFu);
+            }
+        }
+        LIBMATTI_MC_GuiRenderer_Flush(minecraft->guiRenderer, sw, sh);
+    }
+}
+
+// Java: Screen.render - the widgets ride the sprite pass (the nine-slice
+// button family), the labels ride the font pass after the flush (the
+// vanilla render order: the sprites flush, then the font draws).
 static void render_pause_overlay(LIBMATTI_MC_Minecraft *minecraft, int guiWidth, int guiHeight, float scale)
 {
+    if (minecraft->guiRenderer == NULL)
+        return;
     LIBMATTI_MC_Screen *screen = NULL;
     if (minecraft->optionsScreen != NULL)
         screen = &minecraft->optionsScreen->base;
@@ -1066,116 +1461,94 @@ static void render_pause_overlay(LIBMATTI_MC_Minecraft *minecraft, int guiWidth,
     if (screen == NULL)
         return;
 
-    // Java: renderBackground - the darkened backdrop (the flat dim instead of
-    // the blurred world - the blur shader lands with the video settings port)
-    LIBMATTI_MC_GuiRenderer_BlitQuad(minecraft->guiRenderer, 0.0f, 0.0f,
-                                     (float) guiWidth * scale, (float) guiHeight * scale,
-                                     0.0f, 0.0f, 1.0f, 1.0f, 0x90001018u);
-    LIBMATTI_MC_GuiRenderer_SetTexture(minecraft->guiRenderer, 0);
-    LIBMATTI_MC_GuiRenderer_Flush(minecraft->guiRenderer, (float) guiWidth * scale, (float) guiHeight * scale);
+    float sw = (float) guiWidth * scale;
+    float sh = (float) guiHeight * scale;
 
-    // Java: the flat fallback draws the widgets (grey shade, hover brightens);
-    // the press state tints the active button (Button_IsPressed). The cursor
-    // scales into the layout space once (the render pass's hover coords).
+    // Java: the GUI pass runs blended (RenderSystem.enableBlend over the
+    // SRC_ALPHA pair) - the menu tile's 0x40 alpha and the glyph shadow pixels
+    // fold into the frame only when the blend is on; disabled the alpha writes
+    // opaque (the shadow quads read black boxes).
+    LIBMATTI_B3D_GlStateManager_EnableBlend();
+    LIBMATTI_B3D_GlStateManager_BlendFuncSeparate(LIBMATTI_GL_GL_SRC_ALPHA,
+                                                  LIBMATTI_GL_GL_ONE_MINUS_SRC_ALPHA,
+                                                  LIBMATTI_GL_GL_ONE, LIBMATTI_GL_GL_ONE_MINUS_SRC_ALPHA);
+
+    matti_ui_ensure_textures(minecraft);
+
+    // Java: renderBackground - the blurred world + the menu tile
+    render_pause_background(minecraft, sw, sh, scale);
+
+    // --- the widget sprite pass -------------------------------------------
+    // Java: the cursor scales into the layout space (the hover state)
     double cursorX = 0.0, cursorY = 0.0;
     LIBMATTI_GLFW_glfwGetCursorPos(minecraft->window, &cursorX, &cursorY);
     int fw = 0, fh = 0;
     LIBMATTI_GLFW_glfwGetFramebufferSize(minecraft->window, &fw, &fh);
     int guiFactor = gui_scale(fw, fh);
     int mouseX = (int) (cursorX / guiFactor), mouseY = (int) (cursorY / guiFactor);
+
+    LIBMATTI_MC_GuiRenderer_SetTexture(minecraft->guiRenderer, 0);
     for (int i = 0; i < screen->childCount; i++)
         LIBMATTI_MC_AbstractWidget_Render(screen->children[i], mouseX, mouseY, 0.0f);
 
-    // Java: AbstractButton.renderWidget - the vanilla sprite shade + the
-    // centred label. The widget renderer keeps no GuiRenderer handle, so the
-    // client draws the flat fallback over the Screen's children (the same
-    // fold the panel texture rides): grey shade, hover brightens, the press
-    // darkens, the label in the E0E0E0 with the 0.25 alpha shadow.
     for (int i = 0; i < screen->childCount; i++)
     {
-        LIBMATTI_MC_Button *button = (LIBMATTI_MC_Button *) screen->children[i];
-        unsigned tint = 0xFF7D7D7Du;
-        if (LIBMATTI_MC_Button_IsPressed(button))
-            tint = 0xFF5F5F5Fu;
-        else if (button->base.isHovered)
-            tint = 0xFFA9A9A9u;
-        LIBMATTI_MC_GuiRenderer_BlitQuad(minecraft->guiRenderer,
-                                         (float) LIBMATTI_MC_AbstractWidget_GetX(&button->base) * scale,
-                                         (float) LIBMATTI_MC_AbstractWidget_GetY(&button->base) * scale,
-                                         (float) LIBMATTI_MC_AbstractWidget_GetWidth(&button->base) * scale,
-                                         (float) LIBMATTI_MC_AbstractWidget_GetHeight(&button->base) * scale,
-                                         0.0f, 0.0f, 1.0f, 1.0f, tint);
+        LIBMATTI_MC_AbstractWidget *widget = screen->children[i];
+        unsigned int tex;
+        if (!widget->active)
+            tex = matti_ui_button_tex[2]; // Java: the disabled sprite
+        else if (widget->isHovered)
+            tex = matti_ui_button_tex[1];
+        else
+            tex = matti_ui_button_tex[0];
+        LIBMATTI_MC_GuiRenderer_SetTexture(minecraft->guiRenderer, tex);
+        matti_gui_blit_button_sprite(minecraft, tex, LIBMATTI_MC_AbstractWidget_GetX(widget),
+                                     LIBMATTI_MC_AbstractWidget_GetY(widget),
+                                     LIBMATTI_MC_AbstractWidget_GetWidth(widget),
+                                     LIBMATTI_MC_AbstractWidget_GetHeight(widget), scale);
+        LIBMATTI_MC_GuiRenderer_Flush(minecraft->guiRenderer, sw, sh);
     }
-    // Java: renderDirtBackground's order - the dim stays behind the labels:
-    // the button shading flushes BEFORE the font pass.
-    LIBMATTI_MC_GuiRenderer_Flush(minecraft->guiRenderer, (float) guiWidth * scale, (float) guiHeight * scale);
 
-    // Java: the labels ride the font pass after the widget shade (the
-    // renderDirtBackground order keeps the dim behind the text)
-    if (minecraft->font != NULL && minecraft->fontProgram != 0)
+    // --- the font pass ------------------------------------------------------
+    if (matti_ui_font_tex_valid)
     {
-        LIBMATTI_GL_glUseProgram(minecraft->fontProgram);
-        LIBMATTI_GL_glUniform2f(minecraft->fontScreenSizeLocation, (float) guiWidth * scale,
-                                (float) guiHeight * scale);
-        LIBMATTI_B3D_GlStateManager_ActiveTexture(LIBMATTI_GL_GL_TEXTURE0);
-        LIBMATTI_B3D_GlStateManager_BindTexture((int) LIBMATTI_FML_SimpleFont_TextureId(minecraft->font));
-        LIBMATTI_GL_glUniform1i(LIBMATTI_GL_glGetUniformLocation(minecraft->fontProgram, "tex"), 0);
+        LIBMATTI_MC_GuiRenderer_SetTexture(minecraft->guiRenderer, matti_ui_font_tex);
+        // Java: the widget labels (drawCenteredString over the widget box;
+        // the pressed button shifts the label +1,+1 like the vanilla sprite
+        // state - the click reads through the label nudge)
         for (int i = 0; i < screen->childCount; i++)
         {
             LIBMATTI_MC_AbstractWidget *widget = screen->children[i];
             const char *label = LIBMATTI_MC_AbstractWidget_GetMessage(widget);
             if (label == NULL)
                 continue;
-            int labelWidth = LIBMATTI_FML_SimpleFont_StringWidth(minecraft->font, label);
-            // Java: drawCenteredString over the widget box - the pen centres
-            // against the SCALED box while the glyph advance rides the pack's
-            // fixed pixel size (StringWidth reports pixels; the SimpleFont
-            // batcher scales the pen positions only, like the HUD name line).
+            unsigned int argb = widget->active ? 0xFFE0E0E0u : 0xFFA0A0A0u;
+            int labelWidth = matti_gui_ascii_width(label);
             float labelX = (float) LIBMATTI_MC_AbstractWidget_GetX(widget) * scale
-                           + ((float) LIBMATTI_MC_AbstractWidget_GetWidth(widget) * scale - (float) labelWidth) / 2.0f;
-            float labelY = ((float) LIBMATTI_MC_AbstractWidget_GetY(widget)
-                            + ((float) LIBMATTI_MC_AbstractWidget_GetHeight(widget) - 8.0f) / 2.0f) * scale;
-            // Java: the vanilla 8-unit font box centres the label - the
-            // Monocraft pack's glyph ink starts ~9px below the pen, so the
-            // pen rides up by the ink offset to land the same box.
-            labelY -= 9.0f;
-            LIBMATTI_FML_SimpleFont_DisplayText shadow[1] = {{label, 0x40000000u}};
-            LIBMATTI_FML_SimpleFont_DrawTexts(minecraft->font, labelX + scale, labelY + scale, shadow, 1);
-            LIBMATTI_FML_SimpleFont_DisplayText text[1] = {{label, 0xFFE0E0E0u}};
-            LIBMATTI_FML_SimpleFont_DrawTexts(minecraft->font, labelX, labelY, text, 1);
+                           + ((float) LIBMATTI_MC_AbstractWidget_GetWidth(widget) * scale
+                              - (float) labelWidth * scale) / 2.0f;
+            float labelY = (float) LIBMATTI_MC_AbstractWidget_GetY(widget) * scale
+                           + ((float) LIBMATTI_MC_AbstractWidget_GetHeight(widget) - 8.0f) * scale / 2.0f;
+            if (LIBMATTI_MC_Button_IsPressed((LIBMATTI_MC_Button *) widget))
+            {
+                labelX += scale;
+                labelY += scale;
+            }
+            matti_gui_draw_ascii(minecraft, label, labelX, labelY, scale, argb);
         }
-        LIBMATTI_GL_glUseProgram(0);
-    }
-
-    // Java: renderTitleText - "Game Menu" / "Options" centred at
-    // height/4 - 15 + 20 (the widget row top), white with the 0.25 alpha
-    // shadow.
-    if (minecraft->font != NULL && minecraft->fontProgram != 0)
-    {
+        // Java: renderTitleText - drawCenteredString at y 40 (the 1.21.11
+        // pause carries the StringWidget title at MENU_PADDING_TOP - 10)
         const char *title = LIBMATTI_MC_Screen_GetTitle(screen);
         if (title != NULL)
         {
-            LIBMATTI_GL_glUseProgram(minecraft->fontProgram);
-            LIBMATTI_GL_glUniform2f(minecraft->fontScreenSizeLocation, (float) guiWidth * scale,
-                                    (float) guiHeight * scale);
-            LIBMATTI_B3D_GlStateManager_ActiveTexture(LIBMATTI_GL_GL_TEXTURE0);
-            LIBMATTI_B3D_GlStateManager_BindTexture((int) LIBMATTI_FML_SimpleFont_TextureId(minecraft->font));
-            LIBMATTI_GL_glUniform1i(LIBMATTI_GL_glGetUniformLocation(minecraft->fontProgram, "tex"), 0);
-            int textWidth = LIBMATTI_FML_SimpleFont_StringWidth(minecraft->font, title);
-            // Java: renderTitleText - drawCenteredString over the layout
-            // width, the text top at height/4 - 15 (the pen centres against
-            // the scaled width, the glyph advance stays the pack's fixed
-            // pixel size; the ink offset rides the same 9px correction as
-            // the widget labels).
-            float textX = ((float) guiWidth * scale - (float) textWidth) / 2.0f;
-            float textY = (float) (screen->height / 4 - 15) * scale - 9.0f;
-            LIBMATTI_FML_SimpleFont_DisplayText shadow[1] = {{title, 0x40000000u}};
-            LIBMATTI_FML_SimpleFont_DrawTexts(minecraft->font, textX + scale, textY + scale, shadow, 1);
-            LIBMATTI_FML_SimpleFont_DisplayText text[1] = {{title, 0xFFFFFFFFu}};
-            LIBMATTI_FML_SimpleFont_DrawTexts(minecraft->font, textX, textY, text, 1);
-            LIBMATTI_GL_glUseProgram(0);
+            int textWidth = matti_gui_ascii_width(title);
+            float textX = ((float) guiWidth * scale - (float) textWidth * scale) / 2.0f;
+            float textY = (float) LIBMATTI_MC_PauseScreen_TITLE_Y * scale;
+            matti_gui_draw_ascii(minecraft, title, textX, textY, scale, 0xFFFFFFFFu);
         }
+        LIBMATTI_MC_GuiRenderer_Flush(minecraft->guiRenderer, sw, sh);
     }
+    LIBMATTI_B3D_GlStateManager_DisableBlend();
 }
 
 static void render_title(LIBMATTI_MC_Minecraft *minecraft, int width, int height)
@@ -2468,9 +2841,12 @@ static void runTick(LIBMATTI_MC_Minecraft *minecraft, int runGameTime)
                     // the game keeps rendering behind it). The overlay folds
                     // the pause/options render into the pass.
                     if (minecraft->pauseScreen != NULL || minecraft->optionsScreen != NULL)
+                    {
+                        route_pause_clicks(minecraft);
                         render_pause_overlay(minecraft, width / gui_scale(width, height),
                                              height / gui_scale(width, height),
                                              (float) gui_scale(width, height));
+                    }
 
                     // The MATTI_SCREENSHOT debug hook: reads the layout FBO's
                     // back buffer into a PPM once (the renderer verification).
@@ -2685,6 +3061,7 @@ void LIBMATTI_MC_Minecraft_Destroy(LIBMATTI_MC_Minecraft *minecraft)
     LIBMATTI_GLFW_glfwTerminate();
 
     LIBMATTI_MC_DeltaTracker_Free(minecraft->deltaTracker);
+    matti_ui_free_textures();
     LIBMATTI_MC_TextureManager_Free(minecraft->textureManager);
     if (minecraft->fontProgram != 0)
     {
