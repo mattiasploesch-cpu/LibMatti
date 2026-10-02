@@ -7,6 +7,14 @@
 
 #include <string.h>
 
+// Java: !state.is(Blocks.AIR) - the prime scan's air fast path
+static bool is_air(const LIBMATTI_MC_BlockState *state)
+{
+    if (state == NULL)
+        return true;
+    return (const void *) LIBMATTI_MC_BlockState_GetBlock(state) == (const void *) LIBMATTI_MC_VanillaBlocks_AIR();
+}
+
 // Java: NOT_AIR = state -> !state.isAir(); MATERIAL_MOTION_BLOCKING - the port
 // treats every non-air state as motion blocking until the block model carries it
 static bool is_opaque(const LIBMATTI_MC_Heightmap *heightmap, const LIBMATTI_MC_BlockState *state)
@@ -14,7 +22,7 @@ static bool is_opaque(const LIBMATTI_MC_Heightmap *heightmap, const LIBMATTI_MC_
     if (state == NULL)
         return false;
     const void *block = LIBMATTI_MC_BlockState_GetBlock(state);
-    bool notAir = block != (const void *) LIBMATTI_MC_VanillaBlocks_AIR();
+    bool notAir = !is_air(state);
     switch (heightmap->type)
     {
         case LIBMATTI_MC_Heightmap_WORLD_SURFACE_WG:
@@ -118,34 +126,49 @@ void LIBMATTI_MC_Heightmap_PrimeHeightmaps(struct LIBMATTI_MC_ChunkAccess *chunk
     if (count == 0)
         return;
 
-    // Java: primeHeightmaps - scan every column top-down, set each heightmap once
+    // Java: primeHeightmaps - the ObjectList<Heightmap> is rebuilt per column
+    // (the iterator.remove() drops a heightmap from the COLUMN's list, not from
+    // the whole chunk), so every column resolves its own first-available layer
+    LIBMATTI_MC_Heightmap *all[LIBMATTI_MC_Heightmap_TYPES_COUNT];
     LIBMATTI_MC_Heightmap *maps[LIBMATTI_MC_Heightmap_TYPES_COUNT];
     for (size_t i = 0; i < count; i++)
-        maps[i] = LIBMATTI_MC_ChunkAccess_GetOrCreateHeightmapUnprimed((LIBMATTI_MC_ChunkAccess *) chunk, (int) types[i]);
+        all[i] = LIBMATTI_MC_ChunkAccess_GetOrCreateHeightmapUnprimed((LIBMATTI_MC_ChunkAccess *) chunk, (int) types[i]);
 
     int minY = chunk->levelHeightAccessor.minY;
+    // Java: int j = chunk.getHighestSectionPosition() + 16 - the scan starts
+    // at the topmost block of the highest section (getMaxY() is inclusive)
     int maxY = LIBMATTI_MC_LevelHeightAccessor_GetMaxY(&chunk->levelHeightAccessor);
+
     for (int x = 0; x < 16; x++)
     {
         for (int z = 0; z < 16; z++)
         {
+            size_t remaining = 0;
+            for (size_t i = 0; i < count; i++)
+            {
+                if (all[i] != NULL)
+                    maps[remaining++] = all[i];
+            }
+
             for (int y = maxY; y >= minY; y--)
             {
-                bool anyLeft = false;
-                for (size_t i = 0; i < count; i++)
+                LIBMATTI_MC_BlockState *state = LIBMATTI_MC_ChunkAccess_GetBlockStateXYZ(chunk, x, y, z);
+                if (is_air(state))
+                    continue;
+
+                // Java: the iterator walk - every still-listed heightmap that
+                // treats this block as opaque takes the layer and leaves
+                size_t out = 0;
+                for (size_t i = 0; i < remaining; i++)
                 {
-                    if (maps[i] == NULL)
-                        continue;
-                    anyLeft = true;
-                    LIBMATTI_MC_BlockState *state = LIBMATTI_MC_ChunkAccess_GetBlockStateXYZ(chunk, x, y, z);
                     if (is_opaque(maps[i], state))
-                    {
                         set_height(maps[i], x, z, y + 1);
-                        maps[i] = NULL;
-                    }
+                    else
+                        maps[out++] = maps[i];
                 }
-                if (!anyLeft)
-                    return;
+                remaining = out;
+                if (remaining == 0)
+                    break; // Java: objectlist.isEmpty() -> break
             }
         }
     }

@@ -9,6 +9,7 @@
 #include "libmatti/net/minecraft/nbt/ListTag.h"
 #include "libmatti/net/minecraft/server/bootstrap/VanillaBlocks.h"
 #include "libmatti/net/minecraft/world/level/Level.h"
+#include "libmatti/net/minecraft/world/level/biome/Biome.h"
 #include "libmatti/net/minecraft/world/level/block/state/StateDefinition.h"
 #include "libmatti/net/minecraft/world/level/block/state/properties/Property.h"
 #include "libmatti/net/minecraft/world/level/chunk/LevelChunkSection.h"
@@ -22,7 +23,6 @@
 // Java: the vanilla chunk status string the port writes and accepts
 #define CHUNK_STATUS_FULL "minecraft:full"
 // Java: the biome the port's sections carry (the biome model is worldgen content)
-#define BIOME_PLAINS "minecraft:plains"
 
 // ---------------------------------------------------------------------------
 // small helpers
@@ -373,11 +373,13 @@ LIBMATTI_MC_Nbt_CompoundTag *LIBMATTI_MC_SerializableChunkData_Write(LIBMATTI_MC
         LIBMATTI_MC_Nbt_CompoundTag *sectionTag = LIBMATTI_MC_Nbt_CompoundTag_New();
         LIBMATTI_MC_Nbt_CompoundTag_PutByte(sectionTag, "Y", (int8_t) (minSectionY + i));
         write_block_states(sectionTag, section);
-        // Java: store("biomes", biomeCodec, biomes) - the port writes the single
-        // plains palette the biome model will replace
+        // Java: store("biomes", biomeCodec, biomes) - the section's biome rides
+        // the single-entry palette (the generator sources stay single-biome so
+        // far; the container lands with the multi-biome sources)
         LIBMATTI_MC_Nbt_CompoundTag *biomes = LIBMATTI_MC_Nbt_CompoundTag_New();
         LIBMATTI_MC_Nbt_ListTag *biomePalette = LIBMATTI_MC_Nbt_ListTag_New();
-        LIBMATTI_MC_Nbt_ListTag_Add(biomePalette, LIBMATTI_MC_Nbt_StringTag_Of(BIOME_PLAINS));
+        LIBMATTI_MC_Nbt_ListTag_Add(biomePalette, LIBMATTI_MC_Nbt_StringTag_Of(
+                                                      LIBMATTI_MC_LevelChunkSection_GetBiome(section)->id));
         LIBMATTI_MC_Nbt_CompoundTag_Put(biomes, "palette", (LIBMATTI_MC_Nbt_Tag *) biomePalette);
         LIBMATTI_MC_Nbt_CompoundTag_Put(sectionTag, "biomes", (LIBMATTI_MC_Nbt_Tag *) biomes);
         LIBMATTI_MC_Nbt_ListTag_Add(sections, (LIBMATTI_MC_Nbt_Tag *) sectionTag);
@@ -559,6 +561,18 @@ LIBMATTI_MC_LevelChunk *LIBMATTI_MC_SerializableChunkData_Read(struct LIBMATTI_M
             if (index < 0 || index >= chunk->base.sectionCount)
                 continue;
             read_block_states(chunk->base.sections[index], sectionTag, chunkHeight);
+            // Java: the biomes palette read - the first entry names the section's
+            // biome (the multi-entry container lands with the multi-biome sources)
+            LIBMATTI_MC_Nbt_CompoundTag *biomesTag = NULL;
+            LIBMATTI_MC_Nbt_ListTag *biomePalette = NULL;
+            if (LIBMATTI_MC_Nbt_CompoundTag_GetCompound(sectionTag, "biomes", &biomesTag) && biomesTag != NULL
+                && LIBMATTI_MC_Nbt_CompoundTag_GetList(biomesTag, "palette", &biomePalette) && biomePalette != NULL
+                && LIBMATTI_MC_Nbt_ListTag_Size(biomePalette) > 0)
+            {
+                const char *biomeId = NULL;
+                if (LIBMATTI_MC_Nbt_ListTag_GetString(biomePalette, 0, &biomeId) && biomeId != NULL)
+                    LIBMATTI_MC_LevelChunkSection_SetBiome(chunk->base.sections[index], LIBMATTI_MC_Biome_Of(biomeId));
+            }
         }
     }
 

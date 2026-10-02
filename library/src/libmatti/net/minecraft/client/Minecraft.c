@@ -41,6 +41,9 @@
 #include "libmatti/com/mojang/blaze3d/platform/NativeImage.h"
 #include "libmatti/net/minecraft/world/level/block/state/BlockState.h"
 #include "libmatti/net/minecraft/world/level/storage/LevelStorageSource.h"
+#include "libmatti/net/minecraft/world/level/chunk/ChunkGenerator.h"
+#include "libmatti/net/minecraft/world/level/levelgen/flat/FlatLevelSource.h"
+#include "libmatti/net/minecraft/world/level/biome/Biome.h"
 #include "libmatti/net/minecraft/server/bootstrap/VanillaAssetLoader.h"
 #include "libmatti/net/minecraft/client/renderer/block/BlockRenderDispatcher.h"
 #include "libmatti/net/minecraft/server/bootstrap/VanillaBlockModels.h"
@@ -145,6 +148,10 @@ struct LIBMATTI_MC_Minecraft
     // flushes on close. NULL when the save dir is unavailable.
     LIBMATTI_MC_LevelStorageSource *levelStorageSource;
     LIBMATTI_MC_LevelStorageAccess *levelStorage;
+
+    // Java: ServerLevel's ChunkGenerator (the P7.2 port) - the demo world rides
+    // the FlatLevelSource over the superflat recipe; the session owns it.
+    LIBMATTI_MC_FlatLevelSource *chunkGenerator;
 
     // Java: this.levelRenderer = new LevelRenderer - the section dispatcher the
     // chunk meshes go through (the P4.1 port).
@@ -534,61 +541,18 @@ LIBMATTI_MC_Minecraft *LIBMATTI_MC_Minecraft_New(const LIBMATTI_MC_GameConfig *c
     instance = minecraft;
 
     // Java: this.level = new ClientLevel(...) + levelRenderer.setLevel - the
-    // skeleton's demo level: bootstrap the vanilla blocks, one in-memory level
-    // and a flat 16x16 stone platform at y=64 the section compiler meshes.
+    // demo level builds through the P7.2 chunk generator now: the
+    // FlatLevelSource fills the two demo chunks (the superflat recipe) unless
+    // the save already owns them, and the towers re-apply on top either way.
     {
         LIBMATTI_MC_Bootstrap_BootStrap();
         LIBMATTI_MC_Level *level = LIBMATTI_MC_Level_New(-64, 384, LIBMATTI_MC_Level_OVERWORLD, true);
-        LIBMATTI_MC_Block *stone = LIBMATTI_MC_VanillaBlocks_GetByName("STONE");
-        LIBMATTI_MC_Block *dirt = LIBMATTI_MC_VanillaBlocks_GetByName("DIRT");
-        if (stone != NULL && dirt != NULL)
-        {
-            for (int x = 0; x < 16; x++)
-            {
-                for (int z = 0; z < 16; z++)
-                {
-                    LIBMATTI_MC_BlockPos ground = {{x, 64, z}};
-                    LIBMATTI_MC_Level_SetBlock(level, &ground, LIBMATTI_MC_Block_DefaultBlockState(stone),
-                                               LIBMATTI_MC_Level_UPDATE_CLIENTS);
-                    LIBMATTI_MC_BlockPos fill = {{x, 63, z}};
-                    LIBMATTI_MC_Level_SetBlock(level, &fill, LIBMATTI_MC_Block_DefaultBlockState(dirt),
-                                               LIBMATTI_MC_Level_UPDATE_CLIENTS);
-                }
-            }
-            // Two stone towers to make the geometry visible from the camera.
-            for (int y = 65; y < 70; y++)
-            {
-                LIBMATTI_MC_BlockPos a = {{4, y, 4}};
-                LIBMATTI_MC_Level_SetBlock(level, &a, LIBMATTI_MC_Block_DefaultBlockState(stone),
-                                           LIBMATTI_MC_Level_UPDATE_CLIENTS);
-                LIBMATTI_MC_BlockPos b = {{11, y, 11}};
-                LIBMATTI_MC_Level_SetBlock(level, &b, LIBMATTI_MC_Block_DefaultBlockState(stone),
-                                           LIBMATTI_MC_Level_UPDATE_CLIENTS);
-            }
-            // A second platform four sections east (x 64..79, section 4,4,0):
-            // the frustum-culling proof - it draws when the camera faces east
-            // and is culled otherwise, exactly like Java's
-            // cullingFrustum.isVisible(sectionAABB) gate.
-            for (int x = 64; x < 80; x++)
-            {
-                for (int z = 0; z < 16; z++)
-                {
-                    LIBMATTI_MC_BlockPos ground = {{x, 64, z}};
-                    LIBMATTI_MC_Level_SetBlock(level, &ground, LIBMATTI_MC_Block_DefaultBlockState(stone),
-                                               LIBMATTI_MC_Level_UPDATE_CLIENTS);
-                    LIBMATTI_MC_BlockPos fill = {{x, 63, z}};
-                    LIBMATTI_MC_Level_SetBlock(level, &fill, LIBMATTI_MC_Block_DefaultBlockState(dirt),
-                                               LIBMATTI_MC_Level_UPDATE_CLIENTS);
-                }
-            }
-        }
-
-        minecraft->level = level;
 
         // Java: this.levelSource = LevelStorageSource.createDefault(GAMEDIR/saves)
         // + createAccess(levelId) (the P7.1 port) - a previous session's level.dat
-        // and chunks restore over the demo world (the save wins; a fresh run keeps
-        // the procedural platform and writes the first save on close).
+        // and chunks restore over the generated world (the save wins; a fresh run
+        // keeps the generated chunks and writes the first save on close).
+        int restoredCount = 0;
         {
             const char *saveDirOverride = getenv("MATTI_SAVE_DIR");
             const char *gameDir = saveDirOverride != NULL
@@ -618,26 +582,128 @@ LIBMATTI_MC_Minecraft *LIBMATTI_MC_Minecraft_New(const LIBMATTI_MC_GameConfig *c
                         LIBMATTI_MC_Nbt_Tag_Free((LIBMATTI_MC_Nbt_Tag *) data);
                     }
                     // Java: ChunkMap.read - the demo's chunk positions reload from
-                    // the save (the freshly built demo chunk is dropped)
-                    static const int LOAD_POSITIONS[][2] = {{0, 0}, {4, 0}};
-                    int loadedChunks = 0;
-                    for (size_t i = 0; i < sizeof(LOAD_POSITIONS) / sizeof(LOAD_POSITIONS[0]); i++)
+                    // the save (the freshly generated chunk is dropped)
+                    static const int RESTORE_POSITIONS[][2] = {{0, 0}, {4, 0}};
+                    for (size_t i = 0; i < sizeof(RESTORE_POSITIONS) / sizeof(RESTORE_POSITIONS[0]); i++)
                     {
-                        LIBMATTI_MC_LevelChunk *old = LIBMATTI_MC_Level_GetChunk(level, LOAD_POSITIONS[i][0],
-                                                                                 LOAD_POSITIONS[i][1]);
-                        if (LIBMATTI_MC_LevelStorage_LoadChunk(minecraft->levelStorage, level, LOAD_POSITIONS[i][0],
-                                                               LOAD_POSITIONS[i][1]) != NULL)
+                        LIBMATTI_MC_LevelChunk *old = LIBMATTI_MC_Level_GetChunk(level, RESTORE_POSITIONS[i][0],
+                                                                                 RESTORE_POSITIONS[i][1]);
+                        if (LIBMATTI_MC_LevelStorage_LoadChunk(minecraft->levelStorage, level, RESTORE_POSITIONS[i][0],
+                                                               RESTORE_POSITIONS[i][1]) != NULL)
                         {
                             if (old != NULL)
                                 LIBMATTI_MC_LevelChunk_Free(old);
-                            loadedChunks++;
+                            restoredCount++;
                         }
                     }
-                    if (loadedChunks > 0)
-                        LOG("[STORAGE] restored %d chunk(s) from the save", loadedChunks);
+                }
+                if (restoredCount > 0)
+                    LOG("[STORAGE] restored %d chunk(s) from the save", restoredCount);
+            }
+        }
+
+        // Java: the superflat recipe the demo world rides (the P7.2
+        // FlatLevelSource): bedrock 1, dirt 2, stone 126 over the -64 base with
+        // the plains biome - 129 blocks total, the stone surface lands at y 64
+        // (the top face 65) like before, and getSpawnHeight answers 65.
+        LIBMATTI_MC_Block *stone = LIBMATTI_MC_VanillaBlocks_GetByName("STONE");
+        LIBMATTI_MC_Block *dirt = LIBMATTI_MC_VanillaBlocks_GetByName("DIRT");
+        LIBMATTI_MC_Block *bedrock = LIBMATTI_MC_VanillaBlocks_GetByName("BEDROCK");
+        if (stone != NULL && dirt != NULL)
+        {
+            LIBMATTI_MC_FlatLayerInfo layers[3];
+            LIBMATTI_MC_FlatLayerInfo_Init(&layers[0], 1, LIBMATTI_MC_Block_DefaultBlockState(
+                                                              bedrock != NULL ? bedrock : dirt));
+            LIBMATTI_MC_FlatLayerInfo_Init(&layers[1], 2, LIBMATTI_MC_Block_DefaultBlockState(dirt));
+            LIBMATTI_MC_FlatLayerInfo_Init(&layers[2], 126, LIBMATTI_MC_Block_DefaultBlockState(stone));
+            minecraft->chunkGenerator = LIBMATTI_MC_FlatLevelSource_New(layers, 3, LIBMATTI_MC_Biomes_Plains());
+        }// Java: the chunk-map dispatch - each demo position either restored from
+                    // the save or fills through the generator (fillFromNoise + the BIOMES
+                    // pass + the live heightmap priming like the FEATURE status task).
+                    // (2,2) is the generation-only probe: the demo towers and the
+                    // east platform never touch it, so the saved chunk is the raw
+                    // superflat output.
+        if (minecraft->chunkGenerator != NULL)
+        {
+            static const int DEMO_POSITIONS[][2] = {{0, 0}, {4, 0}, {2, 2}};
+            static const LIBMATTI_MC_HeightmapTypes LIVE_TYPES[] = {
+                LIBMATTI_MC_Heightmap_MOTION_BLOCKING,
+                LIBMATTI_MC_Heightmap_MOTION_BLOCKING_NO_LEAVES,
+                LIBMATTI_MC_Heightmap_OCEAN_FLOOR,
+                LIBMATTI_MC_Heightmap_WORLD_SURFACE,
+            };
+            for (size_t i = 0; i < sizeof(DEMO_POSITIONS) / sizeof(DEMO_POSITIONS[0]); i++)
+            {
+                int cx = DEMO_POSITIONS[i][0];
+                int cz = DEMO_POSITIONS[i][1];
+                if (LIBMATTI_MC_Level_GetChunk(level, cx, cz) != NULL)
+                    continue;
+                LIBMATTI_MC_ChunkPos pos = {cx, cz};
+                LIBMATTI_MC_LevelChunk *chunk = LIBMATTI_MC_LevelChunk_New(level, &pos);
+                if (chunk == NULL)
+                    continue;
+                LIBMATTI_MC_ChunkGenerator_FillFromNoise(&minecraft->chunkGenerator->base, &chunk->base);
+                LIBMATTI_MC_ChunkGenerator_FillBiomes(&minecraft->chunkGenerator->base, &chunk->base);
+                LIBMATTI_MC_Heightmap_PrimeHeightmaps(&chunk->base, LIVE_TYPES,
+                                                      sizeof(LIVE_TYPES) / sizeof(LIVE_TYPES[0]));
+                LIBMATTI_MC_ChunkAccess_MarkUnsaved(&chunk->base);
+                LIBMATTI_MC_Level_SetChunk(level, chunk);
+            }
+        }
+
+        if (stone != NULL && dirt != NULL)
+        {
+            // The stone platform only builds on a fresh world (the save owns the
+            // chunks after the first close).
+            if (restoredCount == 0)
+            {
+                for (int x = 0; x < 16; x++)
+                {
+                    for (int z = 0; z < 16; z++)
+                    {
+                        LIBMATTI_MC_BlockPos ground = {{x, 64, z}};
+                        LIBMATTI_MC_Level_SetBlock(level, &ground, LIBMATTI_MC_Block_DefaultBlockState(stone),
+                                                   LIBMATTI_MC_Level_UPDATE_CLIENTS);
+                        LIBMATTI_MC_BlockPos fill = {{x, 63, z}};
+                        LIBMATTI_MC_Level_SetBlock(level, &fill, LIBMATTI_MC_Block_DefaultBlockState(dirt),
+                                                   LIBMATTI_MC_Level_UPDATE_CLIENTS);
+                    }
+                }
+            }
+            // Two stone towers to make the geometry visible from the camera.
+            // They ride chunk (0,0) either way - on a restore they re-apply on
+            // top of the loaded chunk.
+            for (int y = 65; y < 70; y++)
+            {
+                LIBMATTI_MC_BlockPos a = {{4, y, 4}};
+                LIBMATTI_MC_Level_SetBlock(level, &a, LIBMATTI_MC_Block_DefaultBlockState(stone),
+                                           LIBMATTI_MC_Level_UPDATE_CLIENTS);
+                LIBMATTI_MC_BlockPos b = {{11, y, 11}};
+                LIBMATTI_MC_Level_SetBlock(level, &b, LIBMATTI_MC_Block_DefaultBlockState(stone),
+                                           LIBMATTI_MC_Level_UPDATE_CLIENTS);
+            }
+            // A second platform four sections east (x 64..79, section 4,4,0):
+            // the frustum-culling proof - it draws when the camera faces east
+            // and is culled otherwise, exactly like Java's
+            // cullingFrustum.isVisible(sectionAABB) gate.
+            if (restoredCount == 0)
+            {
+                for (int x = 64; x < 80; x++)
+                {
+                    for (int z = 0; z < 16; z++)
+                    {
+                        LIBMATTI_MC_BlockPos ground = {{x, 64, z}};
+                        LIBMATTI_MC_Level_SetBlock(level, &ground, LIBMATTI_MC_Block_DefaultBlockState(stone),
+                                                   LIBMATTI_MC_Level_UPDATE_CLIENTS);
+                        LIBMATTI_MC_BlockPos fill = {{x, 63, z}};
+                        LIBMATTI_MC_Level_SetBlock(level, &fill, LIBMATTI_MC_Block_DefaultBlockState(dirt),
+                                                   LIBMATTI_MC_Level_UPDATE_CLIENTS);
+                    }
                 }
             }
         }
+
+        minecraft->level = level;
 
         minecraft->sectionDispatcher = LIBMATTI_MC_SectionRenderDispatcher_New();
 
@@ -715,15 +781,20 @@ LIBMATTI_MC_Minecraft *LIBMATTI_MC_Minecraft_New(const LIBMATTI_MC_GameConfig *c
 
     // Java: this.player = new LocalPlayer(this, this.level, ...) - the session
     // profile name rides the GameConfig user. The spawn rides the platform
-    // centre (the 16x16 slab spans x/z 0..15 at y 64, top face 65) - since the
-    // P5.3 physics the player collides, so an off-platform spawn falls into
-    // the void; yaw 180 faces north over the slab, pitch 20 looks slightly down
+    // centre (the 16x16 slab spans x/z 0..15, the surface at y 64, top face 65
+    // through the generator's getSpawnHeight) - since the P5.3 physics the
+    // player collides, so an off-platform spawn falls into the void; yaw 180
+    // faces north over the slab, pitch 20 looks slightly down
     minecraft->localPlayer = LIBMATTI_MC_LocalPlayer_New(minecraft->level,
                                                          config->user.name ? config->user.name : "Player", NULL);
     if (minecraft->localPlayer != NULL)
     {
         LIBMATTI_MC_Entity *entity = &minecraft->localPlayer->player.base.base;
-        LIBMATTI_MC_Entity_SetPos(entity, 8.0, 65.0, 8.0);
+        int spawnY = 65;
+        if (minecraft->chunkGenerator != NULL && minecraft->level != NULL)
+            spawnY = LIBMATTI_MC_ChunkGenerator_GetSpawnHeight(
+                &minecraft->chunkGenerator->base, &((LIBMATTI_MC_Level *) minecraft->level)->heightAccessor);
+        LIBMATTI_MC_Entity_SetPos(entity, 8.0, (double) spawnY, 8.0);
         LIBMATTI_MC_Entity_SetRot(entity, 180.0f, 20.0f);
         LIBMATTI_MC_Level_AddEntity(minecraft->level, entity);
     }
@@ -3103,6 +3174,11 @@ void LIBMATTI_MC_Minecraft_Destroy(LIBMATTI_MC_Minecraft *minecraft)
     {
         LIBMATTI_MC_LevelStorageSource_Free(minecraft->levelStorageSource);
         minecraft->levelStorageSource = NULL;
+    }
+    if (minecraft->chunkGenerator != NULL)
+    {
+        LIBMATTI_MC_FlatLevelSource_Free(minecraft->chunkGenerator);
+        minecraft->chunkGenerator = NULL;
     }
 
     // Java: this.close() -> levelRenderer.close() -> the section dispatcher's

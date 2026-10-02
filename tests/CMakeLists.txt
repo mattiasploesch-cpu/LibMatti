@@ -110,6 +110,12 @@ add_test(NAME pick COMMAND test_pick)
 matti_test(test_storage storage/StorageHarness.c)
 add_test(NAME storage COMMAND test_storage)
 
+# worldgen: the P7.2 core - the seeded RNG stack (RandomSupport/Xoroshiro) at
+# the exact JVM reference vectors, the Perlin/Normal noise stack, the biome
+# identity + the FlatLevelSource superflat pass end to end
+matti_test(test_worldgen worldgen/WorldgenHarness.c)
+add_test(NAME worldgen COMMAND test_worldgen)
+
 # hud: the P5.5 core - the Gui layout unit (crosshair/hotbar rects out of
 # Gui.java), the POSITION_COLOR_TEXTURE quad packing and the hotbar item
 # palette the client drives
