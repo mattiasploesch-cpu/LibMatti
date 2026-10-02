@@ -103,6 +103,13 @@ add_test(NAME physics COMMAND test_physics)
 matti_test(test_pick pick/PickHarness.c)
 add_test(NAME pick COMMAND test_pick)
 
+# storage: the P7.1 core - the anvil format end to end (RegionFileVersion
+# codecs, RegionFile sectors/header/.mcc spill, the RegionFileStorage cache,
+# the SerializableChunkData chunk<->NBT codec and the LevelStorageSource
+# level.dat + chunk save/load pass)
+matti_test(test_storage storage/StorageHarness.c)
+add_test(NAME storage COMMAND test_storage)
+
 # hud: the P5.5 core - the Gui layout unit (crosshair/hotbar rects out of
 # Gui.java), the POSITION_COLOR_TEXTURE quad packing and the hotbar item
 # palette the client drives

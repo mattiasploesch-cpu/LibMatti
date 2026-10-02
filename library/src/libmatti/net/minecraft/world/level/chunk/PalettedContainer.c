@@ -128,6 +128,57 @@ void LIBMATTI_MC_PalettedContainer_Free(LIBMATTI_MC_PalettedContainer *container
     free(container);
 }
 
+// Java: private PalettedContainer(Strategy<T>, Palette<T>, Optional<BitStorage>) -
+// the read side of the codec: a one-entry palette with no storage is the trivial
+// strategy, everything else carries the packed words through untouched
+LIBMATTI_MC_PalettedContainer *LIBMATTI_MC_PalettedContainer_ReadFromPalette(LIBMATTI_MC_BlockState **palette,
+                                                                             size_t paletteSize,
+                                                                             const uint64_t *data, size_t dataLength,
+                                                                             int bits)
+{
+    if (palette == NULL || paletteSize == 0)
+        return NULL;
+
+    if (paletteSize == 1 && (data == NULL || dataLength == 0))
+    {
+        // Java: strategy == SINGLE_VALUE - data(value) only
+        return LIBMATTI_MC_PalettedContainer_New(palette[0]);
+    }
+
+    LIBMATTI_MC_PalettedContainer *container = calloc(1, sizeof(LIBMATTI_MC_PalettedContainer));
+    if (container == NULL)
+        return NULL;
+    // the port keeps the read palette unbounded (the GLOBAL mode's layout)
+    container->mode = LIBMATTI_MC_PalettedContainer_Mode_LINEAR;
+    container->paletteCapacity = paletteSize;
+    container->paletteSize = paletteSize;
+    container->palette = malloc(paletteSize * sizeof(LIBMATTI_MC_BlockState *));
+    if (container->palette == NULL)
+    {
+        free(container);
+        return NULL;
+    }
+    memcpy(container->palette, palette, paletteSize * sizeof(LIBMATTI_MC_BlockState *));
+    if (data != NULL && dataLength > 0)
+    {
+        if (bits <= 0)
+        {
+            free(container->palette);
+            free(container);
+            return NULL;
+        }
+        container->storage = LIBMATTI_MC_BitStorage_NewWithData(bits, LIBMATTI_MC_LevelChunkSection_SECTION_SIZE,
+                                                                data, dataLength);
+        if (container->storage == NULL)
+        {
+            free(container->palette);
+            free(container);
+            return NULL;
+        }
+    }
+    return container;
+}
+
 void LIBMATTI_MC_PalettedContainer_Reserve(LIBMATTI_MC_PalettedContainer *container, size_t entries)
 {
     if (container == NULL || entries <= container->paletteCapacity)
@@ -163,7 +214,9 @@ static int palette_id_for(LIBMATTI_MC_PalettedContainer *container, LIBMATTI_MC_
 }
 
 // Java: the strategy switch inside set(): the bits grow when the palette
-// outgrows the current width (4 -> 5 -> ... -> global)
+// outgrows the current width (4 -> 5 -> ... -> global). The grow repacks the
+// entries value by value (Java: BitStorage.copy unpacks and repacks); a raw
+// word copy would lose the entries whose packing changed.
 static bool ensure_bits(LIBMATTI_MC_PalettedContainer *container, int bits)
 {
     if (container->storage != NULL && container->storage->bits >= bits)
@@ -171,13 +224,15 @@ static bool ensure_bits(LIBMATTI_MC_PalettedContainer *container, int bits)
     int newBits = container->storage != NULL ? container->storage->bits : LIBMATTI_MC_PalettedContainer_MIN_BITS;
     while (newBits < bits)
         newBits++;
-    size_t oldLength = 0;
-    const uint64_t *oldData = container->storage != NULL ? LIBMATTI_MC_BitStorage_GetRaw(container->storage, &oldLength) : NULL;
-    LIBMATTI_MC_BitStorage *grown = LIBMATTI_MC_BitStorage_NewWithData(newBits, LIBMATTI_MC_LevelChunkSection_SECTION_SIZE,
-                                                                       oldData, oldLength);
+    LIBMATTI_MC_BitStorage *grown = LIBMATTI_MC_BitStorage_New(newBits, LIBMATTI_MC_LevelChunkSection_SECTION_SIZE);
     if (grown == NULL)
         return false;
-    LIBMATTI_MC_BitStorage_Free(container->storage);
+    if (container->storage != NULL)
+    {
+        for (size_t i = 0; i < LIBMATTI_MC_LevelChunkSection_SECTION_SIZE; i++)
+            LIBMATTI_MC_BitStorage_Set(grown, i, LIBMATTI_MC_BitStorage_Get(container->storage, i));
+        LIBMATTI_MC_BitStorage_Free(container->storage);
+    }
     container->storage = grown;
     return true;
 }

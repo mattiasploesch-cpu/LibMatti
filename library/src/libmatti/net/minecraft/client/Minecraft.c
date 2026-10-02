@@ -24,6 +24,7 @@
 #include "libmatti/net/minecraft/client/renderer/texture/TextureAtlas.h"
 #include "libmatti/net/minecraft/client/renderer/texture/AbstractTexture.h"
 #include "libmatti/net/neoforged/fml/earlydisplay/EarlyFramebuffer.h"
+#include "libmatti/net/neoforged/fml/loading/FMLPaths.h"
 #include "libmatti/net/minecraft/client/gui/GuiRenderer.h"
 #include "libmatti/net/minecraft/client/gui/GuiLayout.h"
 #include "libmatti/net/minecraft/client/renderer/chunk/SectionRenderDispatcher.h"
@@ -39,6 +40,7 @@
 #include "libmatti/net/minecraft/client/renderer/entity/ItemRenderer.h"
 #include "libmatti/com/mojang/blaze3d/platform/NativeImage.h"
 #include "libmatti/net/minecraft/world/level/block/state/BlockState.h"
+#include "libmatti/net/minecraft/world/level/storage/LevelStorageSource.h"
 #include "libmatti/net/minecraft/server/bootstrap/VanillaAssetLoader.h"
 #include "libmatti/net/minecraft/client/renderer/block/BlockRenderDispatcher.h"
 #include "libmatti/net/minecraft/server/bootstrap/VanillaBlockModels.h"
@@ -137,6 +139,12 @@ struct LIBMATTI_MC_Minecraft
 
     // The in-memory level the skeleton drives (game port content).
     void *level;
+
+    // Java: this.levelSource + the LevelStorageAccess the session uses (the P7.1
+    // port): the level.dat + region/*.mca save the client loads at startup and
+    // flushes on close. NULL when the save dir is unavailable.
+    LIBMATTI_MC_LevelStorageSource *levelStorageSource;
+    LIBMATTI_MC_LevelStorageAccess *levelStorage;
 
     // Java: this.levelRenderer = new LevelRenderer - the section dispatcher the
     // chunk meshes go through (the P4.1 port).
@@ -576,6 +584,61 @@ LIBMATTI_MC_Minecraft *LIBMATTI_MC_Minecraft_New(const LIBMATTI_MC_GameConfig *c
         }
 
         minecraft->level = level;
+
+        // Java: this.levelSource = LevelStorageSource.createDefault(GAMEDIR/saves)
+        // + createAccess(levelId) (the P7.1 port) - a previous session's level.dat
+        // and chunks restore over the demo world (the save wins; a fresh run keeps
+        // the procedural platform and writes the first save on close).
+        {
+            const char *saveDirOverride = getenv("MATTI_SAVE_DIR");
+            const char *gameDir = saveDirOverride != NULL
+                                      ? saveDirOverride
+                                      : LIBMATTI_FML_FMLPaths_Get(LIBMATTI_FML_FMLPaths_GAMEDIR);
+            if (gameDir != NULL)
+            {
+                size_t savesSize = strlen(gameDir) + sizeof("/saves");
+                char *savesDir = malloc(savesSize);
+                if (savesDir != NULL)
+                    snprintf(savesDir, savesSize, "%s/saves", gameDir);
+                minecraft->levelStorageSource = savesDir != NULL
+                                                    ? LIBMATTI_MC_LevelStorageSource_CreateDefault(savesDir)
+                                                    : NULL;
+                free(savesDir);
+                if (minecraft->levelStorageSource != NULL)
+                {
+                    minecraft->levelStorage = LIBMATTI_MC_LevelStorageSource_CreateAccess(
+                        minecraft->levelStorageSource, "New World", LIBMATTI_MC_Level_OVERWORLD);
+                }
+                if (minecraft->levelStorage != NULL)
+                {
+                    LIBMATTI_MC_Nbt_CompoundTag *data = NULL;
+                    if (LIBMATTI_MC_LevelStorageAccess_ReadLevelData(minecraft->levelStorage, &data) && data != NULL)
+                    {
+                        LIBMATTI_MC_LevelStorage_ApplyLevelData(level, data);
+                        LIBMATTI_MC_Nbt_Tag_Free((LIBMATTI_MC_Nbt_Tag *) data);
+                    }
+                    // Java: ChunkMap.read - the demo's chunk positions reload from
+                    // the save (the freshly built demo chunk is dropped)
+                    static const int LOAD_POSITIONS[][2] = {{0, 0}, {4, 0}};
+                    int loadedChunks = 0;
+                    for (size_t i = 0; i < sizeof(LOAD_POSITIONS) / sizeof(LOAD_POSITIONS[0]); i++)
+                    {
+                        LIBMATTI_MC_LevelChunk *old = LIBMATTI_MC_Level_GetChunk(level, LOAD_POSITIONS[i][0],
+                                                                                 LOAD_POSITIONS[i][1]);
+                        if (LIBMATTI_MC_LevelStorage_LoadChunk(minecraft->levelStorage, level, LOAD_POSITIONS[i][0],
+                                                               LOAD_POSITIONS[i][1]) != NULL)
+                        {
+                            if (old != NULL)
+                                LIBMATTI_MC_LevelChunk_Free(old);
+                            loadedChunks++;
+                        }
+                    }
+                    if (loadedChunks > 0)
+                        LOG("[STORAGE] restored %d chunk(s) from the save", loadedChunks);
+                }
+            }
+        }
+
         minecraft->sectionDispatcher = LIBMATTI_MC_SectionRenderDispatcher_New();
 
         // Java: the bootstrap order - MODEL_ATLAS (the block textures stitch
@@ -3015,6 +3078,32 @@ void LIBMATTI_MC_Minecraft_Destroy(LIBMATTI_MC_Minecraft *minecraft)
     LIBMATTI_MC_Container_Free(minecraft->playerInventory);
     minecraft->playerInventory = NULL;
     LIBMATTI_MC_KeyMapping_ReleaseAll();
+
+    // Java: Minecraft.close -> the level save (ChunkMap.save + level.dat) rides
+    // the storage access (the P7.1 port); MATTI_NOSAVE=1 skips it for throwaway
+    // smoke runs.
+    if (minecraft->levelStorage != NULL && minecraft->level != NULL && getenv("MATTI_NOSAVE") == NULL)
+    {
+        LIBMATTI_MC_Level *level = minecraft->level;
+        LIBMATTI_MC_Nbt_CompoundTag *data = LIBMATTI_MC_LevelStorage_BuildLevelData(level, "New World");
+        if (data != NULL)
+        {
+            LIBMATTI_MC_LevelStorageAccess_WriteLevelData(minecraft->levelStorage, data);
+            LIBMATTI_MC_Nbt_Tag_Free((LIBMATTI_MC_Nbt_Tag *) data);
+        }
+        int savedChunks = LIBMATTI_MC_LevelStorage_SaveChunks(minecraft->levelStorage, level);
+        LOG("[STORAGE] saved %d chunk(s) + level.dat", savedChunks);
+    }
+    if (minecraft->levelStorage != NULL)
+    {
+        LIBMATTI_MC_LevelStorageAccess_Free(minecraft->levelStorage);
+        minecraft->levelStorage = NULL;
+    }
+    if (minecraft->levelStorageSource != NULL)
+    {
+        LIBMATTI_MC_LevelStorageSource_Free(minecraft->levelStorageSource);
+        minecraft->levelStorageSource = NULL;
+    }
 
     // Java: this.close() -> levelRenderer.close() -> the section dispatcher's
     // sections and compiled meshes free with the level.

@@ -124,7 +124,7 @@ Vor P0 fertig (frühere Meilensteine, nicht Teil des Plans):
 
 | # | Was                                                                          | Status |
 |---|------------------------------------------------------------------------------|--------|
-| 1 | LevelStorage + Region/Anvil-Format (über NBT aus P1)                          | ⬜     |
+| 1 | LevelStorage + Region/Anvil-Format (über NBT aus P1)                          | ✅     |
 | 2 | Chunk-Generierung (Noise-Shader, Biome-Quelle — erst simple Superflat)        | ⬜     |
 | 3 | DataFixerUpper (vendor/DataFixerUpper liegt vor — erst für alte Welten nötig) | ⬜     |
 | 4 | Entities speichern/laden                                                      | ⬜     |

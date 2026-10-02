@@ -23,3 +23,8 @@ int LIBMATTI_MC_SharedConstants_GetDataPackVersionMinor(void)
 {
     return LIBMATTI_MC_SharedConstants_DATA_PACK_FORMAT_MINOR;
 }
+
+int LIBMATTI_MC_SharedConstants_GetDataVersion(void)
+{
+    return LIBMATTI_MC_SharedConstants_DATA_VERSION;
+}
