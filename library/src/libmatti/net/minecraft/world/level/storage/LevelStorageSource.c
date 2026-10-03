@@ -8,6 +8,9 @@
 #include "libmatti/net/minecraft/nbt/NbtIo.h"
 #include "libmatti/net/minecraft/nbt/NbtAccounter.h"
 #include "libmatti/net/minecraft/world/level/chunk/storage/SerializableChunkData.h"
+#include "libmatti/com/mojang/datafixers/DataFixer.h"
+#include "libmatti/net/minecraft/util/datafix/DataFixers.h"
+#include "libmatti/net/minecraft/util/datafix/DataFixTypes.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -328,6 +331,33 @@ LIBMATTI_MC_LevelChunk *LIBMATTI_MC_LevelStorage_LoadChunk(LIBMATTI_MC_LevelStor
     LIBMATTI_MC_Nbt_CompoundTag *tag = LIBMATTI_MC_RegionFileStorage_Read(access->regionStorage, &pos);
     if (tag == NULL)
         return NULL;
+
+    // Java: DataFixTypes.CHUNK.updateToCurrentVersion(fixer, tag,
+    // NbtUtils.getDataVersion(tag)) in ChunkStorage.read - the raw tag is
+    // rewritten to the current DataVersion BEFORE the codec parses it. The
+    // port fixes in place, so the next save writes the converted chunk.
+    {
+        int version = LIBMATTI_MC_Nbt_CompoundTag_GetIntOr(tag, "DataVersion", 0);
+        const LIBMATTI_MC_DataFixer *fixer = LIBMATTI_MC_DataFixers_GetDataFixer();
+        if (fixer != NULL && version < LIBMATTI_MC_SharedConstants_GetDataVersion())
+        {
+            LIBMATTI_MC_Nbt_Tag *fixed = LIBMATTI_MC_DataFixer_UpdateToCurrentVersion(
+                fixer, LIBMATTI_MC_DataFixTypes_CHUNK, (LIBMATTI_MC_Nbt_Tag *) tag, version);
+            const LIBMATTI_MC_DataFixer *applied = fixer;
+            if (fixed != (LIBMATTI_MC_Nbt_Tag *) tag)
+                tag = (LIBMATTI_MC_Nbt_CompoundTag *) fixed;
+            if (applied->lastAppliedCount > 0)
+            {
+                // Java: the update chain logs which rules ran
+                fprintf(stderr, "[DATAFIX] chunk (%d,%d) from DataVersion %d ran %d rule(s):", chunkX, chunkZ, version,
+                        applied->lastAppliedCount);
+                for (int i = 0; i < applied->lastAppliedCount; i++)
+                    fprintf(stderr, " %s", applied->lastApplied[i]);
+                fprintf(stderr, "\n");
+            }
+        }
+    }
+
     // Java: the status gate - only full chunks spin up (the ProtoChunk pipeline
     // is worldgen content)
     if (!LIBMATTI_MC_SerializableChunkData_IsFullChunk(tag))

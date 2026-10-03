@@ -1,107 +1,57 @@
-// Port of com.mojang.datafixers (the surface the game needs):
-// DataFixerUpper with versioned DataFix entries and the Dynamic value tree.
-// The generic optics/type rewriting is folded into the version rule the game
-// uses: fix(schemaVersion, data) picks the newest fix chain.
+// Port of com.mojang.datafixers.DataFixer / DataFixerUpper (P7.3).
+//
+// Java resolves the rule chain once per (version, newVersion) pair and caches
+// it; the port walks the registered fix list per update instead - same order,
+// same predicate, no cache (a chunk save loads the fixer twice at most).
 
-#ifndef MATTICRAFT_DFUP_DATAFIXER_H
-#define MATTICRAFT_DFUP_DATAFIXER_H
+#ifndef MATTICRAFT_MOJIANG_DATAFIXERS_DATAFIXER_H
+#define MATTICRAFT_MOJIANG_DATAFIXERS_DATAFIXER_H
 
+#include "libmatti/com/mojang/datafixers/DataFix.h"
+
+#include <stdbool.h>
 #include <stddef.h>
 
-// ---------------------------------------------------------------------------
-// Java: com.mojang.serialization.Dynamic<T> - the value tree the fixes walk.
-// The port's Dynamic is an untyped JSON-like tree (the DynamicOps is folded
-// into the tree itself).
-// ---------------------------------------------------------------------------
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-typedef enum
+typedef struct LIBMATTI_MC_DataFixer
 {
-    LIBMATTI_DFUP_ValueType_EMPTY,
-    LIBMATTI_DFUP_ValueType_BOOLEAN,
-    LIBMATTI_DFUP_ValueType_INT,
-    LIBMATTI_DFUP_ValueType_LONG,
-    LIBMATTI_DFUP_ValueType_FLOAT,
-    LIBMATTI_DFUP_ValueType_DOUBLE,
-    LIBMATTI_DFUP_ValueType_STRING,
-    LIBMATTI_DFUP_ValueType_LIST,
-    LIBMATTI_DFUP_ValueType_MAP
-} LIBMATTI_DFUP_ValueType;
-
-typedef struct LIBMATTI_DFUP_Dynamic LIBMATTI_DFUP_Dynamic;
-typedef struct
-{
-    char *key;
-    LIBMATTI_DFUP_Dynamic *value;
-} LIBMATTI_DFUP_MapEntry;
-
-struct LIBMATTI_DFUP_Dynamic
-{
-    LIBMATTI_DFUP_ValueType type;
-    int booleanValue;
-    int intValue;
-    long longValue;
-    float floatValue;
-    double doubleValue;
-    char *stringValue;      // owned
-    LIBMATTI_DFUP_Dynamic **list; // owned, size listCount
-    size_t listCount;
-    LIBMATTI_DFUP_MapEntry *map; // owned entries (key + value), size mapCount
-    size_t mapCount;
-};
-
-// Java: Dynamic constructor equivalents
-LIBMATTI_DFUP_Dynamic *LIBMATTI_DFUP_Dynamic_Empty(void);
-LIBMATTI_DFUP_Dynamic *LIBMATTI_DFUP_Dynamic_Int(int value);
-LIBMATTI_DFUP_Dynamic *LIBMATTI_DFUP_Dynamic_String(const char *value);
-LIBMATTI_DFUP_Dynamic *LIBMATTI_DFUP_Dynamic_Map(void);
-// Sets or replaces a map entry (the key is copied)
-LIBMATTI_DFUP_Dynamic *LIBMATTI_DFUP_Dynamic_Set(LIBMATTI_DFUP_Dynamic *dynamic, const char *key,
-                                                 LIBMATTI_DFUP_Dynamic *value);
-// Java: Dynamic.get(key) -> Optional - NULL when absent
-LIBMATTI_DFUP_Dynamic *LIBMATTI_DFUP_Dynamic_Get(const LIBMATTI_DFUP_Dynamic *dynamic, const char *key);
-// Java: Dynamic.getOrThrow style accessors
-int LIBMATTI_DFUP_Dynamic_AsInt(const LIBMATTI_DFUP_Dynamic *dynamic, int fallback);
-const char *LIBMATTI_DFUP_Dynamic_AsString(const LIBMATTI_DFUP_Dynamic *dynamic, const char *fallback);
-void LIBMATTI_DFUP_Dynamic_Free(LIBMATTI_DFUP_Dynamic *dynamic);
-
-// ---------------------------------------------------------------------------
-// Java: com.mojang.datafixers.DataFix - one fix version
-// The port's fix receives the dynamic tree and returns the rewritten tree.
-// ---------------------------------------------------------------------------
-
-typedef LIBMATTI_DFUP_Dynamic *(*LIBMATTI_DFUP_Fix)(LIBMATTI_DFUP_Dynamic *data, void *self);
-
-typedef struct
-{
-    int version;        // Java: the schema version this fix upgrades to
-    char *name;         // Java: SCHEMA_NAME / the fix name
-    LIBMATTI_DFUP_Fix fix;
-    void *self;
-} LIBMATTI_DFUP_DataFix;
-
-// ---------------------------------------------------------------------------
-// Java: com.mojang.datafixers.DataFixerUpper
-// ---------------------------------------------------------------------------
-
-typedef struct
-{
-    LIBMATTI_DFUP_DataFix *fixes; // sorted by version ascending
+    // Java: DataFixerBuilder.dataVersion - the DataVersion of the running game
+    int dataVersion;
+    // Java: DataFixerUpper.globalList - the fix list in registration order
+    const LIBMATTI_MC_DataFix *fixes;
     size_t fixCount;
-    size_t fixCapacity;
-} LIBMATTI_DFUP_DataFixerUpper;
+    // the rules the last update() applied (Java logs the "fixed" paths; the
+    // port hands the caller the names so the storage layer can log them)
+    const char *lastApplied[64];
+    int lastAppliedCount;
+} LIBMATTI_MC_DataFixer;
 
-// Java: DataFixerBuilder.addSchema(version, fix) - the port registers one fix
-void LIBMATTI_DFUP_DataFixerUpper_Add(LIBMATTI_DFUP_DataFixerUpper *fixer, int version, const char *name,
-                                      LIBMATTI_DFUP_Fix fix, void *self);
-// Java: DataFixer.build(Util.memoize...) / DataFixerUpper.update(version, input)
-// Runs every fix with version > dataVersion, in ascending order.
-LIBMATTI_DFUP_Dynamic *LIBMATTI_DFUP_DataFixerUpper_Update(LIBMATTI_DFUP_DataFixerUpper *fixer,
-                                                           LIBMATTI_DFUP_Dynamic *input, int dataVersion,
-                                                           int currentVersion);
-void LIBMATTI_DFUP_DataFixerUpper_Free(LIBMATTI_DFUP_DataFixerUpper *fixer);
+// Java: new DataFixerBuilder(dataVersion) + addFixer(fix) for each + build()
+LIBMATTI_MC_DataFixer *LIBMATTI_MC_DataFixer_New(int dataVersion, const LIBMATTI_MC_DataFix *fixes, size_t fixCount);
 
-// Java: DataFixUtils.updateIfChanged style helper
-LIBMATTI_DFUP_Dynamic *LIBMATTI_DFUP_DataFixUtils_UpdateNamed(
-    LIBMATTI_DFUP_Dynamic *data, const char *oldName, const char *newName);
+void LIBMATTI_MC_DataFixer_Free(LIBMATTI_MC_DataFixer *fixer);
 
-#endif //MATTICRAFT_DFUP_DATAFIXER_H
+// Java: <T> Dynamic<T> update(DSL.TypeReference type, Dynamic<T> input, int
+// version, int newVersion) - the rules with
+// (fix.versionKey > makeKey(version) && fix.version <= newVersion) run in
+// registration order; an already-current tag returns untouched.
+LIBMATTI_MC_Nbt_Tag *LIBMATTI_MC_DataFixer_UpdateToCurrentVersion(const LIBMATTI_MC_DataFixer *fixer,
+                                                                   const char *type, LIBMATTI_MC_Nbt_Tag *root,
+                                                                   int version);
+
+// Java: updateToCurrentVersion(fixer, tag, version) - newVersion is the
+// fixer's own dataVersion
+static inline LIBMATTI_MC_Nbt_Tag *LIBMATTI_MC_DataFixer_Update(const LIBMATTI_MC_DataFixer *fixer, const char *type,
+                                                                LIBMATTI_MC_Nbt_Tag *root, int version)
+{
+    return LIBMATTI_MC_DataFixer_UpdateToCurrentVersion(fixer, type, root, version);
+}
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif // MATTICRAFT_MOJIANG_DATAFIXERS_DATAFIXER_H

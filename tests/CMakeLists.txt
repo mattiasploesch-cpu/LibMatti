@@ -116,6 +116,12 @@ add_test(NAME storage COMMAND test_storage)
 matti_test(test_worldgen worldgen/WorldgenHarness.c)
 add_test(NAME worldgen COMMAND test_worldgen)
 
+# datafix: the P7.3 fix chain - the Java parity vectors (addPadding, the
+# heightmap shift, the biome expansion, the section upgrade) and the registry
+# walk over a synthetic old chunk
+matti_test(test_datafix datafix/DataFixHarness.c)
+add_test(NAME datafix COMMAND test_datafix)
+
 # hud: the P5.5 core - the Gui layout unit (crosshair/hotbar rects out of
 # Gui.java), the POSITION_COLOR_TEXTURE quad packing and the hotbar item
 # palette the client drives

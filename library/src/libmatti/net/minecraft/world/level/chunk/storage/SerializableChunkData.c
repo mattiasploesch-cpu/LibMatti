@@ -6,6 +6,7 @@
 #include "libmatti/net/minecraft/world/level/chunk/storage/SerializableChunkData.h"
 
 #include "libmatti/net/minecraft/SharedConstants.h"
+#include "libmatti/net/minecraft/nbt/CompoundTag.h"
 #include "libmatti/net/minecraft/nbt/ListTag.h"
 #include "libmatti/net/minecraft/server/bootstrap/VanillaBlocks.h"
 #include "libmatti/net/minecraft/world/level/Level.h"
@@ -22,6 +23,8 @@
 
 // Java: the vanilla chunk status string the port writes and accepts
 #define CHUNK_STATUS_FULL "minecraft:full"
+// the same status without the default namespace (what the status fixers write)
+#define CHUNK_STATUS_FULL_NAME "full"
 // Java: the biome the port's sections carry (the biome model is worldgen content)
 
 // ---------------------------------------------------------------------------
@@ -451,7 +454,61 @@ bool LIBMATTI_MC_SerializableChunkData_IsFullChunk(const LIBMATTI_MC_Nbt_Compoun
     if (tag == NULL)
         return false;
     const char *status = LIBMATTI_MC_Nbt_CompoundTag_GetStringOr(tag, "Status", "");
-    return strcmp(status, CHUNK_STATUS_FULL) == 0;
+    // Java: ChunkStatus.CODEC reads the status through Identifier.withDefaultNamespace,
+    // so the bare "full" the status fixers write and the namespaced "minecraft:full"
+    // the port writes both land on the same ChunkStatus.
+    if (strncmp(status, "minecraft:", 10) == 0)
+        status += 10;
+    return strcmp(status, CHUNK_STATUS_FULL_NAME) == 0;
+}
+
+// Java: the palette codec accepts a plain state string ("minecraft:oak_stairs[facing=north]") as
+// well as the pre-1.18 block-state compound ({Name: ..., Properties: {...}}) the datafixers still
+// write - ChunkPalettedStorageFix builds the compound form. Both are folded into the string form
+// here so one parser (StateFromString) covers them.
+static LIBMATTI_MC_BlockState *state_from_palette_entry(const LIBMATTI_MC_Nbt_ListTag *palette, int index)
+{
+    const char *stateString = NULL;
+    if (LIBMATTI_MC_Nbt_ListTag_GetString(palette, index, &stateString))
+        return LIBMATTI_MC_SerializableChunkData_StateFromString(stateString);
+
+    LIBMATTI_MC_Nbt_CompoundTag *entry = NULL;
+    if (!LIBMATTI_MC_Nbt_ListTag_GetCompound(palette, index, &entry) || entry == NULL)
+        return NULL;
+
+    const char *name = LIBMATTI_MC_Nbt_CompoundTag_GetStringOr(entry, "Name", NULL);
+    if (name == NULL)
+        return NULL;
+
+    LIBMATTI_MC_Nbt_CompoundTag *properties = NULL;
+    if (!LIBMATTI_MC_Nbt_CompoundTag_GetCompound(entry, "Properties", &properties) || properties == NULL)
+        return LIBMATTI_MC_SerializableChunkData_StateFromString(name); // no properties
+
+    size_t propertyCount = 0;
+    char **keys = LIBMATTI_MC_Nbt_CompoundTag_KeySet(properties, &propertyCount);
+    if (keys == NULL || propertyCount == 0)
+    {
+        // the key set is the compound's own array, nothing to free
+        return LIBMATTI_MC_SerializableChunkData_StateFromString(name);
+    }
+
+    char buffer[512];
+    int written = snprintf(buffer, sizeof(buffer), "%s[", name);
+    if (written < 0 || (size_t) written >= sizeof(buffer))
+        return NULL;
+    for (size_t k = 0; k < propertyCount; k++)
+    {
+        const char *value = LIBMATTI_MC_Nbt_CompoundTag_GetStringOr(properties, keys[k], NULL);
+        if (value == NULL)
+            return NULL;
+        written += snprintf(buffer + written, sizeof(buffer) - (size_t) written, "%s%s=%s",
+                            k > 0 ? "," : "", keys[k], value);
+        if (written < 0 || (size_t) written >= sizeof(buffer))
+            return NULL;
+    }
+    snprintf(buffer + written, sizeof(buffer) - (size_t) written, "]");
+
+    return LIBMATTI_MC_SerializableChunkData_StateFromString(buffer);
 }
 
 // one section's block_states compound -> the section's container
@@ -473,13 +530,7 @@ static int read_block_states(LIBMATTI_MC_LevelChunkSection *section, const LIBMA
         return -1;
     for (int i = 0; i < paletteSize; i++)
     {
-        const char *stateString = NULL;
-        if (!LIBMATTI_MC_Nbt_ListTag_GetString(palette, i, &stateString))
-        {
-            free(states);
-            return -1;
-        }
-        states[i] = LIBMATTI_MC_SerializableChunkData_StateFromString(stateString);
+        states[i] = state_from_palette_entry(palette, i);
         if (states[i] == NULL)
         {
             free(states);
@@ -545,8 +596,8 @@ LIBMATTI_MC_LevelChunk *LIBMATTI_MC_SerializableChunkData_Read(struct LIBMATTI_M
     int chunkHeight = chunk->base.levelHeightAccessor.height;
 
     LIBMATTI_MC_Nbt_ListTag *sections = NULL;
-    if (LIBMATTI_MC_Nbt_CompoundTag_GetList(tag, LIBMATTI_MC_SerializableChunkData_SECTIONS_TAG, &sections)
-        && sections != NULL)
+    if (LIBMATTI_MC_Nbt_CompoundTag_GetList(tag, LIBMATTI_MC_SerializableChunkData_SECTIONS_TAG, &sections) &&
+        sections != NULL)
     {
         int sectionCount = LIBMATTI_MC_Nbt_ListTag_Size(sections);
         for (int i = 0; i < sectionCount; i++)
