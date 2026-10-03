@@ -18,10 +18,28 @@ extern const char *const LIBMATTI_MC_VanillaModels_CUBE;
 extern const char *const LIBMATTI_MC_VanillaModels_STONE;
 // Java: assets/minecraft/models/block/dirt.json (parent: cube_all)
 extern const char *const LIBMATTI_MC_VanillaModels_DIRT;
+// The cube_all family slice the demo level renders (the hotbar palette).
+extern const char *const LIBMATTI_MC_VanillaModels_COBBLESTONE;
+extern const char *const LIBMATTI_MC_VanillaModels_OAK_PLANKS;
+extern const char *const LIBMATTI_MC_VanillaModels_GLASS;
+extern const char *const LIBMATTI_MC_VanillaModels_BRICKS;
+extern const char *const LIBMATTI_MC_VanillaModels_SAND;
+extern const char *const LIBMATTI_MC_VanillaModels_GRAVEL;
+// Java: assets/minecraft/models/block/cube_column.json (the log parent)
+extern const char *const LIBMATTI_MC_VanillaModels_CUBE_COLUMN;
+// Java: assets/minecraft/models/block/oak_log.json (parent: cube_column)
+extern const char *const LIBMATTI_MC_VanillaModels_OAK_LOG;
 
 // Java: ModelBakery's model resource ids ("minecraft:block/stone").
 extern const char *const LIBMATTI_MC_VanillaModels_STONE_ID;
 extern const char *const LIBMATTI_MC_VanillaModels_DIRT_ID;
+extern const char *const LIBMATTI_MC_VanillaModels_COBBLESTONE_ID;
+extern const char *const LIBMATTI_MC_VanillaModels_OAK_PLANKS_ID;
+extern const char *const LIBMATTI_MC_VanillaModels_GLASS_ID;
+extern const char *const LIBMATTI_MC_VanillaModels_BRICKS_ID;
+extern const char *const LIBMATTI_MC_VanillaModels_SAND_ID;
+extern const char *const LIBMATTI_MC_VanillaModels_GRAVEL_ID;
+extern const char *const LIBMATTI_MC_VanillaModels_OAK_LOG_ID;
 
 // Java: ModelDiscovery's parent resolution - the embedded parent models by id
 // ("minecraft:block/cube_all" etc.), NULL when unknown.

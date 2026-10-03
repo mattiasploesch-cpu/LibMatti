@@ -84,6 +84,15 @@ typedef struct LIBMATTI_MC_PalettedContainer
 
 // Java: PalettedContainer(T singletonValue, Strategy, PaletteHolder) - all air
 LIBMATTI_MC_PalettedContainer *LIBMATTI_MC_PalettedContainer_New(LIBMATTI_MC_BlockState *singletonValue);
+// Java: private PalettedContainer(Strategy, Palette<T>, Optional<BitStorage>) - the
+// codec read path (SerializableChunkData section parse): one palette entry with no
+// data becomes SINGLE_VALUE, everything else takes the packed storage as-is. The
+// palette states are borrowed pointers (the caller owns the array), the storage is
+// copied.
+LIBMATTI_MC_PalettedContainer *LIBMATTI_MC_PalettedContainer_ReadFromPalette(LIBMATTI_MC_BlockState **palette,
+                                                                             size_t paletteSize,
+                                                                             const uint64_t *data, size_t dataLength,
+                                                                             int bits);
 void LIBMATTI_MC_PalettedContainer_Free(LIBMATTI_MC_PalettedContainer *container);
 // The resize path Java runs inside set(): the palette outgrew its bits
 void LIBMATTI_MC_PalettedContainer_Reserve(LIBMATTI_MC_PalettedContainer *container, size_t entries);

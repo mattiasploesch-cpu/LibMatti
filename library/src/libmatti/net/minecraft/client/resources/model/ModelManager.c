@@ -132,18 +132,12 @@ int LIBMATTI_MC_ModelManager_RegisterBaked(LIBMATTI_MC_ModelManager *manager, co
     if (manager == NULL || modelId == NULL || collection == NULL)
         return 0;
     if (LIBMATTI_MC_ModelManager_GetModel(manager, modelId) != NULL)
-    {
-        LIBMATTI_MC_QuadCollection_Free(collection);
-        return 0; // Java: the registry dedupes.
-    }
+        return 0; // Java: the registry dedupes - the caller's copy stays owned.
     char **ids = realloc(manager->modelIds, (manager->modelCount + 1) * sizeof(char *));
     LIBMATTI_MC_QuadCollection *models =
         realloc(manager->models, (manager->modelCount + 1) * sizeof(LIBMATTI_MC_QuadCollection));
     if (ids == NULL || models == NULL)
-    {
-        LIBMATTI_MC_QuadCollection_Free(collection);
-        return 0;
-    }
+        return 0; // the caller keeps ownership (no partial take-over).
     manager->modelIds = ids;
     manager->models = models;
     manager->modelIds[manager->modelCount] = strdup(modelId);

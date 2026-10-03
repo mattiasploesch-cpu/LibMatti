@@ -32,6 +32,8 @@ static const char *TERRAIN_VERT =
 
 // Java: block.fsh - the atlas sample multiplied by the vertex colour (the
 // AO/light tint rides in the vertex color, the lightmap is folded there too).
+// The cutout discard rides the same program (Java: RenderStateShard's
+// TEXTURE_CUTOUT alpha 0.5 - the glass pane's transparent interior drops).
 static const char *TERRAIN_FRAG =
     "#version 150\n"
     "in vec4 vtxColor;\n"
@@ -41,6 +43,7 @@ static const char *TERRAIN_FRAG =
     "out vec4 fragColor;\n"
     "void main() {\n"
     "    fragColor = texture(Sampler0, vtxUv0) * vtxColor;\n"
+    "    if (fragColor.a < 0.5) discard;\n"
     "}\n";
 
 static int compile_ok(unsigned int shader, const char *label)

@@ -1,178 +1,95 @@
-// Port of com.mojang.datafixers.DataFixerUpper (the versioned update chain)
-// and the Dynamic value tree the fixes walk.
+// Port of com.mojang.datafixers.DataFixerBuilder / DataFixerUpper (P7.3).
 
 #include "libmatti/com/mojang/datafixers/DataFixer.h"
+#include "libmatti/com/mojang/datafixers/DataFixUtils.h"
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-// ---------------------------------------------------------------------------
-// Dynamic
-// ---------------------------------------------------------------------------
+#define MAX_APPLIED 64
 
-LIBMATTI_DFUP_Dynamic *LIBMATTI_DFUP_Dynamic_Empty(void)
+LIBMATTI_MC_DataFixer *LIBMATTI_MC_DataFixer_New(int dataVersion, const LIBMATTI_MC_DataFix *fixes, size_t fixCount)
 {
-    return calloc(1, sizeof(LIBMATTI_DFUP_Dynamic));
-}
+    // Java: DataFixerBuilder.addFixer drops every fix registered above the
+    // running game's DataVersion ("Ignored fix registered for version: ...")
+    size_t kept = 0;
+    for (size_t i = 0; i < fixCount; i++)
+        if (fixes[i].version <= dataVersion)
+            kept++;
 
-LIBMATTI_DFUP_Dynamic *LIBMATTI_DFUP_Dynamic_Int(int value)
-{
-    LIBMATTI_DFUP_Dynamic *dynamic = LIBMATTI_DFUP_Dynamic_Empty();
-    dynamic->type = LIBMATTI_DFUP_ValueType_INT;
-    dynamic->intValue = value;
-    return dynamic;
-}
-
-LIBMATTI_DFUP_Dynamic *LIBMATTI_DFUP_Dynamic_String(const char *value)
-{
-    LIBMATTI_DFUP_Dynamic *dynamic = LIBMATTI_DFUP_Dynamic_Empty();
-    dynamic->type = LIBMATTI_DFUP_ValueType_STRING;
-    dynamic->stringValue = strdup(value);
-    return dynamic;
-}
-
-LIBMATTI_DFUP_Dynamic *LIBMATTI_DFUP_Dynamic_Map(void)
-{
-    LIBMATTI_DFUP_Dynamic *dynamic = LIBMATTI_DFUP_Dynamic_Empty();
-    dynamic->type = LIBMATTI_DFUP_ValueType_MAP;
-    return dynamic;
-}
-
-void LIBMATTI_DFUP_Dynamic_Free(LIBMATTI_DFUP_Dynamic *dynamic)
-{
-    if (dynamic == NULL)
-        return;
-    free(dynamic->stringValue);
-    for (size_t i = 0; i < dynamic->listCount; i++)
-        LIBMATTI_DFUP_Dynamic_Free(dynamic->list[i]);
-    free(dynamic->list);
-    for (size_t i = 0; i < dynamic->mapCount; i++)
+    LIBMATTI_MC_DataFix *copy = NULL;
+    if (kept > 0)
     {
-        free(dynamic->map[i].key);
-        LIBMATTI_DFUP_Dynamic_Free(dynamic->map[i].value);
-    }
-    free(dynamic->map);
-    free(dynamic);
-}
-
-LIBMATTI_DFUP_Dynamic *LIBMATTI_DFUP_Dynamic_Set(LIBMATTI_DFUP_Dynamic *dynamic, const char *key,
-                                                 LIBMATTI_DFUP_Dynamic *value)
-{
-    // Java: Dynamic.set(key, value)
-    for (size_t i = 0; i < dynamic->mapCount; i++)
-    {
-        if (strcmp(dynamic->map[i].key, key) == 0)
-        {
-            LIBMATTI_DFUP_Dynamic_Free(dynamic->map[i].value);
-            dynamic->map[i].value = value;
-            return dynamic;
-        }
-    }
-    dynamic->map = realloc(dynamic->map, sizeof(LIBMATTI_DFUP_MapEntry) * (dynamic->mapCount + 1));
-    dynamic->map[dynamic->mapCount].key = strdup(key);
-    dynamic->map[dynamic->mapCount].value = value;
-    dynamic->mapCount++;
-    return dynamic;
-}
-
-LIBMATTI_DFUP_Dynamic *LIBMATTI_DFUP_Dynamic_Get(const LIBMATTI_DFUP_Dynamic *dynamic, const char *key)
-{
-    // Java: Dynamic.get(key) -> Optional
-    for (size_t i = 0; i < dynamic->mapCount; i++)
-        if (strcmp(dynamic->map[i].key, key) == 0)
-            return dynamic->map[i].value;
-    return NULL;
-}
-
-int LIBMATTI_DFUP_Dynamic_AsInt(const LIBMATTI_DFUP_Dynamic *dynamic, int fallback)
-{
-    switch (dynamic->type)
-    {
-        case LIBMATTI_DFUP_ValueType_INT:
-            return dynamic->intValue;
-        case LIBMATTI_DFUP_ValueType_LONG:
-            return (int) dynamic->longValue;
-        case LIBMATTI_DFUP_ValueType_FLOAT:
-            return (int) dynamic->floatValue;
-        case LIBMATTI_DFUP_ValueType_DOUBLE:
-            return (int) dynamic->doubleValue;
-        default:
-            return fallback;
-    }
-}
-
-const char *LIBMATTI_DFUP_Dynamic_AsString(const LIBMATTI_DFUP_Dynamic *dynamic, const char *fallback)
-{
-    return dynamic->type == LIBMATTI_DFUP_ValueType_STRING ? dynamic->stringValue : fallback;
-}
-
-// ---------------------------------------------------------------------------
-// DataFixerUpper
-// ---------------------------------------------------------------------------
-
-void LIBMATTI_DFUP_DataFixerUpper_Add(LIBMATTI_DFUP_DataFixerUpper *fixer, int version, const char *name,
-                                      LIBMATTI_DFUP_Fix fix, void *self)
-{
-    if (fixer->fixCount == fixer->fixCapacity)
-    {
-        fixer->fixCapacity = fixer->fixCapacity == 0 ? 8 : fixer->fixCapacity * 2;
-        fixer->fixes = realloc(fixer->fixes, sizeof(LIBMATTI_DFUP_DataFix) * fixer->fixCapacity);
-    }
-    fixer->fixes[fixer->fixCount].version = version;
-    fixer->fixes[fixer->fixCount].name = strdup(name);
-    fixer->fixes[fixer->fixCount].fix = fix;
-    fixer->fixes[fixer->fixCount].self = self;
-    fixer->fixCount++;
-}
-
-// Java: DataFixerUpper.update - the fixes run in ascending version order
-LIBMATTI_DFUP_Dynamic *LIBMATTI_DFUP_DataFixerUpper_Update(LIBMATTI_DFUP_DataFixerUpper *fixer,
-                                                           LIBMATTI_DFUP_Dynamic *input, int dataVersion,
-                                                           int currentVersion)
-{
-    // Java: if (dataVersion >= currentVersion) return input;
-    if (dataVersion >= currentVersion)
-        return input;
-
-    LIBMATTI_DFUP_Dynamic *data = input;
-    for (size_t i = 0; i < fixer->fixCount; i++)
-    {
-        // Java: the fix for the version above dataVersion applies
-        if (fixer->fixes[i].version <= dataVersion)
-            continue;
-        if (fixer->fixes[i].version > currentVersion)
-            break;
-        data = fixer->fixes[i].fix(data, fixer->fixes[i].self);
-        if (data == NULL)
+        copy = calloc(kept, sizeof(LIBMATTI_MC_DataFix));
+        if (copy == NULL)
             return NULL;
+        size_t at = 0;
+        for (size_t i = 0; i < fixCount; i++)
+            if (fixes[i].version <= dataVersion)
+                copy[at++] = fixes[i];
     }
-    return data;
+
+    LIBMATTI_MC_DataFixer *fixer = calloc(1, sizeof(LIBMATTI_MC_DataFixer));
+    if (fixer == NULL)
+    {
+        free(copy);
+        return NULL;
+    }
+    fixer->dataVersion = dataVersion;
+    fixer->fixes = copy;
+    fixer->fixCount = kept;
+    return fixer;
 }
 
-void LIBMATTI_DFUP_DataFixerUpper_Free(LIBMATTI_DFUP_DataFixerUpper *fixer)
+void LIBMATTI_MC_DataFixer_Free(LIBMATTI_MC_DataFixer *fixer)
 {
     if (fixer == NULL)
         return;
-    for (size_t i = 0; i < fixer->fixCount; i++)
-        free(fixer->fixes[i].name);
-    free(fixer->fixes);
+    free((void *) fixer->fixes);
     free(fixer);
 }
 
-// Java: DataFixUtils.updateNamedChoice / the rename helper the fixes use
-LIBMATTI_DFUP_Dynamic *LIBMATTI_DFUP_DataFixUtils_UpdateNamed(LIBMATTI_DFUP_Dynamic *data, const char *oldName,
-                                                              const char *newName)
+LIBMATTI_MC_Nbt_Tag *LIBMATTI_MC_DataFixer_UpdateToCurrentVersion(const LIBMATTI_MC_DataFixer *fixer,
+                                                                   const char *type, LIBMATTI_MC_Nbt_Tag *root,
+                                                                   int version)
 {
-    // Renames the top-level "Name"/"id" style entry when it matches oldName
-    LIBMATTI_DFUP_Dynamic *name = LIBMATTI_DFUP_Dynamic_Get(data, "Name");
-    if (name != NULL && name->type == LIBMATTI_DFUP_ValueType_STRING &&
-        strcmp(name->stringValue, oldName) == 0)
-    {
-        return LIBMATTI_DFUP_Dynamic_Set(data, "Name", LIBMATTI_DFUP_Dynamic_String(newName));
-    }
+    if (fixer == NULL || root == NULL)
+        return root;
 
-    LIBMATTI_DFUP_Dynamic *id = LIBMATTI_DFUP_Dynamic_Get(data, "id");
-    if (id != NULL && id->type == LIBMATTI_DFUP_ValueType_STRING && strcmp(id->stringValue, oldName) == 0)
-        return LIBMATTI_DFUP_Dynamic_Set(data, "id", LIBMATTI_DFUP_Dynamic_String(newName));
-    return data;
+    // Java: the mutable fixer the caller holds the applied-rule list on
+    LIBMATTI_MC_DataFixer *mutableFixer = (LIBMATTI_MC_DataFixer *) fixer;
+    mutableFixer->lastAppliedCount = 0;
+
+    // Java: if (version < newVersion) { ... } - a current or newer tag is
+    // handed straight back
+    if (version >= fixer->dataVersion)
+        return root;
+
+    // Java: getRule(version, newVersion) walks the registered rules with
+//     expandedFixVersion > getLowestFixSameVersion(makeKey(version))
+// which is schema bookkeeping the C port does not carry: the rule list spans
+// schema versions from 704 (1.11) to 4537, and a single monotone comparison
+// cannot express it - a 1.12 chunk (1343) needs BOTH the 704 rule (the block
+// entity names) and the 2832 rule (the world height), one below and one above
+// its own version.
+//
+// The port therefore runs the whole chain for every tag below the current
+// DataVersion, and every rule recognises the shape it produces and leaves a
+// converted tag alone. That keeps the effect for a 1343 chunk (all five
+// conversions run) while a 2832 chunk passes through without a rule touching
+// data that is already current.
+    for (size_t i = 0; i < fixer->fixCount; i++)
+    {
+        const LIBMATTI_MC_DataFix *fix = &fixer->fixes[i];
+        if (fix->version > fixer->dataVersion)
+            continue;
+        if (type != NULL && fix->type != NULL && strcmp(fix->type, type) != 0)
+            continue;
+        if (fix->apply == NULL)
+            continue;
+        if (fix->apply(root) && mutableFixer->lastAppliedCount < MAX_APPLIED)
+            mutableFixer->lastApplied[mutableFixer->lastAppliedCount++] = fix->name;
+    }
+    return root;
 }

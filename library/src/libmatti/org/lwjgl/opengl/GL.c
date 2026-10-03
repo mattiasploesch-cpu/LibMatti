@@ -114,6 +114,7 @@ static void *p_glTexSubImage2D = NULL;
 static void *p_glTexParameteri = NULL;
 static void *p_glTexParameterf = NULL;
 static void *p_glGetTexLevelParameteriv = NULL;
+static void *p_glGetTexImage = NULL;
 static void *p_glCopyBufferSubData = NULL;
 static void *p_glTexBuffer = NULL;
 static void *p_glDrawArraysInstanced = NULL;
@@ -291,6 +292,7 @@ int LIBMATTI_GL_Load(void)
     GL_PROC(glTexParameteri, "glTexParameteri");
     GL_PROC(glTexParameterf, "glTexParameterf");
     GL_PROC(glGetTexLevelParameteriv, "glGetTexLevelParameteriv");
+    GL_PROC(glGetTexImage, "glGetTexImage");
     GL_PROC(glCopyBufferSubData, "glCopyBufferSubData");
     GL_PROC(glTexBuffer, "glTexBuffer");
     GL_PROC(glDrawArraysInstanced, "glDrawArraysInstanced");
@@ -952,6 +954,21 @@ int LIBMATTI_GL_glGetTexLevelParameteri(unsigned int target, int level, unsigned
         (void (*)(unsigned int, int, unsigned int, int *)) p_glGetTexLevelParameteriv;
     if (fn != NULL) fn(target, level, pname, &value);
     return value;
+}
+
+// Java: GL11.glGetTexImage - the debug/texel-verification readback path.
+void LIBMATTI_GL_glGetTexImage(unsigned int target, int level, unsigned int format, unsigned int type, void *pixels)
+{
+    void (*fn)(unsigned int, int, unsigned int, unsigned int, void *) =
+        (void (*)(unsigned int, int, unsigned int, unsigned int, void *)) p_glGetTexImage;
+    if (fn != NULL) fn(target, level, format, type, pixels);
+}
+
+int LIBMATTI_GL_glGetIntegerv(unsigned int pname, int *params)
+{
+    void (*fn)(unsigned int, int *) = (void (*)(unsigned int, int *)) p_glGetIntegerv;
+    if (fn != NULL) fn(pname, params);
+    return 0;
 }
 
 void LIBMATTI_GL_glCopyBufferSubData(unsigned int readTarget, unsigned int writeTarget, long readOffset, long writeOffset, long size)

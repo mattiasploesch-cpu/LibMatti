@@ -97,6 +97,62 @@ add_test(NAME player COMMAND test_player)
 matti_test(test_physics physics/PhysicsHarness.c)
 add_test(NAME physics COMMAND test_physics)
 
+# pick: the P5.4 core - the level ray cast (BlockGetter.clip over the
+# traverseBlocks DDA), the per-cell cube clip with the entry face, the reach
+# cutoff and the ClipContext shape gate
+matti_test(test_pick pick/PickHarness.c)
+add_test(NAME pick COMMAND test_pick)
+
+# storage: the P7.1 core - the anvil format end to end (RegionFileVersion
+# codecs, RegionFile sectors/header/.mcc spill, the RegionFileStorage cache,
+# the SerializableChunkData chunk<->NBT codec and the LevelStorageSource
+# level.dat + chunk save/load pass)
+matti_test(test_storage storage/StorageHarness.c)
+add_test(NAME storage COMMAND test_storage)
+
+# worldgen: the P7.2 core - the seeded RNG stack (RandomSupport/Xoroshiro) at
+# the exact JVM reference vectors, the Perlin/Normal noise stack, the biome
+# identity + the FlatLevelSource superflat pass end to end
+matti_test(test_worldgen worldgen/WorldgenHarness.c)
+add_test(NAME worldgen COMMAND test_worldgen)
+
+# datafix: the P7.3 fix chain - the Java parity vectors (addPadding, the
+# heightmap shift, the biome expansion, the section upgrade) and the registry
+# walk over a synthetic old chunk
+matti_test(test_datafix datafix/DataFixHarness.c)
+add_test(NAME datafix COMMAND test_datafix)
+
+# hud: the P5.5 core - the Gui layout unit (crosshair/hotbar rects out of
+# Gui.java), the POSITION_COLOR_TEXTURE quad packing and the hotbar item
+# palette the client drives
+matti_test(test_hud hud/HudHarness.c)
+add_test(NAME hud COMMAND test_hud)
+
+# sound: the P5.6 core - the SoundEngine stack over the LIBMATTI_OAL_*
+# wrapper (library/channel/boot lifecycle, headless no-op tolerance) and
+# the SoundEvents resolve cache the SoundTypes ride
+matti_test(test_sound sound/SoundHarness.c)
+add_test(NAME sound COMMAND test_sound)
+
+# inventory: the P6.1 core - SimpleContainer storage, Slot semantics
+# (safeInsert/safeTake/tryRemove), the MenuType registry (25 vanilla types)
+# and the AbstractContainerMenu click semantics (PICKUP/QUICK_MOVE/CLONE/
+# THROW/PICKUP_ALL/QUICK_CRAFT)
+matti_test(test_inventory inventory/InventoryHarness.c)
+add_test(NAME inventory COMMAND test_inventory)
+
+# widgets: the P6.2 core - the Screen lifecycle (init/resize/ESC close),
+# the AbstractWidget geometry/state gates and the Button/EditBox behaviour
+matti_test(test_widgets widgets/WidgetHarness.c)
+add_test(NAME widgets COMMAND test_widgets)
+
+# options: the P6.4 core - the Options store (the vanilla key:value
+# options.txt round-trip over FMLPaths.GAMEDIR), the PauseScreen (the
+# vanilla 3-button layout, isPauseScreen, the flag contract) and the
+# OptionsScreen (the 10% step rows, the live setters, the Done contract)
+matti_test(test_options options/OptionsHarness.c)
+add_test(NAME options COMMAND test_options)
+
 # ao: the P4.4 AO kernel over a real level (BlockColors providers, shade table,
 # the tesselate paths through the dispatcher)
 matti_test(test_ao ao/AoHarness.c)

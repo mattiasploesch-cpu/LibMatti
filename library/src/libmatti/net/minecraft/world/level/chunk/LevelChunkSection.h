@@ -7,6 +7,7 @@
 #ifndef MATTICRAFT_MC_WORLD_LEVEL_CHUNK_LEVELCHUNKSECTION_H
 #define MATTICRAFT_MC_WORLD_LEVEL_CHUNK_LEVELCHUNKSECTION_H
 
+#include "libmatti/net/minecraft/world/level/biome/Biome.h"
 #include "libmatti/net/minecraft/world/level/block/state/BlockState.h"
 #include "libmatti/net/minecraft/world/level/chunk/PalettedContainer.h"
 
@@ -29,6 +30,10 @@ typedef struct LIBMATTI_MC_LevelChunkSection
     int16_t nonEmptyBlockCount;
     int16_t tickingBlockCount;
     int16_t tickingFluidCount;
+    // Java: private final PalettedContainer<Holder<Biome>> biomes - the P7.2
+    // port keeps the interred biome pointer (the 64-biome palette container is
+    // not needed while the generator sources stay flat)
+    LIBMATTI_MC_Biome *biome;
     // Java: private final PalettedContainer<BlockState> states - the palette +
     // BitStorage port (SINGLE_VALUE/LINEAR/GLOBAL like Java's strategies)
     LIBMATTI_MC_PalettedContainer *states;
@@ -44,6 +49,9 @@ LIBMATTI_MC_BlockState *LIBMATTI_MC_LevelChunkSection_GetBlockState(const LIBMAT
 LIBMATTI_MC_BlockState *LIBMATTI_MC_LevelChunkSection_SetBlockState(LIBMATTI_MC_LevelChunkSection *section, int x, int y, int z, LIBMATTI_MC_BlockState *state);
 // the PalettedContainer access (Java: the field read through the section)
 LIBMATTI_MC_PalettedContainer *LIBMATTI_MC_LevelChunkSection_GetStates(const LIBMATTI_MC_LevelChunkSection *section);
+// Java: the biomes container read/write (the P7.2 port: the biome pointer)
+LIBMATTI_MC_Biome *LIBMATTI_MC_LevelChunkSection_GetBiome(const LIBMATTI_MC_LevelChunkSection *section);
+void LIBMATTI_MC_LevelChunkSection_SetBiome(LIBMATTI_MC_LevelChunkSection *section, LIBMATTI_MC_Biome *biome);
 // Java: public boolean hasOnlyAir()
 bool LIBMATTI_MC_LevelChunkSection_HasOnlyAir(const LIBMATTI_MC_LevelChunkSection *section);
 // Java: public boolean isRandomlyTicking() / isRandomlyTickingBlocks() / isRandomlyTickingFluids()

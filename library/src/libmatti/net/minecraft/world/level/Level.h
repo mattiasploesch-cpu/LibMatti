@@ -7,6 +7,7 @@
 
 #include "libmatti/net/minecraft/core/BlockPos.h"
 #include "libmatti/net/minecraft/world/phys/AABB.h"
+#include "libmatti/net/minecraft/world/phys/BlockHitResult.h"
 #include "libmatti/net/minecraft/resources/ResourceKey.h"
 #include "libmatti/net/minecraft/world/level/BlockGetter.h"
 #include "libmatti/net/minecraft/world/level/ChunkPos.h"
@@ -69,6 +70,10 @@ typedef struct LIBMATTI_MC_Level
     struct LIBMATTI_MC_Entity **entities;
     int entityCount;
     int entityCapacity;
+    // Java: the level's chunk source (ChunkMap on the server, ClientChunkCache
+    // on the client) - the port keeps the generator the source generates missing
+    // chunks with, borrowed from the owner (Minecraft holds the FlatLevelSource)
+    struct LIBMATTI_MC_ChunkGenerator *chunkGenerator;
 } LIBMATTI_MC_Level;
 
 // Java: Level(...) - the port takes the height range + the dimension key; the
@@ -76,6 +81,25 @@ typedef struct LIBMATTI_MC_Level
 LIBMATTI_MC_Level *LIBMATTI_MC_Level_New(int minY, int height, const char *dimension, bool isClientSide);
 // Java: the LevelHeightAccessor view of this level (ChunkAccess receives it)
 LIBMATTI_MC_LevelHeightAccessor LIBMATTI_MC_Level_GetHeightAccessor(struct LIBMATTI_MC_Level *level);
+
+// Java: ServerLevel/ClientLevel take the chunk source in the constructor; the
+// port takes the generator alone (the storage side rides the LevelStorage) -
+// the generator is borrowed, the owner frees it
+void LIBMATTI_MC_Level_SetChunkGenerator(struct LIBMATTI_MC_Level *level,
+                                         struct LIBMATTI_MC_ChunkGenerator *generator);
+struct LIBMATTI_MC_ChunkGenerator *LIBMATTI_MC_Level_GetChunkGenerator(struct LIBMATTI_MC_Level *level);
+
+// Java: ServerLevel.createChunk / the chunk source's generate - a missing chunk
+// is generated from the level's generator and stored (the heightmaps ride along
+// so the renderer and the spawn queries have them). NULL when the level has no
+// generator.
+struct LIBMATTI_MC_LevelChunk *LIBMATTI_MC_Level_GenerateChunk(struct LIBMATTI_MC_Level *level, int chunkX,
+                                                                int chunkZ);
+
+// Java: the chunk map's keep-alive pass - generate every chunk inside the view
+// distance around (centreX, centreZ) that is not loaded yet, and report how many
+// came in. NULL generator -> 0.
+int LIBMATTI_MC_Level_EnsureChunksAround(struct LIBMATTI_MC_Level *level, int centreX, int centreZ, int radius);
 
 // Java: public LevelChunk getChunk(int chunkX, int chunkZ) - NULL when not loaded
 LIBMATTI_MC_LevelChunk *LIBMATTI_MC_Level_GetChunk(struct LIBMATTI_MC_Level *level, int chunkX, int chunkZ);
@@ -148,6 +172,19 @@ int LIBMATTI_MC_Level_GetBlockCollisions(struct LIBMATTI_MC_Level *level, double
 // Java: CollisionGetter.noCollision(Entity, AABB) - true when no block collision
 // shape intersects the box (the block-only check; entities ride the entity scan)
 bool LIBMATTI_MC_Level_NoBlockCollision(struct LIBMATTI_MC_Level *level, const LIBMATTI_MC_AABB *box);
+
+// Java: BlockGetter.clip(ClipContext) - the DDA ray cast over the level's block
+// states (P5.4). The context carries the ray + the clip modes; the hit returns
+// the entry face and the location, no hit returns the Java miss (the ray end
+// plus the approximate nearest of the reverse ray).
+struct LIBMATTI_MC_ClipContext;
+LIBMATTI_MC_BlockHitResult LIBMATTI_MC_Level_Clip(struct LIBMATTI_MC_Level *level,
+                                                  struct LIBMATTI_MC_ClipContext *context);
+// Java: the per-cell clip lambda (BlockGetter.clipWithState shape) - the single
+// position's full-cube clip, exposed for the harness and the pick debug.
+LIBMATTI_MC_BlockHitResult LIBMATTI_MC_Level_ClipWithState(LIBMATTI_MC_Level *level, const LIBMATTI_MC_Vec3 *from,
+                                                           const LIBMATTI_MC_Vec3 *to, const LIBMATTI_MC_BlockPos *pos,
+                                                           const LIBMATTI_MC_BlockState *state);
 
 #ifdef __cplusplus
 }

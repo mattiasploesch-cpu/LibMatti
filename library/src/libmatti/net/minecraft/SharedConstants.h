@@ -21,4 +21,9 @@ int LIBMATTI_MC_SharedConstants_GetResourcePackVersionMinor(void);
 int LIBMATTI_MC_SharedConstants_GetDataPackVersionMajor(void);
 int LIBMATTI_MC_SharedConstants_GetDataPackVersionMinor(void);
 
+// Java: getCurrentVersion().getDataVersion().getVersion() - the world data
+// version the save format stamps (1.21.11: 4671, DetectedVersion.java)
+#define LIBMATTI_MC_SharedConstants_DATA_VERSION 4671
+int LIBMATTI_MC_SharedConstants_GetDataVersion(void);
+
 #endif //MATTICRAFT_MC_SHAREDCONSTANTS_H

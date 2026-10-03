@@ -24,9 +24,28 @@
 #include "libmatti/net/minecraft/client/renderer/texture/TextureAtlas.h"
 #include "libmatti/net/minecraft/client/renderer/texture/AbstractTexture.h"
 #include "libmatti/net/neoforged/fml/earlydisplay/EarlyFramebuffer.h"
+#include "libmatti/net/neoforged/fml/loading/FMLPaths.h"
+#include "libmatti/net/minecraft/client/gui/GuiRenderer.h"
+#include "libmatti/net/minecraft/client/gui/GuiLayout.h"
 #include "libmatti/net/minecraft/client/renderer/chunk/SectionRenderDispatcher.h"
+
 #include "libmatti/net/minecraft/client/renderer/chunk/SectionShader.h"
 #include "libmatti/net/minecraft/client/resources/model/ModelManager.h"
+#include "libmatti/net/minecraft/client/sounds/SoundEngine.h"
+#include "libmatti/net/minecraft/client/gui/screens/Screen.h"
+#include "libmatti/net/minecraft/client/gui/screens/PauseScreen.h"
+#include "libmatti/net/minecraft/client/gui/screens/OptionsScreen.h"
+#include "libmatti/net/minecraft/client/gui/screens/inventory/InventoryScreen.h"
+#include "libmatti/net/minecraft/client/gui/components/Button.h"
+#include "libmatti/net/minecraft/client/Options.h"
+#include "libmatti/net/minecraft/client/renderer/entity/ItemRenderer.h"
+#include "libmatti/com/mojang/blaze3d/platform/NativeImage.h"
+#include "libmatti/net/minecraft/world/level/block/state/BlockState.h"
+#include "libmatti/net/minecraft/world/level/storage/LevelStorageSource.h"
+#include "libmatti/net/minecraft/world/level/chunk/ChunkGenerator.h"
+#include "libmatti/net/minecraft/world/level/levelgen/flat/FlatLevelSource.h"
+#include "libmatti/net/minecraft/world/level/biome/Biome.h"
+#include "libmatti/net/minecraft/server/bootstrap/VanillaAssetLoader.h"
 #include "libmatti/net/minecraft/client/renderer/block/BlockRenderDispatcher.h"
 #include "libmatti/net/minecraft/server/bootstrap/VanillaBlockModels.h"
 #include "libmatti/net/minecraft/server/bootstrap/VanillaBlockTextures.h"
@@ -34,8 +53,15 @@
 #include "libmatti/net/minecraft/client/resources/model/SpriteGetter.h"
 #include "libmatti/net/minecraft/client/renderer/chunk/ChunkSectionLayer.h"
 #include "libmatti/net/minecraft/core/BlockPos.h"
+#include "libmatti/net/minecraft/core/SectionPos.h"
 #include "libmatti/net/minecraft/util/Mth.h"
+#include "libmatti/net/minecraft/world/Container.h"
+#include "libmatti/net/minecraft/world/level/ClipContext.h"
+#include "libmatti/net/minecraft/world/phys/BlockHitResult.h"
 #include "libmatti/net/minecraft/server/bootstrap/VanillaBlocks.h"
+#include "libmatti/net/minecraft/server/bootstrap/VanillaItems.h"
+#include "libmatti/net/minecraft/world/item/ItemStack.h"
+#include "libmatti/net/minecraft/world/item/Item.h"
 #include "libmatti/net/minecraft/Bootstrap.h"
 #include "libmatti/org/joml/Matrix4f.h"
 #include "libmatti/net/neoforged/fml/earlydisplay/FontShader.h"
@@ -52,11 +78,24 @@
 
 #include "libmatti/net/minecraft/client/EmbeddedFont.h"
 
+// Java: the client render distance in chunks (the port keeps a small window so
+// the in-memory level stays cheap) and how often the keep-alive pass runs
+#define CHUNK_STREAM_RADIUS 4
+#define CHUNK_STREAM_INTERVAL_TICKS 20
+
+// Java: ClientChunkCache.replaceWithPacketData - the keep-alive pass pulls in
+// the chunks around the player, so walking past the border finds ground instead
+// of the empty void an unloaded chunk reads as.
+static void stream_chunks_around(LIBMATTI_MC_Minecraft *minecraft, int centreX, int centreZ);
+
 // The theme resource root (see load_font below); every consumer defines it
 // from CMake (client/src does the same for the selftest fixtures).
 #ifndef MATTI_SOURCE_DIR
 #define MATTI_SOURCE_DIR "."
 #endif
+
+// Java: Inventory.getSelectionSize() - the hotbar carries 9 slots.
+#define HOTBAR_SIZE 9
 
 // Java: private static final Logger LOGGER = LogUtils.getLogger();
 #define LOG(...)                                                                                     \
@@ -115,6 +154,16 @@ struct LIBMATTI_MC_Minecraft
     // The in-memory level the skeleton drives (game port content).
     void *level;
 
+    // Java: this.levelSource + the LevelStorageAccess the session uses (the P7.1
+    // port): the level.dat + region/*.mca save the client loads at startup and
+    // flushes on close. NULL when the save dir is unavailable.
+    LIBMATTI_MC_LevelStorageSource *levelStorageSource;
+    LIBMATTI_MC_LevelStorageAccess *levelStorage;
+
+    // Java: ServerLevel's ChunkGenerator (the P7.2 port) - the demo world rides
+    // the FlatLevelSource over the superflat recipe; the session owns it.
+    LIBMATTI_MC_FlatLevelSource *chunkGenerator;
+
     // Java: this.levelRenderer = new LevelRenderer - the section dispatcher the
     // chunk meshes go through (the P4.1 port).
     LIBMATTI_MC_SectionRenderDispatcher *sectionDispatcher;
@@ -150,6 +199,47 @@ struct LIBMATTI_MC_Minecraft
     int mouseLookEnabled;
     double lastCursorX;
     double lastCursorY;
+    // Java: public HitResult hitResult - the crosshair pick (the P5.4 port); the
+    // mouse-button edge state rides beside it (Java: the GameSettings attack/use
+    // KeyMappings + MouseHandler's event feeding).
+    LIBMATTI_MC_BlockHitResult hitResult;
+    int attackDown;
+    int useDown;
+
+    // Java: this.gui = new Gui(this) - the HUD the frame draws after the world
+    // (the P5.5 port: the batcher renders, the hotbar data lives here).
+    LIBMATTI_MC_GuiRenderer *guiRenderer;
+    // Java: this.soundManager = new SoundManager(this.options) - the P5.6
+    // sound engine over the LIBMATTI_OAL wrapper (the reload boots lazily).
+    LIBMATTI_MC_SoundEngine *soundEngine;
+    // Java: Inventory.selectedSlot - the hotbar row itself rides the player
+    // inventory container (the slots 0..8 the Inventory.items layout puts
+    // first; one owner, the menu slots mirror the same stacks).
+    int hotbarSelected;
+    // Java: Gui.tick - the toolHighlightTimer (10s fade after a hotbar switch)
+    // + lastToolHighlight (the name it renders).
+    int toolHighlightTimer;
+    const LIBMATTI_MC_ItemStack *toolHighlight;
+    // Java: Minecraft.screen - the @Nullable Screen the input/render ride
+    // (the P6.2 port: the InventoryScreen the E key toggles; NULL = closed).
+    LIBMATTI_MC_InventoryScreen *inventoryScreen;
+    // Java: Minecraft.screen (P6.4): the pause menu + its options sub-screen
+    // (ESC with no screen opens the pause; the pause button opens options).
+    LIBMATTI_MC_PauseScreen *pauseScreen;
+    LIBMATTI_MC_OptionsScreen *optionsScreen;
+    // Java: private final Options options - the game settings store (the
+    // P6.4 port: options.txt over the vanilla key:value format).
+    LIBMATTI_MC_Options options;
+    // the open pause screen blocks the attack/use edge (the render pass
+    // routes the clicks; the screenMouseWasDown edge guard rides the same
+    // frame the block decision is read)
+    int screenMouseWasDown;
+    // the MATTI_OPEN_PAUSE smoke hook (the deterministic open for the
+    // headless verification)
+    int smokePauseRequested;
+    // the player-inventory container the inventory screen's menu binds
+    // (36 slots + the armor 34..37 + offhand 40 range the menu slots index)
+    LIBMATTI_MC_Container *playerInventory;
 };
 
 // Java: GameRenderer.renderLevel - "Matrix4f matrix4f1 = new Matrix4f()
@@ -193,32 +283,63 @@ static const LIBMATTI_MC_QuadCollection *model_for_block(void *userdata, const L
     if (key == NULL)
         return NULL;
     // Java: ResourceKey.location() - the identifier directly (no ToString parse).
+    // The registry keys the baked models by the namespaced ModelResourceLocation
+    // ("minecraft:block/<path>", the VanillaModels convention).
     char modelId[128];
-    snprintf(modelId, sizeof(modelId), "block/%s", LIBMATTI_MC_Identifier_GetPath(key->identifier));
+    snprintf(modelId, sizeof(modelId), "minecraft:block/%s", LIBMATTI_MC_Identifier_GetPath(key->identifier));
     const LIBMATTI_MC_QuadCollection *model = LIBMATTI_MC_ModelManager_GetModel(manager, modelId);
     return model;
 }
 
 // Java: the sprite-rect resolver - the block's model sprite rect for the face
-// UVs (the atlas texture "block/<path>").
+// UVs (the atlas texture "block/<path>"). An unknown texture falls back to
+// the missing-no sprite (Java: getSprite -> the missingSprite checkerboard),
+// never the full-atlas rect (that smears the whole page over the face - the
+// "weird triangles" the demo rendered before).
 static void sprite_rect_for_block(void *userdata, const LIBMATTI_MC_Block *block, float uv[4])
 {
     LIBMATTI_MC_ModelManager *manager = (LIBMATTI_MC_ModelManager *) userdata;
     LIBMATTI_MC_TextureAtlas *atlas = LIBMATTI_MC_ModelManager_GetAtlas(manager);
     if (atlas == NULL)
-        return; // the default full-sprite rect stays.
+        return; // the default full-sprite rect stays (no atlas at all).
     LIBMATTI_MC_ResourceKey *key = LIBMATTI_MC_Block_GetKey(block);
     if (key == NULL)
         return;
     // Java: ResourceKey.location() - the identifier directly (no ToString parse).
     char textureId[128];
     snprintf(textureId, sizeof(textureId), "block/%s", LIBMATTI_MC_Identifier_GetPath(key->identifier));
-    LIBMATTI_MC_SpriteGetter_SpriteRect(atlas, textureId, uv);
-    return;
+    if (LIBMATTI_MC_SpriteGetter_SpriteRect(atlas, textureId, uv))
+        return;
+    // Java: the missingSprite's rect (the checkerboard fallback).
+    LIBMATTI_MC_SpriteGetter_SpriteRect(atlas, "missingno", uv);
 }
 
 // Java: public static Minecraft getInstance()
 static LIBMATTI_MC_Minecraft *instance = NULL;
+
+// the P6.4 tails (the tick body routes through them; the render pass clicks
+// the menu widgets through the screen's children)
+static void tick_pause_screen(LIBMATTI_MC_Minecraft *minecraft);
+static void tick_options_screen(LIBMATTI_MC_Minecraft *minecraft);
+static void route_pause_clicks(LIBMATTI_MC_Minecraft *minecraft);
+static void apply_fullscreen_option(LIBMATTI_MC_Minecraft *minecraft);
+
+// Java: Window.calculateScale - the auto guiScale (the 0 = auto default
+// scales while width / (320 * (scale + 1)) fits and height / (240 * (scale +
+// 1)) fits). The options guiScale pins the factor when non-zero (the
+// OptionsScreen's later guiScale row drives it); the calc covers the auto
+// default. Every caller (layout/mouse/text) rides the same factor.
+static int gui_scale(int width, int height)
+{
+    LIBMATTI_MC_Minecraft *minecraft = LIBMATTI_MC_Minecraft_GetInstance();
+    int pinned = minecraft != NULL && minecraft->options.guiScale > 0 ? minecraft->options.guiScale : 0;
+    if (pinned > 0)
+        return pinned;
+    int scale = 1;
+    while (scale < 8 && width / (320 * (scale + 1)) != 0 && height / (240 * (scale + 1)) != 0)
+        scale++;
+    return scale;
+}
 
 LIBMATTI_MC_Minecraft *LIBMATTI_MC_Minecraft_GetInstance(void)
 {
@@ -231,6 +352,26 @@ float LIBMATTI_MC_Minecraft_GetTickTargetMillis(float msPerTick)
     // run keeps 50 ms.
     (void) msPerTick;
     return msPerTick;
+}
+
+// Java: Minecraft.setScreen(new InventoryScreen(player)) - the open path the
+// E edge and the MATTI_OPEN_INVENTORY smoke hook share (the releaseAll tail
+// + the container layout over the current window size).
+static void open_inventory_screen(LIBMATTI_MC_Minecraft *minecraft)
+{
+    if (minecraft->inventoryScreen != NULL)
+        return;
+    LIBMATTI_MC_KeyMapping_ReleaseAll();
+    LIBMATTI_MC_Player *player =
+        minecraft->localPlayer != NULL ? &minecraft->localPlayer->player : NULL;
+    minecraft->inventoryScreen = LIBMATTI_MC_InventoryScreen_New(minecraft, player, minecraft->playerInventory);
+    if (minecraft->inventoryScreen != NULL)
+    {
+        int sw = 0, sh = 0;
+        LIBMATTI_GLFW_glfwGetFramebufferSize(minecraft->window, &sw, &sh);
+        int gui = gui_scale(sw, sh);
+        LIBMATTI_MC_AbstractContainerScreen_Layout(&minecraft->inventoryScreen->base, sw / gui, sh / gui);
+    }
 }
 
 // Java: private String createTitle() - "Minecraft*" + version name; the
@@ -382,6 +523,12 @@ LIBMATTI_MC_Minecraft *LIBMATTI_MC_Minecraft_New(const LIBMATTI_MC_GameConfig *c
 
     LOG("Backend library: LWJGL version (port), OpenGL context acquired");
 
+    // Java: this.options = new Options(this); this.options.load(); - the
+    // settings load right after the window exists (the FML paths already
+    // initialized through the loader: options.txt resolves in the GAMEDIR).
+    LIBMATTI_MC_Options_Init(&minecraft->options);
+    LIBMATTI_MC_Options_Load(&minecraft->options);
+
     // Java (Minecraft ctor): this.textureManager = new TextureManager(this.resourceManager);
     // The ctor registers the missing texture (see TextureManager_New).
     minecraft->textureManager = LIBMATTI_MC_TextureManager_New(NULL);
@@ -395,6 +542,9 @@ LIBMATTI_MC_Minecraft *LIBMATTI_MC_Minecraft_New(const LIBMATTI_MC_GameConfig *c
         minecraft->fontProgram = LIBMATTI_FML_FontShader_Compile(&minecraft->fontScreenSizeLocation);
         if (minecraft->fontProgram == 0)
             LOG("Font shader compile failed; title rendering disabled");
+        else
+            LIBMATTI_MC_ItemRenderer_AttachFont(minecraft->fontProgram, minecraft->fontScreenSizeLocation,
+                                                LIBMATTI_GL_glGetUniformLocation(minecraft->fontProgram, "tex"));
         // Java: LoadingScreenRenderer ctor - the fixed 854x480 layout buffer
         minecraft->framebuffer = LIBMATTI_FML_EarlyFramebuffer_New(854, 480);
     }
@@ -402,28 +552,131 @@ LIBMATTI_MC_Minecraft *LIBMATTI_MC_Minecraft_New(const LIBMATTI_MC_GameConfig *c
     instance = minecraft;
 
     // Java: this.level = new ClientLevel(...) + levelRenderer.setLevel - the
-    // skeleton's demo level: bootstrap the vanilla blocks, one in-memory level
-    // and a flat 16x16 stone platform at y=64 the section compiler meshes.
+    // demo level builds through the P7.2 chunk generator now: the
+    // FlatLevelSource fills the two demo chunks (the superflat recipe) unless
+    // the save already owns them, and the towers re-apply on top either way.
     {
         LIBMATTI_MC_Bootstrap_BootStrap();
         LIBMATTI_MC_Level *level = LIBMATTI_MC_Level_New(-64, 384, LIBMATTI_MC_Level_OVERWORLD, true);
+
+        // Java: this.levelSource = LevelStorageSource.createDefault(GAMEDIR/saves)
+        // + createAccess(levelId) (the P7.1 port) - a previous session's level.dat
+        // and chunks restore over the generated world (the save wins; a fresh run
+        // keeps the generated chunks and writes the first save on close).
+        int restoredCount = 0;
+        {
+            const char *saveDirOverride = getenv("MATTI_SAVE_DIR");
+            const char *gameDir = saveDirOverride != NULL
+                                      ? saveDirOverride
+                                      : LIBMATTI_FML_FMLPaths_Get(LIBMATTI_FML_FMLPaths_GAMEDIR);
+            if (gameDir != NULL)
+            {
+                size_t savesSize = strlen(gameDir) + sizeof("/saves");
+                char *savesDir = malloc(savesSize);
+                if (savesDir != NULL)
+                    snprintf(savesDir, savesSize, "%s/saves", gameDir);
+                minecraft->levelStorageSource = savesDir != NULL
+                                                    ? LIBMATTI_MC_LevelStorageSource_CreateDefault(savesDir)
+                                                    : NULL;
+                free(savesDir);
+                if (minecraft->levelStorageSource != NULL)
+                {
+                    minecraft->levelStorage = LIBMATTI_MC_LevelStorageSource_CreateAccess(
+                        minecraft->levelStorageSource, "New World", LIBMATTI_MC_Level_OVERWORLD);
+                }
+                if (minecraft->levelStorage != NULL)
+                {
+                    LIBMATTI_MC_Nbt_CompoundTag *data = NULL;
+                    if (LIBMATTI_MC_LevelStorageAccess_ReadLevelData(minecraft->levelStorage, &data) && data != NULL)
+                    {
+                        LIBMATTI_MC_LevelStorage_ApplyLevelData(level, data);
+                        LIBMATTI_MC_Nbt_Tag_Free((LIBMATTI_MC_Nbt_Tag *) data);
+                    }
+                    // Java: ChunkMap.read - the demo's chunk positions reload from
+                    // the save (the freshly generated chunk is dropped)
+                    static const int RESTORE_POSITIONS[][2] = {{0, 0}, {4, 0}};
+                    for (size_t i = 0; i < sizeof(RESTORE_POSITIONS) / sizeof(RESTORE_POSITIONS[0]); i++)
+                    {
+                        LIBMATTI_MC_LevelChunk *old = LIBMATTI_MC_Level_GetChunk(level, RESTORE_POSITIONS[i][0],
+                                                                                 RESTORE_POSITIONS[i][1]);
+                        if (LIBMATTI_MC_LevelStorage_LoadChunk(minecraft->levelStorage, level, RESTORE_POSITIONS[i][0],
+                                                               RESTORE_POSITIONS[i][1]) != NULL)
+                        {
+                            if (old != NULL)
+                                LIBMATTI_MC_LevelChunk_Free(old);
+                            restoredCount++;
+                        }
+                    }
+                }
+                if (restoredCount > 0)
+                    LOG("[STORAGE] restored %d chunk(s) from the save", restoredCount);
+            }
+        }
+
+        // Java: the superflat recipe the demo world rides (the P7.2
+        // FlatLevelSource): bedrock 1, dirt 2, stone 126 over the -64 base with
+        // the plains biome - 129 blocks total, the stone surface lands at y 64
+        // (the top face 65) like before, and getSpawnHeight answers 65.
         LIBMATTI_MC_Block *stone = LIBMATTI_MC_VanillaBlocks_GetByName("STONE");
         LIBMATTI_MC_Block *dirt = LIBMATTI_MC_VanillaBlocks_GetByName("DIRT");
+        LIBMATTI_MC_Block *bedrock = LIBMATTI_MC_VanillaBlocks_GetByName("BEDROCK");
         if (stone != NULL && dirt != NULL)
         {
-            for (int x = 0; x < 16; x++)
+            LIBMATTI_MC_FlatLayerInfo layers[3];
+            LIBMATTI_MC_FlatLayerInfo_Init(&layers[0], 1, LIBMATTI_MC_Block_DefaultBlockState(
+                                                              bedrock != NULL ? bedrock : dirt));
+            LIBMATTI_MC_FlatLayerInfo_Init(&layers[1], 2, LIBMATTI_MC_Block_DefaultBlockState(dirt));
+            LIBMATTI_MC_FlatLayerInfo_Init(&layers[2], 126, LIBMATTI_MC_Block_DefaultBlockState(stone));
+            minecraft->chunkGenerator = LIBMATTI_MC_FlatLevelSource_New(layers, 3, LIBMATTI_MC_Biomes_Plains());
+        }
+        // Java: the level's chunk source owns the generator - the keep-alive pass
+        // fills the world around the player from it, so walking past the generated
+        // area grows the world instead of dropping the walker into an all-air chunk
+        if (minecraft->chunkGenerator != NULL)
+            LIBMATTI_MC_Level_SetChunkGenerator(level, &minecraft->chunkGenerator->base);
+
+        // Java: the chunk-map dispatch - each demo position either restored from
+                    // the save or fills through the generator (fillFromNoise + the BIOMES
+                    // pass + the live heightmap priming like the FEATURE status task).
+                    // (2,2) is the generation-only probe: the demo towers and the
+                    // east platform never touch it, so the saved chunk is the raw
+                    // superflat output.
+        if (minecraft->chunkGenerator != NULL)
+        {
+            static const int DEMO_POSITIONS[][2] = {{0, 0}, {4, 0}, {2, 2}};
+            for (size_t i = 0; i < sizeof(DEMO_POSITIONS) / sizeof(DEMO_POSITIONS[0]); i++)
             {
-                for (int z = 0; z < 16; z++)
+                if (LIBMATTI_MC_Level_GetChunk(level, DEMO_POSITIONS[i][0], DEMO_POSITIONS[i][1]) != NULL)
+                    continue;
+                LIBMATTI_MC_Level_GenerateChunk(level, DEMO_POSITIONS[i][0], DEMO_POSITIONS[i][1]);
+            }
+            // the keep-alive pass around the spawn chunk, so the first steps in
+            // any direction already have ground under them
+            stream_chunks_around(minecraft, 0, 0);
+        }
+
+        if (stone != NULL && dirt != NULL)
+        {
+            // The stone platform only builds on a fresh world (the save owns the
+            // chunks after the first close).
+            if (restoredCount == 0)
+            {
+                for (int x = 0; x < 16; x++)
                 {
-                    LIBMATTI_MC_BlockPos ground = {{x, 64, z}};
-                    LIBMATTI_MC_Level_SetBlock(level, &ground, LIBMATTI_MC_Block_DefaultBlockState(stone),
-                                               LIBMATTI_MC_Level_UPDATE_CLIENTS);
-                    LIBMATTI_MC_BlockPos fill = {{x, 63, z}};
-                    LIBMATTI_MC_Level_SetBlock(level, &fill, LIBMATTI_MC_Block_DefaultBlockState(dirt),
-                                               LIBMATTI_MC_Level_UPDATE_CLIENTS);
+                    for (int z = 0; z < 16; z++)
+                    {
+                        LIBMATTI_MC_BlockPos ground = {{x, 64, z}};
+                        LIBMATTI_MC_Level_SetBlock(level, &ground, LIBMATTI_MC_Block_DefaultBlockState(stone),
+                                                   LIBMATTI_MC_Level_UPDATE_CLIENTS);
+                        LIBMATTI_MC_BlockPos fill = {{x, 63, z}};
+                        LIBMATTI_MC_Level_SetBlock(level, &fill, LIBMATTI_MC_Block_DefaultBlockState(dirt),
+                                                   LIBMATTI_MC_Level_UPDATE_CLIENTS);
+                    }
                 }
             }
             // Two stone towers to make the geometry visible from the camera.
+            // They ride chunk (0,0) either way - on a restore they re-apply on
+            // top of the loaded chunk.
             for (int y = 65; y < 70; y++)
             {
                 LIBMATTI_MC_BlockPos a = {{4, y, 4}};
@@ -437,41 +690,65 @@ LIBMATTI_MC_Minecraft *LIBMATTI_MC_Minecraft_New(const LIBMATTI_MC_GameConfig *c
             // the frustum-culling proof - it draws when the camera faces east
             // and is culled otherwise, exactly like Java's
             // cullingFrustum.isVisible(sectionAABB) gate.
-            for (int x = 64; x < 80; x++)
+            if (restoredCount == 0)
             {
-                for (int z = 0; z < 16; z++)
+                for (int x = 64; x < 80; x++)
                 {
-                    LIBMATTI_MC_BlockPos ground = {{x, 64, z}};
-                    LIBMATTI_MC_Level_SetBlock(level, &ground, LIBMATTI_MC_Block_DefaultBlockState(stone),
-                                               LIBMATTI_MC_Level_UPDATE_CLIENTS);
-                    LIBMATTI_MC_BlockPos fill = {{x, 63, z}};
-                    LIBMATTI_MC_Level_SetBlock(level, &fill, LIBMATTI_MC_Block_DefaultBlockState(dirt),
-                                               LIBMATTI_MC_Level_UPDATE_CLIENTS);
+                    for (int z = 0; z < 16; z++)
+                    {
+                        LIBMATTI_MC_BlockPos ground = {{x, 64, z}};
+                        LIBMATTI_MC_Level_SetBlock(level, &ground, LIBMATTI_MC_Block_DefaultBlockState(stone),
+                                                   LIBMATTI_MC_Level_UPDATE_CLIENTS);
+                        LIBMATTI_MC_BlockPos fill = {{x, 63, z}};
+                        LIBMATTI_MC_Level_SetBlock(level, &fill, LIBMATTI_MC_Block_DefaultBlockState(dirt),
+                                                   LIBMATTI_MC_Level_UPDATE_CLIENTS);
+                    }
                 }
             }
         }
 
         minecraft->level = level;
+
         minecraft->sectionDispatcher = LIBMATTI_MC_SectionRenderDispatcher_New();
 
         // Java: the bootstrap order - MODEL_ATLAS (the block textures stitch
-        // first) then ModelBakery (the models bake against it). The atlas is
-        // procedural in the port (VanillaBlockTextures), the models embedded
-        // (VanillaModels) - headless-safe, no resource pack on disk.
-        LIBMATTI_MC_TextureAtlas *blockAtlas = LIBMATTI_MC_VanillaBlockTextures_Bootstrap(1024);
-        minecraft->modelManager = LIBMATTI_MC_ModelManager_New(blockAtlas);
-        if (LIBMATTI_MC_VanillaBlockModels_Bootstrap(minecraft->modelManager))
+        // first) then ModelBakery (the models bake against it). The assets
+        // ride the embedded pack (the gzip blob in the executable): the loader
+        // runs the SpriteSourceList -> SpriteLoader -> ModelBakery pipeline
+        // over the RAM-only pack, driven entirely by the pack's JSON + PNGs.
+        // A missing blob (or a failed stitch) falls back to the procedural
+        // atlas + the embedded cube models so the demo keeps rendering.
+        LIBMATTI_MC_TextureAtlas *blockAtlas = NULL;
+        if (LIBMATTI_MC_VanillaAssetLoader_Load())
         {
-            LIBMATTI_MC_SectionRenderDispatcher_SetModelResolver(
-                minecraft->sectionDispatcher,
-                (const LIBMATTI_MC_QuadCollection * (*)(void *, const LIBMATTI_MC_Block *))
-                    model_for_block,
-                minecraft->modelManager);
-            // Java: the sprite-rect resolver rides on the same atlas - the
-            // compiler maps the block's model sprite for the face UVs.
-            LIBMATTI_MC_SectionRenderDispatcher_SetSpriteResolver(
-                minecraft->sectionDispatcher, sprite_rect_for_block, minecraft->modelManager);
+            minecraft->modelManager = LIBMATTI_MC_VanillaAssetLoader_GetModelManager();
+            blockAtlas = LIBMATTI_MC_ModelManager_GetAtlas(minecraft->modelManager);
+            // Java: the ctor built the TextureManager over this.resourceManager
+            // - the port wires the embedded-pack manager in after the reload
+            // (the lazy SimpleTexture loads - the GUI panel/skin textures -
+            // resolve through the pack instead of the NULL-manager fallback).
+            if (minecraft->textureManager != NULL)
+                minecraft->textureManager->resourceManager =
+                    LIBMATTI_MC_VanillaAssetLoader_GetResourceManager();
+            fprintf(stderr, "[ASSETS] embedded pack active (%d entries)\n",
+                    (int) LIBMATTI_MC_VanillaAssetLoader_PackEntryCount());
         }
+        else
+        {
+            blockAtlas = LIBMATTI_MC_VanillaBlockTextures_Bootstrap(1024);
+            minecraft->modelManager = LIBMATTI_MC_ModelManager_New(blockAtlas);
+            LIBMATTI_MC_VanillaBlockModels_Bootstrap(minecraft->modelManager);
+            fprintf(stderr, "[ASSETS] procedural fallback active\n");
+        }
+        LIBMATTI_MC_SectionRenderDispatcher_SetModelResolver(
+            minecraft->sectionDispatcher,
+            (const LIBMATTI_MC_QuadCollection * (*)(void *, const LIBMATTI_MC_Block *))
+                model_for_block,
+            minecraft->modelManager);
+        // Java: the sprite-rect resolver rides on the same atlas - the
+        // compiler maps the block's model sprite for the face UVs.
+        LIBMATTI_MC_SectionRenderDispatcher_SetSpriteResolver(
+            minecraft->sectionDispatcher, sprite_rect_for_block, minecraft->modelManager);
 
         // Java: this.blockRenderer = new BlockRenderDispatcher(blockModelShaper,
         // materials, blockColors) - created with the model manager so the
@@ -508,18 +785,77 @@ LIBMATTI_MC_Minecraft *LIBMATTI_MC_Minecraft_New(const LIBMATTI_MC_GameConfig *c
 
     // Java: this.player = new LocalPlayer(this, this.level, ...) - the session
     // profile name rides the GameConfig user. The spawn rides the platform
-    // centre (the 16x16 slab spans x/z 0..15 at y 64, top face 65) - since the
-    // P5.3 physics the player collides, so an off-platform spawn falls into
-    // the void; yaw 180 faces north over the slab, pitch 20 looks slightly down
+    // centre (the 16x16 slab spans x/z 0..15, the surface at y 64, top face 65
+    // through the generator's getSpawnHeight) - since the P5.3 physics the
+    // player collides, so an off-platform spawn falls into the void; yaw 180
+    // faces north over the slab, pitch 20 looks slightly down
     minecraft->localPlayer = LIBMATTI_MC_LocalPlayer_New(minecraft->level,
                                                          config->user.name ? config->user.name : "Player", NULL);
     if (minecraft->localPlayer != NULL)
     {
         LIBMATTI_MC_Entity *entity = &minecraft->localPlayer->player.base.base;
-        LIBMATTI_MC_Entity_SetPos(entity, 8.0, 65.0, 8.0);
+        int spawnY = 65;
+        if (minecraft->chunkGenerator != NULL && minecraft->level != NULL)
+            spawnY = LIBMATTI_MC_ChunkGenerator_GetSpawnHeight(
+                &minecraft->chunkGenerator->base, &((LIBMATTI_MC_Level *) minecraft->level)->heightAccessor);
+        LIBMATTI_MC_Entity_SetPos(entity, 8.0, (double) spawnY, 8.0);
         LIBMATTI_MC_Entity_SetRot(entity, 180.0f, 20.0f);
         LIBMATTI_MC_Level_AddEntity(minecraft->level, entity);
     }
+
+    // Java: this.hitResult = BlockHitResult.createMiss(...) - the shared miss
+    // the renderer reads until the first pick lands.
+    minecraft->hitResult = LIBMATTI_MC_BlockHitResult_DefaultMiss();
+    minecraft->attackDown = 0;
+    minecraft->useDown = 0;
+
+    // Java: this.soundManager = new SoundManager(this.options) - the engine
+    // boots on the first reload (the play/reload calls lazy-init it).
+    minecraft->soundEngine = LIBMATTI_MC_SoundEngine_New();
+    LIBMATTI_MC_SoundEngine_Reload(minecraft->soundEngine);
+
+    // Java: the player's Inventory rides the menu the InventoryScreen binds
+    // (41 cells: the 36 inventory + the armor 34..37 + the offhand 40).
+    minecraft->playerInventory = LIBMATTI_MC_Container_New(41);
+    minecraft->inventoryScreen = NULL; // Java: this.screen = null
+
+    // Java: MouseHandler registers the scroll callback at window init - the
+    // gesture accumulator feeds the hotbar wheel the tick polls (the install
+    // binds the internal polling callback on the live window).
+    LIBMATTI_GLFW_glfwInstallScrollGesturePolling();
+
+    // Java: this.gui = new Gui(this) - the HUD renderer compiles with the GL
+    // context up (the constructor opened the window); a NULL renderer leaves
+    // the HUD off like the font path gates the title line.
+    minecraft->guiRenderer = LIBMATTI_MC_GuiRenderer_New();
+    if (minecraft->guiRenderer == NULL)
+        fprintf(stderr, "[GUI] renderer unavailable - HUD stays off\n");
+
+    // Java: this.itemRenderer = new ItemRenderer(this) - the GUI item icons
+    // (the isometric icon page bakes lazily on the first draw).
+    LIBMATTI_MC_ItemRenderer_Init(minecraft);
+
+    // Java: the options drive the window mode (Window.setMode over
+    // options.fullscreen) - the port polls the flag every frame like the
+    // real game's window events (apply_fullscreen_option below).
+    apply_fullscreen_option(minecraft);
+
+    // Java: the creative inventory's hotbar defaults - the port builds the 9
+    // stacks once into the player inventory's hotbar row (the container slots
+    // 0..8 the Inventory.items layout puts first - the palette the right click
+    // places from and the inventory menu mirrors).
+    static const char *const hotbarBlocks[HOTBAR_SIZE] = {
+        "STONE", "DIRT", "COBBLESTONE", "OAK_PLANKS", "GLASS",
+        "BRICKS", "SAND", "GRAVEL", "OAK_LOG"};
+    for (int slot = 0; slot < HOTBAR_SIZE; slot++)
+    {
+        LIBMATTI_MC_Item *item = LIBMATTI_MC_VanillaItems_GetByName(hotbarBlocks[slot]);
+        LIBMATTI_MC_Container_SetItem(minecraft->playerInventory, slot,
+                                      item != NULL ? LIBMATTI_MC_ItemStack_NewWithCount(item, 64) : NULL);
+    }
+    minecraft->hotbarSelected = 0;
+    minecraft->toolHighlightTimer = 0;
+    minecraft->toolHighlight = NULL;
 
     return minecraft;
 }
@@ -530,12 +866,47 @@ LIBMATTI_MC_Minecraft *LIBMATTI_MC_Minecraft_New(const LIBMATTI_MC_GameConfig *c
 // the body prints once per tick like the demo target.
 static void minecraft_demo_tick(void)
 {
-    printf("minecraft: tick body ran\n");
+    // printf("minecraft: tick body ran\n");
 }
 
 MATTI_MIXIN_TARGET("matticraft::demo::tick", minecraft_demo_tick)
 
+// Java: ClientChunkCache.replaceWithPacketData - the keep-alive pass pulls in
+// the chunks around the player, so walking past the border finds ground instead
+// of the empty void an unloaded chunk reads as.
+static void stream_chunks_around(LIBMATTI_MC_Minecraft *minecraft, int centreX, int centreZ)
+{
+    LIBMATTI_MC_Level *level = (LIBMATTI_MC_Level *) minecraft->level;
+    if (level == NULL || minecraft->chunkGenerator == NULL)
+        return;
+    for (int dz = -CHUNK_STREAM_RADIUS; dz <= CHUNK_STREAM_RADIUS; dz++)
+    {
+        for (int dx = -CHUNK_STREAM_RADIUS; dx <= CHUNK_STREAM_RADIUS; dx++)
+        {
+            int cx = centreX + dx;
+            int cz = centreZ + dz;
+            // Java: the chunk cache asks the chunk storage first and only
+            // generates when the storage has nothing - a saved chunk keeps the
+            // blocks that were built in it
+            if (LIBMATTI_MC_Level_GetChunk(level, cx, cz) != NULL)
+                continue;
+            if (minecraft->levelStorage != NULL)
+                LIBMATTI_MC_LevelStorage_LoadChunk(minecraft->levelStorage, level, cx, cz);
+            if (LIBMATTI_MC_Level_GetChunk(level, cx, cz) == NULL)
+                LIBMATTI_MC_Level_GenerateChunk(level, cx, cz);
+        }
+    }
+}
+
 static void apply_walk(LIBMATTI_MC_Minecraft *minecraft);
+static void handle_block_interaction(LIBMATTI_MC_Minecraft *minecraft);
+static void handle_hotbar_keys(LIBMATTI_MC_Minecraft *minecraft);
+static void dirty_sections_around(LIBMATTI_MC_Minecraft *minecraft, const LIBMATTI_MC_BlockPos *pos);
+// the P6.4 tails (defined after tick; the tick body routes through them)
+static void tick_pause_screen(LIBMATTI_MC_Minecraft *minecraft);
+static void tick_options_screen(LIBMATTI_MC_Minecraft *minecraft);
+// the window-mode poll (the ctor + the render loop drive it)
+static void apply_fullscreen_option(LIBMATTI_MC_Minecraft *minecraft);
 
 static void tick(LIBMATTI_MC_Minecraft *minecraft)
 {
@@ -559,6 +930,252 @@ static void tick(LIBMATTI_MC_Minecraft *minecraft)
     // per-frame rate - the tick loop above repeats this body for every
     // accumulated tick).
     apply_walk(minecraft);
+
+    // Java: startUseItem/continueAttack ride the tick loop (the multi/hold
+    // semantics run at tick rate) - the block interaction acts on the pick
+    // the renderer refreshed this frame. With a screen open the clicks route
+    // to the screen (MouseHandler.onPress gates the game keys) - the pause
+    // screens swallow them entirely (nothing to click in the world).
+    if (minecraft->inventoryScreen == NULL && minecraft->pauseScreen == NULL
+        && minecraft->optionsScreen == NULL)
+        handle_block_interaction(minecraft);
+
+    // Java: the hotbar keys ride the same poll (Inventory.selectedSlot).
+    handle_hotbar_keys(minecraft);
+
+    // Java: Minecraft.handleKeybinds -> the key.inventory edge toggles the
+    // screen (setScreen(screen == null ? new InventoryScreen(...) : null)).
+    // The skeleton polls the GLFW key and keeps the PREVIOUS state for the
+    // press edge. ESC closes through the Screen's keyPressed contract.
+    {
+        static int inventoryWasDown = 0;
+        static int escapeWasDown = 0;
+        int inventoryDown = LIBMATTI_GLFW_glfwGetKey(minecraft->window, LIBMATTI_GLFW_KEY_E) == LIBMATTI_GLFW_PRESS;
+        int escapeDown = LIBMATTI_GLFW_glfwGetKey(minecraft->window, LIBMATTI_GLFW_KEY_ESCAPE) == LIBMATTI_GLFW_PRESS;
+        if (minecraft->inventoryScreen != NULL)
+        {
+            // Java: screen.keyPressed(ESC) -> shouldCloseOnEsc() -> onClose() ->
+            // setScreen(null). The port's Screen_OnClose is a stub (the client
+            // owns the pointer), so the client translates the ESC branch
+            // itself: the shouldCloseOnEsc gate + the removed()/free tail the
+            // E-toggle shares. The edge guard keeps a held ESC single-fire.
+            if (escapeDown && !escapeWasDown
+                && LIBMATTI_MC_Screen_ShouldCloseOnEsc(&minecraft->inventoryScreen->base.base))
+            {
+                LIBMATTI_MC_Screen_Removed(&minecraft->inventoryScreen->base.base);
+                LIBMATTI_MC_InventoryScreen_Free(minecraft->inventoryScreen);
+                minecraft->inventoryScreen = NULL;
+            }
+        }
+        else if (minecraft->optionsScreen != NULL)
+        {
+            // Java: OptionsScreen.keyPressed(ESC) -> onClose -> setScreen(lastScreen)
+            // - the Done flag carries the same return.
+            if (escapeDown && !escapeWasDown)
+                minecraft->optionsScreen->done = true;
+        }
+        else if (minecraft->pauseScreen != NULL)
+        {
+            // Java: PauseScreen.keyPressed(ESC) -> onClose -> back to the game
+            if (escapeDown && !escapeWasDown)
+                minecraft->pauseScreen->backToGame = true;
+        }
+        else if (escapeDown && !escapeWasDown)
+        {
+            // Java: keyPressed(ESC) with no screen -> setScreen(new PauseScreen())
+            // (the pause menu never quits the game - the quit rides its button).
+            minecraft->pauseScreen = LIBMATTI_MC_PauseScreen_New(minecraft);
+            if (minecraft->pauseScreen != NULL)
+            {
+                int sw = 0, sh = 0;
+                LIBMATTI_GLFW_glfwGetFramebufferSize(minecraft->window, &sw, &sh);
+                int gui = gui_scale(sw, sh);
+                LIBMATTI_MC_Screen_Resize(&minecraft->pauseScreen->base, sw / gui, sh / gui);
+                // Java: KeyMapping.releaseAll - the walk input stops (the
+                // shared open path the inventory screen rides)
+                LIBMATTI_MC_KeyMapping_ReleaseAll();
+            }
+        }
+        escapeWasDown = escapeDown;
+        if (inventoryDown && !inventoryWasDown)
+        {
+            if (minecraft->inventoryScreen != NULL)
+            {
+                // Java: Minecraft.setScreen(null) -> screen.removed()
+                LIBMATTI_MC_Screen_Removed(&minecraft->inventoryScreen->base.base);
+                LIBMATTI_MC_InventoryScreen_Free(minecraft->inventoryScreen);
+                minecraft->inventoryScreen = NULL;
+            }
+            else
+            {
+                // Java: setScreen(new InventoryScreen(player)) -> init(w, h)
+                // over the CURRENT window size. The shared open path rides the
+                // releaseAll tail (KeyMapping.releaseAll - the walk input stops
+                // with the screen up) + the container layout that CENTERS the
+                // 176x166 image (Screen_Resize alone never touches
+                // leftPos/topPos - the panel sat in the corner and the slot
+                // hits missed by the offset).
+                open_inventory_screen(minecraft);
+            }
+        }
+        inventoryWasDown = inventoryDown;
+    }
+
+    // The MATTI_OPEN_INVENTORY smoke hook: the deterministic open for the
+    // headless screenshots (the E key rides the real input path, but the X
+    // synthetic-key delivery is unreliable for the pixel verification).
+    if (minecraft->inventoryScreen == NULL && minecraft->pauseScreen == NULL
+        && getenv("MATTI_OPEN_INVENTORY") != NULL)
+        open_inventory_screen(minecraft);
+
+    // The MATTI_OPEN_PAUSE smoke hook: the deterministic pause open (the ESC
+    // edge rides the real input path; the hook keeps the verification
+    // deterministic over xvfb).
+    if (getenv("MATTI_OPEN_PAUSE") != NULL)
+    {
+        if (minecraft->inventoryScreen == NULL && minecraft->pauseScreen == NULL)
+        {
+            minecraft->pauseScreen = LIBMATTI_MC_PauseScreen_New(minecraft);
+            if (minecraft->pauseScreen != NULL)
+            {
+                int sw = 0, sh = 0;
+                LIBMATTI_GLFW_glfwGetFramebufferSize(minecraft->window, &sw, &sh);
+                int gui = gui_scale(sw, sh);
+                LIBMATTI_MC_Screen_Resize(&minecraft->pauseScreen->base, sw / gui, sh / gui);
+                LIBMATTI_MC_KeyMapping_ReleaseAll();
+            }
+        }
+    }
+
+    // The MATTI_RESIZE_AT smoke hook: the deterministic resize for the
+    // headless verification (MATTI_RESIZE_AT=<tick>_<w>x<h> - the window
+    // size rides the live framebuffer the loop reads every frame). The tick
+    // counter is the hook's own (the frames field resets with the FPS timer).
+    {
+        const char *resizeAt = getenv("MATTI_RESIZE_AT");
+        if (resizeAt != NULL)
+        {
+            static int resizeDone = 0;
+            static int resizeTick = 0;
+            int atTick = 0, rw = 0, rh = 0;
+            resizeTick++;
+            if (sscanf(resizeAt, "%d_%dx%d", &atTick, &rw, &rh) == 3 && !resizeDone
+                && resizeTick >= atTick)
+            {
+                resizeDone = 1;
+                fprintf(stderr, "[RESIZE] tick %d -> %dx%d\n", atTick, rw, rh);
+                LIBMATTI_GLFW_glfwSetWindowSize(minecraft->window, rw, rh);
+            }
+        }
+    }
+
+    // Java: the open screen ticks (Minecraft.runTick -> screen.tick())
+    if (minecraft->inventoryScreen != NULL)
+    {
+        // Java: Window event -> screen.resize(w, h) - the open screen rides
+        // the LIVE window size (the panel recenters when the window/fullscreen
+        // changes; the stale layout sat in the top-right corner after a
+        // resize). The layout is idempotent, so the tick re-runs it every
+        // frame like the render pass re-reads the framebuffer size.
+        int sw = 0, sh = 0;
+        LIBMATTI_GLFW_glfwGetFramebufferSize(minecraft->window, &sw, &sh);
+        int gui = gui_scale(sw, sh);
+        LIBMATTI_MC_AbstractContainerScreen_Layout(&minecraft->inventoryScreen->base, sw / gui, sh / gui);
+        LIBMATTI_MC_Screen_Tick(&minecraft->inventoryScreen->base.base);
+    }
+    tick_pause_screen(minecraft);
+    tick_options_screen(minecraft);
+
+    // Java: the pause screens freeze the tick loop (Minecraft.runTick gates
+    // the game tick on the screen's isPauseScreen) - the walk/gravity
+    // impulses stop while the menu rides the render pass.
+    if (minecraft->pauseScreen != NULL || minecraft->optionsScreen != NULL)
+    {
+        LIBMATTI_MC_DeltaTracker_UpdatePauseState(minecraft->deltaTracker, 1);
+        minecraft->pause = 1;
+    }
+    else
+    {
+        LIBMATTI_MC_DeltaTracker_UpdatePauseState(minecraft->deltaTracker, 0);
+        minecraft->pause = 0;
+    }
+
+    // Java: Gui.tick - the 10s name fade decays per tick (the timer only runs
+    // while the HUD shows it).
+    if (minecraft->toolHighlightTimer > 0)
+        minecraft->toolHighlightTimer--;
+
+    // Java: SoundEngine -> SoundSource.MASTER rides the options slider (the
+    // volume folds into every channel gain at the next play).
+    if (minecraft->soundEngine != NULL)
+        LIBMATTI_MC_SoundEngine_SetVolume(minecraft->soundEngine,
+                                          LIBMATTI_MC_Options_GetMasterVolume(&minecraft->options));
+}
+
+// Java: Minecraft.handleKeybinds - the pause-menu poll (the client-side
+// contract the Smoke hook shares: the ESC edge opens the screen in tick,
+// this tail resolves the flags the buttons set).
+static void tick_pause_screen(LIBMATTI_MC_Minecraft *minecraft)
+{
+    if (minecraft->pauseScreen == NULL)
+        return;
+    LIBMATTI_MC_PauseScreen *pause = minecraft->pauseScreen;
+    // Java: the resize event rebuilds through Screen.resize (the open screen
+    // rides the live window size)
+    int sw = 0, sh = 0;
+    LIBMATTI_GLFW_glfwGetFramebufferSize(minecraft->window, &sw, &sh);
+    int gui = gui_scale(sw, sh);
+    if (pause->base.width != sw / gui || pause->base.height != sh / gui)
+        LIBMATTI_MC_Screen_Resize(&pause->base, sw / gui, sh / gui);
+    LIBMATTI_MC_Screen_Tick(&pause->base);
+
+    if (pause->backToGame || pause->quitToTitle)
+    {
+        // Java: setScreen(null) -> removed(); the QUIT keeps stopping through
+        // the stop flag (Save and Quit -> minecraft.stop())
+        LIBMATTI_MC_Screen_Removed(&pause->base);
+        LIBMATTI_MC_PauseScreen_Free(pause);
+        minecraft->pauseScreen = NULL;
+        // Java: the close flushes options.txt (Options.save rides
+        // the screen close in the port)
+        LIBMATTI_MC_Options_Save(&minecraft->options);
+    }
+    else if (pause->openOptions)
+    {
+        // Java: setScreen(new OptionsScreen(this, this.options)) - the pause
+        // screen stays alive below (the return target)
+        pause->openOptions = false;
+        minecraft->optionsScreen = LIBMATTI_MC_OptionsScreen_New(minecraft, &minecraft->options);
+        if (minecraft->optionsScreen != NULL)
+            LIBMATTI_MC_Screen_Resize(&minecraft->optionsScreen->base, sw / gui, sh / gui);
+    }
+
+    if (pause->quitToTitle)
+        LIBMATTI_MC_Minecraft_Stop(minecraft);
+}
+
+// Java: Minecraft.handleKeybinds - the options-screen poll (Done -> back to
+// the pause screen; the ESC close rides the same flag)
+static void tick_options_screen(LIBMATTI_MC_Minecraft *minecraft)
+{
+    if (minecraft->optionsScreen == NULL)
+        return;
+    LIBMATTI_MC_OptionsScreen *options = minecraft->optionsScreen;
+    int sw = 0, sh = 0;
+    LIBMATTI_GLFW_glfwGetFramebufferSize(minecraft->window, &sw, &sh);
+    int gui = gui_scale(sw, sh);
+    if (options->base.width != sw / gui || options->base.height != sh / gui)
+        LIBMATTI_MC_Screen_Resize(&options->base, sw / gui, sh / gui);
+    LIBMATTI_MC_Screen_Tick(&options->base);
+
+    if (options->done)
+    {
+        // Java: setScreen(this.lastScreen) - back to the pause menu
+        LIBMATTI_MC_Screen_Removed(&options->base);
+        LIBMATTI_MC_OptionsScreen_Free(options);
+        minecraft->optionsScreen = NULL;
+        LIBMATTI_MC_Options_Save(&minecraft->options);
+    }
 }
 
 // Java: private void renderTitleLine(...) - the skeleton draws the game title
@@ -599,6 +1216,506 @@ static void shot_after(LIBMATTI_MC_Minecraft *minecraft, const char *phase)
     LIBMATTI_MC_Minecraft_Stop(minecraft);
 }
 
+// ---------------------------------------------------------------------------
+// The pause/options overlay (Java: Screen.renderWithTooltipAndSubtitles over
+// the runTick render tail). The 1.21.11 render order: the world blurs behind
+// the screen (the GUI blur pass the port folds into a down-sampled
+// framebuffer copy), the menu_background tiles dim it, the widgets draw the
+// vanilla sprites (the nine-slice button.png family), the font rides the
+// classic ascii.png glyphs (the 8x8 bitmap font the FontRenderer texture
+// carries - NOT the earlydisplay Monocraft pack the load screen uses).
+// ---------------------------------------------------------------------------
+
+// the shared overlay ui state (the textures the overlay draws + the blur
+// scratch; lazily built, freed with the Minecraft instance)
+static unsigned int matti_ui_button_tex[3];   // [0]=button, [1]=highlighted, [2]=disabled
+static unsigned int matti_ui_font_tex;        // ascii.png (the 128x128 page)
+static unsigned int matti_ui_menubg_tex;      // menu_background.png (16x16)
+static unsigned int matti_ui_blur_tex;        // the down-sampled frame copy
+static int matti_ui_blur_tex_w, matti_ui_blur_tex_h;
+static unsigned char *matti_ui_readback;      // the frame readback buffer
+static int matti_ui_readback_cap;
+static unsigned char *matti_ui_small;         // the down-sampled pixels
+static int matti_ui_small_cap;
+static LIBMATTI_B3D_NativeImage *matti_ui_font_image; // kept for the metrics audit
+static bool matti_ui_font_tex_valid;          // the font page made it up
+static bool matti_ui_textures_attempted;      // the one-shot load gate
+
+// Java: Font.width over the classic bitmap font - the width table (the ink
+// width in px; the draw adds the 1px advance). The table rides the classic
+// font metrics (verified against ascii.png in the harness).
+static const unsigned char matti_ascii_widths[256] = {
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 1, 3, 5, 5, 5, 5, 1, 3, 3, 3, 5, 1, 5, 1, 5,
+    5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 1, 1, 4, 5, 4, 5,
+    6, 5, 5, 5, 5, 5, 5, 5, 5, 3, 5, 5, 5, 5, 5, 5,
+    5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 3, 5, 3, 5, 5,
+    5, 5, 5, 5, 5, 4, 5, 5, 1, 5, 4, 2, 5, 5, 5, 5,
+    5, 5, 5, 3, 5, 5, 5, 5, 5, 5, 3, 1, 3, 6, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 5, 0, 0, 5, 0, 0, 0, 0, 0, 0, 4, 4, 0, 0, 0,
+    5, 0, 0, 0, 6, 6, 7, 8, 8, 5, 5, 5, 7, 7, 5, 7,
+    7, 7, 7, 7, 5, 5, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
+    8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
+    8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
+    8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 5, 8,
+    8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 5, 0,
+    6, 5, 5, 5, 7, 4, 5, 6, 4, 5, 0, 6, 4, 4, 5, 0};
+
+// Java: the gui textures load through the TextureManager's SimpleTexture
+// path (the embedded pack carries them). The direct NativeImage load here
+// mirrors the same pipeline without the reload wiring (the overlay textures
+// upload once and stay for the session).
+static unsigned int matti_ui_load_png(const char *resourcePath)
+{
+    const LIBMATTI_MC_MultiPackResourceManager *manager =
+        LIBMATTI_MC_VanillaAssetLoader_GetResourceManager();
+    if (manager == NULL)
+        return 0;
+    LIBMATTI_MC_Resource *resource = LIBMATTI_MC_MultiPackResourceManager_GetResource(
+        manager, "minecraft", resourcePath);
+    if (resource == NULL)
+        return 0;
+    size_t length = 0;
+    unsigned char *bytes = LIBMATTI_MC_Resource_Open(resource, &length);
+    if (bytes == NULL)
+    {
+        LIBMATTI_MC_Resource_Free(resource);
+        return 0;
+    }
+    LIBMATTI_B3D_NativeImage *image = LIBMATTI_B3D_NativeImage_Read(bytes, length);
+    LIBMATTI_MC_Resource_Free(resource);
+    if (image == NULL)
+        return 0;
+    unsigned int tex = 0;
+    LIBMATTI_GL_glGenTextures(1, &tex);
+    LIBMATTI_B3D_GlStateManager_BindTexture((int) tex);
+    LIBMATTI_GL_glTexParameteri(LIBMATTI_GL_GL_TEXTURE_2D, LIBMATTI_GL_GL_TEXTURE_MIN_FILTER, LIBMATTI_GL_GL_NEAREST);
+    LIBMATTI_GL_glTexParameteri(LIBMATTI_GL_GL_TEXTURE_2D, LIBMATTI_GL_GL_TEXTURE_MAG_FILTER, LIBMATTI_GL_GL_NEAREST);
+    LIBMATTI_GL_glTexParameteri(LIBMATTI_GL_GL_TEXTURE_2D, LIBMATTI_GL_GL_TEXTURE_WRAP_S, LIBMATTI_GL_GL_CLAMP_TO_EDGE);
+    LIBMATTI_GL_glTexParameteri(LIBMATTI_GL_GL_TEXTURE_2D, LIBMATTI_GL_GL_TEXTURE_WRAP_T, LIBMATTI_GL_GL_CLAMP_TO_EDGE);
+    LIBMATTI_GL_glPixelStorei(LIBMATTI_GL_GL_UNPACK_ALIGNMENT, 1);
+    LIBMATTI_GL_glTexImage2D(LIBMATTI_GL_GL_TEXTURE_2D, 0, LIBMATTI_GL_GL_RGBA, image->width, image->height,
+                             0, LIBMATTI_GL_GL_RGBA, LIBMATTI_GL_GL_UNSIGNED_BYTE, image->pixels);
+    free(image->pixels);
+    free(image);
+    return tex;
+}
+
+// the lazy texture build (the first overlay frame)
+static void matti_ui_ensure_textures(LIBMATTI_MC_Minecraft *minecraft)
+{
+    (void) minecraft;
+    if (matti_ui_textures_attempted)
+        return;
+    matti_ui_textures_attempted = true;
+    matti_ui_button_tex[0] = matti_ui_load_png("textures/gui/sprites/widget/button.png");
+    matti_ui_button_tex[1] = matti_ui_load_png("textures/gui/sprites/widget/button_highlighted.png");
+    matti_ui_button_tex[2] = matti_ui_load_png("textures/gui/sprites/widget/button_disabled.png");
+    matti_ui_menubg_tex = matti_ui_load_png("textures/gui/menu_background.png");
+    // the font page stays (the metrics audit + the potential re-upload ride
+    // the session)
+    const LIBMATTI_MC_MultiPackResourceManager *manager =
+        LIBMATTI_MC_VanillaAssetLoader_GetResourceManager();
+    if (manager != NULL)
+    {
+        LIBMATTI_MC_Resource *resource = LIBMATTI_MC_MultiPackResourceManager_GetResource(
+            manager, "minecraft", "textures/font/ascii.png");
+        if (resource != NULL)
+        {
+            size_t length = 0;
+            unsigned char *bytes = LIBMATTI_MC_Resource_Open(resource, &length);
+            if (bytes != NULL)
+            {
+                matti_ui_font_image = LIBMATTI_B3D_NativeImage_Read(bytes, length);
+                LIBMATTI_MC_Resource_Free(resource);
+                if (matti_ui_font_image != NULL)
+                {
+                    unsigned int tex = 0;
+                    LIBMATTI_GL_glGenTextures(1, &tex);
+                    LIBMATTI_B3D_GlStateManager_BindTexture((int) tex);
+                    LIBMATTI_GL_glTexParameteri(LIBMATTI_GL_GL_TEXTURE_2D, LIBMATTI_GL_GL_TEXTURE_MIN_FILTER, LIBMATTI_GL_GL_NEAREST);
+                    LIBMATTI_GL_glTexParameteri(LIBMATTI_GL_GL_TEXTURE_2D, LIBMATTI_GL_GL_TEXTURE_MAG_FILTER, LIBMATTI_GL_GL_NEAREST);
+                    LIBMATTI_GL_glTexParameteri(LIBMATTI_GL_GL_TEXTURE_2D, LIBMATTI_GL_GL_TEXTURE_WRAP_S, LIBMATTI_GL_GL_CLAMP_TO_EDGE);
+                    LIBMATTI_GL_glTexParameteri(LIBMATTI_GL_GL_TEXTURE_2D, LIBMATTI_GL_GL_TEXTURE_WRAP_T, LIBMATTI_GL_GL_CLAMP_TO_EDGE);
+                    LIBMATTI_GL_glPixelStorei(LIBMATTI_GL_GL_UNPACK_ALIGNMENT, 1);
+                    LIBMATTI_GL_glTexImage2D(LIBMATTI_GL_GL_TEXTURE_2D, 0, LIBMATTI_GL_GL_RGBA,
+                                             matti_ui_font_image->width, matti_ui_font_image->height,
+                                             0, LIBMATTI_GL_GL_RGBA, LIBMATTI_GL_GL_UNSIGNED_BYTE,
+                                             matti_ui_font_image->pixels);
+                    matti_ui_font_tex = tex;
+                }
+            }
+        }
+    }
+    matti_ui_font_tex_valid = matti_ui_font_image != NULL;
+    fprintf(stderr, "[OVERLAY] textures: button=%u highlighted=%u disabled=%u menu=%u font=%u (%s)\n",
+            matti_ui_button_tex[0], matti_ui_button_tex[1], matti_ui_button_tex[2], matti_ui_menubg_tex,
+            matti_ui_font_tex, matti_ui_font_tex_valid ? "ok" : "missing");
+}
+
+// the overlay textures die with the game (Destroy tail)
+static void matti_ui_free_textures(void)
+{
+    if (matti_ui_readback != NULL)
+    {
+        free(matti_ui_readback);
+        matti_ui_readback = NULL;
+    }
+    matti_ui_readback_cap = 0;
+    if (matti_ui_small != NULL)
+    {
+        free(matti_ui_small);
+        matti_ui_small = NULL;
+    }
+    matti_ui_small_cap = 0;
+    if (matti_ui_font_image != NULL)
+    {
+        free(matti_ui_font_image->pixels);
+        free(matti_ui_font_image);
+        matti_ui_font_image = NULL;
+    }
+    matti_ui_font_tex_valid = false;
+}
+
+// Java: Font.width - the ink width sum + the 1px advance, the trailing
+// spacing dies
+static int matti_gui_ascii_width(const char *text)
+{
+    if (text == NULL)
+        return 0;
+    int w = 0;
+    for (const unsigned char *p = (const unsigned char *) text; *p != '\0'; p++)
+    {
+        unsigned char c = *p;
+        if (c < 32 || c > 127)
+            c = '?';
+        w += matti_ascii_widths[c] + 1;
+    }
+    return w > 0 ? w - 1 : 0;
+}
+
+// Java: the glyph quad (the 8x8 cell over the ascii.png page, ASCII 32..127
+// in the left 8 columns - the layout the classic font page carries)
+static void matti_gui_draw_ascii_char(LIBMATTI_MC_Minecraft *minecraft, unsigned char c,
+                                      float x, float y, float scale, unsigned int argb)
+{
+    if (c < 32 || c > 127)
+        c = '?';
+    int gx = (int) (c % 16) * 8;
+    int gy = (int) (c / 16) * 8;
+    LIBMATTI_MC_GuiRenderer_BlitQuad(minecraft->guiRenderer, x, y,
+                                     8.0f * scale, 8.0f * scale,
+                                     (float) gx / 128.0f, (float) gy / 128.0f,
+                                     (float) (gx + 8) / 128.0f, (float) (gy + 8) / 128.0f,
+                                     argb);
+}
+
+// Java: drawString - the shadow pass (+1 gui unit, the vanilla shadow folds
+// the colour by 4: (argb & 0xFCFCFCFC) >> 2 over the same alpha) then the
+// text pass at the pen; both ride the GUI batcher with the font page bound
+// (the caller flushes the sprite batch first).
+static void matti_gui_draw_ascii(LIBMATTI_MC_Minecraft *minecraft, const char *text,
+                                 float x, float y, float scale, unsigned int argb)
+{
+    if (text == NULL || minecraft->guiRenderer == NULL)
+        return;
+    unsigned int shadowRGB = (argb & 0x00FCFCFCu) >> 2;
+    unsigned int shadow = shadowRGB | (argb & 0xFF000000u);
+    for (int pass = 0; pass < 2; pass++)
+    {
+        float penX = pass == 0 ? x + scale : x;
+        float penY = pass == 0 ? y + scale : y;
+        for (const unsigned char *p = (const unsigned char *) text; *p != '\0'; p++)
+        {
+            unsigned char c = *p;
+            if (c < 32 || c > 127)
+                c = '?';
+            matti_gui_draw_ascii_char(minecraft, c, penX, penY, scale, pass == 0 ? shadow : argb);
+            penX += (float) (matti_ascii_widths[c] + 1) * scale;
+        }
+    }
+}
+
+// Java: AbstractWidget.renderSprite - the nine-slice re-pack over the
+// 200x20 button sprite (the mcmeta nine_slice border=3): the corners ride
+// the 3px border, the edges stretch, the centre stretches both ways.
+static void matti_gui_blit_button_sprite(LIBMATTI_MC_Minecraft *minecraft, unsigned int tex,
+                                         int x, int y, int w, int h, float scale)
+{
+    if (tex == 0 || minecraft->guiRenderer == NULL)
+        return;
+    const float TW = 200.0f, TH = 20.0f;
+    float s = scale;
+    float x0 = (float) x * s, y0 = (float) y * s;
+    float x1 = (float) (x + w) * s, y1 = (float) (y + h) * s;
+    float bw = 3.0f * s; // the border in screen px
+    struct
+    {
+        float rx0, ry0, rx1, ry1; // the dest rect (screen px)
+        float su0, sv0, su1, sv1; // the sprite uv
+    } q[9] = {
+        // the corners (fixed 3x3 sprite -> 3x3 gui)
+        {x0, y0, x0 + bw, y0 + bw, 0.0f, 0.0f, 3.0f / TW, 3.0f / TH},
+        {x1 - bw, y0, x1, y0 + bw, 197.0f / TW, 0.0f, 1.0f, 3.0f / TH},
+        {x0, y1 - bw, x0 + bw, y1, 0.0f, 17.0f / TH, 3.0f / TW, 1.0f},
+        {x1 - bw, y1 - bw, x1, y1, 197.0f / TW, 17.0f / TH, 1.0f, 1.0f},
+        // the top/bottom edges (the long axis stretches)
+        {x0 + bw, y0, x1 - bw, y0 + bw, 3.0f / TW, 0.0f, 197.0f / TW, 3.0f / TH},
+        {x0 + bw, y1 - bw, x1 - bw, y1, 3.0f / TW, 17.0f / TH, 197.0f / TW, 1.0f},
+        // the left/right edges (the short axis stretches)
+        {x0, y0 + bw, x0 + bw, y1 - bw, 0.0f, 3.0f / TH, 3.0f / TW, 17.0f / TH},
+        {x1 - bw, y0 + bw, x1, y1 - bw, 197.0f / TW, 3.0f / TH, 1.0f, 17.0f / TH},
+        // the centre (both axes stretch)
+        {x0 + bw, y0 + bw, x1 - bw, y1 - bw, 3.0f / TW, 3.0f / TH, 197.0f / TW, 17.0f / TH},
+    };
+    for (int i = 0; i < 9; i++)
+    {
+        LIBMATTI_MC_GuiRenderer_BlitQuad(minecraft->guiRenderer, q[i].rx0, q[i].ry0,
+                                         q[i].rx1 - q[i].rx0, q[i].ry1 - q[i].ry0,
+                                         q[i].su0, q[i].sv0, q[i].su1, q[i].sv1, 0xFFFFFFFFu);
+    }
+}
+
+// Java: Screen.renderBackground (the 1.21.x in-world pause path) - the world
+// blurs behind the screen and the menu_background tiles dim the copy. The
+// port blurs through a 1/8 down-sampled framebuffer copy (glReadPixels ->
+// the small texture -> the screen-filling LINEAR quads), the menu tile rides
+// over it (the alpha-tiled dim), the text keeps its contrast.
+static void render_pause_background(LIBMATTI_MC_Minecraft *minecraft, float sw, float sh, float scale)
+{
+    if (minecraft->guiRenderer == NULL)
+        return;
+
+    int fw = 0, fh = 0;
+    LIBMATTI_GLFW_glfwGetFramebufferSize(minecraft->window, &fw, &fh);
+    if (fw <= 0 || fh <= 0)
+        return;
+
+    int smallW = fw / 8 > 2 ? fw / 8 : 2;
+    int smallH = fh / 8 > 2 ? fh / 8 : 2;
+    if (matti_ui_blur_tex == 0)
+    {
+        LIBMATTI_GL_glGenTextures(1, &matti_ui_blur_tex);
+        matti_ui_blur_tex_w = 0;
+        matti_ui_blur_tex_h = 0;
+    }
+    // the readback rides the full frame, the small buffer the down-sample
+    int readNeed = fw * fh * 4;
+    if (matti_ui_readback_cap < readNeed)
+    {
+        unsigned char *grown = realloc(matti_ui_readback, (size_t) readNeed);
+        if (grown == NULL)
+            return;
+        matti_ui_readback = grown;
+        matti_ui_readback_cap = readNeed;
+    }
+    int smallNeed = smallW * smallH * 4;
+    if (matti_ui_small_cap < smallNeed)
+    {
+        unsigned char *grown = realloc(matti_ui_small, (size_t) smallNeed);
+        if (grown == NULL)
+            return;
+        matti_ui_small = grown;
+        matti_ui_small_cap = smallNeed;
+    }
+
+    // the frame copy: the readback rides the CURRENT framebuffer (the render
+    // pass draws into the layout FBO the BlitToScreen samples). The readback
+    // targets the READ binding, not the write one - bind the layout FBO (the
+    // bound WRITE target) as READ like the MATTI_SCREENSHOT hook does, or the
+    // copy samples the window's default framebuffer (black) and the blur
+    // quadruples the black.
+    LIBMATTI_B3D_GlStateManager_BindFramebuffer(36008,
+                                                (unsigned int) LIBMATTI_B3D_GlStateManager_GetFrameBuffer(36009));
+    LIBMATTI_GL_glPixelStorei(LIBMATTI_GL_GL_PACK_ALIGNMENT, 1);
+    LIBMATTI_GL_glReadPixels(0, 0, fw, fh, LIBMATTI_GL_GL_RGBA, LIBMATTI_GL_GL_UNSIGNED_BYTE,
+                             matti_ui_readback);
+    // down-sample 8x8 (the box average over the readback)
+    int step = fw / smallW;
+    for (int y = 0; y < smallH; y++)
+    {
+        for (int x = 0; x < smallW; x++)
+        {
+            unsigned int r = 0, g = 0, b = 0, a = 0;
+            int count = 0;
+            for (int sy = 0; sy < step && y * step + sy < fh; sy++)
+            {
+                for (int sx = 0; sx < step && x * step + sx < fw; sx++)
+                {
+                    const unsigned char *px = matti_ui_readback + ((y * step + sy) * fw + (x * step + sx)) * 4;
+                    r += px[0];
+                    g += px[1];
+                    b += px[2];
+                    a += px[3];
+                    count++;
+                }
+            }
+            unsigned char *out = matti_ui_small + (y * smallW + x) * 4;
+            out[0] = (unsigned char) (r / count);
+            out[1] = (unsigned char) (g / count);
+            out[2] = (unsigned char) (b / count);
+            out[3] = (unsigned char) (a / count);
+        }
+    }
+    LIBMATTI_B3D_GlStateManager_ActiveTexture(LIBMATTI_GL_GL_TEXTURE0);
+    LIBMATTI_B3D_GlStateManager_BindTexture((int) matti_ui_blur_tex);
+    if (matti_ui_blur_tex_w != smallW || matti_ui_blur_tex_h != smallH)
+    {
+        LIBMATTI_GL_glTexParameteri(LIBMATTI_GL_GL_TEXTURE_2D, LIBMATTI_GL_GL_TEXTURE_MIN_FILTER, LIBMATTI_GL_GL_LINEAR);
+        LIBMATTI_GL_glTexParameteri(LIBMATTI_GL_GL_TEXTURE_2D, LIBMATTI_GL_GL_TEXTURE_MAG_FILTER, LIBMATTI_GL_GL_LINEAR);
+        LIBMATTI_GL_glTexParameteri(LIBMATTI_GL_GL_TEXTURE_2D, LIBMATTI_GL_GL_TEXTURE_WRAP_S, LIBMATTI_GL_GL_CLAMP_TO_EDGE);
+        LIBMATTI_GL_glTexParameteri(LIBMATTI_GL_GL_TEXTURE_2D, LIBMATTI_GL_GL_TEXTURE_WRAP_T, LIBMATTI_GL_GL_CLAMP_TO_EDGE);
+    LIBMATTI_GL_glPixelStorei(LIBMATTI_GL_GL_UNPACK_ALIGNMENT, 1);
+        LIBMATTI_GL_glTexImage2D(LIBMATTI_GL_GL_TEXTURE_2D, 0, LIBMATTI_GL_GL_RGBA, smallW, smallH,
+                                 0, LIBMATTI_GL_GL_RGBA, LIBMATTI_GL_GL_UNSIGNED_BYTE, matti_ui_small);
+        matti_ui_blur_tex_w = smallW;
+        matti_ui_blur_tex_h = smallH;
+    }
+    else
+    {
+        LIBMATTI_GL_glPixelStorei(LIBMATTI_GL_GL_UNPACK_ALIGNMENT, 1);
+        LIBMATTI_GL_glTexSubImage2D(LIBMATTI_GL_GL_TEXTURE_2D, 0, 0, 0, smallW, smallH,
+                                    LIBMATTI_GL_GL_RGBA, LIBMATTI_GL_GL_UNSIGNED_BYTE, matti_ui_small);
+    }
+
+    // the blurred copy over the screen (the 4x LINEAR up-scale carries the
+    // blur; the dim rides the menu tile + the flat guard below)
+    LIBMATTI_MC_GuiRenderer_SetTexture(minecraft->guiRenderer, matti_ui_blur_tex);
+    LIBMATTI_MC_GuiRenderer_BlitQuad(minecraft->guiRenderer, 0.0f, 0.0f, sw, sh,
+                                     0.0f, 0.0f, 1.0f, 1.0f, 0xFFFFFFFFu);
+    LIBMATTI_MC_GuiRenderer_Flush(minecraft->guiRenderer, sw, sh);
+
+    // Java: renderMenuBackground - the menu_background tile tiles the blurred
+    // copy (the 16x16 texture repeats over the screen; the 0.25-alpha dim
+    // sits IN the tile - the texture's own shading).
+    if (matti_ui_menubg_tex != 0)
+    {
+        LIBMATTI_MC_GuiRenderer_SetTexture(minecraft->guiRenderer, matti_ui_menubg_tex);
+        float tile = 16.0f * scale;
+        int tilesX = (int) (sw / tile) + 1;
+        int tilesY = (int) (sh / tile) + 1;
+        for (int ty = 0; ty < tilesY; ty++)
+        {
+            for (int tx = 0; tx < tilesX; tx++)
+            {
+                LIBMATTI_MC_GuiRenderer_BlitQuad(minecraft->guiRenderer,
+                                                 (float) tx * tile, (float) ty * tile,
+                                                 tile, tile,
+                                                 0.0f, 0.0f, 1.0f, 1.0f, 0xFFFFFFFFu);
+            }
+        }
+        LIBMATTI_MC_GuiRenderer_Flush(minecraft->guiRenderer, sw, sh);
+    }
+}
+
+// Java: Screen.render - the widgets ride the sprite pass (the nine-slice
+// button family), the labels ride the font pass after the flush (the
+// vanilla render order: the sprites flush, then the font draws).
+static void render_pause_overlay(LIBMATTI_MC_Minecraft *minecraft, int guiWidth, int guiHeight, float scale)
+{
+    if (minecraft->guiRenderer == NULL)
+        return;
+    LIBMATTI_MC_Screen *screen = NULL;
+    if (minecraft->optionsScreen != NULL)
+        screen = &minecraft->optionsScreen->base;
+    else if (minecraft->pauseScreen != NULL)
+        screen = &minecraft->pauseScreen->base;
+    if (screen == NULL)
+        return;
+
+    float sw = (float) guiWidth * scale;
+    float sh = (float) guiHeight * scale;
+
+    // Java: the GUI pass runs blended (RenderSystem.enableBlend over the
+    // SRC_ALPHA pair) - the menu tile's 0x40 alpha and the glyph shadow pixels
+    // fold into the frame only when the blend is on; disabled the alpha writes
+    // opaque (the shadow quads read black boxes).
+    LIBMATTI_B3D_GlStateManager_EnableBlend();
+    LIBMATTI_B3D_GlStateManager_BlendFuncSeparate(LIBMATTI_GL_GL_SRC_ALPHA,
+                                                  LIBMATTI_GL_GL_ONE_MINUS_SRC_ALPHA,
+                                                  LIBMATTI_GL_GL_ONE, LIBMATTI_GL_GL_ONE_MINUS_SRC_ALPHA);
+
+    matti_ui_ensure_textures(minecraft);
+
+    // Java: renderBackground - the blurred world + the menu tile
+    render_pause_background(minecraft, sw, sh, scale);
+
+    // --- the widget sprite pass -------------------------------------------
+    // Java: the cursor scales into the layout space (the hover state)
+    double cursorX = 0.0, cursorY = 0.0;
+    LIBMATTI_GLFW_glfwGetCursorPos(minecraft->window, &cursorX, &cursorY);
+    int fw = 0, fh = 0;
+    LIBMATTI_GLFW_glfwGetFramebufferSize(minecraft->window, &fw, &fh);
+    int guiFactor = gui_scale(fw, fh);
+    int mouseX = (int) (cursorX / guiFactor), mouseY = (int) (cursorY / guiFactor);
+
+    LIBMATTI_MC_GuiRenderer_SetTexture(minecraft->guiRenderer, 0);
+    for (int i = 0; i < screen->childCount; i++)
+        LIBMATTI_MC_AbstractWidget_Render(screen->children[i], mouseX, mouseY, 0.0f);
+
+    for (int i = 0; i < screen->childCount; i++)
+    {
+        LIBMATTI_MC_AbstractWidget *widget = screen->children[i];
+        unsigned int tex;
+        if (!widget->active)
+            tex = matti_ui_button_tex[2]; // Java: the disabled sprite
+        else if (widget->isHovered)
+            tex = matti_ui_button_tex[1];
+        else
+            tex = matti_ui_button_tex[0];
+        LIBMATTI_MC_GuiRenderer_SetTexture(minecraft->guiRenderer, tex);
+        matti_gui_blit_button_sprite(minecraft, tex, LIBMATTI_MC_AbstractWidget_GetX(widget),
+                                     LIBMATTI_MC_AbstractWidget_GetY(widget),
+                                     LIBMATTI_MC_AbstractWidget_GetWidth(widget),
+                                     LIBMATTI_MC_AbstractWidget_GetHeight(widget), scale);
+        LIBMATTI_MC_GuiRenderer_Flush(minecraft->guiRenderer, sw, sh);
+    }
+
+    // --- the font pass ------------------------------------------------------
+    if (matti_ui_font_tex_valid)
+    {
+        LIBMATTI_MC_GuiRenderer_SetTexture(minecraft->guiRenderer, matti_ui_font_tex);
+        // Java: the widget labels (drawCenteredString over the widget box;
+        // the pressed button shifts the label +1,+1 like the vanilla sprite
+        // state - the click reads through the label nudge)
+        for (int i = 0; i < screen->childCount; i++)
+        {
+            LIBMATTI_MC_AbstractWidget *widget = screen->children[i];
+            const char *label = LIBMATTI_MC_AbstractWidget_GetMessage(widget);
+            if (label == NULL)
+                continue;
+            unsigned int argb = widget->active ? 0xFFE0E0E0u : 0xFFA0A0A0u;
+            int labelWidth = matti_gui_ascii_width(label);
+            float labelX = (float) LIBMATTI_MC_AbstractWidget_GetX(widget) * scale
+                           + ((float) LIBMATTI_MC_AbstractWidget_GetWidth(widget) * scale
+                              - (float) labelWidth * scale) / 2.0f;
+            float labelY = (float) LIBMATTI_MC_AbstractWidget_GetY(widget) * scale
+                           + ((float) LIBMATTI_MC_AbstractWidget_GetHeight(widget) - 8.0f) * scale / 2.0f;
+            if (LIBMATTI_MC_Button_IsPressed((LIBMATTI_MC_Button *) widget))
+            {
+                labelX += scale;
+                labelY += scale;
+            }
+            matti_gui_draw_ascii(minecraft, label, labelX, labelY, scale, argb);
+        }
+        // Java: renderTitleText - drawCenteredString at y 40 (the 1.21.11
+        // pause carries the StringWidget title at MENU_PADDING_TOP - 10)
+        const char *title = LIBMATTI_MC_Screen_GetTitle(screen);
+        if (title != NULL)
+        {
+            int textWidth = matti_gui_ascii_width(title);
+            float textX = ((float) guiWidth * scale - (float) textWidth * scale) / 2.0f;
+            float textY = (float) LIBMATTI_MC_PauseScreen_TITLE_Y * scale;
+            matti_gui_draw_ascii(minecraft, title, textX, textY, scale, 0xFFFFFFFFu);
+        }
+        LIBMATTI_MC_GuiRenderer_Flush(minecraft->guiRenderer, sw, sh);
+    }
+    LIBMATTI_B3D_GlStateManager_DisableBlend();
+}
+
 static void render_title(LIBMATTI_MC_Minecraft *minecraft, int width, int height)
 {
     (void) width;
@@ -631,6 +1748,287 @@ static void render_title(LIBMATTI_MC_Minecraft *minecraft, int width, int height
     LIBMATTI_FML_SimpleFont_DrawTexts(minecraft->font, 10.0f, 10.0f, texts, 1);
 
     LIBMATTI_GL_glUseProgram(0);
+    LIBMATTI_B3D_GlStateManager_DisableBlend();
+}
+
+// Java: Gui.render + Gui.renderSelectedItemName - the HUD layer over the world
+// pass: the crosshair, the hotbar sprite, the 9 item cells (the real block
+// textures through the block atlas) and the selected name line (the
+// toolHighlightTimer fade). Java computes scaledWidth = fbWidth / guiScale and
+// blits every element at guiScale pixels per layout pixel - the port runs the
+// layout math over width/2 x height/2 (the guiScale-2 space the 1080p window
+// drives) and scales every rect x2 into the framebuffer pixels.
+static void render_hud(LIBMATTI_MC_Minecraft *minecraft, int width, int height)
+{
+    if (minecraft->guiRenderer == NULL || LIBMATTI_MC_GuiRenderer_Program(minecraft->guiRenderer) == 0)
+        return;
+
+    // Java: Window.getGuiScale - the layout space the Gui math runs over and
+    // the scale the blits multiply with (the auto scale the calculateScale
+    // loop derives from the window size).
+    int gui = gui_scale(width, height);
+    const int guiWidth = width / gui, guiHeight = height / gui;
+    const float scale = (float) gui;
+    if (guiWidth < 1 || guiHeight < 1)
+        return;
+
+    // Java: RenderSystem.setShaderTexture - the quads sample the block atlas
+    // for the item cells and the white 1x1 for the tint-only widgets.
+    unsigned int atlasTexture = 0;
+    if (minecraft->modelManager != NULL)
+    {
+        const LIBMATTI_MC_TextureAtlas *atlas = LIBMATTI_MC_ModelManager_GetAtlas(minecraft->modelManager);
+        if (atlas != NULL)
+            atlasTexture = atlas->base.texture; // 0 until the lazy world upload.
+    }
+
+    // Java: the crosshair (15x15, centred) tints over the world (the normal
+    // blend, the GUI_TEXTURED path).
+    LIBMATTI_B3D_GlStateManager_EnableBlend();
+    LIBMATTI_B3D_GlStateManager_BlendFuncSeparate(LIBMATTI_GL_GL_SRC_ALPHA,
+                                                  LIBMATTI_GL_GL_ONE_MINUS_SRC_ALPHA,
+                                                  LIBMATTI_GL_GL_ONE, LIBMATTI_GL_GL_ONE_MINUS_SRC_ALPHA);
+
+    int x = 0, y = 0, w = 0, h = 0;
+    // Java: Gui.render gates the crosshair on screen == null (the open screen
+    // hides it); the inventory-open state rides the same gate.
+    if (minecraft->inventoryScreen == NULL)
+    {
+        LIBMATTI_MC_GuiLayout_CrosshairRect(guiWidth, guiHeight, &x, &y, &w, &h);
+        LIBMATTI_MC_GuiRenderer_BlitQuad(minecraft->guiRenderer, (float) x * scale, (float) y * scale,
+                                         (float) w * scale, (float) h * scale,
+                                         0.0f, 0.0f, 1.0f, 1.0f, 0xB0FFFFFFu);
+    }
+
+    // The white-texture group flushes first (the widgets sample the 1x1);
+    // the atlas group rides a second flush (one texture per draw).
+    LIBMATTI_MC_GuiRenderer_SetTexture(minecraft->guiRenderer, 0);
+
+    // Java: the hotbar (182x22 at w/2-91, h-22) - the dark bar with the 9
+    // slot cells (the widget texture's insets the flat fallback shades in).
+    // Java: Gui.renderHotbar - the row rides the ItemRenderer port now (the
+    // widget blit + cell shading + item sprites + selection frame one module).
+    LIBMATTI_MC_TextureAtlas *atlas = minecraft->modelManager != NULL
+        ? LIBMATTI_MC_ModelManager_GetAtlas(minecraft->modelManager)
+        : NULL;
+    // Java: Inventory.items - the hotbar row IS the container's first 9 slots
+    // (the borrowed row the ItemRenderer draws).
+    LIBMATTI_MC_ItemStack *hotbarRow[HOTBAR_SIZE];
+    for (int slot = 0; slot < HOTBAR_SIZE; slot++)
+        hotbarRow[slot] = LIBMATTI_MC_Container_GetItem(minecraft->playerInventory, slot);
+    LIBMATTI_MC_ItemRenderer_RenderHotbar(minecraft->guiRenderer, minecraft->font, atlas,
+                                          hotbarRow, HOTBAR_SIZE, minecraft->hotbarSelected,
+                                          (float) guiWidth, (float) guiHeight, scale);
+
+    // Java: renderSelectedItemName - the name line (hover name of the selected
+    // stack) centred over the hotbar, fading with the toolHighlightTimer.
+    if (minecraft->toolHighlightTimer > 0 && minecraft->font != NULL && minecraft->fontProgram != 0)
+    {
+        const LIBMATTI_MC_ItemStack *stack = minecraft->toolHighlight;
+        if (stack != NULL)
+        {
+            LIBMATTI_MC_Item *item = LIBMATTI_MC_ItemStack_GetItem(stack);
+            const char *name = item != NULL ? LIBMATTI_MC_Item_GetDescriptionId(item) : NULL;
+            if (name != NULL)
+            {
+                int textWidth = LIBMATTI_FML_SimpleFont_StringWidth(minecraft->font, name);
+                int nameY = 0;
+                int nameX = LIBMATTI_MC_GuiLayout_SelectedItemNameRect(guiWidth, guiHeight, textWidth, &nameY);
+                int alpha = minecraft->toolHighlightTimer * 256 / 10;
+                if (alpha > 255)
+                    alpha = 255;
+                char buffer[64];
+                snprintf(buffer, sizeof(buffer), "%s", name);
+                LIBMATTI_FML_SimpleFont_DisplayText shadow[1] = {{buffer, 0x40000000u | ((unsigned) alpha)}};
+                LIBMATTI_FML_SimpleFont_DisplayText text[1] = {{buffer, 0x00FFFFFFu | ((unsigned) alpha << 24)}};
+                LIBMATTI_GL_glUseProgram(minecraft->fontProgram);
+                // Java: the name line rides the live gui size (the hardcoded
+                // 854x480 garbled the glyphs at other window sizes - the same
+                // class the label path fixed).
+                LIBMATTI_GL_glUniform2f(minecraft->fontScreenSizeLocation, (float) guiWidth * scale,
+                                        (float) guiHeight * scale);
+                LIBMATTI_B3D_GlStateManager_ActiveTexture(LIBMATTI_GL_GL_TEXTURE0);
+                LIBMATTI_B3D_GlStateManager_BindTexture((int) LIBMATTI_FML_SimpleFont_TextureId(minecraft->font));
+                LIBMATTI_GL_glUniform1i(LIBMATTI_GL_glGetUniformLocation(minecraft->fontProgram, "tex"), 0);
+                // Java: the guiScale scales the name line with the widgets -
+                // the font shader keeps the layout normalization, the
+                // positions ride the scale factor (doubled like the blits).
+                LIBMATTI_FML_SimpleFont_DrawTexts(minecraft->font, (float) (nameX + 2) * scale,
+                                                  (float) (nameY + 2) * scale, shadow, 1);
+                LIBMATTI_FML_SimpleFont_DrawTexts(minecraft->font, (float) nameX * scale, (float) nameY * scale,
+                                                  text, 1);
+                LIBMATTI_GL_glUseProgram(0);
+            }
+        }
+    }
+
+    // Java: the GUI quads flush after the text (the batcher uploads the
+    // accumulated vertices and draws; the blend state stays the caller's).
+    LIBMATTI_MC_GuiRenderer_Flush(minecraft->guiRenderer, (float) guiWidth * scale, (float) guiHeight * scale);
+
+    // Java: Minecraft.render -> screen.renderWithTooltipAndSubtitles - the
+    // open screen renders AFTER the HUD. The panel rides the VANILLA
+    // textures/gui/container/inventory.png (the 256x256 the embedded pack
+    // carries) - the blit samples the 176x166 region with the GUI_NEAREST
+    // sampler the hotbar path drives.
+    if (minecraft->inventoryScreen != NULL)
+    {
+        LIBMATTI_MC_AbstractContainerScreen *container = &minecraft->inventoryScreen->base;
+        const int panelW = container->imageWidth, panelH = container->imageHeight;
+        int px = container->leftPos, py = container->topPos;
+
+        // Java: renderBackground - the blurred darkened background (the
+        // gradient the vanilla screen dim rides). The dim flushes IMMEDIATELY:
+        // the GetTexture below may generate+bind the panel texture, and a
+        // batch spanning both would sample the 256x256 page over the whole
+        // screen (the black filler regions spread across the frame - the
+        // "black rectangle" bug).
+        LIBMATTI_MC_GuiRenderer_BlitQuad(minecraft->guiRenderer, 0.0f, 0.0f,
+                                         (float) guiWidth * scale, (float) guiHeight * scale,
+                                         0.0f, 0.0f, 1.0f, 1.0f, 0x80001018u);
+        LIBMATTI_MC_GuiRenderer_Flush(minecraft->guiRenderer, (float) guiWidth * scale, (float) guiHeight * scale);
+
+        // Java: InventoryScreen.render -> super.render - the container panel
+        // texture (the embedded pack's gui/container/inventory.png over the
+        // TextureManager's lazy SimpleTexture load).
+        unsigned int panelTexture = 0;
+        if (minecraft->textureManager != NULL)
+        {
+            LIBMATTI_MC_Identifier *panelId =
+                LIBMATTI_MC_Identifier_New("minecraft", "textures/gui/container/inventory.png");
+            if (panelId != NULL)
+            {
+                LIBMATTI_MC_AbstractTexture *panelTex =
+                    LIBMATTI_MC_TextureManager_GetTexture(minecraft->textureManager, panelId);
+                if (panelTex != NULL)
+                    panelTexture = panelTex->texture;
+                LIBMATTI_MC_Identifier_Free(panelId);
+            }
+        }
+        if (panelTexture != 0)
+        {
+            // Java: blit(TEXTURE, x, y, u=0, v=0, w=176, h=166) - the top-left
+            // region of the 256x256 page (the 0.6875 uv gate keeps the
+            // neighbouring sprites out with the NEAREST sampler).
+            LIBMATTI_MC_GuiRenderer_SetTexture(minecraft->guiRenderer, panelTexture);
+            LIBMATTI_MC_GuiRenderer_BlitQuad(minecraft->guiRenderer, (float) px * scale, (float) py * scale,
+                                             (float) panelW * scale, (float) panelH * scale,
+                                             0.0f, 0.0f, panelW / 256.0f, panelH / 256.0f, 0xFFFFFFFFu);
+            LIBMATTI_MC_GuiRenderer_Flush(minecraft->guiRenderer, (float) guiWidth * scale, (float) guiHeight * scale);
+        }
+        else
+        {
+            // the texture-less fallback (the flat panel shade)
+            LIBMATTI_MC_GuiRenderer_BlitQuad(minecraft->guiRenderer, (float) px * scale, (float) py * scale,
+                                             (float) panelW * scale, (float) panelH * scale,
+                                             0.0f, 0.0f, 1.0f, 1.0f, 0xF0C6C6C6u);
+            LIBMATTI_MC_GuiRenderer_Flush(minecraft->guiRenderer, (float) guiWidth * scale, (float) guiHeight * scale);
+        }
+
+        // Java: renderSlot - the item quad per filled slot over the panel (the
+        // ItemRenderer port renders the icon; the slot coords are
+        // panel-relative like the texture) + the counts over the flushed
+        // icons (the renderItemDecorations order).
+        LIBMATTI_MC_AbstractContainerMenu *menu = container->menu;
+        if (atlas != NULL)
+        {
+            for (int i = 0; i < menu->slotCount; i++)
+            {
+                LIBMATTI_MC_Slot *slot = menu->slots[i];
+                const LIBMATTI_MC_ItemStack *stack = LIBMATTI_MC_Slot_GetItem(slot);
+                if (LIBMATTI_MC_ItemStack_IsEmpty(stack))
+                    continue;
+                int cellX = px + slot->x, cellY = py + slot->y;
+                LIBMATTI_MC_ItemRenderer_RenderGuiItem(minecraft->guiRenderer, atlas, stack,
+                                                       (float) cellX * scale, (float) cellY * scale, scale);
+            }
+            LIBMATTI_MC_GuiRenderer_Flush(minecraft->guiRenderer, (float) guiWidth * scale,
+                                          (float) guiHeight * scale);
+            for (int i = 0; i < menu->slotCount; i++)
+            {
+                LIBMATTI_MC_Slot *slot = menu->slots[i];
+                const LIBMATTI_MC_ItemStack *stack = LIBMATTI_MC_Slot_GetItem(slot);
+                if (LIBMATTI_MC_ItemStack_IsEmpty(stack))
+                    continue;
+                int cellX = px + slot->x, cellY = py + slot->y;
+                LIBMATTI_MC_ItemRenderer_RenderGuiCount(minecraft->font, stack,
+                                                        (float) cellX * scale, (float) cellY * scale, scale,
+                                                        (float) guiWidth * scale, (float) guiHeight * scale);
+            }
+        }
+
+        // Java: InventoryScreen.renderBg's entity - the player figure in the
+        // panel's left half (renderEntityInInventory). The entity renderer
+        // lands with the player model port; the panel shows the player's
+        // texture head/torso over the entity region the vanilla layout
+        // reserves (the 30x60 px block right of the armor slots).
+        if (minecraft->textureManager != NULL)
+        {
+            LIBMATTI_MC_Identifier *skinId =
+                LIBMATTI_MC_Identifier_New("minecraft", "textures/entity/player/wide/steve.png");
+            if (skinId != NULL)
+            {
+                LIBMATTI_MC_AbstractTexture *skin =
+                    LIBMATTI_MC_TextureManager_GetTexture(minecraft->textureManager, skinId);
+                if (skin != NULL && skin->texture != 0)
+                {
+                    // Java: the entity pose occupies (px+26, py+8) .. 32x62
+                    // layout px in the 176x166 panel; the head/torso crop of
+                    // the 64x64 skin rides the same region (head 8..24,
+                    // torso 20..32 on the u axis at v 8..32).
+                    LIBMATTI_MC_GuiRenderer_SetTexture(minecraft->guiRenderer, skin->texture);
+                    // the head (the 8x8x8 cube's front face maps 8..16, 8..16
+                    // on the skin; blitted into the entity region scaled to
+                    // the 24x24 layout px the vanilla pose carries)
+                    LIBMATTI_MC_GuiRenderer_BlitQuad(minecraft->guiRenderer,
+                                                     (float) (px + 34) * scale, (float) (py + 12) * scale,
+                                                     24.0f * scale, 24.0f * scale,
+                                                     8.0f / 64.0f, 8.0f / 64.0f, 16.0f / 64.0f, 16.0f / 64.0f,
+                                                     0xFFFFFFFFu);
+                    // the torso (the body front face maps 20..28, 20..32 on
+                    // the skin; 24x36 layout px below the head)
+                    LIBMATTI_MC_GuiRenderer_BlitQuad(minecraft->guiRenderer,
+                                                     (float) (px + 34) * scale, (float) (py + 36) * scale,
+                                                     24.0f * scale, 36.0f * scale,
+                                                     20.0f / 64.0f, 20.0f / 64.0f, 28.0f / 64.0f, 32.0f / 64.0f,
+                                                     0xFFFFFFFFu);
+                    LIBMATTI_MC_GuiRenderer_Flush(minecraft->guiRenderer, (float) guiWidth * scale,
+                                                  (float) guiHeight * scale);
+                }
+                LIBMATTI_MC_Identifier_Free(skinId);
+            }
+        }
+        LIBMATTI_MC_GuiRenderer_SetTexture(minecraft->guiRenderer, 0);
+
+        // Java: renderLabels - the screen title (container.crafting) + the
+        // inventory label over the panel. The font shader's ortho rides the
+        // REAL layout size (the hardcoded 854x480 garbled the glyphs on the
+        // other window sizes - the "chinese characters" bug).
+        if (minecraft->font != NULL && minecraft->fontProgram != 0)
+        {
+            LIBMATTI_GL_glUseProgram(minecraft->fontProgram);
+            LIBMATTI_GL_glUniform2f(minecraft->fontScreenSizeLocation, (float) guiWidth * scale,
+                                    (float) guiHeight * scale);
+            LIBMATTI_B3D_GlStateManager_ActiveTexture(LIBMATTI_GL_GL_TEXTURE0);
+            LIBMATTI_B3D_GlStateManager_BindTexture((int) LIBMATTI_FML_SimpleFont_TextureId(minecraft->font));
+            LIBMATTI_GL_glUniform1i(LIBMATTI_GL_glGetUniformLocation(minecraft->fontProgram, "tex"), 0);
+            const char *title = LIBMATTI_MC_Screen_GetTitle(&container->base);
+            if (title != NULL)
+            {
+                LIBMATTI_FML_SimpleFont_DisplayText text[1] = {{title, 0xFF404040u}};
+                LIBMATTI_FML_SimpleFont_DrawTexts(minecraft->font, (float) (px + container->titleLabelX) * scale,
+                                                  (float) (py + container->titleLabelY) * scale, text, 1);
+            }
+            LIBMATTI_FML_SimpleFont_DisplayText invLabel[1] = {{"Inventory", 0xFF404040u}};
+            LIBMATTI_FML_SimpleFont_DrawTexts(minecraft->font, (float) (px + container->inventoryLabelX) * scale,
+                                              (float) (py + container->inventoryLabelY) * scale, invLabel, 1);
+            LIBMATTI_GL_glUseProgram(0);
+        }
+    }
+
+    // Java: Screen.render over the frame - the pause/options overlay rides
+    // the HUD pass (the world keeps rendering behind the dim like the real
+    // game's pause).
     LIBMATTI_B3D_GlStateManager_DisableBlend();
 }
 
@@ -711,25 +2109,62 @@ static void updateMouseLook(LIBMATTI_MC_Minecraft *minecraft)
         LIBMATTI_GLFW_glfwSetInputMode(minecraft->window, LIBMATTI_GLFW_CURSOR,
                                        LIBMATTI_GLFW_CURSOR_DISABLED);
     }
-    if (LIBMATTI_GLFW_glfwGetKey(minecraft->window, LIBMATTI_GLFW_KEY_ESCAPE))
+
+    // Java: the open screen releases the mouse (MouseHandler:onRelease) and
+    // the camera stops turning; the cursor shows for the slot hover/clicks.
+    // ESC only stops the game while NO screen is open (the screen's keyPressed
+    // handles it first). The pause screens ride the same gate.
+    if (minecraft->inventoryScreen != NULL || minecraft->pauseScreen != NULL
+        || minecraft->optionsScreen != NULL)
     {
-        if (minecraft->mouseLookEnabled)
-            LIBMATTI_MC_Minecraft_Stop(minecraft);
+        LIBMATTI_GLFW_glfwSetInputMode(minecraft->window, LIBMATTI_GLFW_CURSOR,
+                                       LIBMATTI_GLFW_CURSOR_NORMAL);
+        minecraft->mouseLookEnabled = 0;
+        minecraft->lastCursorX = -1.0; // the re-arm rides the close path
+        return;
     }
+    LIBMATTI_GLFW_glfwSetInputMode(minecraft->window, LIBMATTI_GLFW_CURSOR,
+                                   LIBMATTI_GLFW_CURSOR_DISABLED);
+
+    // Java: ESC with no screen opens the pause menu (1.21.11 keyPressed ->
+    // pause) - it NEVER quits the game. The skeleton's stop-on-ESC poll dies
+    // here: a lost key RELEASE (the X focus glitch drops synthetic releases)
+    // replays a phantom press edge later and stopped the client mid-game.
+    // The window-close button still stops through glfwWindowShouldClose;
+    // the pause screen lands with P6.4.
 
     double cx = 0.0, cy = 0.0;
     LIBMATTI_GLFW_glfwGetCursorPos(minecraft->window, &cx, &cy);
     if (minecraft->mouseLookEnabled)
     {
+        // the re-arm after a screen close: the first frame back in the world
+        // just records the cursor (no turn from the screen-close jump)
+        if (minecraft->lastCursorX < 0.0)
+        {
+            minecraft->lastCursorX = cx;
+            minecraft->lastCursorY = cy;
+            return;
+        }
         float dx = (float) (cx - minecraft->lastCursorX);
         float dy = (float) (cy - minecraft->lastCursorY);
-        // Java: MouseHandler.turnPlayer -> entity.turn(dx, -dy); the negative
-        // pitch looks UP (the camera convention).
-        LIBMATTI_MC_Entity_Turn(&minecraft->localPlayer->player.base.base, (double) dx, (double) -dy);
+        // Java: MouseHandler.turnPlayer folds the options sensitivity into the
+        // delta: d2 = sensitivity * 0.6 + 0.2, d3 = d2^3 * 8.0, and the turn
+        // multiplies with d3 (Entity.turn keeps its fixed 0.15). The default
+        // 0.5 gives d3 = 1.0 - the behaviour rides unchanged without options.
+        float sensitivity = LIBMATTI_MC_Options_GetSensitivity(&minecraft->options);
+        double d2 = (double) sensitivity * 0.6 + 0.2;
+        double d3 = d2 * d2 * d2 * 8.0;
+        // Java: MouseHandler.turnPlayer -> entity.turn(dx, dy) - Java's turn
+        // ADDS the pitch (moving the mouse up lowers xRot and the camera
+        // SetRotation's -xRot raises the view). The old -dy inverted the axis.
+        LIBMATTI_MC_Entity_Turn(&minecraft->localPlayer->player.base.base, (double) dx * d3, (double) dy * d3);
+    }
+    else
+    {
+        minecraft->mouseLookEnabled = 1;
     }
     minecraft->lastCursorX = cx;
     minecraft->lastCursorY = cy;
-    minecraft->mouseLookEnabled = 1;
 }
 
 // Java: LocalPlayer.aiStep -> the travel impulse - the input move vector turns
@@ -738,6 +2173,65 @@ static void updateMouseLook(LIBMATTI_MC_Minecraft *minecraft)
 // LivingEntity friction into a flat per-frame walk speed scaled by the abilities
 // walking speed. The gravity rides Java's LivingEntity.aiStep default (-0.08
 // per tick, * 0.98 the drag), the jump the vanilla +0.42 impulse.
+// Java: Screen.mouseClicked - the render pass routes the cursor through the
+// Screen's children (the widgets answer the press/release edges; the base
+// dispatch fires onClick on the release). The port folds the routing into the
+// per-frame pass like the rest of the client input (the tick opens/closes the
+// screens, the render clicks them).
+static void route_pause_clicks(LIBMATTI_MC_Minecraft *minecraft)
+{
+    LIBMATTI_MC_Screen *screen = NULL;
+    if (minecraft->optionsScreen != NULL)
+        screen = &minecraft->optionsScreen->base;
+    else if (minecraft->pauseScreen != NULL)
+        screen = &minecraft->pauseScreen->base;
+    if (screen == NULL)
+    {
+        minecraft->screenMouseWasDown = 0;
+        return;
+    }
+
+    int down = LIBMATTI_GLFW_glfwGetMouseButton(minecraft->window, LIBMATTI_GLFW_MOUSE_BUTTON_1) == LIBMATTI_GLFW_PRESS;
+    double cx = 0.0, cy = 0.0;
+    LIBMATTI_GLFW_glfwGetCursorPos(minecraft->window, &cx, &cy);
+    int sw = 0, sh = 0;
+    LIBMATTI_GLFW_glfwGetFramebufferSize(minecraft->window, &sw, &sh);
+    int gui = gui_scale(sw, sh);
+    double mouseX = cx / (double) gui, mouseY = cy / (double) gui;
+
+    for (int i = 0; i < screen->childCount; i++)
+        LIBMATTI_MC_AbstractWidget_MouseClicked(screen->children[i], mouseX, mouseY, 0, down);
+    minecraft->screenMouseWasDown = down;
+}// Java: Window.setMode - the fullscreen flag polls every frame (the port's
+// window-events stand-in; the flag rides options.fullscreen).
+static void apply_fullscreen_option(LIBMATTI_MC_Minecraft *minecraft)
+{
+    if (minecraft->window == 0)
+        return;
+    static int appliedFullscreen = -1;
+    if (appliedFullscreen < 0)
+        appliedFullscreen = minecraft->options.fullscreen;
+    if (minecraft->options.fullscreen == appliedFullscreen)
+        return;
+    appliedFullscreen = minecraft->options.fullscreen;
+    if (minecraft->options.fullscreen)
+    {
+        // Java: Window.setMode -> glfwSetWindowMonitor(monitor) - the port
+        // carries the windowed-mode sizes (the video-mode switch lands with
+        // the real setMode port)
+        int width = minecraft->config.display.width;
+        int height = minecraft->config.display.height;
+        LIBMATTI_GLFW_glfwSetWindowSize(minecraft->window, width, height);
+    }
+    else
+    {
+        LIBMATTI_GLFW_glfwSetWindowSize(minecraft->window, minecraft->config.display.width,
+                                        minecraft->config.display.height);
+        LIBMATTI_GLFW_glfwSetWindowPos(minecraft->window, 0, 0);
+    }
+    fprintf(stderr, "[OPTIONS] fullscreen -> %d\n", appliedFullscreen);
+}
+
 static void apply_walk(LIBMATTI_MC_Minecraft *minecraft)
 {
     if (minecraft->window == 0 || minecraft->localPlayer == NULL) return;
@@ -760,13 +2254,28 @@ static void apply_walk(LIBMATTI_MC_Minecraft *minecraft)
                                LIBMATTI_GLFW_glfwGetKey(minecraft->window, LIBMATTI_GLFW_KEY_LEFT_SHIFT) == LIBMATTI_GLFW_PRESS);
     LIBMATTI_MC_KeyMapping_Set(LIBMATTI_MC_InputConstants_KEYSYM, 341,
                                LIBMATTI_GLFW_glfwGetKey(minecraft->window, LIBMATTI_GLFW_KEY_LEFT_CONTROL) == LIBMATTI_GLFW_PRESS);
+    // Java: the open screen swallows the world input (Minecraft.runTick gates
+    // the keyboardInput tick on screen == null).
+    if (minecraft->inventoryScreen != NULL)
+    {
+        LIBMATTI_MC_KeyMapping_Set(LIBMATTI_MC_InputConstants_KEYSYM, 87, false);
+        LIBMATTI_MC_KeyMapping_Set(LIBMATTI_MC_InputConstants_KEYSYM, 83, false);
+        LIBMATTI_MC_KeyMapping_Set(LIBMATTI_MC_InputConstants_KEYSYM, 65, false);
+        LIBMATTI_MC_KeyMapping_Set(LIBMATTI_MC_InputConstants_KEYSYM, 68, false);
+        LIBMATTI_MC_KeyMapping_Set(LIBMATTI_MC_InputConstants_KEYSYM, 32, false);
+        LIBMATTI_MC_KeyMapping_Set(LIBMATTI_MC_InputConstants_KEYSYM, 340, false);
+        LIBMATTI_MC_KeyMapping_Set(LIBMATTI_MC_InputConstants_KEYSYM, 341, false);
+    }
 
     // Java: LocalPlayer.tick -> input.tick() - the Input record + move vector
     LIBMATTI_MC_LocalPlayer_TickInput(minecraft->localPlayer);
     const LIBMATTI_MC_Input *presses = LIBMATTI_MC_LocalPlayer_GetKeyPresses(minecraft->localPlayer);
 
     // Java: the jump - onGround && keyJump.isDown() -> jumpFromGround() (+0.42
-    // the vanilla impulse, sprint adds the horizontal boost)
+    // the vanilla impulse, sprint adds the horizontal boost). The impulse
+    // RIDES the delta movement: the travel below re-READS it (the old code
+    // computed "next" from the pre-jump motion and SetDeltaMovement overwrote
+    // the impulse in the same tick - the player never left the ground).
     if (presses->jump && LIBMATTI_MC_Entity_OnGround(entity))
     {
         LIBMATTI_MC_Vec3 jump = {entity->dx, 0.42, entity->dz};
@@ -795,14 +2304,19 @@ static void apply_walk(LIBMATTI_MC_Minecraft *minecraft)
     // accel/(1 - friction) = 0.1/0.454 = 0.22 blocks/tick (4.4 m/s, vanilla).
     // The old flat 0.91 ran the physics per FRAME and 14x too fast.
     float friction = LIBMATTI_MC_Entity_OnGround(entity) ? 0.546f : 0.91f;
-    LIBMATTI_MC_Vec3 next = {entity->dx * friction + accelX,
-                             entity->dy * 0.98 - 0.08,
-                             entity->dz * friction + accelZ};
-    LIBMATTI_MC_Entity_SetDeltaMovement(entity, &next);
+    // Java: handleRelativeFrictionAndCalculateMovement -> move() FIRST (the
+    // box sweeps the current motion), then travelInAir folds gravity AFTER the
+    // move: d0 = dy - 0.08 (the attribute gravity), d0 *= 0.98 (the vertical
+    // inertia). The old order (gravity before the move) shaved the jump arc's
+    // first tick - the 0.81-block peak instead of the vanilla 1.2522.
+    LIBMATTI_MC_Vec3 current;
+    LIBMATTI_MC_Entity_GetDeltaMovement(entity, &current);
+    LIBMATTI_MC_Entity_Move(entity, LIBMATTI_MC_MoverType_SELF, &current);
 
-    // Java: this.move(MoverType.SELF, this.getDeltaMovement()) - the collide
-    // path clips the motion against the level's blocks (the P5.3 port)
-    LIBMATTI_MC_Entity_Move(entity, LIBMATTI_MC_MoverType_SELF, &next);
+    LIBMATTI_MC_Vec3 next = {current.x * friction + accelX,
+                             (current.y - 0.08) * 0.98,
+                             current.z * friction + accelZ};
+    LIBMATTI_MC_Entity_SetDeltaMovement(entity, &next);
 
     // MATTI_DEBUG_POS - the per-second position/onGround trace (the input/
     // physics smoke runs grep it to prove the walk actually moves the player).
@@ -818,6 +2332,274 @@ static void apply_walk(LIBMATTI_MC_Minecraft *minecraft)
                     LIBMATTI_MC_Entity_OnGround(entity), move.x, move.y,
                     LIBMATTI_MC_KeyMapping_Forward() != NULL,
                     LIBMATTI_GLFW_glfwGetKey(minecraft->window, LIBMATTI_GLFW_KEY_W));
+    }
+}
+
+// MATTI_DEBUG_PICK - the crosshair trace (the pick smoke greps the hit block +
+// face to prove the ray reaches the aimed block).
+static void debug_pick(LIBMATTI_MC_Minecraft *minecraft)
+{
+    static int debugPick = -1;
+    if (debugPick < 0)
+        debugPick = getenv("MATTI_DEBUG_PICK") != NULL;
+    if (!debugPick)
+        return;
+    static int pickFrame = 0;
+    if (pickFrame++ % 20 != 0)
+        return;
+    const LIBMATTI_MC_BlockHitResult *hit = &minecraft->hitResult;
+    if (hit->type == LIBMATTI_MC_HitResult_BLOCK)
+        fprintf(stderr, "[PICK] block=(%d,%d,%d) face=%s loc=(%.2f,%.2f,%.2f)\n",
+                hit->blockPos.base.x, hit->blockPos.base.y, hit->blockPos.base.z,
+                LIBMATTI_MC_Direction_GetName(hit->direction),
+                hit->location.x, hit->location.y, hit->location.z);
+    else
+        fprintf(stderr, "[PICK] miss\n");
+}
+
+// Java: the attack/use mouse edge handling (MouseHandler feeds the events into
+// the KeyMappings, Minecraft.startUseItem / continueAttack act on them) - the
+// port polls the buttons and acts on the press edges.
+static void handle_block_interaction(LIBMATTI_MC_Minecraft *minecraft)
+{
+    if (minecraft->window == 0 || minecraft->localPlayer == NULL || minecraft->level == NULL)
+    {
+        minecraft->attackDown = 0;
+        minecraft->useDown = 0;
+        return;
+    }
+
+    // Java: the open screen swallows the mouse (Minecraft.runTick gates the
+    // mouse-handling on screen != null; the screen rides the click routing).
+    // Java: the pause screens swallow the game clicks entirely (the render
+    // pass routes the menu clicks; the game buttons park)
+    if (minecraft->pauseScreen != NULL || minecraft->optionsScreen != NULL)
+    {
+        minecraft->screenMouseWasDown =
+            LIBMATTI_GLFW_glfwGetMouseButton(minecraft->window, LIBMATTI_GLFW_MOUSE_BUTTON_1) == LIBMATTI_GLFW_PRESS
+            || LIBMATTI_GLFW_glfwGetMouseButton(minecraft->window, LIBMATTI_GLFW_MOUSE_BUTTON_2) == LIBMATTI_GLFW_PRESS;
+        minecraft->attackDown = 0;
+        minecraft->useDown = 0;
+        return;
+    }
+
+    if (minecraft->inventoryScreen != NULL)
+    {
+        int down = LIBMATTI_GLFW_glfwGetMouseButton(minecraft->window, LIBMATTI_GLFW_MOUSE_BUTTON_1) == LIBMATTI_GLFW_PRESS
+                   || LIBMATTI_GLFW_glfwGetMouseButton(minecraft->window, LIBMATTI_GLFW_MOUSE_BUTTON_2) == LIBMATTI_GLFW_PRESS;
+        if (down && !minecraft->screenMouseWasDown)
+        {
+            double cx = 0.0, cy = 0.0;
+            LIBMATTI_GLFW_glfwGetCursorPos(minecraft->window, &cx, &cy);
+            // Java: screen.mouseX = mousePos.x() / guiScale - the layout coords
+            // the click routing rides (the same factor the HUD layout uses).
+            int sw = 0, sh = 0;
+            LIBMATTI_GLFW_glfwGetFramebufferSize(minecraft->window, &sw, &sh);
+            int gui = gui_scale(sw, sh);
+            LIBMATTI_MC_AbstractContainerScreen *container = &minecraft->inventoryScreen->base;
+            int button = LIBMATTI_GLFW_glfwGetMouseButton(minecraft->window, LIBMATTI_GLFW_MOUSE_BUTTON_2) == LIBMATTI_GLFW_PRESS
+                             ? 1
+                             : 0;
+            LIBMATTI_MC_Player *player = &minecraft->localPlayer->player;
+            LIBMATTI_MC_AbstractContainerScreen_MouseClickedScreen(container, cx / (double) gui, cy / (double) gui, button, player);
+        }
+        minecraft->screenMouseWasDown = down;
+        minecraft->attackDown = 0;
+        minecraft->useDown = 0;
+        return;
+    }
+
+    const LIBMATTI_MC_BlockHitResult *hit = &minecraft->hitResult;
+    LIBMATTI_MC_Level *level = (LIBMATTI_MC_Level *) minecraft->level;
+
+    // Java: continueAttack - left click breaks the aimed block (the creative
+    // instant-break path; hold-repeat rides the same poll per tick)
+    int attacking = LIBMATTI_GLFW_glfwGetMouseButton(minecraft->window, LIBMATTI_GLFW_MOUSE_BUTTON_1) == LIBMATTI_GLFW_PRESS;
+    if (attacking && !minecraft->attackDown)
+    {
+        if (hit->type == LIBMATTI_MC_HitResult_BLOCK)
+        {
+            // Java: Level.destroyBlock -> level.playSound(player, pos,
+            // state.getSoundType().getBreakSound(), SoundSource.BLOCKS,
+            // (soundType.volume + 1) / 2, soundType.pitch * 0.8) - the state
+            // rides the pre-destroy lookup.
+            LIBMATTI_MC_BlockState *breakState = LIBMATTI_MC_Level_GetBlockState(level, &hit->blockPos);
+            const LIBMATTI_MC_SoundType *breakSoundType = NULL;
+            if (breakState != NULL)
+            {
+                LIBMATTI_MC_Block *breakBlock = (LIBMATTI_MC_Block *) LIBMATTI_MC_BlockState_GetBlock(breakState);
+                if (breakBlock != NULL && breakBlock->properties != NULL)
+                    breakSoundType = breakBlock->properties->soundType;
+            }
+            if (LIBMATTI_MC_Level_DestroyBlock(level, &hit->blockPos, false))
+            {
+                dirty_sections_around(minecraft, &hit->blockPos);
+                if (minecraft->soundEngine != NULL && breakSoundType != NULL)
+                    LIBMATTI_MC_SoundEngine_Play(
+                        minecraft->soundEngine,
+                        LIBMATTI_MC_SoundType_GetBreakSound(breakSoundType),
+                        (float) hit->blockPos.base.x + 0.5f, (float) hit->blockPos.base.y + 0.5f,
+                        (float) hit->blockPos.base.z + 0.5f,
+                        (LIBMATTI_MC_SoundType_GetVolume(breakSoundType) + 1.0f) / 2.0f,
+                        LIBMATTI_MC_SoundType_GetPitch(breakSoundType) * 0.8f);
+            }
+        }
+    }
+    minecraft->attackDown = attacking;
+
+    // Java: startUseItem - right click places against the hit face (the
+    // creative block-in-hand path: the block next to the entry face; BlockItem
+    // canPlace rejects the hit cell itself, so the inside hit skips like here).
+    int using = LIBMATTI_GLFW_glfwGetMouseButton(minecraft->window, LIBMATTI_GLFW_MOUSE_BUTTON_2) == LIBMATTI_GLFW_PRESS;
+    if (using && !minecraft->useDown)
+    {
+        if (hit->type == LIBMATTI_MC_HitResult_BLOCK && !hit->inside)
+        {
+            // Java: BlockItem.place - the selected hotbar stack's block (the
+            // creative palette) places against the hit face.
+            LIBMATTI_MC_Direction face = hit->direction;
+            LIBMATTI_MC_BlockPos placePos = {{hit->blockPos.base.x + LIBMATTI_MC_Direction_GetStepX(face),
+                                              hit->blockPos.base.y + LIBMATTI_MC_Direction_GetStepY(face),
+                                              hit->blockPos.base.z + LIBMATTI_MC_Direction_GetStepZ(face)}};
+            // Java: BlockItem.canPlace -> level().noCollision(this, context)
+            // - the placement rejects the cell when the PLAYER's bounding box
+            // intersects it (no blocks inside the player, no walking inside a
+            // placed block).
+            LIBMATTI_MC_Entity *player = &minecraft->localPlayer->player.base.base;
+            const LIBMATTI_MC_AABB *playerBox = LIBMATTI_MC_Entity_GetBoundingBox(player);
+            LIBMATTI_MC_AABB cellBox = {
+                (double) placePos.base.x, (double) placePos.base.y, (double) placePos.base.z,
+                (double) placePos.base.x + 1.0, (double) placePos.base.y + 1.0,
+                (double) placePos.base.z + 1.0};
+            if (playerBox != NULL
+                && playerBox->minX < cellBox.maxX && playerBox->maxX > cellBox.minX
+                && playerBox->minY < cellBox.maxY && playerBox->maxY > cellBox.minY
+                && playerBox->minZ < cellBox.maxZ && playerBox->maxZ > cellBox.minZ)
+            {
+                minecraft->useDown = using;
+                return; // Java: the canPlace rejection - no placement, no face skip
+            }
+            LIBMATTI_MC_ItemStack *stack =
+                LIBMATTI_MC_Container_GetItem(minecraft->playerInventory, minecraft->hotbarSelected);
+            LIBMATTI_MC_Item *item = stack != NULL ? LIBMATTI_MC_ItemStack_GetItem(stack) : NULL;
+            // Java: BlockItem.block - the port exposes the field directly (no
+            // getter the Item.h surface carries).
+            LIBMATTI_MC_Block *block = item != NULL ? (LIBMATTI_MC_Block *) item->block : NULL;
+            LIBMATTI_MC_BlockState *placeState = block != NULL
+                                                     ? LIBMATTI_MC_Block_DefaultBlockState(block)
+                                                     : LIBMATTI_MC_Block_DefaultBlockState(
+                                                           LIBMATTI_MC_VanillaBlocks_GetByName("STONE"));
+            if (LIBMATTI_MC_Level_SetBlock(level, &placePos, placeState, LIBMATTI_MC_Level_UPDATE_CLIENTS))
+            {
+                dirty_sections_around(minecraft, &placePos);
+                // Java: BlockItem.place -> level.playSound(..., soundType.getPlaceSound(),
+                // SoundSource.BLOCKS, (soundType.volume + 1) / 2, soundType.pitch)
+                // - the state the cell carries after the placement.
+                LIBMATTI_MC_BlockState *placedState = LIBMATTI_MC_Level_GetBlockState(level, &placePos);
+                const LIBMATTI_MC_SoundType *placeSoundType = NULL;
+                if (placedState != NULL)
+                {
+                    LIBMATTI_MC_Block *placedBlock = (LIBMATTI_MC_Block *) LIBMATTI_MC_BlockState_GetBlock(placedState);
+                    if (placedBlock != NULL && placedBlock->properties != NULL)
+                        placeSoundType = placedBlock->properties->soundType;
+                }
+                if (minecraft->soundEngine != NULL && placeSoundType != NULL)
+                    LIBMATTI_MC_SoundEngine_Play(
+                        minecraft->soundEngine,
+                        LIBMATTI_MC_SoundType_GetPlaceSound(placeSoundType),
+                        (float) placePos.base.x + 0.5f, (float) placePos.base.y + 0.5f,
+                        (float) placePos.base.z + 0.5f,
+                        (LIBMATTI_MC_SoundType_GetVolume(placeSoundType) + 1.0f) / 2.0f,
+                        LIBMATTI_MC_SoundType_GetPitch(placeSoundType));
+
+                static int debugPlace = -1;
+                if (debugPlace < 0)
+                    debugPlace = getenv("MATTI_DEBUG_PICK") != NULL;
+                if (debugPlace)
+                {
+                    // the placed block name proves the hotbar selection rides
+                    // the placement (the hotbar-key smoke greps it).
+                    const char *placed = item != NULL ? LIBMATTI_MC_Item_GetDescriptionId(item) : "?";
+                    fprintf(stderr, "[PLACE] pos=(%d,%d,%d) item=%s slot=%d\n",
+                            placePos.base.x, placePos.base.y, placePos.base.z,
+                            placed != NULL ? placed : "?", minecraft->hotbarSelected);
+                }
+            }
+        }
+    }
+    minecraft->useDown = using;
+}
+
+// Java: KeyboardInput + KeyMapping hotbar keys - keys 1..9 select the hotbar
+// slot directly (Inventory.selectedSlot = index); the selection rides the same
+// per-tick poll the block interaction runs on.
+static void handle_hotbar_keys(LIBMATTI_MC_Minecraft *minecraft)
+{
+    if (minecraft->window == 0)
+        return;
+    // GLFW_KEY_1..KEY_9 are the consecutive keycodes 49..57.
+    for (int slot = 0; slot < HOTBAR_SIZE; slot++)
+    {
+        if (LIBMATTI_GLFW_glfwGetKey(minecraft->window, LIBMATTI_GLFW_KEY_1 + slot) == LIBMATTI_GLFW_PRESS)
+        {
+            if (minecraft->hotbarSelected != slot)
+            {
+                minecraft->hotbarSelected = slot;
+                // Java: Gui.tick - the 10s (200 tick) highlight fade restarts
+                // on every selection change.
+                minecraft->toolHighlightTimer = 200;
+                minecraft->toolHighlight = LIBMATTI_MC_Container_GetItem(minecraft->playerInventory, slot);
+            }
+        }
+    }
+
+    // Java: MouseHandler.onScroll -> Minecraft.handleProfiling/major scroll -
+    // the wheel steps the hotbar selection (each notch = one slot, like the
+    // GLFW y gesture the MouseHandler accumulates).
+    double scrollX = 0.0, scrollY = 0.0;
+    while (LIBMATTI_GLFW_glfwPollScrollGesture(&scrollX, &scrollY))
+    {
+        (void) scrollX;
+        if (scrollY != 0.0)
+        {
+            int slot = minecraft->hotbarSelected + (scrollY > 0.0 ? -1 : 1);
+            if (slot < 0)
+                slot = HOTBAR_SIZE - 1;
+            else if (slot >= HOTBAR_SIZE)
+                slot = 0;
+            if (minecraft->hotbarSelected != slot)
+            {
+                minecraft->hotbarSelected = slot;
+                minecraft->toolHighlightTimer = 200;
+                minecraft->toolHighlight = LIBMATTI_MC_Container_GetItem(minecraft->playerInventory, slot);
+            }
+        }
+    }
+}
+
+// Java: the sections re-mesh when a block changes inside them (LevelRenderer
+// blockChanged -> setSectionDirty). The port walks the registered sections and
+// flags the ones overlapping the position's 3x3x3 block neighbourhood (Java's
+// markAndRebuildBlocks spans the faces the change can bleed into).
+static void dirty_sections_around(LIBMATTI_MC_Minecraft *minecraft, const LIBMATTI_MC_BlockPos *pos)
+{
+    if (minecraft->sectionDispatcher == NULL)
+        return;
+    LIBMATTI_MC_SectionRenderDispatcher *dispatcher = minecraft->sectionDispatcher;
+    int minX = pos->base.x - 1, minY = pos->base.y - 1, minZ = pos->base.z - 1;
+    int maxX = pos->base.x + 1, maxY = pos->base.y + 1, maxZ = pos->base.z + 1;
+    for (int i = 0; i < dispatcher->sectionCount; i++)
+    {
+        LIBMATTI_MC_RenderSection *section = dispatcher->sections[i];
+        const LIBMATTI_MC_Vec3i *origin = &section->sectionPos->base;
+        int sx = LIBMATTI_MC_Vec3i_GetX(origin) * LIBMATTI_MC_SectionPos_SECTION_SIZE;
+        int sy = LIBMATTI_MC_Vec3i_GetY(origin) * LIBMATTI_MC_SectionPos_SECTION_SIZE;
+        int sz = LIBMATTI_MC_Vec3i_GetZ(origin) * LIBMATTI_MC_SectionPos_SECTION_SIZE;
+        if (maxX < sx || minX >= sx + LIBMATTI_MC_SectionPos_SECTION_SIZE
+            || maxY < sy || minY >= sy + LIBMATTI_MC_SectionPos_SECTION_SIZE
+            || maxZ < sz || minZ >= sz + LIBMATTI_MC_SectionPos_SECTION_SIZE)
+            continue;
+        LIBMATTI_MC_RenderSection_SetDirty(section, 1);
     }
 }
 
@@ -844,6 +2626,14 @@ static void runTick(LIBMATTI_MC_Minecraft *minecraft, int runGameTime)
     // per-tick loop below (apply_walk inside tick), not the frame rate.
     updateMouseLook(minecraft);
 
+    static int streamCountdown;
+    if (minecraft->level != NULL && minecraft->localPlayer != NULL && --streamCountdown <= 0)
+    {
+        streamCountdown = CHUNK_STREAM_INTERVAL_TICKS;
+        const LIBMATTI_MC_Entity *streamEntity = &minecraft->localPlayer->player.base.base;
+        stream_chunks_around(minecraft, (int) floor(streamEntity->x) >> 4, (int) floor(streamEntity->z) >> 4);
+    }
+
     // Java: Camera.setup(BlockGetter, Entity, ...) - the camera rides the local
     // player's entity: eye position + rotation (the renderer reads it below)
     if (minecraft->localPlayer != NULL)
@@ -851,14 +2641,57 @@ static void runTick(LIBMATTI_MC_Minecraft *minecraft, int runGameTime)
         LIBMATTI_MC_Entity *entity = &minecraft->localPlayer->player.base.base;
         LIBMATTI_MC_Camera_SetRotation(&minecraft->camera, entity->yRot, entity->xRot);
         LIBMATTI_MC_Camera_SetPosition(&minecraft->camera, entity->x, entity->y + LIBMATTI_MC_Entity_GetEyeHeight(entity), entity->z);
+
+        // Java: GameRenderer.pick - the crosshair ray from the eye along the
+        // view vector over the CREATIVE reach (4.5 blocks). The context rides
+        // the COLLIDER block mode (the outline shape equals the cube here) and
+        // the NONE fluid mode (the port has no fluids).
+        if (minecraft->level != NULL)
+        {
+            LIBMATTI_MC_Vec3 eye = {entity->x, entity->y + LIBMATTI_MC_Entity_GetEyeHeight(entity), entity->z};
+            LIBMATTI_MC_Vec3 end = {eye.x + minecraft->camera.forwards.x * 4.5,
+                                    eye.y + minecraft->camera.forwards.y * 4.5,
+                                    eye.z + minecraft->camera.forwards.z * 4.5};
+            LIBMATTI_MC_ClipContext context = LIBMATTI_MC_ClipContext_New(
+                &eye, &end, LIBMATTI_MC_ClipContext_Block_COLLIDER,
+                LIBMATTI_MC_ClipContext_Fluid_NONE, NULL, NULL);
+            minecraft->hitResult = LIBMATTI_MC_Level_Clip((LIBMATTI_MC_Level *) minecraft->level, &context);
+            debug_pick(minecraft);
+        }
+
+        // Java: SoundEngine.tick -> Listener.setTransform(camera.position(),
+        // forwards, up) - the listener rides the camera every frame.
+        if (minecraft->soundEngine != NULL)
+        {
+            LIBMATTI_MC_ListenerTransform transform;
+            transform.position[0] = (float) minecraft->camera.x;
+            transform.position[1] = (float) minecraft->camera.y;
+            transform.position[2] = (float) minecraft->camera.z;
+            transform.forward[0] = minecraft->camera.forwards.x;
+            transform.forward[1] = minecraft->camera.forwards.y;
+            transform.forward[2] = minecraft->camera.forwards.z;
+            transform.up[0] = minecraft->camera.up.x;
+            transform.up[1] = minecraft->camera.up.y;
+            transform.up[2] = minecraft->camera.up.z;
+            LIBMATTI_MC_SoundEngine_Tick(minecraft->soundEngine, &transform);
+        }
     }
 
-    // Java: if (renderLevelInMainMenu) { ... for (l = 0; l < min(10, k); l++) tick(); }
-    if (runGameTime)
+    // Java: if (renderLevelInMainMenu) { ... for (l = 0; l < min(10, k); l++)
+    // tick(); } - the pause freezes the GAME tick (the screen tail runs below,
+    // outside the frozen loop like the real game's runTick order).
+    if (runGameTime && minecraft->pauseScreen == NULL && minecraft->optionsScreen == NULL)
     {
         int max = ticks < 10 ? ticks : 10;
         for (int l = 0; l < max; l++)
             tick(minecraft);
+    }
+    else if (runGameTime && (minecraft->pauseScreen != NULL || minecraft->optionsScreen != NULL))
+    {
+        // Java: the paused screens still tick (Minecraft.tick calls
+        // screen.tick() before the pause gate hits the game body)
+        tick_pause_screen(minecraft);
+        tick_options_screen(minecraft);
     }
 
     // Java: profilerfiller.push("gameRenderer"); gameRenderer.render(deltaTracker, ...);
@@ -866,6 +2699,10 @@ static void runTick(LIBMATTI_MC_Minecraft *minecraft, int runGameTime)
     // the LoadingScreenRenderer pipeline (renderToScreen): resize the layout FBO
     // to the window framebuffer, render the layout bottom-up into it, blit it
     // (vertically flipped, aspect-fitted) onto the window, then swap.
+    // Java: the window-events poll rides the frame (Window.setMode over the
+    // options flag; the port's stand-in re-reads options.fullscreen).
+    apply_fullscreen_option(minecraft);
+
     if (!minecraft->noRender)
     {
         // Java: glfwMakeContextCurrent + the context check like LWJGL requires
@@ -1120,6 +2957,13 @@ static void runTick(LIBMATTI_MC_Minecraft *minecraft, int runGameTime)
                                 minecraft->sectionDispatcher, LIBMATTI_MC_ChunkSectionLayer_SOLID,
                                 terrainProgram, mvp, origin, &minecraft->frustum);
 
+                            // Java: the CUTOUT_TERRAIN pass - the non-occluding
+                            // blocks (glass, leaves) render after the SOLID pass
+                            // with the alpha-tested fragment discard.
+                            LIBMATTI_MC_SectionRenderDispatcher_RenderLayer(
+                                minecraft->sectionDispatcher, LIBMATTI_MC_ChunkSectionLayer_CUTOUT,
+                                terrainProgram, mvp, origin, &minecraft->frustum);
+
                             // Java: addCloudsPass - after the main (terrain)
                             // pass, before weather. The cloud color is the
                             // CLOUD_COLOR attribute (the overworld curve:
@@ -1154,6 +2998,28 @@ static void runTick(LIBMATTI_MC_Minecraft *minecraft, int runGameTime)
 
                     if (getenv("MATTI_NO_TITLE") == NULL)
                         render_title(minecraft, 854, 480);
+
+                    // Java: Gui.render - the HUD layer (the crosshair + hotbar
+                    // + name line) over the world pass, gated like the title
+                    // line (MATTI_NO_HUD keeps the deterministic screenshots
+                    // clean).
+                    if (getenv("MATTI_NO_HUD") == NULL)
+                    {
+                        render_hud(minecraft, width, height);
+                        shot_after(minecraft, "hud");
+                    }
+
+                    // Java: Minecraft.runTick's render tail - the open screen
+                    // overlays the frame (Screen.render over the world + HUD,
+                    // the game keeps rendering behind it). The overlay folds
+                    // the pause/options render into the pass.
+                    if (minecraft->pauseScreen != NULL || minecraft->optionsScreen != NULL)
+                    {
+                        route_pause_clicks(minecraft);
+                        render_pause_overlay(minecraft, width / gui_scale(width, height),
+                                             height / gui_scale(width, height),
+                                             (float) gui_scale(width, height));
+                    }
 
                     // The MATTI_SCREENSHOT debug hook: reads the layout FBO's
                     // back buffer into a PPM once (the renderer verification).
@@ -1264,6 +3130,10 @@ void LIBMATTI_MC_Minecraft_Run(LIBMATTI_MC_Minecraft *minecraft)
         runTick(minecraft, !flag);
     }
 
+    // Java: the final save rides the shutdown (Minecraft.close's Options
+    // tail) - the port keeps the flush-on-exit the pause close also runs.
+    LIBMATTI_MC_Options_Save(&minecraft->options);
+
     // Java: Minecraft.run falls out of the loop; destroy runs at the caller.
 }
 
@@ -1291,8 +3161,64 @@ void LIBMATTI_MC_Minecraft_Destroy(LIBMATTI_MC_Minecraft *minecraft)
         LIBMATTI_MC_LocalPlayer_Free(minecraft->localPlayer);
         minecraft->localPlayer = NULL;
     }
+    // Java: this.soundManager = null - the engine stops + closes the AL
+    // context before the window dies (the P5.6 teardown order).
+    if (minecraft->soundEngine != NULL)
+    {
+        LIBMATTI_MC_SoundEngine_Free(minecraft->soundEngine);
+        minecraft->soundEngine = NULL;
+    }
+
     // Java: Options - the static KeyMapping table releases
+    if (minecraft->optionsScreen != NULL)
+    {
+        LIBMATTI_MC_OptionsScreen_Free(minecraft->optionsScreen);
+        minecraft->optionsScreen = NULL;
+    }
+    if (minecraft->pauseScreen != NULL)
+    {
+        LIBMATTI_MC_PauseScreen_Free(minecraft->pauseScreen);
+        minecraft->pauseScreen = NULL;
+    }
+    if (minecraft->inventoryScreen != NULL)
+    {
+        LIBMATTI_MC_InventoryScreen_Free(minecraft->inventoryScreen);
+        minecraft->inventoryScreen = NULL;
+    }
+    LIBMATTI_MC_Container_Free(minecraft->playerInventory);
+    minecraft->playerInventory = NULL;
     LIBMATTI_MC_KeyMapping_ReleaseAll();
+
+    // Java: Minecraft.close -> the level save (ChunkMap.save + level.dat) rides
+    // the storage access (the P7.1 port); MATTI_NOSAVE=1 skips it for throwaway
+    // smoke runs.
+    if (minecraft->levelStorage != NULL && minecraft->level != NULL && getenv("MATTI_NOSAVE") == NULL)
+    {
+        LIBMATTI_MC_Level *level = minecraft->level;
+        LIBMATTI_MC_Nbt_CompoundTag *data = LIBMATTI_MC_LevelStorage_BuildLevelData(level, "New World");
+        if (data != NULL)
+        {
+            LIBMATTI_MC_LevelStorageAccess_WriteLevelData(minecraft->levelStorage, data);
+            LIBMATTI_MC_Nbt_Tag_Free((LIBMATTI_MC_Nbt_Tag *) data);
+        }
+        int savedChunks = LIBMATTI_MC_LevelStorage_SaveChunks(minecraft->levelStorage, level);
+        LOG("[STORAGE] saved %d chunk(s) + level.dat", savedChunks);
+    }
+    if (minecraft->levelStorage != NULL)
+    {
+        LIBMATTI_MC_LevelStorageAccess_Free(minecraft->levelStorage);
+        minecraft->levelStorage = NULL;
+    }
+    if (minecraft->levelStorageSource != NULL)
+    {
+        LIBMATTI_MC_LevelStorageSource_Free(minecraft->levelStorageSource);
+        minecraft->levelStorageSource = NULL;
+    }
+    if (minecraft->chunkGenerator != NULL)
+    {
+        LIBMATTI_MC_FlatLevelSource_Free(minecraft->chunkGenerator);
+        minecraft->chunkGenerator = NULL;
+    }
 
     // Java: this.close() -> levelRenderer.close() -> the section dispatcher's
     // sections and compiled meshes free with the level.
@@ -1315,6 +3241,17 @@ void LIBMATTI_MC_Minecraft_Destroy(LIBMATTI_MC_Minecraft *minecraft)
         minecraft->modelManager = NULL;
     }
 
+    // Java: this.gui = null - the HUD batcher closes with the game.
+    if (minecraft->guiRenderer != NULL)
+    {
+        LIBMATTI_MC_GuiRenderer_Free(minecraft->guiRenderer);
+        minecraft->guiRenderer = NULL;
+    }
+    // Java: this.itemRenderer = null - the icon page closes with the batcher.
+    LIBMATTI_MC_ItemRenderer_Free();
+    // (the hotbar stacks ride the playerInventory container - its Free above
+    // releases them; the port keeps one owner)
+
     // Java: public void destroy() { LOGGER.info("Stopping!"); ... }
     LOG("Stopping!");
 
@@ -1328,6 +3265,7 @@ void LIBMATTI_MC_Minecraft_Destroy(LIBMATTI_MC_Minecraft *minecraft)
     LIBMATTI_GLFW_glfwTerminate();
 
     LIBMATTI_MC_DeltaTracker_Free(minecraft->deltaTracker);
+    matti_ui_free_textures();
     LIBMATTI_MC_TextureManager_Free(minecraft->textureManager);
     if (minecraft->fontProgram != 0)
     {

@@ -35,6 +35,10 @@ int main(void)
     // compiler meshes into the SOLID layer.
     LIBMATTI_MC_Level *level = LIBMATTI_MC_Level_New(-64, 384, LIBMATTI_MC_Level_OVERWORLD, true);
     CHECK(level != NULL);
+    // the chunk the platform lives in - the level has no generator here, so it
+    // is created explicitly (the client gets it from the chunk source)
+    LIBMATTI_MC_ChunkPos platform = {0, 0};
+    LIBMATTI_MC_Level_SetChunk(level, LIBMATTI_MC_LevelChunk_New(level, &platform));
     LIBMATTI_MC_Block *stone = LIBMATTI_MC_VanillaBlocks_GetByName("STONE");
     CHECK(stone != NULL);
     for (int x = 0; x < 16; x++)

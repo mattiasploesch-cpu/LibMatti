@@ -37,6 +37,19 @@ LIBMATTI_MC_PalettedContainer *LIBMATTI_MC_LevelChunkSection_GetStates(const LIB
     return section != NULL ? section->states : NULL;
 }
 
+LIBMATTI_MC_Biome *LIBMATTI_MC_LevelChunkSection_GetBiome(const LIBMATTI_MC_LevelChunkSection *section)
+{
+    // Java: the biomes container read - the default rides plains (the empty
+    // sections keep a biome too, exactly like the single-value container)
+    return section != NULL && section->biome != NULL ? section->biome : LIBMATTI_MC_Biomes_Plains();
+}
+
+void LIBMATTI_MC_LevelChunkSection_SetBiome(LIBMATTI_MC_LevelChunkSection *section, LIBMATTI_MC_Biome *biome)
+{
+    if (section != NULL)
+        section->biome = biome;
+}
+
 LIBMATTI_MC_BlockState *LIBMATTI_MC_LevelChunkSection_GetBlockState(const LIBMATTI_MC_LevelChunkSection *section, int x, int y, int z)
 {
     return LIBMATTI_MC_PalettedContainer_Get(section->states, x, y, z);
