@@ -28,6 +28,7 @@
 #include "libmatti/net/minecraft/client/gui/GuiRenderer.h"
 #include "libmatti/net/minecraft/client/gui/GuiLayout.h"
 #include "libmatti/net/minecraft/client/renderer/chunk/SectionRenderDispatcher.h"
+
 #include "libmatti/net/minecraft/client/renderer/chunk/SectionShader.h"
 #include "libmatti/net/minecraft/client/resources/model/ModelManager.h"
 #include "libmatti/net/minecraft/client/sounds/SoundEngine.h"
@@ -76,6 +77,16 @@
 #include <string.h>
 
 #include "libmatti/net/minecraft/client/EmbeddedFont.h"
+
+// Java: the client render distance in chunks (the port keeps a small window so
+// the in-memory level stays cheap) and how often the keep-alive pass runs
+#define CHUNK_STREAM_RADIUS 4
+#define CHUNK_STREAM_INTERVAL_TICKS 20
+
+// Java: ClientChunkCache.replaceWithPacketData - the keep-alive pass pulls in
+// the chunks around the player, so walking past the border finds ground instead
+// of the empty void an unloaded chunk reads as.
+static void stream_chunks_around(LIBMATTI_MC_Minecraft *minecraft, int centreX, int centreZ);
 
 // The theme resource root (see load_font below); every consumer defines it
 // from CMake (client/src does the same for the selftest fixtures).
@@ -617,7 +628,14 @@ LIBMATTI_MC_Minecraft *LIBMATTI_MC_Minecraft_New(const LIBMATTI_MC_GameConfig *c
             LIBMATTI_MC_FlatLayerInfo_Init(&layers[1], 2, LIBMATTI_MC_Block_DefaultBlockState(dirt));
             LIBMATTI_MC_FlatLayerInfo_Init(&layers[2], 126, LIBMATTI_MC_Block_DefaultBlockState(stone));
             minecraft->chunkGenerator = LIBMATTI_MC_FlatLevelSource_New(layers, 3, LIBMATTI_MC_Biomes_Plains());
-        }// Java: the chunk-map dispatch - each demo position either restored from
+        }
+        // Java: the level's chunk source owns the generator - the keep-alive pass
+        // fills the world around the player from it, so walking past the generated
+        // area grows the world instead of dropping the walker into an all-air chunk
+        if (minecraft->chunkGenerator != NULL)
+            LIBMATTI_MC_Level_SetChunkGenerator(level, &minecraft->chunkGenerator->base);
+
+        // Java: the chunk-map dispatch - each demo position either restored from
                     // the save or fills through the generator (fillFromNoise + the BIOMES
                     // pass + the live heightmap priming like the FEATURE status task).
                     // (2,2) is the generation-only probe: the demo towers and the
@@ -626,29 +644,15 @@ LIBMATTI_MC_Minecraft *LIBMATTI_MC_Minecraft_New(const LIBMATTI_MC_GameConfig *c
         if (minecraft->chunkGenerator != NULL)
         {
             static const int DEMO_POSITIONS[][2] = {{0, 0}, {4, 0}, {2, 2}};
-            static const LIBMATTI_MC_HeightmapTypes LIVE_TYPES[] = {
-                LIBMATTI_MC_Heightmap_MOTION_BLOCKING,
-                LIBMATTI_MC_Heightmap_MOTION_BLOCKING_NO_LEAVES,
-                LIBMATTI_MC_Heightmap_OCEAN_FLOOR,
-                LIBMATTI_MC_Heightmap_WORLD_SURFACE,
-            };
             for (size_t i = 0; i < sizeof(DEMO_POSITIONS) / sizeof(DEMO_POSITIONS[0]); i++)
             {
-                int cx = DEMO_POSITIONS[i][0];
-                int cz = DEMO_POSITIONS[i][1];
-                if (LIBMATTI_MC_Level_GetChunk(level, cx, cz) != NULL)
+                if (LIBMATTI_MC_Level_GetChunk(level, DEMO_POSITIONS[i][0], DEMO_POSITIONS[i][1]) != NULL)
                     continue;
-                LIBMATTI_MC_ChunkPos pos = {cx, cz};
-                LIBMATTI_MC_LevelChunk *chunk = LIBMATTI_MC_LevelChunk_New(level, &pos);
-                if (chunk == NULL)
-                    continue;
-                LIBMATTI_MC_ChunkGenerator_FillFromNoise(&minecraft->chunkGenerator->base, &chunk->base);
-                LIBMATTI_MC_ChunkGenerator_FillBiomes(&minecraft->chunkGenerator->base, &chunk->base);
-                LIBMATTI_MC_Heightmap_PrimeHeightmaps(&chunk->base, LIVE_TYPES,
-                                                      sizeof(LIVE_TYPES) / sizeof(LIVE_TYPES[0]));
-                LIBMATTI_MC_ChunkAccess_MarkUnsaved(&chunk->base);
-                LIBMATTI_MC_Level_SetChunk(level, chunk);
+                LIBMATTI_MC_Level_GenerateChunk(level, DEMO_POSITIONS[i][0], DEMO_POSITIONS[i][1]);
             }
+            // the keep-alive pass around the spawn chunk, so the first steps in
+            // any direction already have ground under them
+            stream_chunks_around(minecraft, 0, 0);
         }
 
         if (stone != NULL && dirt != NULL)
@@ -866,6 +870,33 @@ static void minecraft_demo_tick(void)
 }
 
 MATTI_MIXIN_TARGET("matticraft::demo::tick", minecraft_demo_tick)
+
+// Java: ClientChunkCache.replaceWithPacketData - the keep-alive pass pulls in
+// the chunks around the player, so walking past the border finds ground instead
+// of the empty void an unloaded chunk reads as.
+static void stream_chunks_around(LIBMATTI_MC_Minecraft *minecraft, int centreX, int centreZ)
+{
+    LIBMATTI_MC_Level *level = (LIBMATTI_MC_Level *) minecraft->level;
+    if (level == NULL || minecraft->chunkGenerator == NULL)
+        return;
+    for (int dz = -CHUNK_STREAM_RADIUS; dz <= CHUNK_STREAM_RADIUS; dz++)
+    {
+        for (int dx = -CHUNK_STREAM_RADIUS; dx <= CHUNK_STREAM_RADIUS; dx++)
+        {
+            int cx = centreX + dx;
+            int cz = centreZ + dz;
+            // Java: the chunk cache asks the chunk storage first and only
+            // generates when the storage has nothing - a saved chunk keeps the
+            // blocks that were built in it
+            if (LIBMATTI_MC_Level_GetChunk(level, cx, cz) != NULL)
+                continue;
+            if (minecraft->levelStorage != NULL)
+                LIBMATTI_MC_LevelStorage_LoadChunk(minecraft->levelStorage, level, cx, cz);
+            if (LIBMATTI_MC_Level_GetChunk(level, cx, cz) == NULL)
+                LIBMATTI_MC_Level_GenerateChunk(level, cx, cz);
+        }
+    }
+}
 
 static void apply_walk(LIBMATTI_MC_Minecraft *minecraft);
 static void handle_block_interaction(LIBMATTI_MC_Minecraft *minecraft);
@@ -2594,6 +2625,14 @@ static void runTick(LIBMATTI_MC_Minecraft *minecraft, int runGameTime)
     // the renderer picks the camera up. The walk/gravity impulses ride the
     // per-tick loop below (apply_walk inside tick), not the frame rate.
     updateMouseLook(minecraft);
+
+    static int streamCountdown;
+    if (minecraft->level != NULL && minecraft->localPlayer != NULL && --streamCountdown <= 0)
+    {
+        streamCountdown = CHUNK_STREAM_INTERVAL_TICKS;
+        const LIBMATTI_MC_Entity *streamEntity = &minecraft->localPlayer->player.base.base;
+        stream_chunks_around(minecraft, (int) floor(streamEntity->x) >> 4, (int) floor(streamEntity->z) >> 4);
+    }
 
     // Java: Camera.setup(BlockGetter, Entity, ...) - the camera rides the local
     // player's entity: eye position + rotation (the renderer reads it below)

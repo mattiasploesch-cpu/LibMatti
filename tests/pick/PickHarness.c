@@ -34,6 +34,17 @@ static void check(int condition, const char *what)
 // physics harness walks against)
 static void build_arena(LIBMATTI_MC_Level *level)
 {
+    // the arena spans x/z -2..7, so it covers four chunks - they are created
+    // explicitly because this level has no generator (a missing chunk is no
+    // longer answered with an empty one)
+    for (int cx = -1; cx <= 0; cx++)
+    {
+        for (int cz = -1; cz <= 0; cz++)
+        {
+            LIBMATTI_MC_ChunkPos arenaPos = {cx, cz};
+            LIBMATTI_MC_Level_SetChunk(level, LIBMATTI_MC_LevelChunk_New(level, &arenaPos));
+        }
+    }
     LIBMATTI_MC_BlockState *stone = LIBMATTI_MC_Block_DefaultBlockState(LIBMATTI_MC_VanillaBlocks_GetByName("STONE"));
     for (int y = 64; y < 68; y++)
     {

@@ -280,6 +280,10 @@ static void test_state_codec(void)
 static LIBMATTI_MC_Level *build_demo_level(void)
 {
     LIBMATTI_MC_Level *level = LIBMATTI_MC_Level_New(-64, 384, LIBMATTI_MC_Level_OVERWORLD, true);
+    // the platform chunk is created explicitly - the level has no generator
+    // here, and a missing chunk is no longer answered with an empty one
+    LIBMATTI_MC_ChunkPos platform = {0, 0};
+    LIBMATTI_MC_Level_SetChunk(level, LIBMATTI_MC_LevelChunk_New(level, &platform));
     LIBMATTI_MC_BlockState *stone = LIBMATTI_MC_Block_DefaultBlockState(LIBMATTI_MC_VanillaBlocks_GetByName("STONE"));
     LIBMATTI_MC_BlockState *dirt = LIBMATTI_MC_Block_DefaultBlockState(LIBMATTI_MC_VanillaBlocks_GetByName("DIRT"));
     for (int x = 0; x < 16; x++)
@@ -396,6 +400,9 @@ static void test_chunk_codec(void)
 static void test_chunk_codec_global_palette(void)
 {
     LIBMATTI_MC_Level *level = LIBMATTI_MC_Level_New(-64, 384, LIBMATTI_MC_Level_OVERWORLD, true);
+    // created explicitly - this level has no generator to hand out chunk (0,0)
+    LIBMATTI_MC_ChunkPos palettePos = {0, 0};
+    LIBMATTI_MC_Level_SetChunk(level, LIBMATTI_MC_LevelChunk_New(level, &palettePos));
     LIBMATTI_MC_Block **all = LIBMATTI_MC_VanillaBlocks_All();
     for (int i = 0; i < 20; i++)
     {

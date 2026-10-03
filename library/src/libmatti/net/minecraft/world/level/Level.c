@@ -12,6 +12,7 @@
 #include "libmatti/net/minecraft/util/Mth.h"
 #include "libmatti/net/minecraft/world/level/ClipContext.h"
 #include "libmatti/net/minecraft/world/level/LevelReader.h"
+#include "libmatti/net/minecraft/world/level/chunk/ChunkGenerator.h"
 #include "libmatti/net/minecraft/world/level/chunk/LevelChunkSection.h"
 
 #include <float.h>
@@ -37,6 +38,76 @@ LIBMATTI_MC_Level *LIBMATTI_MC_Level_New(int minY, int height, const char *dimen
 LIBMATTI_MC_LevelHeightAccessor LIBMATTI_MC_Level_GetHeightAccessor(struct LIBMATTI_MC_Level *level)
 {
     return level->heightAccessor;
+}
+
+void LIBMATTI_MC_Level_SetChunkGenerator(struct LIBMATTI_MC_Level *level,
+                                         LIBMATTI_MC_ChunkGenerator *generator)
+{
+    if (level != NULL)
+        level->chunkGenerator = generator;
+}
+
+LIBMATTI_MC_ChunkGenerator *LIBMATTI_MC_Level_GetChunkGenerator(struct LIBMATTI_MC_Level *level)
+{
+    return level != NULL ? level->chunkGenerator : NULL;
+}
+
+LIBMATTI_MC_LevelChunk *LIBMATTI_MC_Level_GenerateChunk(struct LIBMATTI_MC_Level *level, int chunkX, int chunkZ)
+{
+    if (level == NULL || level->chunkGenerator == NULL)
+        return NULL;
+
+    // Java: ServerLevel.createChunk -> the chunk source generates the chunk into
+    // a fresh LevelChunk and hands it back
+    LIBMATTI_MC_ChunkPos pos = {chunkX, chunkZ};
+    LIBMATTI_MC_LevelChunk *chunk = LIBMATTI_MC_LevelChunk_New(level, &pos);
+    if (chunk == NULL)
+        return NULL;
+
+    LIBMATTI_MC_ChunkGenerator_FillFromNoise(level->chunkGenerator, &chunk->base);
+    LIBMATTI_MC_ChunkGenerator_FillBiomes(level->chunkGenerator, &chunk->base);
+
+    // Java: the heightmaps the render distance and the spawn queries read. The
+    // port primes the four the demo level keeps live (MOTION_BLOCKING,
+    // MOTION_BLOCKING_NO_LEAVES, OCEAN_FLOOR, WORLD_SURFACE) - primeHeightmaps
+    // is the ChunkStatus.MOTION_BLOCKING task.
+    static const LIBMATTI_MC_HeightmapTypes LIVE_TYPES[] = {
+        LIBMATTI_MC_Heightmap_MOTION_BLOCKING,
+        LIBMATTI_MC_Heightmap_MOTION_BLOCKING_NO_LEAVES,
+        LIBMATTI_MC_Heightmap_OCEAN_FLOOR,
+        LIBMATTI_MC_Heightmap_WORLD_SURFACE,
+    };
+    LIBMATTI_MC_Heightmap_PrimeHeightmaps(&chunk->base, LIVE_TYPES,
+                                          sizeof(LIVE_TYPES) / sizeof(LIVE_TYPES[0]));
+
+    // Java: the generated chunk is not yet written back
+    LIBMATTI_MC_ChunkAccess_MarkUnsaved(&chunk->base);
+    LIBMATTI_MC_Level_SetChunk(level, chunk);
+    return chunk;
+}
+
+// Java: the chunk map's keep-alive pass - the chunks inside the view distance
+// around the player are pulled in (from the storage or from the generator) and
+// the ones that fell out of it are dropped. This is what fills the world while
+// the player walks; the block access path never generates.
+int LIBMATTI_MC_Level_EnsureChunksAround(struct LIBMATTI_MC_Level *level, int centreX, int centreZ, int radius)
+{
+    if (level == NULL || level->chunkGenerator == NULL || radius < 0)
+        return 0;
+    int generated = 0;
+    for (int dz = -radius; dz <= radius; dz++)
+    {
+        for (int dx = -radius; dx <= radius; dx++)
+        {
+            // Java: the keep-alive only pulls in what is missing - a loaded or
+            // restored chunk keeps its blocks, so the pass must not regenerate it
+            if (LIBMATTI_MC_Level_GetChunk(level, centreX + dx, centreZ + dz) != NULL)
+                continue;
+            if (LIBMATTI_MC_Level_GenerateChunk(level, centreX + dx, centreZ + dz) != NULL)
+                generated++;
+        }
+    }
+    return generated;
 }
 
 LIBMATTI_MC_LevelChunk *LIBMATTI_MC_Level_GetChunk(struct LIBMATTI_MC_Level *level, int chunkX, int chunkZ)

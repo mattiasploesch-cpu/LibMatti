@@ -10,6 +10,8 @@
 #include "libmatti/net/minecraft/world/level/block/Block.h"
 #include "libmatti/net/minecraft/world/level/chunk/LevelChunk.h"
 #include "libmatti/net/minecraft/world/level/chunk/LevelChunkSection.h"
+#include "libmatti/net/minecraft/world/level/biome/Biome.h"
+#include "libmatti/net/minecraft/world/level/levelgen/flat/FlatLevelSource.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -28,6 +30,88 @@ static void check(int condition, const char *what)
     }
 }
 
+// ---- the chunk source: a missing chunk is generated, never handed out empty ----
+// The in-memory level used to answer getChunk(..., load=true) with a fresh
+// all-air chunk. Walking past the border then dropped the player through it into
+// the void, because the empty chunk carries no collision.
+static void test_chunk_generation(void)
+{
+    LIBMATTI_MC_Level *level = LIBMATTI_MC_Level_New(-64, 384, LIBMATTI_MC_Level_OVERWORLD, true);
+
+    // without a generator there is nothing to generate - the lookup stays empty
+    check(LIBMATTI_MC_LevelReader_GetChunk(level, 7, 7, true) == NULL,
+          "load=true without a generator returns NULL (no empty chunk)");
+    check(LIBMATTI_MC_Level_GetChunk(level, 7, 7) == NULL, "the empty chunk was not stored");
+
+    LIBMATTI_MC_BlockState *bedrock = LIBMATTI_MC_Block_DefaultBlockState(LIBMATTI_MC_VanillaBlocks_GetByName("BEDROCK"));
+    LIBMATTI_MC_BlockState *dirt = LIBMATTI_MC_Block_DefaultBlockState(LIBMATTI_MC_VanillaBlocks_GetByName("DIRT"));
+    LIBMATTI_MC_BlockState *stone = LIBMATTI_MC_Block_DefaultBlockState(LIBMATTI_MC_VanillaBlocks_GetByName("STONE"));
+    LIBMATTI_MC_FlatLayerInfo layers[3];
+    LIBMATTI_MC_FlatLayerInfo_Init(&layers[0], 1, bedrock);
+    LIBMATTI_MC_FlatLayerInfo_Init(&layers[1], 2, dirt);
+    LIBMATTI_MC_FlatLayerInfo_Init(&layers[2], 126, stone);
+    LIBMATTI_MC_FlatLevelSource *flat = LIBMATTI_MC_FlatLevelSource_New(layers, 3, LIBMATTI_MC_Biomes_Plains());
+    LIBMATTI_MC_Level_SetChunkGenerator(level, &flat->base);
+    check(LIBMATTI_MC_Level_GetChunkGenerator(level) == &flat->base, "the generator is wired to the level");
+
+    // the block access path does NOT generate - the keep-alive pass does
+    check(LIBMATTI_MC_LevelReader_GetChunk(level, 7, 7, true) == NULL,
+          "load=true does not generate (the cache fills from the keep-alive pass)");
+
+    LIBMATTI_MC_LevelChunk *generated = LIBMATTI_MC_Level_GenerateChunk(level, 7, 7);
+    check(generated != NULL, "the missing chunk generates");
+    check(LIBMATTI_MC_Level_GetChunk(level, 7, 7) == generated, "the generated chunk is stored in the level");
+    check(LIBMATTI_MC_LevelReader_GetChunk(level, 7, 7, true) == generated, "the cache answers the second ask");
+
+    // the superflat stack: bedrock 1 / dirt 2 / stone 126 over the -64 base, so the
+    // stone surface lands at y=64 and the air above it is what a walker used to
+    // fall through
+    LIBMATTI_MC_BlockPos *floorPos = LIBMATTI_MC_BlockPos_New(7 * 16 + 3, 64, 7 * 16 + 5);
+    LIBMATTI_MC_BlockState *floor = LIBMATTI_MC_Level_GetBlockState(level, floorPos);
+    check(LIBMATTI_MC_BlockState_GetBlock(floor) == (void *) LIBMATTI_MC_VanillaBlocks_GetByName("STONE"),
+          "the generated chunk has the stone floor at y=64");
+    LIBMATTI_MC_BlockPos *airPos = LIBMATTI_MC_BlockPos_New(7 * 16 + 3, 65, 7 * 16 + 5);
+    check(LIBMATTI_MC_BlockState_GetBlock(LIBMATTI_MC_Level_GetBlockState(level, airPos)) ==
+              (void *) LIBMATTI_MC_VanillaBlocks_AIR(),
+          "air above the surface at y=65");
+    LIBMATTI_MC_BlockPos *dirtPos = LIBMATTI_MC_BlockPos_New(7 * 16 + 3, -63, 7 * 16 + 5);
+    check(LIBMATTI_MC_BlockState_GetBlock(LIBMATTI_MC_Level_GetBlockState(level, dirtPos)) ==
+              (void *) LIBMATTI_MC_VanillaBlocks_GetByName("DIRT"),
+          "dirt at y=-63");
+    LIBMATTI_MC_BlockPos *basePos = LIBMATTI_MC_BlockPos_New(7 * 16 + 3, -64, 7 * 16 + 5);
+    check(LIBMATTI_MC_BlockState_GetBlock(LIBMATTI_MC_Level_GetBlockState(level, basePos)) ==
+              (void *) LIBMATTI_MC_VanillaBlocks_GetByName("BEDROCK"),
+          "bedrock at y=-64");
+    free(floorPos);
+    free(airPos);
+    free(dirtPos);
+    free(basePos);
+
+    // the heightmaps ride along (MOTION_BLOCKING is primed, not just allocated)
+    check(LIBMATTI_MC_ChunkAccess_HasPrimedHeightmap(&generated->base, LIBMATTI_MC_Heightmap_MOTION_BLOCKING),
+          "the generated chunk carries its primed heightmaps");
+
+    // the keep-alive pass fills the square around a centre, and only the gaps
+    check(LIBMATTI_MC_Level_EnsureChunksAround(level, 1, 0, 1) == 9, "the radius-1 pass filled all 9 chunks around the centre");
+    check(LIBMATTI_MC_Level_GetChunk(level, 2, 1) != NULL, "the pass reached the corner chunk (2,1)");
+    check(LIBMATTI_MC_Level_EnsureChunksAround(level, 1, 0, 1) == 0, "the second pass has nothing left to do");
+    check(LIBMATTI_MC_Level_GetChunk(level, 7, 7) == generated, "the first chunk survived the pass");
+
+    // the pass must not overwrite a loaded chunk - a built chunk keeps its blocks
+    LIBMATTI_MC_BlockPos *built = LIBMATTI_MC_BlockPos_New(0 * 16 + 2, 70, 0 * 16 + 2);
+    LIBMATTI_MC_Level_SetBlock(level, built, LIBMATTI_MC_Block_DefaultBlockState(
+                                             LIBMATTI_MC_VanillaBlocks_GetByName("OAK_PLANKS")),
+                               LIBMATTI_MC_Level_UPDATE_CLIENTS);
+    LIBMATTI_MC_Level_EnsureChunksAround(level, 0, 0, 2);
+    check(LIBMATTI_MC_BlockState_GetBlock(LIBMATTI_MC_Level_GetBlockState(level, built)) ==
+              (void *) LIBMATTI_MC_VanillaBlocks_GetByName("OAK_PLANKS"),
+          "the keep-alive pass kept the block in a loaded chunk");
+    free(built);
+
+    LIBMATTI_MC_FlatLevelSource_Free(flat);
+    LIBMATTI_MC_Level_Free(level);
+}
+
 int main(void)
 {
     // overworld: minY -64, height 384 (like the Java DimensionType overworld)
@@ -39,7 +123,17 @@ int main(void)
     LIBMATTI_MC_BlockState *stone = LIBMATTI_MC_Block_DefaultBlockState(LIBMATTI_MC_VanillaBlocks_GetByName("STONE"));
     LIBMATTI_MC_BlockState *oakPlanks = LIBMATTI_MC_Block_DefaultBlockState(LIBMATTI_MC_VanillaBlocks_GetByName("OAK_PLANKS"));
 
-    // write through setBlock - this loads two chunks on the fly
+    // Java: setBlock needs the chunk to be there - the chunk source generates a
+    // missing one, and this level has no generator, so the two write chunks are
+    // created explicitly here
+    const int WRITE_CHUNKS[][2] = {{0, 0}, {1, -3}};
+    for (size_t i = 0; i < sizeof(WRITE_CHUNKS) / sizeof(WRITE_CHUNKS[0]); i++)
+    {
+        LIBMATTI_MC_ChunkPos writePos = {WRITE_CHUNKS[i][0], WRITE_CHUNKS[i][1]};
+        LIBMATTI_MC_Level_SetChunk(level, LIBMATTI_MC_LevelChunk_New(level, &writePos));
+    }
+
+    // write through setBlock
     LIBMATTI_MC_BlockPos *p1 = LIBMATTI_MC_BlockPos_New(0, -60, 0);
     LIBMATTI_MC_BlockPos *p2 = LIBMATTI_MC_BlockPos_New(30, 100, -47);
     check(LIBMATTI_MC_Level_SetBlock(level, p1, stone, LIBMATTI_MC_Level_UPDATE_CLIENTS), "setBlock stone at (0,-60,0)");
@@ -116,6 +210,8 @@ int main(void)
     LIBMATTI_MC_LevelChunk_RemoveBlockEntity(planksChunk, chestPos);
     check(LIBMATTI_MC_LevelChunk_GetBlockEntity(planksChunk, chestPos) == NULL, "entity removed");
     check(LIBMATTI_MC_Level_GetBlockEntity(level, atPlanks) == NULL, "no entity through level");
+
+    test_chunk_generation();
 
     free(p1);
     free(p2);

@@ -306,6 +306,12 @@ int LIBMATTI_MC_LevelStorage_SaveChunks(LIBMATTI_MC_LevelStorageAccess *access, 
         LIBMATTI_MC_LevelChunk *chunk = level->chunks[i].chunk;
         if (chunk == NULL)
             continue;
+        // Java: ChunkMap.save -> LevelChunk.needsSaving returns on !isUnsaved,
+        // so only the chunks that actually changed since the last write reach the
+        // storage. Without this gate a save would rewrite the whole loaded set -
+        // and the empty chunks the cache can hand out would become real files.
+        if (!LIBMATTI_MC_ChunkAccess_IsUnsaved(&chunk->base))
+            continue;
         // Java: ChunkMap.save - every loaded chunk's SerializableChunkData
         LIBMATTI_MC_Nbt_CompoundTag *tag = LIBMATTI_MC_SerializableChunkData_Write(chunk);
         if (tag == NULL)

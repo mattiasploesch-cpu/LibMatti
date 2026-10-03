@@ -9,17 +9,14 @@
 
 LIBMATTI_MC_LevelChunk *LIBMATTI_MC_LevelReader_GetChunk(struct LIBMATTI_MC_Level *level, int chunkX, int chunkZ, bool load)
 {
-    // Java: getChunk(x, z, status, load) - the in-memory port has no load path,
-    // so load=true creates an empty chunk like the cache's "should always be able
-    // to create a chunk" fallback would
-    LIBMATTI_MC_LevelChunk *chunk = LIBMATTI_MC_Level_GetChunk(level, chunkX, chunkZ);
-    if (chunk == NULL && load)
-    {
-        LIBMATTI_MC_ChunkPos pos = {chunkX, chunkZ};
-        chunk = LIBMATTI_MC_LevelChunk_New(level, &pos);
-        LIBMATTI_MC_Level_SetChunk(level, chunk);
-    }
-    return chunk;
+    // Java: getChunk(x, z, status, load) reads through the chunk cache. The
+    // cache fills itself from a separate pass (the chunk map's IChunkStorage
+    // loop over the keep-alive radius), NOT from the block access path - the
+    // port keeps that split, so a missing chunk answers NULL and the block
+    // reads see air instead of pulling a whole world into memory one ray cast at
+    // a time. The keep-alive pass is Level_EnsureChunksAround.
+    (void) load;
+    return LIBMATTI_MC_Level_GetChunk(level, chunkX, chunkZ);
 }
 
 LIBMATTI_MC_LevelChunk *LIBMATTI_MC_LevelReader_GetChunkAt(struct LIBMATTI_MC_Level *level, const LIBMATTI_MC_BlockPos *pos)
