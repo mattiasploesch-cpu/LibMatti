@@ -47,6 +47,11 @@ target_compile_definitions(matti
 
 # Java: java.util.zip sits on zlib and java.lang.Math on libm; every consumer of the
 # library links them transitively.
+# find_package(stb)
+# target_link_libraries(matti PUBLIC stb::stb_truetype)
+
+target_include_directories(matti PRIVATE ${CMAKE_SOURCE_DIR}/vendor/stb)
+
 find_package(ZLIB QUIET)
 if(ZLIB_FOUND)
     target_link_libraries(matti PUBLIC ZLIB::ZLIB)
