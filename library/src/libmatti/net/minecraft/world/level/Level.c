@@ -9,9 +9,13 @@
 
 #include "libmatti/net/minecraft/core/BlockPos.h"
 #include "libmatti/net/minecraft/server/bootstrap/VanillaBlocks.h"
+#include "libmatti/net/minecraft/util/Mth.h"
+#include "libmatti/net/minecraft/world/level/ClipContext.h"
 #include "libmatti/net/minecraft/world/level/LevelReader.h"
 #include "libmatti/net/minecraft/world/level/chunk/LevelChunkSection.h"
 
+#include <float.h>
+#include <math.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -389,6 +393,182 @@ bool LIBMATTI_MC_Level_NoBlockCollision(struct LIBMATTI_MC_Level *level, const L
     LIBMATTI_MC_AABB *hits[1];
     return LIBMATTI_MC_Level_GetBlockCollisions(level, box->minX, box->minY, box->minZ,
                                                 box->maxX, box->maxY, box->maxZ, hits, 1) == 0;
+}
+
+// ---------------------------------------------------------------------------
+// Java: BlockGetter.clip / traverseBlocks - the DDA ray cast. The per-cell
+// lambda clips the ray against the context's block shape (the fluid shape is
+// empty through the NONE mode); the traversal walks the cells the segment
+// passes through with the ±1.0E-7-lerped endpoints exactly like Java (the
+// first non-empty clip wins, the walk exhausts into the miss with the ray end
+// as the location and the approximate nearest of the reverse ray as the face).
+// ---------------------------------------------------------------------------
+static int level_clip_step(LIBMATTI_MC_Level *level, const LIBMATTI_MC_ClipContext *context,
+                           const LIBMATTI_MC_BlockPos *pos, const LIBMATTI_MC_Vec3 *from,
+                           const LIBMATTI_MC_Vec3 *to, LIBMATTI_MC_BlockHitResult *out)
+{
+    LIBMATTI_MC_AABB *shape = LIBMATTI_MC_ClipContext_GetBlockShape(context, level, pos);
+    if (shape == NULL)
+        return 0;
+
+    // Java: VoxelShape.clip - a start point inside the shape (after the 0.001
+    // step along the ray) hits immediately with inside=true and the face riding
+    // the approximate nearest of the reverse ray.
+    double rayX = to->x - from->x, rayY = to->y - from->y, rayZ = to->z - from->z;
+    if (rayX * rayX + rayY * rayY + rayZ * rayZ >= 1.0e-7)
+    {
+        double insideX = from->x + rayX * 0.001;
+        double insideY = from->y + rayY * 0.001;
+        double insideZ = from->z + rayZ * 0.001;
+        if (insideX >= shape->minX && insideX <= shape->maxX && insideY >= shape->minY && insideY <= shape->maxY
+            && insideZ >= shape->minZ && insideZ <= shape->maxZ)
+        {
+            free(shape);
+            out->location = *from;
+            out->type = LIBMATTI_MC_HitResult_BLOCK;
+            out->direction = LIBMATTI_MC_Direction_GetApproximateNearest((float) -rayX, (float) -rayY, (float) -rayZ);
+            out->blockPos = *pos;
+            out->inside = true;
+            out->worldBorder = false;
+            return 1;
+        }
+    }
+
+    int found = 0;
+    LIBMATTI_MC_Vec3 *location = LIBMATTI_MC_AABB_Clip(shape, from, to, &found);
+    int direction = found ? LIBMATTI_MC_AABB_ClipDirection(shape, from, to) : -1;
+    if (location != NULL)
+    {
+        out->location = *location;
+        free(location);
+    }
+    free(shape);
+    if (!found || direction < 0)
+        return 0;
+    out->type = LIBMATTI_MC_HitResult_BLOCK;
+    out->direction = (LIBMATTI_MC_Direction) direction;
+    out->blockPos = *pos;
+    out->inside = false;
+    out->worldBorder = false;
+    return 1;
+}
+
+// Java: BlockGetter.clipWithState / clipWithInteractionOverride collapsed - the
+// explicit per-cell clip the traversal lambda runs.
+LIBMATTI_MC_BlockHitResult LIBMATTI_MC_Level_ClipWithState(LIBMATTI_MC_Level *level, const LIBMATTI_MC_Vec3 *from,
+                                                           const LIBMATTI_MC_Vec3 *to, const LIBMATTI_MC_BlockPos *pos,
+                                                           const LIBMATTI_MC_BlockState *state)
+{
+    (void) level;
+    (void) state; // the shape model rides the position's full cube
+    LIBMATTI_MC_BlockHitResult out;
+    memset(&out, 0, sizeof(out));
+    LIBMATTI_MC_AABB *shape = LIBMATTI_MC_AABB_FromBlockPos(pos);
+    int found = 0;
+    LIBMATTI_MC_Vec3 *location = LIBMATTI_MC_AABB_Clip(shape, from, to, &found);
+    int direction = found ? LIBMATTI_MC_AABB_ClipDirection(shape, from, to) : -1;
+    if (location != NULL)
+    {
+        out.location = *location;
+        free(location);
+    }
+    free(shape);
+    if (found && direction >= 0)
+    {
+        out.type = LIBMATTI_MC_HitResult_BLOCK;
+        out.direction = (LIBMATTI_MC_Direction) direction;
+        out.blockPos = *pos;
+        out.inside = false;
+        out.worldBorder = false;
+    }
+    return out;
+}
+
+LIBMATTI_MC_BlockHitResult LIBMATTI_MC_Level_Clip(LIBMATTI_MC_Level *level, LIBMATTI_MC_ClipContext *context)
+{
+    const LIBMATTI_MC_Vec3 *from = &context->from;
+    const LIBMATTI_MC_Vec3 *to = &context->to;
+
+    // Java: the miss lambda - the location rides the ray end, the direction the
+    // approximate nearest of the reverse ray, the block the containing one.
+    LIBMATTI_MC_BlockPos toPos = {{LIBMATTI_MC_Mth_FloorD(to->x), LIBMATTI_MC_Mth_FloorD(to->y),
+                                   LIBMATTI_MC_Mth_FloorD(to->z)}};
+    LIBMATTI_MC_Vec3 reverse = {from->x - to->x, from->y - to->y, from->z - to->z};
+    LIBMATTI_MC_Direction missDirection = LIBMATTI_MC_Direction_GetApproximateNearest(
+        (float) reverse.x, (float) reverse.y, (float) reverse.z);
+
+    // Java: Vec3.equals - the degenerate zero-length ray misses immediately.
+    if (from->x == to->x && from->y == to->y && from->z == to->z)
+        return LIBMATTI_MC_BlockHitResult_Miss(to, missDirection, &toPos);
+
+    // Java: both endpoints lerp by -1.0E-7 toward the other so the grid floors
+    // never land exactly on a boundary from the wrong side.
+    double endX = LIBMATTI_MC_Mth_LerpD(-1.0E-7, to->x, from->x);
+    double endY = LIBMATTI_MC_Mth_LerpD(-1.0E-7, to->y, from->y);
+    double endZ = LIBMATTI_MC_Mth_LerpD(-1.0E-7, to->z, from->z);
+    double startX = LIBMATTI_MC_Mth_LerpD(-1.0E-7, from->x, to->x);
+    double startY = LIBMATTI_MC_Mth_LerpD(-1.0E-7, from->y, to->y);
+    double startZ = LIBMATTI_MC_Mth_LerpD(-1.0E-7, from->z, to->z);
+
+    int x = LIBMATTI_MC_Mth_FloorD(startX);
+    int y = LIBMATTI_MC_Mth_FloorD(startY);
+    int z = LIBMATTI_MC_Mth_FloorD(startZ);
+
+    LIBMATTI_MC_BlockPos pos = {{x, y, z}};
+    LIBMATTI_MC_BlockHitResult hit;
+    memset(&hit, 0, sizeof(hit));
+    if (level_clip_step(level, context, &pos, from, to, &hit))
+        return hit;
+
+    double dirX = endX - startX;
+    double dirY = endY - startY;
+    double dirZ = endZ - startZ;
+    int stepX = LIBMATTI_MC_Mth_Sign(dirX);
+    int stepY = LIBMATTI_MC_Mth_Sign(dirY);
+    int stepZ = LIBMATTI_MC_Mth_Sign(dirZ);
+    // Java: l == 0 ? Double.MAX_VALUE : l / d - the t per whole cell on the axis
+    double tDeltaX = stepX == 0 ? DBL_MAX : (double) stepX / dirX;
+    double tDeltaY = stepY == 0 ? DBL_MAX : (double) stepY / dirY;
+    double tDeltaZ = stepZ == 0 ? DBL_MAX : (double) stepZ / dirZ;
+    // Java: the t to the first boundary per axis from the fractional start
+    double tMaxX = tDeltaX * (stepX > 0 ? 1.0 - LIBMATTI_MC_Mth_FracD(startX) : LIBMATTI_MC_Mth_FracD(startX));
+    double tMaxY = tDeltaY * (stepY > 0 ? 1.0 - LIBMATTI_MC_Mth_FracD(startY) : LIBMATTI_MC_Mth_FracD(startY));
+    double tMaxZ = tDeltaZ * (stepZ > 0 ? 1.0 - LIBMATTI_MC_Mth_FracD(startZ) : LIBMATTI_MC_Mth_FracD(startZ));
+
+    while (tMaxX <= 1.0 || tMaxY <= 1.0 || tMaxZ <= 1.0)
+    {
+        if (tMaxX < tMaxY)
+        {
+            if (tMaxX < tMaxZ)
+            {
+                x += stepX;
+                tMaxX += tDeltaX;
+            }
+            else
+            {
+                z += stepZ;
+                tMaxZ += tDeltaZ;
+            }
+        }
+        else if (tMaxY < tMaxZ)
+        {
+            y += stepY;
+            tMaxY += tDeltaY;
+        }
+        else
+        {
+            z += stepZ;
+            tMaxZ += tDeltaZ;
+        }
+
+        pos.base.x = x;
+        pos.base.y = y;
+        pos.base.z = z;
+        if (level_clip_step(level, context, &pos, from, to, &hit))
+            return hit;
+    }
+
+    return LIBMATTI_MC_BlockHitResult_Miss(to, missDirection, &toPos);
 }
 
 void LIBMATTI_MC_Level_Free(struct LIBMATTI_MC_Level *level)

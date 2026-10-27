@@ -10823,6 +10823,11 @@ static void initialize(void)
             LIBMATTI_MC_ResourceKey_Create(LIBMATTI_MC_Registries_ITEM(), identifier);
         LIBMATTI_MC_ItemProperties *properties = LIBMATTI_MC_ItemProperties_New();
         LIBMATTI_MC_ItemProperties_SetId(properties, key);
+        // Java: BlockItem's description id rides the block. prefix (the
+        // constructor defaults useBlockDescriptionPrefix) - the name line and
+        // the hover names read the block key, not the item one.
+        if (entries[i].block != NULL)
+            LIBMATTI_MC_ItemProperties_UseBlockDescriptionPrefix(properties);
         if (entries[i].props != NULL)
             entries[i].props(properties);
         if (entries[i].block == NULL)

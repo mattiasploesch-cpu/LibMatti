@@ -41,9 +41,21 @@ static void create_texture(LIBMATTI_MC_TextureAtlas *atlas, int width, int heigh
     atlas->height = height;
     atlas->maxMipLevel = mipLevel;
 
+    // The storage allocation - Java's GlTexture allocates the immutable page
+    // here. Without it the TexSubImage2D blits below write into an undefined
+    // texture (the black blocks/triangles on the real GPU drivers).
+    LIBMATTI_GL_glActiveTexture(LIBMATTI_GL_GL_TEXTURE0);
+    LIBMATTI_GL_glBindTexture(LIBMATTI_GL_GL_TEXTURE_2D, atlas->base.texture);
+    LIBMATTI_GL_glTexImage2D(LIBMATTI_GL_GL_TEXTURE_2D, 0, LIBMATTI_GL_GL_RGBA8, width, height, 0,
+                             LIBMATTI_GL_GL_RGBA, LIBMATTI_GL_GL_UNSIGNED_BYTE, NULL);
+
     // Java: the sampler is getClampToEdge(NEAREST)
     atlas->base.addressModeClamp = 1;
     atlas->base.filterLinear = 0;
+    LIBMATTI_GL_glTexParameteri(LIBMATTI_GL_GL_TEXTURE_2D, LIBMATTI_GL_GL_TEXTURE_MIN_FILTER, LIBMATTI_GL_GL_NEAREST);
+    LIBMATTI_GL_glTexParameteri(LIBMATTI_GL_GL_TEXTURE_2D, LIBMATTI_GL_GL_TEXTURE_MAG_FILTER, LIBMATTI_GL_GL_NEAREST);
+    LIBMATTI_GL_glTexParameteri(LIBMATTI_GL_GL_TEXTURE_2D, LIBMATTI_GL_GL_TEXTURE_WRAP_S, LIBMATTI_GL_GL_CLAMP_TO_EDGE);
+    LIBMATTI_GL_glTexParameteri(LIBMATTI_GL_GL_TEXTURE_2D, LIBMATTI_GL_GL_TEXTURE_WRAP_T, LIBMATTI_GL_GL_CLAMP_TO_EDGE);
 }
 
 LIBMATTI_MC_TextureAtlas *LIBMATTI_MC_TextureAtlas_New(const LIBMATTI_MC_Identifier *location,

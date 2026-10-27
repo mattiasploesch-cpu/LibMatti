@@ -60,10 +60,12 @@ static char *build_metadata_path(const char *path)
 static int pack_has_filter(LIBMATTI_MC_PackResources *pack)
 {
     // Java: pack.getMetadataSection(ResourceFilterSection.TYPE).isPresent()
+    const LIBMATTI_MC_MetadataSectionSerializer *serializer = LIBMATTI_MC_MetadataSection_Get("filter");
+    if (serializer == NULL)
+        return 0; // the serializers were never registered (the harness path)
     char *error = NULL;
     LIBMATTI_MC_ResourceFilterSection *filter =
-        (LIBMATTI_MC_ResourceFilterSection *) pack->vtable->getMetadataSection(
-            pack, LIBMATTI_MC_MetadataSection_Get("filter"), &error);
+        (LIBMATTI_MC_ResourceFilterSection *) pack->vtable->getMetadataSection(pack, serializer, &error);
     free(error);
     if (filter == NULL) return 0;
     LIBMATTI_MC_ResourceFilterSection_Free(filter);

@@ -82,15 +82,16 @@ static void emit_baked_quad(CompileState *state, LIBMATTI_B3D_BufferBuilder *bui
                             const float spriteUv[4])
 {
     (void) state;
+    (void) spriteUv; // FaceBakery folds the rect into the UVs at bake time.
     for (int corner = 0; corner < 4; corner++)
     {
         float x = quad->pos[corner][0] + (float) blockX;
         float y = quad->pos[corner][1] + (float) blockY;
         float z = quad->pos[corner][2] + (float) blockZ;
-        // Java: the model UVs sit in the sprite's 0..1 space; the atlas rect
-        // maps them in (the vanilla quads bake sprite-relative UVs).
-        float u = spriteUv[0] + quad->uv[corner][0] * (spriteUv[2] - spriteUv[0]);
-        float v = spriteUv[1] + quad->uv[corner][1] * (spriteUv[3] - spriteUv[1]);
+        // Java: FaceBakery already folded the sprite rect into the quad's UVs
+        // (sprite.getU(f3) at bake time) - the emit consumes them as-is.
+        float u = quad->uv[corner][0];
+        float v = quad->uv[corner][1];
         LIBMATTI_B3D_BufferBuilder_AddVertexFull(
             builder,
             x, y, z,
@@ -118,8 +119,13 @@ static void batch_sink(void *userdata, int corner, const float vertexPos[3],
                        const LIBMATTI_MC_BakedQuad *quad, float r, float g, float b, int lightmap)
 {
     BatchSinkState *sinkState = userdata;
-    float u = sinkState->spriteUv[0] + quad->uv[corner][0] * (sinkState->spriteUv[2] - sinkState->spriteUv[0]);
-    float v = sinkState->spriteUv[1] + quad->uv[corner][1] * (sinkState->spriteUv[3] - sinkState->spriteUv[1]);
+    (void) sinkState;
+    // Java: FaceBakery already folded the sprite rect into the quad's UVs
+    // (sprite.getU(f3) at bake time) - the sink consumes them as-is. A second
+    // remap would squeeze every sprite into the block's sprite rect (the
+    // stone-half-on-stone / dirt-rect-on-stone smear this fixes).
+    float u = quad->uv[corner][0];
+    float v = quad->uv[corner][1];
     // Java: the ARGB vertex color - alpha 255, the channels as bytes
     int color = 0xFF000000 | ((int) (b * 255.0f) & 0xFF) << 16 | ((int) (g * 255.0f) & 0xFF) << 8 | ((int) (r * 255.0f) & 0xFF);
     LIBMATTI_B3D_BufferBuilder_AddVertexFull(

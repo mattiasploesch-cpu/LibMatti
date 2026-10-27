@@ -43,6 +43,7 @@ static void (*glfw_swap_interval)(int) = NULL;
 static void (*glfw_swap_buffers)(unsigned long) = NULL;
 static int (*glfw_get_error)(const char **) = NULL;
 static int (*glfw_window_should_close)(unsigned long) = NULL;
+static int (*glfw_get_mouse_button)(unsigned long, int) = NULL;
 static int (*glfw_get_key)(unsigned long, int) = NULL;
 static void (*glfw_set_input_mode)(unsigned long, int, int) = NULL;
 static void (*glfw_get_cursor_pos)(unsigned long, double *, double *) = NULL;
@@ -323,6 +324,15 @@ int LIBMATTI_GLFW_glfwGetKey(long window, int key)
     return glfw_get_key((unsigned long) window, key);
 }
 
+int LIBMATTI_GLFW_glfwGetMouseButton(long window, int button)
+{
+    ensure_library();
+    if (glfw_lib == NULL) return 0;
+    GLFW_DLSYM(get_mouse_button, "glfwGetMouseButton");
+    if (glfw_get_mouse_button == NULL) return 0;
+    return glfw_get_mouse_button((unsigned long) window, button);
+}
+
 void LIBMATTI_GLFW_glfwSetInputMode(long window, int mode, int value)
 {
     ensure_library();
@@ -351,6 +361,58 @@ void LIBMATTI_GLFW_glfwTerminate(void)
     if (glfw_lib == NULL) return;
     GLFW_DLSYM(terminate, "glfwTerminate");
     if (glfw_terminate != NULL) glfw_terminate();
+}
+
+// Java: GLFW.glfwSetScrollCallback - the wheel steps ride the callback (the
+// polled-gesture fallback reads the same wheel state every frame).
+static void (*glfw_set_scroll_callback)(unsigned long, void (*)(unsigned long, double, double)) = NULL;
+
+typedef struct ScrollGesture
+{
+    double x;
+    double y;
+} ScrollGesture;
+static ScrollGesture g_scrollGesture = {0.0, 0.0};
+
+static void scroll_gesture_callback(unsigned long window, double xoffset, double yoffset)
+{
+    (void) window;
+    g_scrollGesture.x += xoffset;
+    g_scrollGesture.y += yoffset;
+}
+
+void LIBMATTI_GLFW_glfwSetScrollCallback(long window, void (*callback)(long, double, double))
+{
+    ensure_library();
+    if (glfw_lib == NULL) return;
+    GLFW_DLSYM(set_scroll_callback, "glfwSetScrollCallback");
+    if (glfw_set_scroll_callback != NULL)
+        glfw_set_scroll_callback((unsigned long) window,
+                                 (void (*)(unsigned long, double, double)) callback);
+}
+
+void LIBMATTI_GLFW_glfwInstallScrollGesturePolling(void)
+{
+    // the shared polling callback: the caller drains and resets the gesture
+    // struct each frame (the wheel steps arrive between the polls)
+    ensure_library();
+    if (glfw_lib == NULL) return;
+    GLFW_DLSYM(set_scroll_callback, "glfwSetScrollCallback");
+    if (glfw_set_scroll_callback == NULL)
+        return;
+    long context = LIBMATTI_GLFW_glfwGetCurrentContext();
+    if (context != 0)
+        glfw_set_scroll_callback((unsigned long) context, scroll_gesture_callback);
+}
+
+int LIBMATTI_GLFW_glfwPollScrollGesture(double *xoffset, double *yoffset)
+{
+    if (xoffset != NULL) *xoffset = g_scrollGesture.x;
+    if (yoffset != NULL) *yoffset = g_scrollGesture.y;
+    int had = (xoffset != NULL && yoffset != NULL && (g_scrollGesture.x != 0.0 || g_scrollGesture.y != 0.0)) ? 1 : 0;
+    g_scrollGesture.x = 0.0;
+    g_scrollGesture.y = 0.0;
+    return had;
 }
 
 void LIBMATTI_GLFW_glfwSetWindowShouldClose(long window, int value)

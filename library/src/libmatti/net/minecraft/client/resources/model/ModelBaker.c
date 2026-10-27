@@ -34,10 +34,12 @@ int LIBMATTI_MC_ModelBaker_Bake(const LIBMATTI_MC_BlockModel *model, LIBMATTI_MC
 {
     if (model == NULL || resolver == NULL || out == NULL)
         return 0;
-    if (!model->elementsPresent)
-        return 1; // Java: an inherit-only model bakes to the empty collection.
-
+    // The empty collection is the bake result for the element-less models too
+    // (Java: the inherit-only geometry bakes to zero quads) - the caller owns
+    // the out struct, so every success path hands a defined collection back.
     memset(out, 0, sizeof(*out));
+    if (!model->elementsPresent)
+        return 1;
     for (size_t e = 0; e < model->elementCount; e++)
     {
         const LIBMATTI_MC_BlockElement *element = &model->elements[e];

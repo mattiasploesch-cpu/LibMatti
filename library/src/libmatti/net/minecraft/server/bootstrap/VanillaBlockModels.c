@@ -99,11 +99,18 @@ int LIBMATTI_MC_VanillaBlockModels_Bootstrap(LIBMATTI_MC_ModelManager *manager)
 
     // Java: the ids are compile-time constants; C needs the literal array
     // inline (the extern const char* variables are not constant initializers).
-    const char *ids[2];
+    const char *ids[9];
     ids[0] = LIBMATTI_MC_VanillaModels_STONE_ID;
     ids[1] = LIBMATTI_MC_VanillaModels_DIRT_ID;
+    ids[2] = LIBMATTI_MC_VanillaModels_COBBLESTONE_ID;
+    ids[3] = LIBMATTI_MC_VanillaModels_OAK_PLANKS_ID;
+    ids[4] = LIBMATTI_MC_VanillaModels_GLASS_ID;
+    ids[5] = LIBMATTI_MC_VanillaModels_BRICKS_ID;
+    ids[6] = LIBMATTI_MC_VanillaModels_SAND_ID;
+    ids[7] = LIBMATTI_MC_VanillaModels_GRAVEL_ID;
+    ids[8] = LIBMATTI_MC_VanillaModels_OAK_LOG_ID;
     int ok = 1;
-    for (size_t i = 0; i < 2; i++)
+    for (size_t i = 0; i < 9; i++)
     {
         if (LIBMATTI_MC_ModelManager_GetModel(manager, ids[i]) != NULL)
             continue;
