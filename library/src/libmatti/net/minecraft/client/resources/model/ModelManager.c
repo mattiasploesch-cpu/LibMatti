@@ -1,4 +1,5 @@
-// Port of the ModelManager slice (implementation).
+
+
 
 #include "libmatti/net/minecraft/client/resources/model/ModelManager.h"
 
@@ -63,9 +64,9 @@ int LIBMATTI_MC_ModelManager_LoadModel(LIBMATTI_MC_ModelManager *manager, const 
     if (manager == NULL || resourceRoot == NULL || modelId == NULL)
         return 0;
     if (LIBMATTI_MC_ModelManager_GetModel(manager, modelId) != NULL)
-        return 1; // Java: the registry dedupes by id.
+        return 1;// Java: the registry dedupes by id.
 
-    // Java: ModelResourceLocation -> the file path
+// Java: ModelResourceLocation -> the file path
     // assets/<namespace>/models/<path>.json
     LIBMATTI_MC_Identifier *id = strchr(modelId, ':') != NULL
                                      ? LIBMATTI_MC_Identifier_Parse(modelId)
@@ -79,14 +80,14 @@ int LIBMATTI_MC_ModelManager_LoadModel(LIBMATTI_MC_ModelManager *manager, const 
 
     char *json = read_file(path);
     if (json == NULL)
-        return 0; // Java: the missing-model fallback.
+        return 0;// Java: the missing-model fallback.
 
     LIBMATTI_MC_BlockModel *model = LIBMATTI_MC_BlockModel_Parse(json);
     free(json);
     if (model == NULL)
         return 0;
 
-    // Java: the bake against the block atlas through the SpriteGetter.
+// Java: the bake against the block atlas through the SpriteGetter.
     ResolverContext context = {manager->blockAtlas};
     LIBMATTI_MC_QuadCollection collection;
     int ok = LIBMATTI_MC_ModelBaker_Bake(model, resolve_sprite, &context, &collection);
@@ -94,7 +95,7 @@ int LIBMATTI_MC_ModelManager_LoadModel(LIBMATTI_MC_ModelManager *manager, const 
     if (!ok)
         return 0;
 
-    // Java: BakedModel registry.put
+// Java: BakedModel registry.put
     char **ids = realloc(manager->modelIds, (manager->modelCount + 1) * sizeof(char *));
     LIBMATTI_MC_QuadCollection *models =
         realloc(manager->models, (manager->modelCount + 1) * sizeof(LIBMATTI_MC_QuadCollection));
@@ -134,7 +135,7 @@ int LIBMATTI_MC_ModelManager_RegisterBaked(LIBMATTI_MC_ModelManager *manager, co
     if (LIBMATTI_MC_ModelManager_GetModel(manager, modelId) != NULL)
     {
         LIBMATTI_MC_QuadCollection_Free(collection);
-        return 0; // Java: the registry dedupes.
+        return 0;// Java: the registry dedupes.
     }
     char **ids = realloc(manager->modelIds, (manager->modelCount + 1) * sizeof(char *));
     LIBMATTI_MC_QuadCollection *models =

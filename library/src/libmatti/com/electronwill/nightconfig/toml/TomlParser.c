@@ -1,5 +1,6 @@
-// Port of com.electronwill.nightconfig.toml.TomlParser.
-// Comments are dropped (FML never reads them); everything else follows the original control flow.
+
+
+
 
 #include "libmatti/com/electronwill/nightconfig/toml/TomlParser.h"
 
@@ -142,7 +143,8 @@ void LIBMATTI_NC_TomlParser_SetComment(LIBMATTI_NC_TomlParser *parser, const cha
 {
     if (comment == NULL) return;
 
-    // control characters other than tab are not permitted in comments
+
+
     for (const char *c = comment; *c != '\0'; c++)
     {
         unsigned char value = (unsigned char) *c;
@@ -210,7 +212,8 @@ static LIBMATTI_NC_Config *getSubTable(LIBMATTI_NC_TomlParser *parser, LIBMATTI_
         }
         else if (value->type == LIBMATTI_NC_VALUE_LIST)
         {
-            // Arrays of tables resolve to their last element
+
+
             int allConfigs = value->listCount > 0;
             for (size_t j = 0; j < value->listCount; j++)
                 if (value->list[j].type != LIBMATTI_NC_VALUE_CONFIG)
@@ -260,7 +263,7 @@ static LIBMATTI_NC_Config *parse(LIBMATTI_NC_TomlParser *parser, LIBMATTI_NC_Rea
 {
     parser->parsingMode = parsingMode;
     LIBMATTI_NC_ParsingMode_PrepareParsing(parsingMode, destination);
-    // Java: CommentedConfig commentedConfig = CommentedConfig.fake(destination) - the same map
+// Java: CommentedConfig commentedConfig = CommentedConfig.fake(destination) - the same map
     LIBMATTI_NC_Config *rootTable = destination;
 
     if (!LIBMATTI_NC_TableParser_ParseNormal(input, parser, rootTable))
@@ -287,9 +290,10 @@ static LIBMATTI_NC_Config *parse(LIBMATTI_NC_TomlParser *parser, LIBMATTI_NC_Rea
 
         const size_t lastIndex = path->count - 1;
         LIBMATTI_NC_Config *parentConfig = getSubTable(parser, rootTable, path->items, lastIndex);
-        const char *lastKey[1] = {path->items[lastIndex]}; // Java: List<String> lastPath
+        const char *lastKey[1] = {path->items[lastIndex]};// Java: List<String> lastPath
 
-        if (isArray) // It's an element of an array of tables
+        if (isArray)
+
         {
             if (parentConfig == NULL)
             {
@@ -316,7 +320,8 @@ static LIBMATTI_NC_Config *parse(LIBMATTI_NC_TomlParser *parser, LIBMATTI_NC_Rea
             }
             else if (shouldBeArrayOfTables == NULL)
             {
-                // fill the array of tables before put because put could convert the value
+
+
                 LIBMATTI_NC_Value *arrayOfTables = malloc(sizeof(LIBMATTI_NC_Value));
                 arrayOfTables[0] = LIBMATTI_NC_Value_OfConfig(table);
                 LIBMATTI_NC_Value arrayValue = LIBMATTI_NC_Value_OfList(arrayOfTables, 1);
@@ -332,7 +337,8 @@ static LIBMATTI_NC_Config *parse(LIBMATTI_NC_TomlParser *parser, LIBMATTI_NC_Rea
                 return NULL;
             }
         }
-        else // It's a table
+        else
+
         {
             if (parentConfig == NULL)
             {
@@ -361,7 +367,8 @@ static LIBMATTI_NC_Config *parse(LIBMATTI_NC_TomlParser *parser, LIBMATTI_NC_Rea
             {
                 if (alreadyDeclared->type == LIBMATTI_NC_VALUE_CONFIG)
                 {
-                    // check that there is no conflict with the existing declaration
+
+
                     LIBMATTI_NC_Config *table = alreadyDeclared->config;
                     if (!checkContainsOnlySubtables(parser, table))
                     {
@@ -406,7 +413,7 @@ LIBMATTI_NC_Config *LIBMATTI_NC_TomlParser_Parse(LIBMATTI_NC_TomlParser *parser,
     LIBMATTI_NC_Config *result = parse(parser, input, destination, LIBMATTI_NC_PARSINGMODE_MERGE);
     LIBMATTI_NC_ReaderInput_Free(input);
 
-    // Java: any ParsingException aborts the parse, so a recorded failure rejects the document
+// Java: any ParsingException aborts the parse, so a recorded failure rejects the document
     if (result == NULL || parser->failed)
     {
         LIBMATTI_NC_Config_Free(destination);

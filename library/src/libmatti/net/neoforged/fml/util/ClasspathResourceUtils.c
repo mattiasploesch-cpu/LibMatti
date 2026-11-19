@@ -15,13 +15,13 @@ char *LIBMATTI_FML_ClasspathResourceUtils_GetRootFromResourceUrl(const char *rel
 {
     const char *url = LIBMATTI_JN_URL_ToString(resourceUrl);
 
-    // Java: if ("jar".equals(resourceUrl.getProtocol())) { var fileUri = URI.create(resourceUrl.toString().split("!")[0].substring("jar:".length())); return Paths.get(fileUri); }
+// Java: if ("jar".equals(resourceUrl.getProtocol())) { var fileUri = URI.create(resourceUrl.toString().split("!")[0].substring("jar:".length())); return Paths.get(fileUri); }
     if (strncmp(url, "jar:", 4) == 0)
     {
         const char *end = strstr(url, "!");
         size_t length = end != NULL ? (size_t) (end - url - 4) : strlen(url) - 4;
         const char *fileUri = url + 4;
-        // Java: Paths.get(URI) strips the scheme
+// Java: Paths.get(URI) strips the scheme
         if (strncmp(fileUri, "file:", 5) == 0)
         {
             fileUri += 5;
@@ -30,7 +30,7 @@ char *LIBMATTI_FML_ClasspathResourceUtils_GetRootFromResourceUrl(const char *rel
         return strndup(fileUri, length);
     }
 
-    // Java: resourcePath = Paths.get(resourceUrl.toURI()); then walk back the nesting depth of relativePath
+// Java: resourcePath = Paths.get(resourceUrl.toURI()); then walk back the nesting depth of relativePath
     const char *resourcePath = url;
     if (strncmp(resourcePath, "file:", 5) == 0)
         resourcePath += 5;
@@ -56,7 +56,7 @@ char *LIBMATTI_FML_ClasspathResourceUtils_GetRootFromResourceUrl(const char *rel
 char *LIBMATTI_FML_ClasspathResourceUtils_FindJarPathFor(const char *resourceName, const char *jarName,
                                                          const LIBMATTI_JN_URL *resource)
 {
-    // Java: if (uri.getScheme().equals("jar") && uri.getRawSchemeSpecificPart().contains("!/")) { ... lastIndexOf("!/") ... }
+// Java: if (uri.getScheme().equals("jar") && uri.getRawSchemeSpecificPart().contains("!/")) { ... lastIndexOf("!/") ... }
     //       else { Paths.get(new URI("file://" + raw.substring(0, len - resourceName.length()))) }
     char *result = LIBMATTI_FML_ClasspathResourceUtils_GetRootFromResourceUrl(resourceName, resource);
     if (result == NULL)
@@ -71,11 +71,11 @@ char *LIBMATTI_FML_ClasspathResourceUtils_FindJarPathFor(const char *resourceNam
 char **LIBMATTI_FML_ClasspathResourceUtils_FindRoots(const LIBMATTI_JL_ClassLoader *classLoader,
                                                      const char *relativePath, size_t *count)
 {
-    // Java: classLoader.getResources(relativePath).asIterator()
+// Java: classLoader.getResources(relativePath).asIterator()
     size_t resourceCount = 0;
     LIBMATTI_JN_URL **resources = LIBMATTI_JL_ClassLoader_FindResources(classLoader, relativePath, &resourceCount);
 
-    // Java: LinkedHashSet<Path> result
+// Java: LinkedHashSet<Path> result
     char **result = NULL;
     *count = 0;
     for (size_t i = 0; i < resourceCount; i++)
@@ -100,7 +100,7 @@ char **LIBMATTI_FML_ClasspathResourceUtils_FindRoots(const LIBMATTI_JL_ClassLoad
 char *LIBMATTI_FML_ClasspathResourceUtils_FindFileSystemRootOfFileOnClasspath(
     const LIBMATTI_JL_ClassLoader *classLoader, const char *relativePath)
 {
-    // Java: var resource = classLoader.getResource(relativePath); if (resource == null) return null;
+// Java: var resource = classLoader.getResource(relativePath); if (resource == null) return null;
     LIBMATTI_JN_URL *resource = LIBMATTI_JL_ClassLoader_GetResource(classLoader, relativePath);
     if (resource == NULL) return NULL;
     return LIBMATTI_FML_ClasspathResourceUtils_GetRootFromResourceUrl(relativePath, resource);
@@ -110,7 +110,7 @@ char *LIBMATTI_FML_ClasspathResourceUtils_FindFileSystemRootOfFileOnClasspath(
 char **LIBMATTI_FML_ClasspathResourceUtils_FindFileSystemRootsOfFileOnClasspath(const char *relativePath,
                                                                                 size_t *count)
 {
-    // Java: If we're loaded through a module, the original classpath is inaccessible through the context CL
+// Java: If we're loaded through a module, the original classpath is inaccessible through the context CL
     //       if (ClasspathResourceUtils.class.getModule().isNamed()) classLoader = ClassLoader.getSystemClassLoader();
     // The loader classes always live in the executable (a named module), so the port always
     // resolves through the system class loader like the named-module branch in Java.
@@ -124,7 +124,7 @@ char *LIBMATTI_FML_ClasspathResourceUtils_FindFileSystemRootOfFileOnClasspathFro
     size_t count = 0;
     char **paths = LIBMATTI_FML_ClasspathResourceUtils_FindFileSystemRootsOfFileOnClasspath(relativePath, &count);
 
-    // Java: if (paths.isEmpty()) throw new ModLoadingException(ModLoadingIssue.error("fml.modloadingissue.failed_to_find_on_classpath", relativePath));
+// Java: if (paths.isEmpty()) throw new ModLoadingException(ModLoadingIssue.error("fml.modloadingissue.failed_to_find_on_classpath", relativePath));
     if (count == 0)
     {
         LIBMATTI_ML_Logger_Error(LIBMATTI_ML_LogManager_GetLogger(), &LIBMATTI_FML_MARKER_SCAN,
@@ -132,7 +132,7 @@ char *LIBMATTI_FML_ClasspathResourceUtils_FindFileSystemRootOfFileOnClasspathFro
         return NULL;
     }
 
-    // Java: else if (paths.size() > 1) throw new ModLoadingException(ModLoadingIssue.error("fml.modloadingissue.multiple_copies_on_classpath", relativePath, paths));
+// Java: else if (paths.size() > 1) throw new ModLoadingException(ModLoadingIssue.error("fml.modloadingissue.multiple_copies_on_classpath", relativePath, paths));
     if (count > 1)
     {
         LIBMATTI_ML_Logger_Error(LIBMATTI_ML_LogManager_GetLogger(), &LIBMATTI_FML_MARKER_SCAN,
@@ -146,7 +146,7 @@ char *LIBMATTI_FML_ClasspathResourceUtils_FindFileSystemRootOfFileOnClasspathFro
 char **LIBMATTI_FML_ClasspathResourceUtils_GetAllClasspathItems(const LIBMATTI_JL_ClassLoader *loader,
                                                                 size_t *count)
 {
-    // Java: if (loader == ClassLoader.getSystemClassLoader()) return Arrays.stream(System.getProperty("java.class.path").split(File.pathSeparator)).map(Paths::get).collect(toSet());
+// Java: if (loader == ClassLoader.getSystemClassLoader()) return Arrays.stream(System.getProperty("java.class.path").split(File.pathSeparator)).map(Paths::get).collect(toSet());
     if (loader == LIBMATTI_JL_ClassLoader_GetSystemClassLoader())
     {
         const char *classPath = LIBMATTI_JL_System_GetProperty("java.class.path");
@@ -164,7 +164,7 @@ char **LIBMATTI_FML_ClasspathResourceUtils_GetAllClasspathItems(const LIBMATTI_J
         return items;
     }
 
-    // Java: else if (loader instanceof URLClassLoader urlClassLoader) { return urlClassLoader.getURLs() ... }
+// Java: else if (loader instanceof URLClassLoader urlClassLoader) { return urlClassLoader.getURLs() ... }
     // The port's ClassLoader exposes the same URLs through GetClassPath.
     size_t itemCount = 0;
     char **items = LIBMATTI_JL_ClassLoader_GetClassPath(loader, &itemCount);

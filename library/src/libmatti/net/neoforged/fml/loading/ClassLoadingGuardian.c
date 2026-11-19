@@ -19,9 +19,9 @@ struct LIBMATTI_FML_ClassLoadingGuardian
     char **protectedPackages;
     size_t protectedPackageCount;
     void *guardianTransformer;
-    // Java: private volatile boolean uninstalled
+// Java: private volatile boolean uninstalled
     int uninstalled;
-    // Java: private volatile ClassLoader allowedClassLoader
+// Java: private volatile ClassLoader allowedClassLoader
     void *allowedClassLoader;
 };
 
@@ -31,7 +31,7 @@ static char **getPackages(const char *const *packages, size_t packageCount)
     char **protectedPackages = malloc(sizeof(char *) * (packageCount > 0 ? packageCount : 1));
     for (size_t i = 0; i < packageCount; i++)
     {
-        // Java: pkgName.replace('.', '/')
+// Java: pkgName.replace('.', '/')
         protectedPackages[i] = strdup(packages[i]);
         for (char *c = protectedPackages[i]; *c != '\0'; c++)
             if (*c == '.')
@@ -48,7 +48,7 @@ LIBMATTI_FML_ClassLoadingGuardian *LIBMATTI_FML_ClassLoadingGuardian_New(
     guardian->instrumentation = instrumentation;
     guardian->protectedPackages = getPackages(packages, packageCount);
     guardian->protectedPackageCount = packageCount;
-    // Java: org.objectweb.asm generates a self-destructing class; the port runs the same
+// Java: org.objectweb.asm generates a self-destructing class; the port runs the same
     //       check directly through LIBMATTI_FML_ClassLoadingGuardian_Transform.
     guardian->guardianTransformer = guardian;
     LIBMATTI_JLI_Instrumentation_AddTransformer(instrumentation, guardian->guardianTransformer, 0);
@@ -58,7 +58,7 @@ LIBMATTI_FML_ClassLoadingGuardian *LIBMATTI_FML_ClassLoadingGuardian_New(
 // Java: public static void fail()
 void LIBMATTI_FML_ClassLoadingGuardian_Fail(void)
 {
-    // Java: throw new IllegalStateException();
+// Java: throw new IllegalStateException();
     LIBMATTI_ML_Logger_Error(LOGGER(), NULL, "IllegalStateException");
 }
 
@@ -68,15 +68,15 @@ unsigned char *LIBMATTI_FML_ClassLoadingGuardian_Transform(LIBMATTI_FML_ClassLoa
 {
     *byteCount = 0;
 
-    // Java: if (uninstalled) return null; // This can happen due to multi-threaded class-loading
+// Java: if (uninstalled) return null; // This can happen due to multi-threaded class-loading
     if (guardian->uninstalled)
         return NULL;
 
-    // Java: if (loader == allowedClassLoader) return null;
+// Java: if (loader == allowedClassLoader) return null;
     if (loader == guardian->allowedClassLoader)
         return NULL;
 
-    // Java: var packageName = getPackageName(className);
+// Java: var packageName = getPackageName(className);
     char *packageName = NULL;
     const char *lastPkgSep = strrchr(className, '/');
     if (lastPkgSep != NULL)
@@ -100,12 +100,12 @@ unsigned char *LIBMATTI_FML_ClassLoadingGuardian_Transform(LIBMATTI_FML_ClassLoa
         }
         if (protected)
         {
-            // Java: LOGGER.error("Illegal load of protected class {} into class-loader {}", className, loader, new Throwable())
+// Java: LOGGER.error("Illegal load of protected class {} into class-loader {}", className, loader, new Throwable())
             char loaderName[32];
             snprintf(loaderName, sizeof(loaderName), "%p", loader);
             LIBMATTI_ML_Logger_Error(LOGGER(), NULL, "Illegal load of protected class {} into class-loader {}",
                                      className, loaderName);
-            // Java: transformers are actually not allowed to throw, so a self-destructing
+// Java: transformers are actually not allowed to throw, so a self-destructing
             //       class is generated that calls ClassLoadingGuardian.fail() from <clinit>.
             //       The port has no bytecode to poison, so the fail path runs directly.
             LIBMATTI_FML_ClassLoadingGuardian_Fail();
@@ -121,7 +121,7 @@ static int isReachableFrom(void *classLoader, void *origin)
 {
     if (classLoader == origin)
         return 1;
-    // Java: return classLoader.getParent() != null && isReachableFrom(classLoader.getParent(), origin);
+// Java: return classLoader.getParent() != null && isReachableFrom(classLoader.getParent(), origin);
     LIBMATTI_JL_ClassLoader *parent = LIBMATTI_JL_ClassLoader_GetParent(classLoader);
     return parent != NULL && isReachableFrom(parent, origin);
 }
@@ -132,7 +132,7 @@ void LIBMATTI_FML_ClassLoadingGuardian_SetAllowedClassLoader(LIBMATTI_FML_ClassL
 {
     guardian->allowedClassLoader = allowedClassLoader;
 
-    // Java: final check for class-loading bugs
+// Java: final check for class-loading bugs
     size_t loadedClassCount = 0;
     const LIBMATTI_JLI_LoadedClassInfo *loadedClasses =
         LIBMATTI_JLI_Instrumentation_GetAllLoadedClasses(guardian->instrumentation, &loadedClassCount);
@@ -141,7 +141,7 @@ void LIBMATTI_FML_ClassLoadingGuardian_SetAllowedClassLoader(LIBMATTI_FML_ClassL
     size_t foundIssueCount = 0;
     for (size_t i = 0; i < loadedClassCount; i++)
     {
-        // Java: if (loadedClass.getClassLoader() == null) continue; // JDK built-in
+// Java: if (loadedClass.getClassLoader() == null) continue; // JDK built-in
         if (loadedClasses[i].classLoader == NULL)
             continue;
 
@@ -159,7 +159,7 @@ void LIBMATTI_FML_ClassLoadingGuardian_SetAllowedClassLoader(LIBMATTI_FML_ClassL
             }
         }
 
-        // Java: it's ok if the class is not reachable from the now current class-loader
+// Java: it's ok if the class is not reachable from the now current class-loader
         if (protected && isReachableFrom(loadedClasses[i].classLoader, allowedClassLoader))
         {
             foundIssues = realloc(foundIssues, sizeof(char *) * (foundIssueCount + 1));
@@ -170,7 +170,7 @@ void LIBMATTI_FML_ClassLoadingGuardian_SetAllowedClassLoader(LIBMATTI_FML_ClassL
 
     if (foundIssueCount > 0)
     {
-        // Java: throw new IllegalArgumentException(message.toString())
+// Java: throw new IllegalArgumentException(message.toString())
         char *message = malloc(1);
         message[0] = '\0';
         size_t messageLength = 1;

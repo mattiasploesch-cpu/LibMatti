@@ -1,7 +1,8 @@
-// Port of net.neoforged.fml.classloading.transformation.TransformerClassWriter.
-// Java's writer only asks getCommonSuperClass for the hierarchy when COMPUTE_FRAMES is set. The C
-// ClassWriter does not recompute frames (see org/objectweb/asm/ClassWriter.h), so the hierarchy
-// helpers below are provided for callers that need them, but the writer itself never calls them.
+
+
+
+
+
 
 #ifndef MATTICRAFT_FML_CLASSLOADING_TRANSFORMATION_TRANSFORMERCLASSWRITER_H
 #define MATTICRAFT_FML_CLASSLOADING_TRANSFORMATION_TRANSFORMERCLASSWRITER_H
@@ -12,11 +13,11 @@
 // Java: class TransformerClassWriter extends ClassWriter
 typedef struct LIBMATTI_FML_TransformerClassWriter
 {
-    // Java: extends ClassWriter
+// Java: extends ClassWriter
     LIBMATTI_ASM_ClassWriter *writer;
 
     LIBMATTI_ASMT_ClassNode *clazzAccessor;
-    // Java: private boolean computedThis = false
+// Java: private boolean computedThis = false
     int computedThis;
     LIBMATTI_FML_ClassHierarchyRecomputationContext *recomputationContext;
 } LIBMATTI_FML_TransformerClassWriter;
@@ -37,4 +38,4 @@ void LIBMATTI_FML_TransformerClassWriter_ComputeHierarchyForClassNode(LIBMATTI_F
 void LIBMATTI_FML_TransformerClassWriter_ComputeHierarchy(LIBMATTI_FML_TransformerClassWriter *writer,
                                                          const char *className);
 
-#endif //MATTICRAFT_FML_CLASSLOADING_TRANSFORMATION_TRANSFORMERCLASSWRITER_H
+#endif

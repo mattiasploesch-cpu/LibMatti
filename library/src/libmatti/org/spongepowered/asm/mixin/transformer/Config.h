@@ -1,7 +1,8 @@
-// Port of org.spongepowered.asm.mixin.transformer.Config (sponge-mixin 0.17.3+mixin.0.8.7).
-// "Handle for marshalling mixin configs outside of the transformer package". The bytecode
-// transformer's MixinConfig (the parsed JSON) stays behind the port's native hook table; the
-// marshalling handle keeps the config name, its environment, its parent and the decorations.
+
+
+
+
+
 
 #ifndef MATTICRAFT_SP_ASM_MIXIN_TRANSFORMER_CONFIG_H
 #define MATTICRAFT_SP_ASM_MIXIN_TRANSFORMER_CONFIG_H
@@ -30,62 +31,65 @@ void LIBMATTI_SP_ConfigSet_Add(LIBMATTI_SP_ConfigSet *set, LIBMATTI_SP_Config *c
 // (the class names the config declares; the package prefix resolves them)
 typedef struct
 {
-    char *className;   // the entry as written in the JSON
-    int required;      // Java: @SerializedName("required") on MixinInfo
+    char *className;
+
+    int required;// Java: @SerializedName("required") on MixinInfo
 } LIBMATTI_SP_MixinInfo;
 
 // Java: record InjectorInfo - the per-mixin injector block
 // ({"method":"target()V","ordinal":0,"shift":0,...})
 typedef struct
 {
-    char *method;  // the target method spec, NULL = default
-    int ordinal;   // -1 = unset
-    int value;     // Java: the "value" field (groupId/expect)
+    char *method;
+
+    int ordinal;
+
+    int value;// Java: the "value" field (groupId/expect)
 } LIBMATTI_SP_InjectorInfo;
 
 struct LIBMATTI_SP_Config
 {
-    // Java: private final String name
+// Java: private final String name
     char *name;
-    // Java: private final MixinConfig config - the parsed config; the port keeps the JSON text
+// Java: private final MixinConfig config - the parsed config; the port keeps the JSON text
     unsigned char *configContent;
     size_t configContentLength;
-    // Java: MixinEnvironment getEnvironment() (the config's env)
+// Java: MixinEnvironment getEnvironment() (the config's env)
     void *environment;
-    // Java: the decorations (FabricUtil.KEY_MOD_ID / KEY_COMPATIBILITY write these)
+// Java: the decorations (FabricUtil.KEY_MOD_ID / KEY_COMPATIBILITY write these)
     char *modId;
     int behaviorVersion;
     int hasBehaviorVersion;
-    // Java: private transient boolean visited
+// Java: private transient boolean visited
     int visited;
-    // Java: String getParentName() of the inner config
+// Java: String getParentName() of the inner config
     char *parentName;
-    // Java: private final Config parent (assigned by assignParent)
+// Java: private final Config parent (assigned by assignParent)
     LIBMATTI_SP_Config *parent;
 
-    // ---- the parsed MixinConfig fields (Java: MixinConfig.onLoad / readObject) ----
+// ---- the parsed MixinConfig fields (Java: MixinConfig.onLoad / readObject) ----
     // Java: @SerializedName("package") private String pack
     char *packageName;
-    // Java: @SerializedName("refmap") private String refMapName
+// Java: @SerializedName("refmap") private String refMapName
     char *refMapName;
-    // Java: @SerializedName("required") private boolean required
+// Java: @SerializedName("required") private boolean required
     int required;
-    // Java: @SerializedName("minVersion") private float minVersion
+// Java: @SerializedName("minVersion") private float minVersion
     float minVersion;
-    // Java: @SerializedName("compatibilityLevel") private CompatibilityLevel compatibilityLevel
+// Java: @SerializedName("compatibilityLevel") private CompatibilityLevel compatibilityLevel
     char *compatibilityLevel;
-    // Java: @SerializedName("mixins") private List<MixinInfo> mixins
+// Java: @SerializedName("mixins") private List<MixinInfo> mixins
     LIBMATTI_SP_MixinInfo *mixins;
     size_t mixinCount;
-    // Java: @SerializedName("client") private List<MixinInfo> clientMixins
+// Java: @SerializedName("client") private List<MixinInfo> clientMixins
     LIBMATTI_SP_MixinInfo *clientMixins;
     size_t clientMixinCount;
-    // Java: @SerializedName("server") private List<MixinInfo> serverMixins
+// Java: @SerializedName("server") private List<MixinInfo> serverMixins
     LIBMATTI_SP_MixinInfo *serverMixins;
     size_t serverMixinCount;
-    // Java: private String pluginClass (@SerializedName("plugin"))
+// Java: private String pluginClass (@SerializedName("plugin"))
     char *pluginClass;
-    // Java: @SerializedName("injectors") private Map<String,InjectorInfo> injectors (per mixin class)
+// Java: @SerializedName("injectors") private Map<String,InjectorInfo> injectors (per mixin class)
     char **injectorKeys;
     LIBMATTI_SP_InjectorInfo *injectorValues;
     size_t injectorCount;
@@ -137,4 +141,4 @@ char *LIBMATTI_SP_Config_MixinRefName(const LIBMATTI_SP_Config *config, const LI
 LIBMATTI_SP_Config *LIBMATTI_SP_Config_Create(const char *configFile, void *outer,
                                               LIBMATTI_SP_ContainerHandle *source);
 
-#endif //MATTICRAFT_SP_ASM_MIXIN_TRANSFORMER_CONFIG_H
+#endif

@@ -1,20 +1,21 @@
-//
-// Created by administrator on 09.09.26.
-//
-// Port of java.net.URI.
+
+
+
+
+
 
 #ifndef MATTICRAFT_URI_H
 #define MATTICRAFT_URI_H
 
 typedef struct
 {
-    char *raw; // Java: toString()
+    char *raw;// Java: toString()
     char *scheme;
     char *schemeSpecificPart;
     char *authority;
     char *userInfo;
     char *host;
-    int port; // -1 = undefined (Java: port() == -1)
+    int port;// -1 = undefined (Java: port() == -1)
     char *path;
     char *query;
     char *fragment;
@@ -35,4 +36,4 @@ const char *LIBMATTI_JN_URI_Path(const LIBMATTI_JN_URI *uri);
 const char *LIBMATTI_JN_URI_Query(const LIBMATTI_JN_URI *uri);
 const char *LIBMATTI_JN_URI_Fragment(const LIBMATTI_JN_URI *uri);
 
-#endif //MATTICRAFT_URI_H
+#endif

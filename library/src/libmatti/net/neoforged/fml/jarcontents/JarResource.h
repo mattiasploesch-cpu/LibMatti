@@ -1,6 +1,7 @@
-// Port of net.neoforged.fml.jarcontents.JarResource.
-// Instances obtained from a JarResourceVisitor are reused between visits (Java note);
-// retain() copies a reference that can be held on to.
+
+
+
+
 
 #ifndef MATTICRAFT_FML_JARCONTENTS_JARRESOURCE_H
 #define MATTICRAFT_FML_JARCONTENTS_JARRESOURCE_H
@@ -16,13 +17,14 @@ struct LIBMATTI_FML_JarResource
 {
     void *self;
 
-    // Java: InputStream open() throws IOException
+// Java: InputStream open() throws IOException
     unsigned char *(*open)(void *self, size_t *outLength);
-    // Java: JarResourceAttributes attributes() throws IOException
+// Java: JarResourceAttributes attributes() throws IOException
     void (*attributes)(void *self, LIBMATTI_FML_JarResourceAttributes *out);
-    // Java: JarResource retain()
+// Java: JarResource retain()
     LIBMATTI_FML_JarResource *(*retain)(void *self);
-    // Java has no release; the port frees the handle a get() handed out.
+
+
     void (*freeResource)(void *self);
 };
 
@@ -38,4 +40,4 @@ LIBMATTI_FML_JarResource *LIBMATTI_FML_JarResource_Retain(const LIBMATTI_FML_Jar
 // Java: the handle lives until the GC; the port frees what get() allocated.
 void LIBMATTI_FML_JarResource_Free(LIBMATTI_FML_JarResource *resource);
 
-#endif //MATTICRAFT_FML_JARCONTENTS_JARRESOURCE_H
+#endif

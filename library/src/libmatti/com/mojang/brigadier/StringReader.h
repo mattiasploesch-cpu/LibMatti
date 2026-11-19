@@ -1,6 +1,7 @@
-// Port of com.mojang.brigadier.StringReader (and ImmutableStringReader).
-// Java throws CommandSyntaxException; the C port returns the exception through
-// an out-parameter and reads through it on the next call.
+
+
+
+
 
 #ifndef MATTICRAFT_BR_STRINGREADER_H
 #define MATTICRAFT_BR_STRINGREADER_H
@@ -17,7 +18,7 @@ typedef struct LIBMATTI_BR_CommandSyntaxException LIBMATTI_BR_CommandSyntaxExcep
 // Java: public class StringReader implements ImmutableStringReader
 typedef struct LIBMATTI_BR_StringReader
 {
-    // Java: private final String string (borrowed, not owned)
+// Java: private final String string (borrowed, not owned)
     const char *string;
     int cursor;
 } LIBMATTI_BR_StringReader;

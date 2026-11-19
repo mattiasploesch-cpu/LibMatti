@@ -1,5 +1,6 @@
-// Port of net.neoforged.neoforgespi.language.IConfigurable.
-// Java infers T at the call site; the C port returns a tagged value instead.
+
+
+
 
 #ifndef MATTICRAFT_NEOFORGESPI_LANGUAGE_ICONFIGURABLE_H
 #define MATTICRAFT_NEOFORGESPI_LANGUAGE_ICONFIGURABLE_H
@@ -11,22 +12,28 @@ typedef enum
     LIBMATTI_NEOFORGESPI_IConfigurable_STRING,
     LIBMATTI_NEOFORGESPI_IConfigurable_BOOL,
     LIBMATTI_NEOFORGESPI_IConfigurable_INT,
-    // Java: Map<String, Object>
+// Java: Map<String, Object>
     LIBMATTI_NEOFORGESPI_IConfigurable_MAP,
     LIBMATTI_NEOFORGESPI_IConfigurable_STRING_LIST,
-    // Java: com.electronwill.nightconfig.core.UnmodifiableConfig
+// Java: com.electronwill.nightconfig.core.UnmodifiableConfig
     LIBMATTI_NEOFORGESPI_IConfigurable_CONFIG
 } LIBMATTI_NEOFORGESPI_IConfigurable_ValueType;
 
 typedef struct
 {
     LIBMATTI_NEOFORGESPI_IConfigurable_ValueType type;
-    const char *string; // STRING
-    int boolean; // BOOL
-    int integer; // INT
-    void *map; // MAP / CONFIG (opaque)
-    char **list; // STRING_LIST
-    size_t listCount; // STRING_LIST
+    const char *string;
+
+    int boolean;
+
+    int integer;
+
+    void *map;
+
+    char **list;
+
+    size_t listCount;
+
 } LIBMATTI_NEOFORGESPI_IConfigurable_Value;
 
 // Java: public interface IConfigurable
@@ -36,10 +43,10 @@ struct LIBMATTI_NEOFORGESPI_IConfigurable
 {
     void *self;
 
-    // Java: <T> Optional<T> getConfigElement(String... key)
+// Java: <T> Optional<T> getConfigElement(String... key)
     int (*getConfigElement)(void *self, const char *const *key, size_t keyCount,
                             LIBMATTI_NEOFORGESPI_IConfigurable_Value *out);
-    // Java: List<? extends IConfigurable> getConfigList(String... key)
+// Java: List<? extends IConfigurable> getConfigList(String... key)
     LIBMATTI_NEOFORGESPI_IConfigurable **(*getConfigList)(void *self, const char *const *key, size_t keyCount,
                                                           size_t *count);
 };
@@ -57,4 +64,4 @@ int LIBMATTI_NEOFORGESPI_IConfigurable_GetElement(const LIBMATTI_NEOFORGESPI_ICo
                                                   const char *key,
                                                   LIBMATTI_NEOFORGESPI_IConfigurable_Value *out);
 
-#endif //MATTICRAFT_NEOFORGESPI_LANGUAGE_ICONFIGURABLE_H
+#endif

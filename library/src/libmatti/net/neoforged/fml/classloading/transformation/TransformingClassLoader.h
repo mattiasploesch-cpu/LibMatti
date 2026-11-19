@@ -1,6 +1,7 @@
-// Port of net.neoforged.fml.classloading.transformation.TransformingClassLoader.
-// It extends net.neoforged.fml.classloading.ModuleClassLoader and overrides
-// maybeTransformClassBytes, which the C port expresses through the base class' function pointer hook.
+
+
+
+
 
 #ifndef MATTICRAFT_FML_CLASSLOADING_TRANSFORMATION_TRANSFORMINGCLASSLOADER_H
 #define MATTICRAFT_FML_CLASSLOADING_TRANSFORMATION_TRANSFORMINGCLASSLOADER_H
@@ -16,7 +17,7 @@ typedef struct LIBMATTI_FML_TransformingClassLoader
 {
     LIBMATTI_FML_ModuleClassLoader base;
     LIBMATTI_FML_ClassTransformer *classTransformer;
-    // Java: the anonymous ClassHierarchyRecomputationContext created in maybeTransformClassBytes
+// Java: the anonymous ClassHierarchyRecomputationContext created in maybeTransformClassBytes
     LIBMATTI_FML_ClassHierarchyRecomputationContext recomputationContext;
 } LIBMATTI_FML_TransformingClassLoader;
 
@@ -41,4 +42,4 @@ unsigned char *LIBMATTI_FML_TransformingClassLoader_BuildTransformedClassNodeFor
     LIBMATTI_FML_TransformingClassLoader *classLoader, const char *className,
     const LIBMATTI_NEOFORGESPI_ProcessorName *upToTransformer, size_t *outLength);
 
-#endif //MATTICRAFT_FML_CLASSLOADING_TRANSFORMATION_TRANSFORMINGCLASSLOADER_H
+#endif

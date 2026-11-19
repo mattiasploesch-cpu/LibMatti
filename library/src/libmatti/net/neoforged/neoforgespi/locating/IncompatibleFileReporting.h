@@ -1,4 +1,5 @@
-// Port of net.neoforged.neoforgespi.locating.IncompatibleFileReporting.
+
+
 
 #ifndef MATTICRAFT_NEOFORGESPI_LOCATING_INCOMPATIBLEFILEREPORTING_H
 #define MATTICRAFT_NEOFORGESPI_LOCATING_INCOMPATIBLEFILEREPORTING_H
@@ -22,4 +23,4 @@ LIBMATTI_ML_Level LIBMATTI_NEOFORGESPI_IncompatibleFileReporting_GetLogLevel(
 LIBMATTI_FML_ModLoadingIssue_Severity LIBMATTI_NEOFORGESPI_IncompatibleFileReporting_GetIssueSeverity(
     LIBMATTI_NEOFORGESPI_IncompatibleFileReporting reporting);
 
-#endif //MATTICRAFT_NEOFORGESPI_LOCATING_INCOMPATIBLEFILEREPORTING_H
+#endif

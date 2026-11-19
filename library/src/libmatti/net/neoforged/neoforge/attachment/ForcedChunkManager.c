@@ -1,6 +1,7 @@
-// Port of net.neoforged.neoforge.attachment.ForcedChunkManager.
-// The TicketController objects and the chunk system belong to the game port; the port keeps the
-// init lifecycle and the controller id registry (the duplicate check of the Java callback).
+
+
+
+
 
 #include "libmatti/net/neoforged/neoforge/attachment/ForcedChunkManager.h"
 
@@ -42,7 +43,7 @@ void LIBMATTI_NEOFORGE_ForcedChunkManager_RegisterController(const char *control
 // Java: public static synchronized void init()
 void LIBMATTI_NEOFORGE_ForcedChunkManager_Init(void)
 {
-    // Java: if (initialised) throw new UnsupportedOperationException("Cannot init ticket controllers multiple times!")
+// Java: if (initialised) throw new UnsupportedOperationException("Cannot init ticket controllers multiple times!")
     if (initialised)
     {
         LIBMATTI_ML_Logger_Error(LIBMATTI_ML_LogManager_GetLogger(), NULL,
@@ -51,7 +52,7 @@ void LIBMATTI_NEOFORGE_ForcedChunkManager_Init(void)
     }
     initialised = 1;
 
-    // Java: ModLoader.postEvent(new RegisterTicketControllersEvent(...)) - the controllers the
+// Java: ModLoader.postEvent(new RegisterTicketControllersEvent(...)) - the controllers the
     // mods register flow through LIBMATTI_NEOFORGE_ForcedChunkManager_RegisterController; the
     // event object itself lives with the game port (it carries the chunk-system types)
 }

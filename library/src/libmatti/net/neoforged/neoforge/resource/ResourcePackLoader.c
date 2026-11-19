@@ -1,6 +1,7 @@
-// Port of net.neoforged.neoforge.resource.ResourcePackLoader.
-// The pack objects live with the game port; the lifecycle (findResourcePacks, the pack finder,
-// AddPackFindersEvent) runs here over the mod file list.
+
+
+
+
 
 #include "libmatti/net/neoforged/neoforge/resource/ResourcePackLoader.h"
 
@@ -44,7 +45,7 @@ static void find_resource_packs(void)
 {
     if (modResourcePacksLoaded) return;
 
-    // Java: ModList.get().getModFiles().stream().filter(mfi -> hasResourcePack(mfi.getFile()))
+// Java: ModList.get().getModFiles().stream().filter(mfi -> hasResourcePack(mfi.getFile()))
     // - a mod ships a resource pack when its file carries assets/
     LIBMATTI_FML_ModList *modList = LIBMATTI_FML_ModList_Get();
     size_t fileCount = 0;
@@ -60,10 +61,10 @@ void LIBMATTI_NEOFORGE_ResourcePackLoader_PopulatePackRepository(void *resourceP
     (void) trusted;
     LIBMATTI_MC_PackRepository *repository = (LIBMATTI_MC_PackRepository *) resourcePacks;
 
-    // Java: findResourcePacks()
+// Java: findResourcePacks()
     find_resource_packs();
 
-    // Java: resourcePacks.addPackFinder(buildPackFinder(modResourcePacks, packType)) - the finder
+// Java: resourcePacks.addPackFinder(buildPackFinder(modResourcePacks, packType)) - the finder
     // adds one Pack per mod resource pack through readMetaAndCreate
     if (repository != NULL)
     {
@@ -88,7 +89,7 @@ void LIBMATTI_NEOFORGE_ResourcePackLoader_PopulatePackRepository(void *resourceP
             Pack *pack = LIBMATTI_MC_Pack_ReadMetaAndCreate(location, pack_supplier_for(filePath), formats, config);
             if (pack == NULL) continue;
 
-            // Java: the finder consumer adds the pack; the port adds it directly
+// Java: the finder consumer adds the pack; the port adds it directly
             repository->availableIds =
                 realloc(repository->availableIds, (repository->availableCount + 1) * sizeof(char *));
             repository->availablePacks =
@@ -99,7 +100,7 @@ void LIBMATTI_NEOFORGE_ResourcePackLoader_PopulatePackRepository(void *resourceP
         }
     }
 
-    // Java: ModLoader.postEvent(new AddPackFindersEvent(packType, resourcePacks::addPackFinder, trusted))
+// Java: ModLoader.postEvent(new AddPackFindersEvent(packType, resourcePacks::addPackFinder, trusted))
     // - the event object carries the game port's pack types, the port fires the loader side
     LIBMATTI_ML_Logger_Debug(LIBMATTI_ML_LogManager_GetLogger(), NULL, "AddPackFindersEvent fired");
 }

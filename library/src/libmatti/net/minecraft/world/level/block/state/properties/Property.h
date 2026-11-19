@@ -1,8 +1,9 @@
-// Port of net.minecraft.world.level.block.state.properties.Property (and the three
-// concrete subclasses BooleanProperty, IntegerProperty, EnumProperty).
-// Java's generics T extends Comparable<T> collapse to a tagged value: every property
-// carries its values as indices into its own possibleValues list, exactly like Java's
-// getInternalIndex, so the StateHolder neighbours table can be a plain array.
+
+
+
+
+
+
 
 #ifndef MATTICRAFT_MC_BLOCKSTATE_PROPERTY_H
 #define MATTICRAFT_MC_BLOCKSTATE_PROPERTY_H
@@ -26,32 +27,33 @@ typedef enum
 // list plus the raw payload for the boolean/int cases.
 typedef struct LIBMATTI_MC_Property_Value
 {
-    int index;       // Java: getInternalIndex(value) - also the raw value for IntegerProperty
-    int b;           // Java: Boolean - 0/1 (KIND_BOOLEAN only)
-    const char *s;   // Java: StringRepresentable.getSerializedName() (KIND_ENUM only)
+    int index;// Java: getInternalIndex(value) - also the raw value for IntegerProperty
+    int b;// Java: Boolean - 0/1 (KIND_BOOLEAN only)
+    const char *s;// Java: StringRepresentable.getSerializedName() (KIND_ENUM only)
 } LIBMATTI_MC_Property_Value;
 
 // Java: public abstract class Property<T extends Comparable<T>>
 typedef struct LIBMATTI_MC_Property
 {
     LIBMATTI_MC_Property_Kind kind;
-    // Java: private final String name
+// Java: private final String name
     char *name;
-    // Java: private final Class<T> clazz - the kind tag plus a name for diagnostics
+// Java: private final Class<T> clazz - the kind tag plus a name for diagnostics
     const char *clazz;
-    // Java: abstract List<T> getPossibleValues() - the value list in declaration order
+// Java: abstract List<T> getPossibleValues() - the value list in declaration order
     LIBMATTI_MC_Property_Value *values;
     int valueCount;
-    // Java: EnumProperty names map / IntegerProperty min+max
+// Java: EnumProperty names map / IntegerProperty min+max
     int min;
     int max;
-    // Java: private @Nullable Integer hashCode (cached)
+// Java: private @Nullable Integer hashCode (cached)
     int hashCode;
 } LIBMATTI_MC_Property;
 
-// -----------------------------------------------------------------------
-// Property factory + base surface
-// -----------------------------------------------------------------------
+
+
+
+
 
 // Java: BooleanProperty.create(String)
 LIBMATTI_MC_Property *LIBMATTI_MC_BooleanProperty_Create(const char *name);
@@ -83,4 +85,4 @@ int LIBMATTI_MC_Property_IndexOf(const LIBMATTI_MC_Property *property, LIBMATTI_
 }
 #endif
 
-#endif //MATTICRAFT_MC_BLOCKSTATE_PROPERTY_H
+#endif

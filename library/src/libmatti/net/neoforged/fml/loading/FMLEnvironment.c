@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.loading.FMLEnvironment.
+
+
 
 #include "libmatti/net/neoforged/fml/loading/FMLEnvironment.h"
 

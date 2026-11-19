@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.ModLoader.
+
+
 
 #include "libmatti/net/neoforged/fml/ModLoader.h"
 
@@ -31,8 +32,9 @@ static LIBMATTI_ML_Logger *LOGGER(void)
     return LIBMATTI_ML_LogManager_GetLogger();
 }
 
-// Java drops a dispatched event after every mod has seen it; the port frees it. These event classes
-// keep the Event base as their first member and own no heap field of their own.
+
+
+
 static void free_event(LIBMATTI_BUS_Event *event)
 {
     free(event);
@@ -127,9 +129,10 @@ void LIBMATTI_FML_ModLoader_ClearLoadingIssues(void)
     loadingIssueCount = 0;
 }
 
-// The port's "catch (ModLoadingException e)" channel: hand every pending issue to the
-// caller (which owns them afterwards) and empty the list, so an issue registered while a
-// reader ran is attributed to that reader instead of surfacing globally.
+
+
+
+
 LIBMATTI_FML_ModLoadingIssue **LIBMATTI_FML_ModLoader_TakeLoadingIssues(size_t *count)
 {
     LIBMATTI_FML_ModLoadingIssue **taken = loadingIssues;
@@ -172,7 +175,7 @@ static int throwIfErrors(LIBMATTI_FML_ModList *candidate)
 
     if (candidate != NULL) cancelLoading(candidate);
 
-    // Java: throw new ModLoadingException(loadingIssues)
+// Java: throw new ModLoadingException(loadingIssues)
     lastException = &LIBMATTI_FML_ModLoadingException_NewWithIssues(loadingIssues, loadingIssueCount)->base;
     return 0;
 }
@@ -188,7 +191,7 @@ static void add_issue_adapter(void *self, LIBMATTI_FML_ModLoadingIssue *issue)
 static LIBMATTI_FML_ModContainer *buildModContainerFromTOML(LIBMATTI_NEOFORGESPI_IModInfo *modInfo,
                                                            LIBMATTI_NEOFORGESPI_ModFileScanData *scanData)
 {
-    // Java: try { return modInfo.getLoader().loadMod(modInfo, scanData, FMLLoader.getCurrent().getGameLayer()); }
+// Java: try { return modInfo.getLoader().loadMod(modInfo, scanData, FMLLoader.getCurrent().getGameLayer()); }
     //       catch (ModLoadingException mle) { loadingIssues.addAll(mle.getIssues()); return null; }
     // A C language loader cannot throw: it reports through ModLoader.addLoadingIssue and returns NULL.
     LIBMATTI_NEOFORGESPI_IModLanguageLoader *loader =
@@ -202,7 +205,7 @@ static LIBMATTI_FML_ModContainer *buildModContainerFromTOML(LIBMATTI_NEOFORGESPI
 static void buildMods(LIBMATTI_NEOFORGESPI_IModFile *modFile, LIBMATTI_FML_ModContainer ***containers,
                       size_t *containerCount)
 {
-    // Java: Map<IModLanguageLoader, Set<ModContainer>> byLoader = new IdentityHashMap<>();
+// Java: Map<IModLanguageLoader, Set<ModContainer>> byLoader = new IdentityHashMap<>();
     LIBMATTI_NEOFORGESPI_IModLanguageLoader **byLoader = NULL;
     LIBMATTI_FML_ModContainer ***byLoaderContainers = NULL;
     size_t *byLoaderCounts = NULL;
@@ -218,7 +221,7 @@ static void buildMods(LIBMATTI_NEOFORGESPI_IModFile *modFile, LIBMATTI_FML_ModCo
         LIBMATTI_FML_ModContainer *container =
             buildModContainerFromTOML(info, LIBMATTI_NEOFORGESPI_IModFile_GetScanResult(modFile));
 
-        // Java: byLoader.computeIfAbsent(info.getLoader(), k -> new HashSet<>())
+// Java: byLoader.computeIfAbsent(info.getLoader(), k -> new HashSet<>())
         LIBMATTI_NEOFORGESPI_IModLanguageLoader *loader =
             (LIBMATTI_NEOFORGESPI_IModLanguageLoader *) LIBMATTI_NEOFORGESPI_IModInfo_GetLoader(info);
 
@@ -243,12 +246,12 @@ static void buildMods(LIBMATTI_NEOFORGESPI_IModFile *modFile, LIBMATTI_FML_ModCo
             realloc(byLoaderContainers[groupIndex], sizeof(void *) * (byLoaderCounts[groupIndex] + 1));
         byLoaderContainers[groupIndex][byLoaderCounts[groupIndex]++] = container;
 
-        // Java: the mapped stream drops the containers that failed to build
+// Java: the mapped stream drops the containers that failed to build
         *containers = realloc(*containers, sizeof(void *) * (*containerCount + 1));
         (*containers)[(*containerCount)++] = container;
     }
 
-    // Java: byLoader.forEach((loader, loaded) -> loader.validate(modFile, loaded, ModLoader::addLoadingIssue));
+// Java: byLoader.forEach((loader, loaded) -> loader.validate(modFile, loaded, ModLoader::addLoadingIssue));
     LIBMATTI_NEOFORGESPI_IIssueReporting reporter = {NULL, add_issue_adapter};
     for (size_t i = 0; i < byLoaderCount; i++)
     {
@@ -287,7 +290,7 @@ static void constructMods(void (*periodicTask)(void *userdata), void *userdata)
     LIBMATTI_FML_DeferredWorkQueue *workQueue = LIBMATTI_FML_DeferredWorkQueue_New("Mod Construction");
     LIBMATTI_FML_ModLoader_DispatchParallelTask("Mod Construction", periodicTask, userdata, construct_mod, workQueue);
 
-    // Java: waitForTask("Mod Construction: Deferred Queue", periodicTask, CompletableFuture.runAsync(workQueue::runTasks, syncExecutor));
+// Java: waitForTask("Mod Construction: Deferred Queue", periodicTask, CompletableFuture.runAsync(workQueue::runTasks, syncExecutor));
     LIBMATTI_FML_ModLoader_RunInitTask("Mod Construction: Deferred Queue", periodicTask, userdata, run_deferred_queue,
                                        workQueue);
     LIBMATTI_FML_DeferredWorkQueue_Free(workQueue);
@@ -300,7 +303,7 @@ void LIBMATTI_FML_ModLoader_GatherAndInitializeMods(void (*periodicTask)(void *u
     LIBMATTI_FML_LoadingModList *loadingModList =
         (LIBMATTI_FML_LoadingModList *) LIBMATTI_FML_FMLLoader_GetLoadingModList(loader);
 
-    // Java: loadingIssues.addAll(loadingModList.getModLoadingIssues()); throwIfErrors(null);
+// Java: loadingIssues.addAll(loadingModList.getModLoadingIssues()); throwIfErrors(null);
     if (loadingModList != NULL)
     {
         size_t discoveryIssueCount = 0;
@@ -310,7 +313,7 @@ void LIBMATTI_FML_ModLoader_GatherAndInitializeMods(void (*periodicTask)(void *u
     }
     if (!throwIfErrors(NULL)) return;
 
-    // Java: ForgeFeature.registerFeature("javaVersion", ForgeFeature.VersionFeatureTest.forVersionString(
+// Java: ForgeFeature.registerFeature("javaVersion", ForgeFeature.VersionFeatureTest.forVersionString(
     //         IModInfo.DependencySide.BOTH, System.getProperty("java.version")));
     // A JVM always has java.version; the port has no VM properties, so the feature is only registered
     // when the launcher set one (a NULL version is rejected by DefaultArtifactVersion, as in Java).
@@ -320,12 +323,12 @@ void LIBMATTI_FML_ModLoader_GatherAndInitializeMods(void (*periodicTask)(void *u
             "javaVersion", LIBMATTI_NEOFORGESPI_ForgeFeature_VersionFeatureTest_ForVersionString(
                                LIBMATTI_NEOFORGESPI_IModInfo_DependencySide_BOTH, javaVersion));
 
-    // Java: FMLLoader.getCurrent().backgroundScanHandler.waitForScanToComplete(periodicTask);
+// Java: FMLLoader.getCurrent().backgroundScanHandler.waitForScanToComplete(periodicTask);
     if (loader->backgroundScanHandler != NULL)
         LIBMATTI_FML_BackgroundScanHandler_WaitForScanToComplete(
             (LIBMATTI_FML_BackgroundScanHandler *) loader->backgroundScanHandler, periodicTask, userdata);
 
-    // Java: ModList.of(loadingModList.getModFiles().stream().map(ModFileInfo::getFile).toList(), loadingModList.getMods())
+// Java: ModList.of(loadingModList.getModFiles().stream().map(ModFileInfo::getFile).toList(), loadingModList.getMods())
     size_t modFileInfoCount = 0;
     LIBMATTI_FML_ModFileInfo **modFileInfos =
         LIBMATTI_FML_LoadingModList_GetModFiles(loadingModList, &modFileInfoCount);
@@ -342,7 +345,7 @@ void LIBMATTI_FML_ModLoader_GatherAndInitializeMods(void (*periodicTask)(void *u
         return;
     }
 
-    // Java: for (var mod : loadingModList.getMods()) { for (var bound : mod.getForgeFeatures()) { ... } }
+// Java: for (var mod : loadingModList.getMods()) { for (var bound : mod.getForgeFeatures()) { ... } }
     for (size_t i = 0; i < modCount; i++)
     {
         LIBMATTI_NEOFORGESPI_IModInfo *info = LIBMATTI_FML_ModInfo_AsModInfo(mods[i]);
@@ -355,7 +358,8 @@ void LIBMATTI_FML_ModLoader_GatherAndInitializeMods(void (*periodicTask)(void *u
             if (LIBMATTI_NEOFORGESPI_ForgeFeature_TestFeature(LIBMATTI_FML_FMLLoader_GetDist(loader), bound))
                 continue;
 
-            // Java passes the Bound record and the feature's value; the port has no record rendering.
+
+
             const char *args[] = {bound->featureName,
                                   (const char *) LIBMATTI_NEOFORGESPI_ForgeFeature_FeatureValue(bound)};
             LIBMATTI_FML_ModLoadingIssue *issue =
@@ -375,7 +379,7 @@ void LIBMATTI_FML_ModLoader_GatherAndInitializeMods(void (*periodicTask)(void *u
         return;
     }
 
-    // Java: var modContainers = loadingModList.getModFiles().stream().map(ModFileInfo::getFile)
+// Java: var modContainers = loadingModList.getModFiles().stream().map(ModFileInfo::getFile)
     //         .map(ModLoader::buildMods).<ModContainer>mapMulti(Iterable::forEach).toList();
     LIBMATTI_FML_ModContainer **containers = NULL;
     size_t containerCount = 0;
@@ -389,7 +393,7 @@ void LIBMATTI_FML_ModLoader_GatherAndInitializeMods(void (*periodicTask)(void *u
         return;
     }
 
-    // Java: modList.setLoadedMods(modContainers); ModLoader.modList = modList;
+// Java: modList.setLoadedMods(modContainers); ModLoader.modList = modList;
     modList = list;
     LIBMATTI_FML_ModList_SetLoadedMods(list, containers, containerCount);
     free(containers);
@@ -411,7 +415,7 @@ void LIBMATTI_FML_ModLoader_WaitForTask(const char *name, void (*periodicTask)(v
 {
     LIBMATTI_FML_ProgressMeter *progress = LIBMATTI_FML_StartupNotificationManager_AddProgressBar(name, 0);
 
-    // Java: waitForFuture(name, periodicTask, future) - the port has no future, the task is the work.
+// Java: waitForFuture(name, periodicTask, future) - the port has no future, the task is the work.
     if (periodicTask != NULL) periodicTask(userdata);
     if (task != NULL) task(taskUserdata);
 
@@ -430,14 +434,14 @@ void LIBMATTI_FML_ModLoader_DispatchParallelTask(const char *name, void (*period
     int steps = modList != NULL ? LIBMATTI_FML_ModList_Size(modList) : 0;
     LIBMATTI_FML_ProgressMeter *progress = LIBMATTI_FML_StartupNotificationManager_AddProgressBar(name, steps);
 
-    // Java: periodicTask.run();
+// Java: periodicTask.run();
     if (periodicTask != NULL) periodicTask(userdata);
 
     size_t containerCount = 0;
     LIBMATTI_FML_ModContainer **containers =
         modList != NULL ? LIBMATTI_FML_ModList_GetSortedMods(modList, &containerCount) : NULL;
 
-    // Java: the futures of a container's dependencies are awaited before its own task runs; a task whose
+// Java: the futures of a container's dependencies are awaited before its own task runs; a task whose
     //       dependency failed is skipped (DependentFutureFailedException).
     LIBMATTI_FML_LoadingModList *loadingModList =
         (LIBMATTI_FML_LoadingModList *) LIBMATTI_FML_FMLLoader_GetLoadingModList(LIBMATTI_FML_FMLLoader_GetCurrent());
@@ -465,7 +469,7 @@ void LIBMATTI_FML_ModLoader_DispatchParallelTask(const char *name, void (*period
 
                 if (index == containerCount)
                 {
-                    // Java: throw new IllegalStateException("Dependency future for mod %s which is a dependency of %s not found!")
+// Java: throw new IllegalStateException("Dependency future for mod %s which is a dependency of %s not found!")
                     LIBMATTI_ML_Logger_Error(LOGGER(), &LIBMATTI_FML_Logging_LOADING,
                                              "Dependency future for mod {} is missing",
                                              LIBMATTI_NEOFORGESPI_IModInfo_GetModId(
@@ -487,7 +491,7 @@ void LIBMATTI_FML_ModLoader_DispatchParallelTask(const char *name, void (*period
             continue;
         }
 
-        // Java: ModLoadingContext.get().setActiveContainer(modContainer); task.accept(modContainer);
+// Java: ModLoadingContext.get().setActiveContainer(modContainer); task.accept(modContainer);
         //       finally { progress.increment(); ModLoadingContext.get().setActiveContainer(null); }
         LIBMATTI_FML_ModLoadingContext *context = LIBMATTI_FML_ModLoadingContext_Get();
         LIBMATTI_FML_ModLoadingContext_SetActiveContainer(context, container);
@@ -497,7 +501,7 @@ void LIBMATTI_FML_ModLoader_DispatchParallelTask(const char *name, void (*period
     }
 
     free(failed);
-    // Java: getSortedMods() returns the list itself, not a copy - the array belongs to the ModList
+// Java: getSortedMods() returns the list itself, not a copy - the array belongs to the ModList
     // and stays alive for the later dispatches; freeing it here would leave a dangling pointer.
     LIBMATTI_FML_ProgressMeter_Complete(progress);
     LIBMATTI_FML_ProgressMeter_Free(progress);
@@ -517,7 +521,8 @@ static void dispatch_event(LIBMATTI_FML_ModContainer *container, void *userdata)
 {
     ParallelEventUserdata *data = userdata;
 
-    // Java builds one event per container and drops it again; the port frees it the same way.
+
+
     LIBMATTI_BUS_Event *event = data->eventConstructor(container, data->workQueue, data->userdata);
     LIBMATTI_FML_ModContainer_AcceptEvent(container, event);
     free_event(event);
@@ -536,7 +541,7 @@ void LIBMATTI_FML_ModLoader_DispatchParallelEvent(
 
     LIBMATTI_FML_ModLoader_DispatchParallelTask(name, periodicTask, userdata, dispatch_event, &eventUserdata);
 
-    // Java: runInitTask(name + ": Deferred Queue", syncExecutor, periodicTask, workQueue::runTasks);
+// Java: runInitTask(name + ": Deferred Queue", syncExecutor, periodicTask, workQueue::runTasks);
     char deferredName[256];
     snprintf(deferredName, sizeof(deferredName), "%s: Deferred Queue", name);
     LIBMATTI_FML_ModLoader_RunInitTask(deferredName, periodicTask, userdata, run_deferred_queue, workQueue);
@@ -569,7 +574,7 @@ void LIBMATTI_FML_ModLoader_RunEventGenerator(
         return;
     }
 
-    // Java: List<ModContainer> modContainers = ModList.get().getSortedMods(); List<T> events = new ArrayList<>(size)
+// Java: List<ModContainer> modContainers = ModList.get().getSortedMods(); List<T> events = new ArrayList<>(size)
     size_t containerCount = 0;
     LIBMATTI_FML_ModContainer **containers =
         modList != NULL ? LIBMATTI_FML_ModList_GetSortedMods(modList, &containerCount) : NULL;
@@ -579,13 +584,14 @@ void LIBMATTI_FML_ModLoader_RunEventGenerator(
     EventGeneratorUserdata generatorUserdata = {generator, userdata, events, &eventCount};
     if (modList != NULL) LIBMATTI_FML_ModList_ForEachModInOrder(modList, generate_event, &generatorUserdata);
 
-    // Java: for (EventPriority phase : EventPriority.values()) for (i) modContainers.get(i).acceptEvent(phase, events.get(i));
+// Java: for (EventPriority phase : EventPriority.values()) for (i) modContainers.get(i).acceptEvent(phase, events.get(i));
     for (int phase = 0; phase < LIBMATTI_BUS_EventPriority_COUNT; phase++)
         for (size_t i = 0; i < containerCount && i < eventCount; i++)
             LIBMATTI_FML_ModContainer_AcceptEventWithPhase(containers[i], (LIBMATTI_BUS_EventPriority) phase,
                                                           events[i]);
 
-    // Java's generator result is a local, the port frees what the generator built for this call.
+
+
     for (size_t i = 0; i < eventCount; i++) free_event(events[i]);
     free(events);
     free(containers);

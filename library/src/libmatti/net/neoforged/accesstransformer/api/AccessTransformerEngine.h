@@ -1,5 +1,6 @@
-// Port of net.neoforged.accesstransformer.api.AccessTransformerEngine
-// (+ AccessTransformerEngineImpl and AccessTransformerList).
+
+
+
 
 #ifndef MATTICRAFT_AT_ACCESSTRANSFORMERENGINE_H
 #define MATTICRAFT_AT_ACCESSTRANSFORMERENGINE_H
@@ -47,4 +48,4 @@ char **LIBMATTI_AT_AccessTransformerEngine_GetSourcesForTarget(const LIBMATTI_AT
 int LIBMATTI_AT_AccessTransformerEngine_Transform(LIBMATTI_AT_AccessTransformerEngine *engine,
                                                   LIBMATTI_ASMT_ClassNode *classNode, const char *internalName);
 
-#endif //MATTICRAFT_AT_ACCESSTRANSFORMERENGINE_H
+#endif

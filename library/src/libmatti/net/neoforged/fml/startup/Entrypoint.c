@@ -65,13 +65,13 @@ static char *get_game_dir(int argc, char *argv[])
 {
     const char *gameDir = get_arg(argc, argv, "gameDir", "");
 
-    // Java: new File(...).getAbsoluteFile()
+// Java: new File(...).getAbsoluteFile()
     char *absolute = realpath(gameDir[0] != '\0' ? gameDir : ".", NULL);
 
     struct stat status;
     if (absolute == NULL || stat(absolute, &status) != 0 || !S_ISDIR(status.st_mode))
     {
-        // Java: throw new RuntimeException("The game directory passed on the command-line is not a directory: " + gameDir)
+// Java: throw new RuntimeException("The game directory passed on the command-line is not a directory: " + gameDir)
         LIBMATTI_ML_Logger_Error(LIBMATTI_ML_LogManager_GetLogger(), NULL,
                                  "The game directory passed on the command-line is not a directory: {}",
                                  gameDir);
@@ -88,7 +88,7 @@ static void list_classpath_entries(char ***entries, size_t *count)
     *entries = NULL;
     *count = 0;
 
-    // Java: System.getProperty("java.class.path").split(File.pathSeparator)
+// Java: System.getProperty("java.class.path").split(File.pathSeparator)
     const char *classPath = getenv("java.class.path");
     if (classPath == NULL) return;
 
@@ -116,12 +116,12 @@ static int has_custom_logging_configuration(void)
 // Java: static void overwriteLoggingConfiguration()
 static void overwrite_logging_configuration(void)
 {
-    // Java: if (System.getProperty("log4j2.disable.jmx") == null && System.getenv("LOG4J_DISABLE_JMX") == null)
+// Java: if (System.getProperty("log4j2.disable.jmx") == null && System.getenv("LOG4J_DISABLE_JMX") == null)
     //           System.setProperty("log4j2.disable.jmx", "true");
     if (getenv("log4j2.disable.jmx") == NULL && getenv("LOG4J_DISABLE_JMX") == NULL)
         setenv("log4j2.disable.jmx", "true", 1);
 
-    // Java: var loggingConfigUrl = Entrypoint.class.getResource("log4j2.xml");
+// Java: var loggingConfigUrl = Entrypoint.class.getResource("log4j2.xml");
     //       if (loggingConfigUrl == null) return;
     //       var configSource = ConfigurationSource.fromUri(loggingConfigUri);
     //       Configurator.reconfigure(ConfigurationFactory.getInstance().getConfiguration(LoggerContext.getContext(), configSource));
@@ -153,7 +153,7 @@ void LIBMATTI_FML_Entrypoint_Free(LIBMATTI_FML_Entrypoint *entrypoint)
 LIBMATTI_FML_Entrypoint_StartupResult *LIBMATTI_FML_Entrypoint_Startup(int argc, char *argv[], int headless,
                                                                       LIBMATTI_DIST_Dist dist, int cleanDist)
 {
-    // Java: long startupUptime = ManagementFactory.getRuntimeMXBean().getUptime();
+// Java: long startupUptime = ManagementFactory.getRuntimeMXBean().getUptime();
     // the port takes the process start time as the "VM start" (getUptime = now - start)
     static long long startupUptimeMillis = -1;
     if (startupUptimeMillis < 0)
@@ -169,21 +169,21 @@ LIBMATTI_FML_Entrypoint_StartupResult *LIBMATTI_FML_Entrypoint_Startup(int argc,
     char startupUptime[32];
     snprintf(startupUptime, sizeof(startupUptime), "%lld", uptime);
 
-    // Java: if (!hasCustomLoggingConfiguration()) { overwriteLoggingConfiguration(); }
+// Java: if (!hasCustomLoggingConfiguration()) { overwriteLoggingConfiguration(); }
     if (!has_custom_logging_configuration())
     {
         overwrite_logging_configuration();
     }
 
-    // Java: var logger = LoggerFactory.getLogger(Entrypoint.class);
+// Java: var logger = LoggerFactory.getLogger(Entrypoint.class);
     LIBMATTI_ML_Logger *logger = LIBMATTI_ML_LogManager_GetLogger();
 
-    // Java: logger.info("JVM Uptime at startup: {}ms", startupUptime);
+// Java: logger.info("JVM Uptime at startup: {}ms", startupUptime);
     LIBMATTI_ML_Logger_Info(logger, NULL, "JVM Uptime at startup: {}ms", startupUptime);
 
     LIBMATTI_FML_StartupArgs *startupArgs = calloc(1, sizeof(LIBMATTI_FML_StartupArgs));
 
-    // Java: getGameDir(args)
+// Java: getGameDir(args)
     startupArgs->gameDirectory = get_game_dir(argc, argv);
     if (startupArgs->gameDirectory == NULL)
     {
@@ -197,24 +197,24 @@ LIBMATTI_FML_Entrypoint_StartupResult *LIBMATTI_FML_Entrypoint_Startup(int argc,
     startupArgs->argc = argc;
     startupArgs->programArgs = argv;
 
-    // Java: new HashSet<>()
+// Java: new HashSet<>()
     startupArgs->claimedFileCount = 0;
 
-    // Java: listClasspathEntries()
+// Java: listClasspathEntries()
     list_classpath_entries(&startupArgs->unclaimedClassPathEntries, &startupArgs->unclaimedClassPathEntryCount);
 
-    // Java: Thread.currentThread().getContextClassLoader()
+// Java: Thread.currentThread().getContextClassLoader()
     startupArgs->parentClassLoader =
         LIBMATTI_JL_Thread_GetContextClassLoader(LIBMATTI_JL_Thread_CurrentThread());
 
-    // Java: return new StartupResult(FMLLoader.create(DevAgent.getInstrumentation(), startupArgs), startupArgs);
+// Java: return new StartupResult(FMLLoader.create(DevAgent.getInstrumentation(), startupArgs), startupArgs);
     LIBMATTI_FML_FMLLoader *loader = LIBMATTI_FML_FMLLoader_CreateWithInstrumentation(
         LIBMATTI_FML_DevAgent_GetInstrumentation(), startupArgs);
 
-    // Java: create(...) threw -> the catch clause below runs
+// Java: create(...) threw -> the catch clause below runs
     if (loader == NULL)
     {
-        // Java: catch (Exception e) {
+// Java: catch (Exception e) {
         //           var sw = new StringWriter();
         //           e.printStackTrace(new PrintWriter(sw));
         //           logger.error("Failed to start FML: {}", sw);
@@ -224,17 +224,17 @@ LIBMATTI_FML_Entrypoint_StartupResult *LIBMATTI_FML_Entrypoint_Startup(int argc,
         if (e == NULL)
             e = LIBMATTI_JL_Throwable_NewNamed("java.lang.RuntimeException", "FMLLoader.create failed");
 
-        // Java: var sw = new StringWriter();
+// Java: var sw = new StringWriter();
         LIBMATTI_JI_StringWriter *sw = LIBMATTI_JI_StringWriter_New();
-        // Java: e.printStackTrace(new PrintWriter(sw));
+// Java: e.printStackTrace(new PrintWriter(sw));
         LIBMATTI_JI_PrintWriter *pw = LIBMATTI_JI_PrintWriter_New(&sw->base);
         LIBMATTI_JL_Throwable_PrintStackTraceTo(e, pw);
         LIBMATTI_JI_PrintWriter_Flush(pw);
 
-        // Java: logger.error("Failed to start FML: {}", sw);
+// Java: logger.error("Failed to start FML: {}", sw);
         LIBMATTI_ML_Logger_Error(logger, NULL, "Failed to start FML: {}", LIBMATTI_JI_StringWriter_ToString(sw));
 
-        // Java: throw new FatalStartupException("Failed to start FML: " + e, startupArgs, e);
+// Java: throw new FatalStartupException("Failed to start FML: " + e, startupArgs, e);
         LIBMATTI_JL_StringBuilder *message = LIBMATTI_JL_StringBuilder_NewFromString("Failed to start FML: ");
         LIBMATTI_JL_StringBuilder_Append(message, LIBMATTI_JL_Throwable_GetName(e));
         LIBMATTI_JL_StringBuilder_Append(message, ": ");
@@ -258,15 +258,15 @@ LIBMATTI_FML_Entrypoint_StartupResult *LIBMATTI_FML_Entrypoint_Startup(int argc,
 LIBMATTI_JLI_MethodHandle *LIBMATTI_FML_Entrypoint_CreateMainMethodCallable(
     LIBMATTI_FML_Entrypoint_StartupResult *startupResult, const char *mainClassName)
 {
-    // Java: var currentClassLoader = startupResult.loader.getCurrentClassLoader();
+// Java: var currentClassLoader = startupResult.loader.getCurrentClassLoader();
     LIBMATTI_JL_ClassLoader *currentClassLoader =
         LIBMATTI_FML_FMLLoader_GetCurrentClassLoader(startupResult->loader);
 
-    // Java: var mainClass = Class.forName(mainClassName, true, currentClassLoader);
+// Java: var mainClass = Class.forName(mainClassName, true, currentClassLoader);
     LIBMATTI_JL_Class *mainClass = LIBMATTI_JL_Class_ForName(mainClassName, 1, currentClassLoader);
     if (mainClass == NULL)
     {
-        // Java: catch (ClassNotFoundException e) {
+// Java: catch (ClassNotFoundException e) {
         //           throw new FatalStartupException("Missing main class " + mainClassName + " on the classpath.", ...); }
         char *message = concat("Missing main class ", mainClassName, " on the classpath.");
         lastException = fatal_startup_exception(message, startupResult->startupArgs, NULL);
@@ -274,7 +274,7 @@ LIBMATTI_JLI_MethodHandle *LIBMATTI_FML_Entrypoint_CreateMainMethodCallable(
         return NULL;
     }
 
-    // Java: if (mainClass.getClassLoader() != currentClassLoader) {
+// Java: if (mainClass.getClassLoader() != currentClassLoader) {
     //           throw new FatalStartupException("Missing main class " + mainClassName
     //                   + " from the game content loader (but available on " + mainClass.getClassLoader() + ").", ...); }
     if (LIBMATTI_JL_Class_GetClassLoader(mainClass) != currentClassLoader)
@@ -285,21 +285,21 @@ LIBMATTI_JLI_MethodHandle *LIBMATTI_FML_Entrypoint_CreateMainMethodCallable(
         return NULL;
     }
 
-    // Java: var lookup = MethodHandles.publicLookup();
+// Java: var lookup = MethodHandles.publicLookup();
     LIBMATTI_JLI_MethodHandles_Lookup *lookup = LIBMATTI_JLI_MethodHandles_PublicLookup();
 
-    // Java: var methodType = MethodType.methodType(void.class, String[].class);
+// Java: var methodType = MethodType.methodType(void.class, String[].class);
     LIBMATTI_JL_Class **parameterTypes = malloc(sizeof(*parameterTypes));
     parameterTypes[0] = LIBMATTI_JL_Class_StringArrayType();
     LIBMATTI_JLI_MethodType *methodType = LIBMATTI_JLI_MethodType_MethodType(LIBMATTI_JL_Class_VoidType(),
                                                                             parameterTypes, 1);
 
-    // Java: return lookup.findStatic(mainClass, "main", methodType);
+// Java: return lookup.findStatic(mainClass, "main", methodType);
     LIBMATTI_JLI_MethodHandle *handle =
         LIBMATTI_JLI_MethodHandles_Lookup_FindStatic(lookup, mainClass, "main", methodType);
     if (handle == NULL)
     {
-        // Java: catch (NoSuchMethodException e) {
+// Java: catch (NoSuchMethodException e) {
         //           throw new FatalStartupException(mainClassName + " is missing a static 'main' method.", ...); }
         LIBMATTI_JLI_MethodType_Free(methodType);
 
@@ -315,7 +315,7 @@ LIBMATTI_JLI_MethodHandle *LIBMATTI_FML_Entrypoint_CreateMainMethodCallable(
 // Java: protected static @Nullable Thread findThread(String threadName)
 void *LIBMATTI_FML_Entrypoint_FindThread(const char *threadName)
 {
-    // Java: Thread serverThread = null;
+// Java: Thread serverThread = null;
     //       for (var thread : Thread.getAllStackTraces().keySet()) {
     //           if (threadName.equals(thread.getName())) { if (serverThread == null || thread.threadId() <= serverThread.threadId()) serverThread = thread; } }
     //       return serverThread;
@@ -354,7 +354,7 @@ void LIBMATTI_FML_Entrypoint_StartupResult_Close(LIBMATTI_FML_Entrypoint_Startup
 {
     if (startupResult == NULL) return;
 
-    // Java: loader.close();
+// Java: loader.close();
     LIBMATTI_FML_FMLLoader_Close(startupResult->loader);
     LIBMATTI_FML_FMLLoader_Free(startupResult->loader);
 

@@ -1,4 +1,5 @@
-// Port of java.lang.reflect.Modifier.
+
+
 
 #include "libmatti/java/lang/reflect/Modifier.h"
 

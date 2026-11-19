@@ -1,9 +1,10 @@
-// Port of the earlydisplay font pipeline's shader piece (Theme.SHADER_FONT).
-// Java ships gui.vert + gui_font.frag as theme resources; the port embeds the
-// same GLSL sources (copied 1:1 from
-// vendor/FancyModLoader/earlydisplay/src/main/resources/.../theme/) and
-// compiles the pair with the GL binding (no file I/O, like Java's
-// ElementShader does with its static strings).
+
+
+
+
+
+
+
 
 #ifndef MATTICRAFT_FML_EARLYDISPLAY_FONTSHADER_H
 #define MATTICRAFT_FML_EARLYDISPLAY_FONTSHADER_H
@@ -37,10 +38,11 @@
     "    fragColor = texture(tex, fTex).r * fColour;\n" \
     "}\n"
 
-// Compile (and link) the embedded font shader pair; returns the program id
-// (0 when no GL context exists or compilation failed, like the binding's
-// fallbacks). screenSizeLocation receives the uniform location (-1 when the
-// compiler optimized it away or the program is invalid).
+
+
+
+
+
 unsigned int LIBMATTI_FML_FontShader_Compile(int *screenSizeLocation);
 
-#endif //MATTICRAFT_FML_EARLYDISPLAY_FONTSHADER_H
+#endif

@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.loading.moddiscovery.ModFileParser.
+
+
 
 #ifndef MATTICRAFT_FML_LOADING_MODDISCOVERY_MODFILEPARSER_H
 #define MATTICRAFT_FML_LOADING_MODDISCOVERY_MODFILEPARSER_H
@@ -39,4 +40,4 @@ LIBMATTI_FML_ModFileParser_MixinConfig *LIBMATTI_FML_ModFileParser_GetMixinConfi
 int LIBMATTI_FML_ModFileParser_GetAccessTransformers(LIBMATTI_NEOFORGESPI_IModFileInfo *modFileInfo, char ***out,
                                                      size_t *count);
 
-#endif //MATTICRAFT_FML_LOADING_MODDISCOVERY_MODFILEPARSER_H
+#endif

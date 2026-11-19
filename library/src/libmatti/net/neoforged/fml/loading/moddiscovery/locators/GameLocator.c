@@ -81,7 +81,7 @@ static int maskedResourceFilter(const char *relativePath, void *userdata)
 {
     MaskedResourceFilter *filter = userdata;
 
-    // Java: pathFilter = relativePath -> !relativePath.endsWith(".class")
+// Java: pathFilter = relativePath -> !relativePath.endsWith(".class")
     if (filter->excludeClasses && endsWith(relativePath, ".class")) return 0;
 
     for (size_t i = 0; i < filter->maskedResourceCount; i++)
@@ -106,7 +106,7 @@ static int containsJarContents(LIBMATTI_FML_JarContents **contents, size_t count
 // Java: private static JarContents.@Nullable PathFilter getMaskedResourceFilter(JarContents jar, Dist requiredDist)
 static MaskedResourceFilter *getMaskedResourceFilter(LIBMATTI_FML_JarContents *jar, LIBMATTI_DIST_Dist requiredDist)
 {
-    // Java: NeoForgeDevDistCleaner.getMaskedFiles(jar, requiredDist).filter(path -> !path.endsWith(".class")).collect(toSet())
+// Java: NeoForgeDevDistCleaner.getMaskedFiles(jar, requiredDist).filter(path -> !path.endsWith(".class")).collect(toSet())
     size_t maskedCount = 0;
     char **masked = LIBMATTI_FML_NeoForgeDevDistCleaner_GetMaskedFiles(jar, requiredDist, &maskedCount);
 
@@ -135,7 +135,7 @@ static LIBMATTI_FML_FilteredPath buildFilteredMinecraftResourcesFilteredPath(
     LIBMATTI_FML_FilteredPath filteredPath = {0};
     filteredPath.path = LIBMATTI_FML_JarContents_GetPrimaryPath(container);
 
-    // Java: if (systemFiles.getClassesRoots().contains(container)) pathFilter = relativePath -> !relativePath.endsWith(".class");
+// Java: if (systemFiles.getClassesRoots().contains(container)) pathFilter = relativePath -> !relativePath.endsWith(".class");
     size_t classRootCount = 0;
     LIBMATTI_FML_JarContents **classRoots = LIBMATTI_FML_RequiredSystemFiles_GetClassesRoots(systemFiles,
                                                                                             &classRootCount);
@@ -145,7 +145,7 @@ static LIBMATTI_FML_FilteredPath buildFilteredMinecraftResourcesFilteredPath(
     MaskedResourceFilter *masked = getMaskedResourceFilter(container, requiredDist);
     if (isClassRoot || masked != NULL)
     {
-        // Java: JarContents.PathFilter.and(pathFilter, getMaskedResourceFilter(container, requiredDist))
+// Java: JarContents.PathFilter.and(pathFilter, getMaskedResourceFilter(container, requiredDist))
         if (masked == NULL) masked = calloc(1, sizeof(MaskedResourceFilter));
         masked->excludeClasses = isClassRoot;
         filteredPath.filter = maskedResourceFilter;
@@ -196,7 +196,7 @@ static void addContentRoot(LIBMATTI_FML_FilteredPath **roots, size_t *rootCount,
 static LIBMATTI_FML_JarContents *getCombinedMinecraftJar(LIBMATTI_NEOFORGESPI_ILaunchContext *context,
                                                          LIBMATTI_FML_RequiredSystemFiles *systemFiles)
 {
-    // Java: if (systemFiles.getCommonResources() == systemFiles.getNeoForgeResources()) throw new IllegalStateException(...)
+// Java: if (systemFiles.getCommonResources() == systemFiles.getNeoForgeResources()) throw new IllegalStateException(...)
     if (LIBMATTI_FML_RequiredSystemFiles_GetCommonResources(systemFiles) ==
         LIBMATTI_FML_RequiredSystemFiles_GetNeoForgeResources(systemFiles))
         return NULL;
@@ -217,13 +217,13 @@ static LIBMATTI_FML_JarContents *getCombinedMinecraftJar(LIBMATTI_NEOFORGESPI_IL
 // Java: private static String detectMinecraftVersion(JarContents mcJarContents)
 char *LIBMATTI_FML_GameLocator_DetectMinecraftVersion(LIBMATTI_FML_JarContents *mcJarContents)
 {
-    // Java: try (var in = mcJarContents.openFile("version.json")) { ... new Gson().fromJson(reader, JsonObject.class)
+// Java: try (var in = mcJarContents.openFile("version.json")) { ... new Gson().fromJson(reader, JsonObject.class)
     //       .getAsJsonPrimitive("id").getAsString(); }
     size_t length = 0;
     unsigned char *bytes = LIBMATTI_FML_JarContents_OpenFile(mcJarContents, "version.json", &length);
     if (bytes == NULL)
     {
-        // Java: LOG.error("Minecraft version.json not found in {}.", mcJarContents); throw new ModLoadingException(...)
+// Java: LOG.error("Minecraft version.json not found in {}.", mcJarContents); throw new ModLoadingException(...)
         LIBMATTI_ML_Logger_Error(LOGGER(), NULL, "Minecraft version.json not found in {}.",
                                  LIBMATTI_FML_JarContents_GetPrimaryPath(mcJarContents));
         LIBMATTI_FML_ModLoader_AddLoadingIssue(
@@ -231,14 +231,14 @@ char *LIBMATTI_FML_GameLocator_DetectMinecraftVersion(LIBMATTI_FML_JarContents *
         return NULL;
     }
 
-    // Java: var versionElement = new Gson().fromJson(reader, JsonObject.class);
+// Java: var versionElement = new Gson().fromJson(reader, JsonObject.class);
     LIBMATTI_GSON_Gson *gson = LIBMATTI_GSON_Gson_New();
     LIBMATTI_GSON_JsonElement *versionElement = LIBMATTI_GSON_Gson_FromJson(gson, (const char *) bytes, length);
     free(bytes);
     LIBMATTI_GSON_Gson_Free(gson);
     if (versionElement == NULL)
     {
-        // Java: catch (IOException e) { LOG.error("Failed to read Minecraft version.json from {}"); throw new ModLoadingException(...withCause(e)); }
+// Java: catch (IOException e) { LOG.error("Failed to read Minecraft version.json from {}"); throw new ModLoadingException(...withCause(e)); }
         LIBMATTI_JL_Throwable *cause = LIBMATTI_JL_Throwable_NewNamed("java.io.IOException",
                                                                       "Failed to parse version.json");
         LIBMATTI_ML_Logger_Error(LOGGER(), NULL, "Failed to read Minecraft version.json from {}",
@@ -249,11 +249,11 @@ char *LIBMATTI_FML_GameLocator_DetectMinecraftVersion(LIBMATTI_FML_JarContents *
         return NULL;
     }
 
-    // Java: var idPrimitive = versionElement.getAsJsonPrimitive("id"); if (idPrimitive == null) { ... }
+// Java: var idPrimitive = versionElement.getAsJsonPrimitive("id"); if (idPrimitive == null) { ... }
     LIBMATTI_GSON_JsonElement *idPrimitive = LIBMATTI_GSON_JsonElement_GetMember(versionElement, "id");
     if (idPrimitive == NULL || !LIBMATTI_GSON_JsonElement_IsJsonPrimitive(idPrimitive))
     {
-        // Java: LOG.error("Minecraft version.json found in {} is missing 'id' field. Available fields are: {}", ...);
+// Java: LOG.error("Minecraft version.json found in {} is missing 'id' field. Available fields are: {}", ...);
         char *availableFields = LIBMATTI_GSON_JsonElement_ToString(versionElement);
         LIBMATTI_ML_Logger_Error(LOGGER(), NULL,
                                  "Minecraft version.json found in {} is missing 'id' field. Available fields are: {}",
@@ -265,7 +265,7 @@ char *LIBMATTI_FML_GameLocator_DetectMinecraftVersion(LIBMATTI_FML_JarContents *
         return NULL;
     }
 
-    // Java: minecraftVersion = idPrimitive.getAsString();
+// Java: minecraftVersion = idPrimitive.getAsString();
     char *minecraftVersion = LIBMATTI_GSON_JsonElement_GetAsString(idPrimitive);
     LIBMATTI_GSON_JsonElement_Free(versionElement);
     return minecraftVersion;
@@ -282,7 +282,7 @@ static void handleMergedMinecraftAndNeoForgeJar(LIBMATTI_NEOFORGESPI_ILaunchCont
     LIBMATTI_FML_JarContents *mcJarContents = getCombinedMinecraftJar(context, systemFiles);
     LIBMATTI_NEOFORGESPI_IModFile *minecraftModFile;
 
-    // Java: if (mcJarContents.containsFile("META-INF/neoforged.mods.toml")) pipeline.addJarContent(...)
+// Java: if (mcJarContents.containsFile("META-INF/neoforged.mods.toml")) pipeline.addJarContent(...)
     if (LIBMATTI_FML_JarContents_ContainsFile(mcJarContents, LIBMATTI_FML_MODS_TOML))
     {
         LIBMATTI_NEOFORGESPI_ModFileDiscoveryAttributes attributes =
@@ -292,7 +292,7 @@ static void handleMergedMinecraftAndNeoForgeJar(LIBMATTI_NEOFORGESPI_ILaunchCont
             &minecraftModFile);
         if (minecraftModFile == NULL)
         {
-            // Java: throw new ModLoadingException(error("fml.modloadingissue.corrupted_minecraft_jar"));
+// Java: throw new ModLoadingException(error("fml.modloadingissue.corrupted_minecraft_jar"));
             LIBMATTI_FML_ModLoader_AddLoadingIssue(LIBMATTI_FML_ModLoadingIssue_Error(
                 "fml.modloadingissue.corrupted_minecraft_jar", NULL, 0));
             LIBMATTI_ML_Logger_Error(LOGGER(), NULL, "{}", "fml.modloadingissue.corrupted_minecraft_jar");
@@ -301,7 +301,7 @@ static void handleMergedMinecraftAndNeoForgeJar(LIBMATTI_NEOFORGESPI_ILaunchCont
     }
     else
     {
-        // Java: var minecraftVersion = detectMinecraftVersion(mcJarContents); var mcJarMetadata = new ModJarMetadata(); minecraftModFile = IModFile.create(mcJarContents, mcJarMetadata, new MinecraftModInfo(minecraftVersion)::buildMinecraftModInfo);
+// Java: var minecraftVersion = detectMinecraftVersion(mcJarContents); var mcJarMetadata = new ModJarMetadata(); minecraftModFile = IModFile.create(mcJarContents, mcJarMetadata, new MinecraftModInfo(minecraftVersion)::buildMinecraftModInfo);
         char *minecraftVersion = LIBMATTI_FML_GameLocator_DetectMinecraftVersion(mcJarContents);
         LIBMATTI_FML_MinecraftModInfo *minecraftModInfo = LIBMATTI_FML_MinecraftModInfo_New(
             minecraftVersion != NULL ? minecraftVersion : "");
@@ -312,7 +312,7 @@ static void handleMergedMinecraftAndNeoForgeJar(LIBMATTI_NEOFORGESPI_ILaunchCont
         LIBMATTI_FML_ModJarMetadata_SetModFile(mcJarMetadata, minecraftModFile);
         if (!LIBMATTI_NEOFORGESPI_IDiscoveryPipeline_AddModFile(pipeline, minecraftModFile))
         {
-            // Java: throw new ModLoadingException(error("fml.modloadingissue.corrupted_minecraft_jar"));
+// Java: throw new ModLoadingException(error("fml.modloadingissue.corrupted_minecraft_jar"));
             LIBMATTI_FML_ModLoader_AddLoadingIssue(LIBMATTI_FML_ModLoadingIssue_Error(
                 "fml.modloadingissue.corrupted_minecraft_jar", NULL, 0));
             LIBMATTI_ML_Logger_Error(LOGGER(), NULL, "{}", "fml.modloadingissue.corrupted_minecraft_jar");
@@ -320,7 +320,7 @@ static void handleMergedMinecraftAndNeoForgeJar(LIBMATTI_NEOFORGESPI_ILaunchCont
         }
     }
 
-    // Java: if (!minecraftModFile.getId().equals("minecraft")) throw new ModLoadingException(...)
+// Java: if (!minecraftModFile.getId().equals("minecraft")) throw new ModLoadingException(...)
     if (strcmp(LIBMATTI_NEOFORGESPI_IModFile_GetId(minecraftModFile), "minecraft") != 0)
     {
         LIBMATTI_ML_Logger_Error(LOGGER(), NULL, "The mod id for the Minecraft jar is not 'minecraft': {}",
@@ -330,7 +330,7 @@ static void handleMergedMinecraftAndNeoForgeJar(LIBMATTI_NEOFORGESPI_ILaunchCont
         return;
     }
 
-    // Java: JarContents nfJarContents = JarContents.ofFilteredPaths(nfJarRoots);
+// Java: JarContents nfJarContents = JarContents.ofFilteredPaths(nfJarRoots);
     size_t neoForgeRootCount = 0;
     LIBMATTI_FML_JarContents **neoForgeRoots = LIBMATTI_FML_RequiredSystemFiles_GetNeoForgeJarComponents(
         systemFiles, &neoForgeRootCount);
@@ -353,7 +353,7 @@ static void handleMergedMinecraftAndNeoForgeJar(LIBMATTI_NEOFORGESPI_ILaunchCont
         return;
     }
 
-    // Java: var modFile = JarModsDotTomlModFileReader.createModFile(nfJarContents, ModFileDiscoveryAttributes.DEFAULT);
+// Java: var modFile = JarModsDotTomlModFileReader.createModFile(nfJarContents, ModFileDiscoveryAttributes.DEFAULT);
     LIBMATTI_NEOFORGESPI_ModFileDiscoveryAttributes attributes =
         LIBMATTI_NEOFORGESPI_ModFileDiscoveryAttributes_Default();
     LIBMATTI_NEOFORGESPI_IModFile *modFile = LIBMATTI_FML_JarModsDotTomlModFileReader_CreateModFile(nfJarContents,
@@ -365,7 +365,7 @@ static void handleMergedMinecraftAndNeoForgeJar(LIBMATTI_NEOFORGESPI_ILaunchCont
     }
     LIBMATTI_NEOFORGESPI_IDiscoveryPipeline_AddModFile(pipeline, modFile);
 
-    // Java: systemFiles.getAll().stream().map(JarContents::getPrimaryPath).forEach(context::addLocated);
+// Java: systemFiles.getAll().stream().map(JarContents::getPrimaryPath).forEach(context::addLocated);
     size_t allCount = 0;
     LIBMATTI_FML_JarContents **all = LIBMATTI_FML_RequiredSystemFiles_GetAll(systemFiles, &allCount);
     for (size_t i = 0; i < allCount; i++)
@@ -388,7 +388,7 @@ static void locateProductionMinecraft(LIBMATTI_NEOFORGESPI_ILaunchContext *conte
 static void preventLoadingOfObfuscatedClientJar(LIBMATTI_NEOFORGESPI_ILaunchContext *context,
                                                LIBMATTI_JL_ClassLoader *ourCl)
 {
-    // Java: var resources = ourCl.getResources(RequiredSystemFiles.COMMON_CLASS);
+// Java: var resources = ourCl.getResources(RequiredSystemFiles.COMMON_CLASS);
     size_t resourceCount = 0;
     LIBMATTI_JN_URL **resources = LIBMATTI_JL_ClassLoader_FindResources(ourCl,
                                                                        LIBMATTI_FML_REQUIRED_COMMON_CLASS,
@@ -399,7 +399,7 @@ static void preventLoadingOfObfuscatedClientJar(LIBMATTI_NEOFORGESPI_ILaunchCont
             LIBMATTI_FML_REQUIRED_COMMON_CLASS, "minecraft jar", resources[i]);
         if (jarPath == NULL) continue;
 
-        // Java: try (var zip = new ZipFile(jarPath.toFile())) { ... }
+// Java: try (var zip = new ZipFile(jarPath.toFile())) { ... }
         LIBMATTI_FML_JarContents *contents = LIBMATTI_FML_JarContents_OfPath(jarPath);
         if (contents == NULL)
         {
@@ -407,7 +407,7 @@ static void preventLoadingOfObfuscatedClientJar(LIBMATTI_NEOFORGESPI_ILaunchCont
             continue;
         }
 
-        // Java: if (zip.getEntry(RequiredSystemFiles.COMMON_RESOURCE_ROOT) == null) continue;
+// Java: if (zip.getEntry(RequiredSystemFiles.COMMON_RESOURCE_ROOT) == null) continue;
         if (!LIBMATTI_FML_JarContents_ContainsFile(contents, LIBMATTI_FML_REQUIRED_COMMON_RESOURCE_ROOT))
         {
             LIBMATTI_FML_JarContents_Close(contents);
@@ -418,7 +418,7 @@ static void preventLoadingOfObfuscatedClientJar(LIBMATTI_NEOFORGESPI_ILaunchCont
         int hasClientClasses = LIBMATTI_FML_JarContents_ContainsFile(contents, LIBMATTI_FML_REQUIRED_CLIENT_CLASS);
         int hasClientResources = LIBMATTI_FML_JarContents_ContainsFile(contents,
                                                                        LIBMATTI_FML_REQUIRED_CLIENT_RESOURCE_ROOT);
-        // Java: if (hasClientClasses != hasClientResources) continue;
+// Java: if (hasClientClasses != hasClientResources) continue;
         if (hasClientClasses != hasClientResources)
         {
             LIBMATTI_FML_JarContents_Close(contents);
@@ -426,7 +426,7 @@ static void preventLoadingOfObfuscatedClientJar(LIBMATTI_NEOFORGESPI_ILaunchCont
             continue;
         }
 
-        // Java: if (zip.getEntry("META-INF/neoforge.mods.toml") != null) continue;
+// Java: if (zip.getEntry("META-INF/neoforge.mods.toml") != null) continue;
         if (LIBMATTI_FML_JarContents_ContainsFile(contents, LIBMATTI_FML_MODS_TOML))
         {
             LIBMATTI_FML_JarContents_Close(contents);
@@ -449,17 +449,17 @@ void LIBMATTI_FML_GameLocator_FindCandidates(void *self, LIBMATTI_NEOFORGESPI_IL
 {
     (void) self;
 
-    // Java: var ourCl = Thread.currentThread().getContextClassLoader();
+// Java: var ourCl = Thread.currentThread().getContextClassLoader();
     LIBMATTI_JL_ClassLoader *ourCl = LIBMATTI_JL_Thread_GetContextClassLoader(LIBMATTI_JL_Thread_CurrentThread());
 
-    // Java: preventLoadingOfObfuscatedClientJar(context, ourCl);
+// Java: preventLoadingOfObfuscatedClientJar(context, ourCl);
     preventLoadingOfObfuscatedClientJar(context, ourCl);
 
-    // Java: try (var systemFiles = RequiredSystemFiles.find(context, ourCl)) { if (!systemFiles.isEmpty()) { ... return; } else LOG.info(...); }
+// Java: try (var systemFiles = RequiredSystemFiles.find(context, ourCl)) { if (!systemFiles.isEmpty()) { ... return; } else LOG.info(...); }
     LIBMATTI_FML_RequiredSystemFiles *systemFiles = LIBMATTI_FML_RequiredSystemFiles_Find(context, ourCl);
     if (!LIBMATTI_FML_RequiredSystemFiles_IsEmpty(systemFiles))
     {
-        // Java: systemFiles.checkForMissingMinecraftFiles(context.getRequiredDistribution() == Dist.CLIENT);
+// Java: systemFiles.checkForMissingMinecraftFiles(context.getRequiredDistribution() == Dist.CLIENT);
         LIBMATTI_FML_RequiredSystemFiles_CheckForMissingMinecraftFiles(
             systemFiles, LIBMATTI_NEOFORGESPI_ILaunchContext_GetRequiredDistribution(context) == LIBMATTI_DIST_CLIENT);
 
@@ -470,7 +470,7 @@ void LIBMATTI_FML_GameLocator_FindCandidates(void *self, LIBMATTI_NEOFORGESPI_IL
 
     LIBMATTI_FML_RequiredSystemFiles_Close(systemFiles);
 
-    // Java: LOGGER.info("Failed to find common Minecraft classes and resources on the classpath. Assuming we're launching production.");
+// Java: LOGGER.info("Failed to find common Minecraft classes and resources on the classpath. Assuming we're launching production.");
     //       locateProductionMinecraft(context, pipeline);
     // The C port has no launcher libraries to fall back on, so the production lookup is not performed.
     locateProductionMinecraft(context, pipeline);

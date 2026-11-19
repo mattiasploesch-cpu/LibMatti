@@ -1,10 +1,11 @@
-// Port of the org.objectweb.asm.tree instruction node classes
-// (InsnNode, IntInsnNode, VarInsnNode, TypeInsnNode, FieldInsnNode,
-//  MethodInsnNode, InvokeDynamicInsnNode, JumpInsnNode, LabelNode,
-//  LdcInsnNode, IincInsnNode, TableSwitchInsnNode, LookupSwitchInsnNode,
-//  MultiANewArrayInsnNode, FrameNode, LineNumberNode).
-// The C port groups these small node types in one header/implementation pair
-// instead of one file per class.
+
+
+
+
+
+
+
+
 
 #ifndef MATTICRAFT_ASM_INSNNODES_H
 #define MATTICRAFT_ASM_INSNNODES_H
@@ -149,4 +150,4 @@ LIBMATTI_ASMT_MultiANewArrayInsnNode *LIBMATTI_ASMT_MultiANewArrayInsnNode_New(c
 LIBMATTI_ASMT_AbstractInsnNode *LIBMATTI_ASMT_AbstractInsnNode_Clone(const LIBMATTI_ASMT_AbstractInsnNode *node);
 void LIBMATTI_ASMT_AbstractInsnNode_Free(LIBMATTI_ASMT_AbstractInsnNode *node);
 
-#endif //MATTICRAFT_ASM_INSNNODES_H
+#endif

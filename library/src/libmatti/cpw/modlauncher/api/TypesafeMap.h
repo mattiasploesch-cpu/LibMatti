@@ -1,8 +1,9 @@
-//
-// Port of cpw.mods.modlauncher.api.TypesafeMap.
-// Java uses java.lang.Class as the type identity; here the class name string
-// takes its place (Key.getOrCreate compares it).
-//
+
+
+
+
+
+
 
 #ifndef MATTICRAFT_MODLAUNCHER_TYPESAFEMAP_H
 #define MATTICRAFT_MODLAUNCHER_TYPESAFEMAP_H
@@ -36,4 +37,4 @@ LIBMATTI_MLA_KeyBuilder *LIBMATTI_MLA_KeyBuilder_New(const char *name, const cha
 // Java: Key<T> get()
 LIBMATTI_MLA_Key *LIBMATTI_MLA_KeyBuilder_Get(LIBMATTI_MLA_KeyBuilder *builder);
 
-#endif //MATTICRAFT_MODLAUNCHER_TYPESAFEMAP_H
+#endif

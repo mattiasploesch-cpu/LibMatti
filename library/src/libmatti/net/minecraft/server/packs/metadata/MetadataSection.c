@@ -86,9 +86,10 @@ const LIBMATTI_MC_MetadataSectionSerializer *LIBMATTI_MC_PackMetadataSection_TYP
     return pack_serializer;
 }
 
-// ---------------------------------------------------------------------------
-// pack.PackMetadataSection
-// ---------------------------------------------------------------------------
+
+
+
+
 
 LIBMATTI_MC_PackMetadataSection *LIBMATTI_MC_PackMetadataSection_FromJson(
     const LIBMATTI_MC_MetadataSectionSerializer *self, const LIBMATTI_GSON_JsonElement *element, char **outError)
@@ -96,7 +97,7 @@ LIBMATTI_MC_PackMetadataSection *LIBMATTI_MC_PackMetadataSection_FromJson(
     (void) self;
     *outError = NULL;
 
-    // Java: record PackMetadataSection(Component description, int packFormat,
+// Java: record PackMetadataSection(Component description, int packFormat,
     //       Optional<InclusiveRange> supportedFormats, IntermediaryFormat descriptionFormat)
     LIBMATTI_GSON_JsonElement *object = LIBMATTI_GSON_JsonElement_GetAsJsonObject((LIBMATTI_GSON_JsonElement *) element);
     if (object == NULL)
@@ -109,7 +110,7 @@ LIBMATTI_MC_PackMetadataSection *LIBMATTI_MC_PackMetadataSection_FromJson(
     LIBMATTI_GSON_JsonElement *description = LIBMATTI_GSON_JsonElement_GetMember(object, "description");
     section->description = description != NULL ? LIBMATTI_GSON_JsonElement_GetAsString(description) : strdup("");
 
-    // Java: "pack_format" (int)
+// Java: "pack_format" (int)
     LIBMATTI_GSON_JsonElement *format = LIBMATTI_GSON_JsonElement_GetMember(object, "pack_format");
     if (format != NULL)
     {
@@ -117,7 +118,7 @@ LIBMATTI_MC_PackMetadataSection *LIBMATTI_MC_PackMetadataSection_FromJson(
         section->descriptionFormat.format = LIBMATTI_GSON_JsonElement_GetAsInt(format);
     }
 
-    // Java: "supported_formats" / "pack_format_border" (inclusive range, int or [min, max])
+// Java: "supported_formats" / "pack_format_border" (inclusive range, int or [min, max])
     LIBMATTI_GSON_JsonElement *supported = LIBMATTI_GSON_JsonElement_GetMember(object, "supported_formats");
     if (supported == NULL) supported = LIBMATTI_GSON_JsonElement_GetMember(object, "pack_format_border");
     if (supported != NULL)
@@ -147,7 +148,7 @@ LIBMATTI_MC_PackMetadataSection *LIBMATTI_MC_PackMetadataSection_FromJson(
         section->descriptionFormat.supported = LIBMATTI_MC_InclusiveRange_Of(min, max);
     }
 
-    // Java: "min_format"/"max_format" (the IntermediaryFormat)
+// Java: "min_format"/"max_format" (the IntermediaryFormat)
     LIBMATTI_GSON_JsonElement *minFormat = LIBMATTI_GSON_JsonElement_GetMember(object, "min_format");
     LIBMATTI_GSON_JsonElement *maxFormat = LIBMATTI_GSON_JsonElement_GetMember(object, "max_format");
     if (minFormat != NULL && maxFormat != NULL)
@@ -177,9 +178,10 @@ void LIBMATTI_MC_PackMetadataSection_Free(LIBMATTI_MC_PackMetadataSection *secti
     free(section);
 }
 
-// ---------------------------------------------------------------------------
-// ResourceFilterSection
-// ---------------------------------------------------------------------------
+
+
+
+
 
 static void filter_pattern_free(LIBMATTI_MC_ResourceFilterSection_Pattern *pattern)
 {
@@ -254,9 +256,10 @@ LIBMATTI_MC_ResourceFilterSection *LIBMATTI_MC_ResourceFilterSection_FromJson(
     return section;
 }
 
-// ---------------------------------------------------------------------------
-// FeatureFlagsMetadataSection
-// ---------------------------------------------------------------------------
+
+
+
+
 
 void LIBMATTI_MC_FeatureFlagsMetadataSection_Free(LIBMATTI_MC_FeatureFlagsMetadataSection *section)
 {
@@ -290,9 +293,10 @@ LIBMATTI_MC_FeatureFlagsMetadataSection *LIBMATTI_MC_FeatureFlagsMetadataSection
     return section;
 }
 
-// ---------------------------------------------------------------------------
-// OverlayMetadataSection
-// ---------------------------------------------------------------------------
+
+
+
+
 
 void LIBMATTI_MC_OverlayMetadataSection_Free(LIBMATTI_MC_OverlayMetadataSection *section)
 {

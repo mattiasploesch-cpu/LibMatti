@@ -1,4 +1,5 @@
-// Port of cpw.mods.modlauncher.DefaultLaunchHandlerService.
+
+
 
 #include "libmatti/cpw/modlauncher/DefaultLaunchHandlerService.h"
 
@@ -28,7 +29,7 @@ static void *default_service_runner_run(LIBMATTI_MLA_ServiceRunner *self, void *
 {
     DefaultServiceRunner *runner = (DefaultServiceRunner *)self;
 
-    // Java: final Class<?> mcClass = Class.forName(gameLayer.findModule("minecraft").orElseThrow(),
+// Java: final Class<?> mcClass = Class.forName(gameLayer.findModule("minecraft").orElseThrow(),
     //                                                "net.minecraft.client.main.Main");
     //       mcClass.getMethod("main", String[].class).invoke(null, (Object) arguments);
     // Class definition/invocation is JVM-backed (external); the C port reports the target.
@@ -60,7 +61,7 @@ static LIBMATTI_MLA_NamedPath *default_get_paths(LIBMATTI_MLA_ILaunchHandlerServ
 {
     (void)self;
 
-    // Java: private static final String LAUNCH_PATH_STRING = System.getProperty(LAUNCH_PROPERTY)
+// Java: private static final String LAUNCH_PATH_STRING = System.getProperty(LAUNCH_PROPERTY)
     const char *launchPath = getenv(LIBMATTI_ML_DefaultLaunchHandlerService_LAUNCH_PROPERTY);
     if (launchPath == NULL)
     {

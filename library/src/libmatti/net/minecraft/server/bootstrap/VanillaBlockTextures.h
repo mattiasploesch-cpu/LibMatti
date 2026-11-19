@@ -1,8 +1,9 @@
-// The vanilla block textures, generated at runtime. Java ships them in
-// assets/minecraft/textures/block/*.png; the port carries the handful the
-// demo level needs (stone, dirt) as procedural 16x16 RGBA images - the
-// stone grayscale noise and the dirt brown are faithful colour matches so
-// the atlas path runs without a resource pack on disk.
+
+
+
+
+
+
 
 #ifndef MATTICRAFT_MC_SERVER_BOOTSTRAP_VANILLABLOCKTEXTURES_H
 #define MATTICRAFT_MC_SERVER_BOOTSTRAP_VANILLABLOCKTEXTURES_H
@@ -23,4 +24,4 @@ LIBMATTI_MC_TextureAtlas *LIBMATTI_MC_VanillaBlockTextures_Bootstrap(int maxText
 }
 #endif
 
-#endif //MATTICRAFT_MC_SERVER_BOOTSTRAP_VANILLABLOCKTEXTURES_H
+#endif

@@ -158,7 +158,8 @@ size_t LIBMATTI_JN_ByteBuffer_GetBytes(LIBMATTI_JN_ByteBuffer *buffer, unsigned 
     return length;
 }
 
-// Java's default ByteOrder is BIG_ENDIAN for the typed accessors
+
+
 int LIBMATTI_JN_ByteBuffer_PutShort(LIBMATTI_JN_ByteBuffer *buffer, uint16_t value)
 {
     if (LIBMATTI_JN_ByteBuffer_Remaining(buffer) < 2)

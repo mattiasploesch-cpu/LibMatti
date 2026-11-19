@@ -1,4 +1,5 @@
-// Port of cpw.mods.modlauncher.api.ILaunchHandlerService.
+
+
 
 #include "libmatti/cpw/modlauncher/api/ILaunchHandlerService.h"
 
@@ -18,7 +19,7 @@ LIBMATTI_MLA_ServiceRunner *LIBMATTI_MLA_ILaunchHandlerService_LaunchService(LIB
 LIBMATTI_MLA_NamedPath *LIBMATTI_MLA_ILaunchHandlerService_GetPaths(LIBMATTI_MLA_ILaunchHandlerService *service,
                                                                     size_t *count)
 {
-    // Java: default NamedPath[] getPaths() { return new NamedPath[0]; }
+// Java: default NamedPath[] getPaths() { return new NamedPath[0]; }
     if (service == NULL || service->getPaths == NULL)
     {
         *count = 0;

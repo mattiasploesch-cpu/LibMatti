@@ -1,7 +1,8 @@
-// Port of net.minecraft.resources.Identifier.
-// Java's String fields become char* copies owned by the identifier; the Codec/StreamCodec/
-// Brigadier parts are out of scope (their owners are not ported yet) - the parse/validate
-// core is complete 1:1.
+
+
+
+
+
 
 #ifndef MATTICRAFT_NET_MINECRAFT_RESOURCES_IDENTIFIER_H
 #define MATTICRAFT_NET_MINECRAFT_RESOURCES_IDENTIFIER_H
@@ -11,9 +12,9 @@
 // Java: public final class Identifier implements Comparable<Identifier>
 typedef struct LIBMATTI_MC_Identifier
 {
-    // Java: private final String namespace;
+// Java: private final String namespace;
     char *namespace;
-    // Java: private final String path;
+// Java: private final String path;
     char *path;
 } LIBMATTI_MC_Identifier;
 
@@ -88,4 +89,4 @@ int LIBMATTI_MC_Identifier_ValidNamespaceChar(char c);
 LIBMATTI_MC_Identifier *LIBMATTI_MC_Identifier_New(const char *namespace_, const char *path);
 void LIBMATTI_MC_Identifier_Free(LIBMATTI_MC_Identifier *identifier);
 
-#endif //MATTICRAFT_NET_MINECRAFT_RESOURCES_IDENTIFIER_H
+#endif

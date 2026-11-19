@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.common.EventBusSubscriber.
+
+
 
 #include "libmatti/net/neoforged/fml/common/EventBusSubscriber.h"
 

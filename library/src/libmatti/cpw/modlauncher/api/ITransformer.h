@@ -1,6 +1,7 @@
-// Port of cpw.mods.modlauncher.api.ITransformer.
-// Java uses generics (T is ClassNode/MethodNode/FieldNode); the C port passes the
-// node as a void* and the target type carries which node class it is.
+
+
+
+
 
 #ifndef MATTICRAFT_MODLAUNCHER_ITRANSFORMER_H
 #define MATTICRAFT_MODLAUNCHER_ITRANSFORMER_H
@@ -31,17 +32,17 @@ void LIBMATTI_MLA_ITransformer_Target_Free(LIBMATTI_MLA_ITransformer_Target *tar
 // Java: interface ITransformer<T>
 typedef struct LIBMATTI_MLA_ITransformer
 {
-    // Java: T transform(T input, ITransformerVotingContext context)
+// Java: T transform(T input, ITransformerVotingContext context)
     void *(*transform)(struct LIBMATTI_MLA_ITransformer *self, void *input,
                        LIBMATTI_MLA_ITransformerVotingContext *context);
-    // Java: TransformerVoteResult castVote(ITransformerVotingContext context)
+// Java: TransformerVoteResult castVote(ITransformerVotingContext context)
     LIBMATTI_MLA_TransformerVoteResult (*castVote)(struct LIBMATTI_MLA_ITransformer *self,
                                                    LIBMATTI_MLA_ITransformerVotingContext *context);
-    // Java: Set<Target<T>> targets()
+// Java: Set<Target<T>> targets()
     LIBMATTI_MLA_ITransformer_Target *(*targets)(struct LIBMATTI_MLA_ITransformer *self, size_t *count);
-    // Java: TargetType<T> getTargetType()
+// Java: TargetType<T> getTargetType()
     const LIBMATTI_MLA_TargetType *(*getTargetType)(struct LIBMATTI_MLA_ITransformer *self);
-    // Java: default String[] labels() { return DEFAULT_LABEL; }
+// Java: default String[] labels() { return DEFAULT_LABEL; }
     char **(*labels)(struct LIBMATTI_MLA_ITransformer *self, size_t *count);
 } LIBMATTI_MLA_ITransformer;
 
@@ -58,4 +59,4 @@ LIBMATTI_MLA_ITransformer_Target *LIBMATTI_MLA_ITransformer_Targets(LIBMATTI_MLA
 const LIBMATTI_MLA_TargetType *LIBMATTI_MLA_ITransformer_GetTargetType(LIBMATTI_MLA_ITransformer *transformer);
 char **LIBMATTI_MLA_ITransformer_Labels(LIBMATTI_MLA_ITransformer *transformer, size_t *count);
 
-#endif //MATTICRAFT_MODLAUNCHER_ITRANSFORMER_H
+#endif

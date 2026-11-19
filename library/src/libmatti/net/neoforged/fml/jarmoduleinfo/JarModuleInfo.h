@@ -1,6 +1,7 @@
-// Port of net.neoforged.fml.jarmoduleinfo.JarModuleInfo.
-// ModuleDescriptor.read exists (ModuleDescriptorRead.c parses the compiled
-// module-info.class), implemented by ModuleJarModuleInfo.
+
+
+
+
 
 #ifndef MATTICRAFT_FML_JARMODULEINFO_JARMODULEINFO_H
 #define MATTICRAFT_FML_JARMODULEINFO_JARMODULEINFO_H
@@ -17,13 +18,13 @@ struct LIBMATTI_FML_JarModuleInfo
 {
     void *self;
 
-    // Java: String name()
+// Java: String name()
     const char *(*name)(void *self);
-    // Java: @Nullable String version()
+// Java: @Nullable String version()
     const char *(*version)(void *self);
-    // Java: ModuleDescriptor createDescriptor(JarContents contents)
+// Java: ModuleDescriptor createDescriptor(JarContents contents)
     LIBMATTI_JL_ModuleDescriptor *(*createDescriptor)(void *self, LIBMATTI_FML_JarContents *contents);
-    // Java: the module info is owned by ModFile and collected by the GC; the port releases it explicitly
+// Java: the module info is owned by ModFile and collected by the GC; the port releases it explicitly
     void (*free)(void *self);
 };
 
@@ -48,4 +49,4 @@ LIBMATTI_JL_ModuleDescriptor *LIBMATTI_FML_JarModuleInfo_CreateDescriptor(const 
 // Java: the GC - releases the module info
 void LIBMATTI_FML_JarModuleInfo_Free(LIBMATTI_FML_JarModuleInfo *moduleInfo);
 
-#endif //MATTICRAFT_FML_JARMODULEINFO_JARMODULEINFO_H
+#endif

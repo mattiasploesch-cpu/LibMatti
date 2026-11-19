@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.common.asm.enumextension.ExtensionInfo.
+
+
 
 #include "libmatti/net/neoforged/fml/common/asm/enumextension/ExtensionInfo.h"
 

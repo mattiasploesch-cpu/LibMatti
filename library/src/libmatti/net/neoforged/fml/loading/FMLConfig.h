@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.loading.FMLConfig.
+
+
 
 #ifndef MATTICRAFT_FML_FMLCONFIG_H
 #define MATTICRAFT_FML_FMLCONFIG_H
@@ -66,4 +67,4 @@ const char *LIBMATTI_FML_FMLConfig_DefaultConfigPath(void);
 // returns the internal array, do not free
 LIBMATTI_FML_FMLConfig_DependencyOverride **LIBMATTI_FML_FMLConfig_GetOverrides(const char *modId, size_t *count);
 
-#endif //MATTICRAFT_FML_FMLCONFIG_H
+#endif

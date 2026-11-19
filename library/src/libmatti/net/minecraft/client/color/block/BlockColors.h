@@ -1,5 +1,6 @@
-// Port of net.minecraft.client.color.block.BlockColor (the functional
-// interface) and net.minecraft.client.color.block.BlockColors.
+
+
+
 
 #ifndef MATTICRAFT_MC_CLIENT_COLOR_BLOCK_BLOCKCOLORS_H
 #define MATTICRAFT_MC_CLIENT_COLOR_BLOCK_BLOCKCOLORS_H
@@ -27,7 +28,7 @@ typedef int (*LIBMATTI_MC_BlockColor)(
 // Java: public class BlockColors
 typedef struct LIBMATTI_MC_BlockColors
 {
-    // Java: private final IdMapper<BlockColor> blockColors
+// Java: private final IdMapper<BlockColor> blockColors
     LIBMATTI_JL_IdMapper *blockColors;
 } LIBMATTI_MC_BlockColors;
 
@@ -61,4 +62,4 @@ void LIBMATTI_MC_BlockColors_Register(LIBMATTI_MC_BlockColors *colors,
 }
 #endif
 
-#endif //MATTICRAFT_MC_CLIENT_COLOR_BLOCK_BLOCKCOLORS_H
+#endif

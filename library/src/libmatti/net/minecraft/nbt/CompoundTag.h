@@ -1,8 +1,9 @@
-// Port of net.minecraft.nbt.CompoundTag.
-// Java backs the tag with a HashMap<String, Tag>; the C port keeps a growable
-// key/value array with string keys owned by the compound. The put/get surface
-// follows the Java methods 1:1 (putByte..putBoolean, getByte/getByteOr, ...);
-// the Codec/store/read parts are the DFU port's business.
+
+
+
+
+
+
 
 #ifndef MATTICRAFT_NET_MINECRAFT_NBT_COMPOUNDTAG_H
 #define MATTICRAFT_NET_MINECRAFT_NBT_COMPOUNDTAG_H
@@ -12,9 +13,10 @@
 // Java: public final class CompoundTag implements Tag - id 10
 typedef struct LIBMATTI_MC_Nbt_CompoundTag
 {
-    // the Tag header (id = TAG_COMPOUND)
+
+
     uint8_t id;
-    // Java: private final Map<String, Tag> tags - keys owned by the compound, values owned too
+// Java: private final Map<String, Tag> tags - keys owned by the compound, values owned too
     char **keys;
     LIBMATTI_MC_Nbt_Tag **values;
     size_t count;
@@ -25,7 +27,8 @@ typedef struct LIBMATTI_MC_Nbt_CompoundTag
 LIBMATTI_MC_Nbt_CompoundTag *LIBMATTI_MC_Nbt_CompoundTag_New(void);
 // Java: CompoundTag copy() as a Tag
 LIBMATTI_MC_Nbt_Tag *LIBMATTI_MC_Nbt_CompoundTag_CopyTag(const LIBMATTI_MC_Nbt_CompoundTag *compound);
-// free the compound and every entry (the LIBMATTI_MC_Nbt_Tag_Free dispatch)
+
+
 void LIBMATTI_MC_Nbt_CompoundTag_FreeEntries(LIBMATTI_MC_Nbt_CompoundTag *compound);
 
 // Java: public Set<String> keySet()
@@ -115,4 +118,4 @@ LIBMATTI_MC_Nbt_Tag *LIBMATTI_MC_Nbt_CompoundTag_Remove(LIBMATTI_MC_Nbt_Compound
 void LIBMATTI_MC_Nbt_CompoundTag_Merge(LIBMATTI_MC_Nbt_CompoundTag *compound,
                                        const LIBMATTI_MC_Nbt_CompoundTag *other);
 
-#endif //MATTICRAFT_NET_MINECRAFT_NBT_COMPOUNDTAG_H
+#endif

@@ -10,7 +10,7 @@
 typedef struct LIBMATTI_NEOFORGESPI_InvalidModFileException
 {
     LIBMATTI_JL_Throwable base;
-    // Java: private final IModFileInfo modFileInfo
+// Java: private final IModFileInfo modFileInfo
     void *modFileInfo;
 } LIBMATTI_NEOFORGESPI_InvalidModFileException;
 
@@ -22,4 +22,4 @@ LIBMATTI_NEOFORGESPI_InvalidModFileException *LIBMATTI_NEOFORGESPI_InvalidModFil
 void *LIBMATTI_NEOFORGESPI_InvalidModFileException_GetBrokenFile(
     const LIBMATTI_NEOFORGESPI_InvalidModFileException *exception);
 
-#endif //MATTICRAFT_NEOFORGESPI_LOCATING_INVALIDMODFILEEXCEPTION_H
+#endif

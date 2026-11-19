@@ -1,4 +1,5 @@
-// Port of com.electronwill.nightconfig.toml.ValueParser.
+
+
 
 #include "libmatti/com/electronwill/nightconfig/toml/ValueParser.h"
 
@@ -137,7 +138,8 @@ static int simplifyNumber(LIBMATTI_NC_TomlParser *parser, const LIBMATTI_NC_Char
 // Java: private static Number parseNumber(CharsWrapper valueChars)
 static LIBMATTI_NC_ValueResult parseNumber(LIBMATTI_NC_TomlParser *parser, const LIBMATTI_NC_CharsWrapper *valueChars)
 {
-    // Parse +-inf and +-nan
+
+
     char first = valueChars->data[0];
     LIBMATTI_NC_CharsWrapper remaining;
     if (first == '-')
@@ -160,7 +162,8 @@ static LIBMATTI_NC_ValueResult parseNumber(LIBMATTI_NC_TomlParser *parser, const
     if (LIBMATTI_NC_CharsWrapper_ContentEquals(&remaining, FP_NAN_CHARS, 3))
         return LIBMATTI_NC_ValueResult_Ok(LIBMATTI_NC_Value_OfDouble(NAN));
 
-    // Detect the base of integers
+
+
     LIBMATTI_NC_CharsWrapper numberChars = *valueChars;
     int base = 10;
     if (valueChars->length > 2)
@@ -185,7 +188,8 @@ static LIBMATTI_NC_ValueResult parseNumber(LIBMATTI_NC_TomlParser *parser, const
     LIBMATTI_NC_ValueResult result = LIBMATTI_NC_ValueResult_Fail();
     int ok = 0;
 
-    // Parse floating-point numbers with additional TOML restrictions.
+
+
     if (base == 10 && LIBMATTI_NC_CharsWrapper_IndexOfFirst(&simple, ONLY_IN_FP_NUMBER, 3) != -1)
     {
         if (simplifiedLength > 1)
@@ -215,7 +219,8 @@ static LIBMATTI_NC_ValueResult parseNumber(LIBMATTI_NC_TomlParser *parser, const
         goto done;
     }
 
-    // Parse integers with additional TOML restrictions.
+
+
     if (base == 10)
     {
         if (simplifiedLength > 1 && simple.data[0] == '0')
@@ -239,7 +244,8 @@ static LIBMATTI_NC_ValueResult parseNumber(LIBMATTI_NC_TomlParser *parser, const
         LIBMATTI_NC_TomlParser_Error(parser, "Invalid integer value");
         goto done;
     }
-    // forbid 0x-123
+
+
     if (longValue < 0 && base != 10)
     {
         LIBMATTI_NC_TomlParser_Error(parser, "Cannot use a negative integer with a base prefix");
@@ -311,7 +317,8 @@ LIBMATTI_NC_ValueResult LIBMATTI_NC_ValueParser_Parse(LIBMATTI_NC_ReaderInput *i
         char *string;
         if (LIBMATTI_NC_ReaderInput_Peek(input) == '\'' && LIBMATTI_NC_ReaderInput_PeekN(input, 1) == '\'')
         {
-            LIBMATTI_NC_ReaderInput_SkipPeeks(input); // Don't include the opening quotes in the String
+            LIBMATTI_NC_ReaderInput_SkipPeeks(input);
+
             string = LIBMATTI_NC_StringParser_ParseMultiLiteral(input, parser);
         }
         else
@@ -326,7 +333,8 @@ LIBMATTI_NC_ValueResult LIBMATTI_NC_ValueParser_Parse(LIBMATTI_NC_ReaderInput *i
         char *string;
         if (LIBMATTI_NC_ReaderInput_Peek(input) == '"' && LIBMATTI_NC_ReaderInput_PeekN(input, 1) == '"')
         {
-            LIBMATTI_NC_ReaderInput_SkipPeeks(input); // Don't include the opening quotes in the String
+            LIBMATTI_NC_ReaderInput_SkipPeeks(input);
+
             string = LIBMATTI_NC_StringParser_ParseMultiBasic(input, parser);
         }
         else
@@ -355,7 +363,7 @@ LIBMATTI_NC_ValueResult LIBMATTI_NC_ValueParser_Parse(LIBMATTI_NC_ReaderInput *i
             LIBMATTI_NC_ReaderInput_ReadUntil(input, END_OF_VALUE_DATE, sizeof(END_OF_VALUE_DATE) - 1);
         if (shouldBeTemporal(&valueChars))
         {
-            // Java: return TemporalParser.parse(valueChars, parser.tomlVersion)
+// Java: return TemporalParser.parse(valueChars, parser.tomlVersion)
             LIBMATTI_JT_Temporal temporal;
             if (!LIBMATTI_NC_TemporalParser_Parse(&valueChars, LIBMATTI_NC_TomlParser_GetTomlVersion(parser), parser,
                                                   &temporal))

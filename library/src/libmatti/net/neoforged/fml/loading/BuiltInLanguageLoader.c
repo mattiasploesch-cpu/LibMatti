@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.loading.BuiltInLanguageLoader.
+
+
 
 #include "libmatti/net/neoforged/fml/loading/BuiltInLanguageLoader.h"
 

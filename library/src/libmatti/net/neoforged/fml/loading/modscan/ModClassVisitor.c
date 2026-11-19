@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.loading.modscan.ModClassVisitor.
+
+
 
 #include "libmatti/net/neoforged/fml/loading/modscan/ModClassVisitor.h"
 
@@ -48,7 +49,7 @@ LIBMATTI_FML_ModAnnotationVisitor *LIBMATTI_FML_ModClassVisitor_VisitAnnotation(
 {
     (void) runtimeVisible;
 
-    // Java: this.asmType.getClassName() is a temporary String
+// Java: this.asmType.getClassName() is a temporary String
     char *member = LIBMATTI_ASM_Type_GetClassName(visitor->asmType);
 
     LIBMATTI_FML_ModAnnotation *annotation = LIBMATTI_FML_ModAnnotation_New(
@@ -84,7 +85,7 @@ LIBMATTI_FML_ModMethodVisitor *LIBMATTI_FML_ModClassVisitor_VisitMethod(
 void LIBMATTI_FML_ModClassVisitor_BuildData(LIBMATTI_FML_ModClassVisitor *visitor,
                                             LIBMATTI_NEOFORGESPI_ModFileScanData *result)
 {
-    // Java: new ClassData(this.asmType, this.asmSuperType, interfaces) - the Type objects move in
+// Java: new ClassData(this.asmType, this.asmSuperType, interfaces) - the Type objects move in
     LIBMATTI_NEOFORGESPI_ClassData classData = {0};
     classData.clazz = LIBMATTI_ASM_Type_GetObjectType(
         LIBMATTI_ASM_Type_GetInternalName(visitor->asmType));
@@ -98,7 +99,7 @@ void LIBMATTI_FML_ModClassVisitor_BuildData(LIBMATTI_FML_ModClassVisitor *visito
 
     LIBMATTI_NEOFORGESPI_ModFileScanData_AddClass(result, &classData);
 
-    // Java: fromModAnnotation(clazz, annotation) hands the Type over
+// Java: fromModAnnotation(clazz, annotation) hands the Type over
     char *clazzName = LIBMATTI_ASM_Type_GetClassName(classData.clazz);
     for (size_t i = 0; i < visitor->annotations.count; i++)
     {

@@ -1,6 +1,7 @@
-// Port of net.minecraft.core.BlockPos (the packed-long format, the relative helpers and
-// MutableBlockPos). The withinManhattan/betweenClosed iterators stay the game port's part
-// until their callers exist - the packed representation and the geometry are complete.
+
+
+
+
 
 #ifndef MATTICRAFT_NET_MINECRAFT_CORE_BLOCKPOS_H
 #define MATTICRAFT_NET_MINECRAFT_CORE_BLOCKPOS_H
@@ -30,9 +31,10 @@ LIBMATTI_MC_BlockPos *LIBMATTI_MC_BlockPos_New(int x, int y, int z);
 // Java: public BlockPos(Vec3i)
 LIBMATTI_MC_BlockPos *LIBMATTI_MC_BlockPos_FromVec3i(const LIBMATTI_MC_Vec3i *v);
 
-// -----------------------------------------------------------------------
-// The packed long representation
-// -----------------------------------------------------------------------
+
+
+
+
 
 // Java: public static final int PACKED_HORIZONTAL_LENGTH (1 + log2(smallestEncompassingPowerOfTwo(30000000)))
 #define LIBMATTI_MC_BlockPos_PACKED_HORIZONTAL_LENGTH 26
@@ -57,9 +59,10 @@ int64_t LIBMATTI_MC_BlockPos_OffsetLongDirection(int64_t packed, LIBMATTI_MC_Dir
 // Java: public static long getFlatIndex(long) - clears the y bits
 int64_t LIBMATTI_MC_BlockPos_GetFlatIndex(int64_t packed);
 
-// -----------------------------------------------------------------------
-// The geometry
-// -----------------------------------------------------------------------
+
+
+
+
 
 // Java: public static BlockPos containing(double, double, double)
 LIBMATTI_MC_BlockPos *LIBMATTI_MC_BlockPos_Containing(double x, double y, double z);
@@ -110,9 +113,10 @@ LIBMATTI_MC_BlockPos *LIBMATTI_MC_BlockPos_Immutable(const LIBMATTI_MC_BlockPos 
 // Java: public BlockPos.MutableBlockPos mutable()
 LIBMATTI_MC_BlockPos *LIBMATTI_MC_BlockPos_Mutable(const LIBMATTI_MC_BlockPos *pos);
 
-// -----------------------------------------------------------------------
-// MutableBlockPos - the same struct with the set/move mutators
-// -----------------------------------------------------------------------
+
+
+
+
 
 // Java: public static class MutableBlockPos extends BlockPos
 LIBMATTI_MC_BlockPos *LIBMATTI_MC_BlockPos_MutableNew(void);
@@ -137,4 +141,4 @@ LIBMATTI_MC_BlockPos *LIBMATTI_MC_BlockPos_MutableSetZ(LIBMATTI_MC_BlockPos *pos
 }
 #endif
 
-#endif //MATTICRAFT_NET_MINECRAFT_CORE_BLOCKPOS_H
+#endif

@@ -1,5 +1,6 @@
-// Port of com.mojang.blaze3d.vertex.CompactVectorArray - a flat float array of
-// xyz triples used for the quad centroids during transparent sorting.
+
+
+
 
 #ifndef MATTICRAFT_BLAZE3D_VERTEX_COMPACTVECTORARRAY_H
 #define MATTICRAFT_BLAZE3D_VERTEX_COMPACTVECTORARRAY_H

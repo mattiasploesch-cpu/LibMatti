@@ -25,4 +25,4 @@ LIBMATTI_FML_ModWorkManager_Executor LIBMATTI_FML_ModWorkManager_ParallelExecuto
 void LIBMATTI_FML_ModWorkManager_Executor_Execute(const LIBMATTI_FML_ModWorkManager_Executor *executor,
                                                   LIBMATTI_FML_ModWorkManager_Task task, void *userdata);
 
-#endif //MATTICRAFT_FML_MODWORKMANAGER_H
+#endif

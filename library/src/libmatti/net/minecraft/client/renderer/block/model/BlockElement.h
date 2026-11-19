@@ -17,13 +17,14 @@ extern "C" {
 // Java: public record BlockElementRotation(Vector3fc origin, Axis axis, float angle, boolean rescale)
 typedef struct LIBMATTI_MC_BlockElementRotation
 {
-    // The rotation origin in model space (0..16 coordinates).
+
+
     float originX;
     float originY;
     float originZ;
-    // Java: Axis - 0 = X, 1 = Y, 2 = Z.
+// Java: Axis - 0 = X, 1 = Y, 2 = Z.
     int axis;
-    // Java: the angle in degrees (-45..45, the multiples of 22.5).
+// Java: the angle in degrees (-45..45, the multiples of 22.5).
     float angle;
     bool rescale;
 } LIBMATTI_MC_BlockElementRotation;
@@ -33,10 +34,10 @@ typedef struct LIBMATTI_MC_BlockElementRotation
 //           boolean shade, int lightEmission)
 typedef struct LIBMATTI_MC_BlockElement
 {
-    // Java: the from/to corners in the 0..16 model space.
+// Java: the from/to corners in the 0..16 model space.
     float fromX, fromY, fromZ;
     float toX, toY, toZ;
-    // Java: Map<Direction, BlockElementFace> - one face per direction at most.
+// Java: Map<Direction, BlockElementFace> - one face per direction at most.
     // The array is indexed by Direction ordinal; NULL when the face is absent.
     LIBMATTI_MC_BlockElementFace *faces[6];
     LIBMATTI_MC_BlockElementRotation *rotation;
@@ -67,4 +68,4 @@ void LIBMATTI_MC_BlockElement_Free(LIBMATTI_MC_BlockElement *element);
 }
 #endif
 
-#endif //MATTICRAFT_MC_CLIENT_RENDERER_BLOCK_MODEL_BLOCKELEMENT_H
+#endif

@@ -1,4 +1,5 @@
-// Port of net.minecraft.world.item.equipment.ArmorMaterial and ArmorMaterials.
+
+
 
 #ifndef MATTICRAFT_MC_WORLD_ITEM_EQUIPMENT_ARMORMATERIALS_H
 #define MATTICRAFT_MC_WORLD_ITEM_EQUIPMENT_ARMORMATERIALS_H
@@ -16,10 +17,10 @@ extern "C" {
 typedef struct LIBMATTI_MC_ArmorMaterial
 {
     int durability;
-    // Java: Map<ArmorType, Integer> defense - indexed by the ArmorType ordinal
+// Java: Map<ArmorType, Integer> defense - indexed by the ArmorType ordinal
     int defense[5];
     int enchantmentValue;
-    // Java: Holder<SoundEvent> equipSound - the sound location
+// Java: Holder<SoundEvent> equipSound - the sound location
     const char *equipSound;
     float toughness;
     float knockbackResistance;
@@ -43,4 +44,4 @@ const LIBMATTI_MC_ArmorMaterial *LIBMATTI_MC_ArmorMaterials_ARMADILLO_SCUTE(void
 }
 #endif
 
-#endif //MATTICRAFT_MC_WORLD_ITEM_EQUIPMENT_ARMORMATERIALS_H
+#endif

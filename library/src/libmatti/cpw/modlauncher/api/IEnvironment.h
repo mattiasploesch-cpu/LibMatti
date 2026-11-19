@@ -1,6 +1,7 @@
-//
-// Port of cpw.mods.modlauncher.api.IEnvironment.
-//
+
+
+
+
 
 #ifndef MATTICRAFT_MODLAUNCHER_IENVIRONMENT_H
 #define MATTICRAFT_MODLAUNCHER_IENVIRONMENT_H
@@ -52,4 +53,4 @@ LIBMATTI_MLA_Key *LIBMATTI_MLA_IEnvironment_Keys_ModList(void);
 LIBMATTI_MLA_Key *LIBMATTI_MLA_IEnvironment_Keys_MlSpecVersion(void);
 LIBMATTI_MLA_Key *LIBMATTI_MLA_IEnvironment_Keys_MlImplVersion(void);
 
-#endif //MATTICRAFT_MODLAUNCHER_IENVIRONMENT_H
+#endif

@@ -1,5 +1,6 @@
-// Port of net.minecraft.nbt.Tag (value factories and NumericTag conversions) plus
-// StringTag.quoteAndEscape/escapeWithoutQuotes and SnbtGrammar.escapeControlCharacters.
+
+
+
 
 #include "libmatti/net/minecraft/nbt/Tag.h"
 
@@ -9,9 +10,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-// ---------------------------------------------------------------------------
-// The container dispatch (CompoundTag.c / ListTag.c provide the real bodies)
-// ---------------------------------------------------------------------------
+
+
+
+
 
 LIBMATTI_MC_Nbt_Tag *LIBMATTI_MC_Nbt_Tag_CopyContainer(const LIBMATTI_MC_Nbt_Tag *tag)
 {
@@ -28,7 +30,7 @@ int LIBMATTI_MC_Nbt_Tag_EqualsContainer(const LIBMATTI_MC_Nbt_Tag *a, const LIBM
         const LIBMATTI_MC_Nbt_CompoundTag *right = (const LIBMATTI_MC_Nbt_CompoundTag *) b;
         if (left->count != right->count)
             return 0;
-        // Java: Objects.equals(this.tags, other.tags) - order-independent map equality
+// Java: Objects.equals(this.tags, other.tags) - order-independent map equality
         for (size_t i = 0; i < left->count; i++)
         {
             LIBMATTI_MC_Nbt_Tag *other = LIBMATTI_MC_Nbt_CompoundTag_Get(right, left->keys[i]);
@@ -172,7 +174,7 @@ LIBMATTI_MC_Nbt_Tag *LIBMATTI_MC_Nbt_Tag_Copy(const LIBMATTI_MC_Nbt_Tag *tag)
     case LIBMATTI_MC_Nbt_TAG_LONG_ARRAY:
         return LIBMATTI_MC_Nbt_LongArrayTag_Of(tag->as.longArray.data, tag->as.longArray.length);
     default:
-        // Java: CompoundTag.copy() / ListTag.copy() - the containers dispatch through their
+// Java: CompoundTag.copy() / ListTag.copy() - the containers dispatch through their
         // own copy functions; Tag.h forward-declares the compound/list copies
         return LIBMATTI_MC_Nbt_Tag_CopyContainer(tag);
     }
@@ -308,7 +310,8 @@ int LIBMATTI_MC_Nbt_Tag_Equals(const LIBMATTI_MC_Nbt_Tag *a, const LIBMATTI_MC_N
     case LIBMATTI_MC_Nbt_TAG_LIST:
         return LIBMATTI_MC_Nbt_Tag_EqualsContainer(a, b);
     default:
-        return 1; // EndTag
+        return 1;
+
     }
 }
 
@@ -339,12 +342,13 @@ static const char *escape_control(char c)
 char *LIBMATTI_MC_Nbt_StringTag_QuoteAndEscape(const char *value)
 {
     size_t length = strlen(value);
-    // worst case: every character escapes to two, plus the two quote characters
+
+
     char *out = malloc(length * 2 + 3);
     size_t outLength = 0;
 
     char quote = 0;
-    out[outLength++] = ' '; // Java: the placeholder at the start position, replaced at the end
+    out[outLength++] = ' ';// Java: the placeholder at the start position, replaced at the end
     for (const char *c = value; *c != '\0'; c++)
     {
         char ch = *c;
@@ -365,7 +369,7 @@ char *LIBMATTI_MC_Nbt_StringTag_QuoteAndEscape(const char *value)
                 }
                 else
                 {
-                    // Java: "x" + HexFormat uppercase byte digits for the remaining controls
+// Java: "x" + HexFormat uppercase byte digits for the remaining controls
                     out[outLength++] = 'x';
                     out[outLength++] = "0123456789ABCDEF"[(unsigned char) ch >> 4];
                     out[outLength++] = "0123456789ABCDEF"[(unsigned char) ch & 0xF];
@@ -398,7 +402,8 @@ char *LIBMATTI_MC_Nbt_StringTag_QuoteAndEscape(const char *value)
 char *LIBMATTI_MC_Nbt_StringTag_EscapeWithoutQuotes(const char *value)
 {
     size_t length = strlen(value);
-    char *out = malloc(length * 6 + 1); // worst case \xHH per character
+    char *out = malloc(length * 6 + 1);
+
     size_t outLength = 0;
     for (const char *c = value; *c != '\0'; c++)
     {

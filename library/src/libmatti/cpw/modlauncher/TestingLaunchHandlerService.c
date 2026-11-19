@@ -1,4 +1,5 @@
-// Port of cpw.mods.modlauncher.TestingLaunchHandlerService.
+
+
 
 #include "TestingLaunchHandlerService.h"
 
@@ -46,17 +47,17 @@ static LIBMATTI_MLA_ServiceRunner *testing_launch_service(LIBMATTI_MLA_ILaunchHa
     (void)argv;
     (void)gameLayer;
 
-    // Java: System.getProperty("test.harness.callable")
+// Java: System.getProperty("test.harness.callable")
     const char *callableName = getenv("test.harness.callable");
 
     for (size_t i = 0; callableName != NULL && i < callableCount; i++)
     {
         if (strcmp(callables[i].className, callableName) != 0) continue;
-        // Java: (ServiceRunner) handle.invoke()
+// Java: (ServiceRunner) handle.invoke()
         return callables[i].supplier(callables[i].userdata);
     }
 
-    // Java: catch (...) { throw new RuntimeException(e); }
+// Java: catch (...) { throw new RuntimeException(e); }
     LIBMATTI_ML_Logger_Error(LIBMATTI_ML_LogManager_GetLogger(), &LIBMATTI_ML_MARKER_MODLAUNCHER,
                              "Unable to resolve test harness callable {}", callableName != NULL ? callableName : "");
     return NULL;
@@ -67,7 +68,7 @@ LIBMATTI_ML_TestingLaunchHandlerService *LIBMATTI_ML_TestingLaunchHandlerService
     LIBMATTI_ML_TestingLaunchHandlerService *service = calloc(1, sizeof(LIBMATTI_ML_TestingLaunchHandlerService));
     service->base.name = testing_name;
     service->base.launchService = testing_launch_service;
-    // Java: getPaths() is not overridden -> the interface default returns an empty array
+// Java: getPaths() is not overridden -> the interface default returns an empty array
     service->base.getPaths = NULL;
     return service;
 }

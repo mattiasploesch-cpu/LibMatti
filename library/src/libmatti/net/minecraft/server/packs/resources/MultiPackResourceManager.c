@@ -1,14 +1,16 @@
-// Port of net.minecraft.server.packs.resources.MultiPackResourceManager and
-// net.minecraft.server.packs.resources.ReloadableResourceManager.
+
+
+
 
 #include "libmatti/net/minecraft/server/packs/resources/MultiPackResourceManager.h"
 
 #include <stdlib.h>
 #include <string.h>
 
-// ---------------------------------------------------------------------------
-// ReloadInstance
-// ---------------------------------------------------------------------------
+
+
+
+
 
 LIBMATTI_MC_ReloadInstance *LIBMATTI_MC_ReloadInstance_Simple(void)
 {
@@ -23,9 +25,10 @@ void LIBMATTI_MC_ReloadInstance_Free(LIBMATTI_MC_ReloadInstance *instance)
     free(instance);
 }
 
-// ---------------------------------------------------------------------------
-// MultiPackResourceManager
-// ---------------------------------------------------------------------------
+
+
+
+
 
 LIBMATTI_MC_MultiPackResourceManager *LIBMATTI_MC_MultiPackResourceManager_New(int type,
                                                                                 LIBMATTI_MC_PackResources *const *packs,
@@ -37,7 +40,7 @@ LIBMATTI_MC_MultiPackResourceManager *LIBMATTI_MC_MultiPackResourceManager_New(i
     if (packCount > 0) memcpy(manager->packs, packs, packCount * sizeof(LIBMATTI_MC_PackResources *));
     manager->packCount = packCount;
 
-    // Java: for each namespace in the union of the pack namespaces, build one
+// Java: for each namespace in the union of the pack namespaces, build one
     // FallbackResourceManager and push every pack (in order)
     size_t capacity = 0;
     for (size_t i = 0; i < packCount; i++)
@@ -76,7 +79,7 @@ LIBMATTI_MC_MultiPackResourceManager *LIBMATTI_MC_MultiPackResourceManager_New(i
         free(namespaces);
     }
 
-    // Java: namespaces.forEach((name, manager) -> packs.forEach(manager::add))
+// Java: namespaces.forEach((name, manager) -> packs.forEach(manager::add))
     for (size_t i = 0; i < packCount; i++)
     {
         for (size_t j = 0; j < manager->managerCount; j++)
@@ -162,14 +165,15 @@ void LIBMATTI_MC_MultiPackResourceManager_Free(LIBMATTI_MC_MultiPackResourceMana
     }
     free(manager->namespaces);
     free(manager->managers);
-    // Java: the manager does not own the packs; the repository closes them
+// Java: the manager does not own the packs; the repository closes them
     free(manager->packs);
     free(manager);
 }
 
-// ---------------------------------------------------------------------------
-// ReloadableResourceManager
-// ---------------------------------------------------------------------------
+
+
+
+
 
 LIBMATTI_MC_ReloadableResourceManager *LIBMATTI_MC_ReloadableResourceManager_New(int type)
 {
@@ -188,7 +192,7 @@ void LIBMATTI_MC_ReloadableResourceManager_Add(LIBMATTI_MC_ReloadableResourceMan
 LIBMATTI_MC_ReloadInstance *LIBMATTI_MC_ReloadableResourceManager_CreateReload(
     LIBMATTI_MC_ReloadableResourceManager *manager)
 {
-    // Java: the reload pipeline runs the listeners async; the port's listeners are
+// Java: the reload pipeline runs the listeners async; the port's listeners are
     // data-only placeholders, so the reload completes immediately
     if (manager->reloadInstance != NULL) LIBMATTI_MC_ReloadInstance_Free(manager->reloadInstance);
     manager->reloadInstance = LIBMATTI_MC_ReloadInstance_Simple();

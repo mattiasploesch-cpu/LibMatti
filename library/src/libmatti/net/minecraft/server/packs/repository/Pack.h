@@ -1,5 +1,6 @@
-// Port of net.minecraft.server.packs.repository.Pack and
-// net.minecraft.server.packs.PackSelectionConfig.
+
+
+
 
 #ifndef MATTICRAFT_MC_PACKS_REPOSITORY_PACK_H
 #define MATTICRAFT_MC_PACKS_REPOSITORY_PACK_H
@@ -14,10 +15,10 @@ typedef struct LIBMATTI_MC_Pack Pack;
 // Java: interface Pack.ResourcesSupplier
 typedef struct LIBMATTI_MC_Pack_ResourcesSupplier
 {
-    // Java: PackResources open(PackLocationInfo) - the caller owns the result
+// Java: PackResources open(PackLocationInfo) - the caller owns the result
     LIBMATTI_MC_PackResources *(*open)(const struct LIBMATTI_MC_Pack_ResourcesSupplier *self,
                                        LIBMATTI_MC_PackLocationInfo *location);
-    // Java: PackResources openPrimary(PackLocationInfo) - the default delegates to open
+// Java: PackResources openPrimary(PackLocationInfo) - the default delegates to open
     LIBMATTI_MC_PackResources *(*openPrimary)(const struct LIBMATTI_MC_Pack_ResourcesSupplier *self,
                                               LIBMATTI_MC_PackLocationInfo *location);
     void *userData;
@@ -27,7 +28,7 @@ typedef struct LIBMATTI_MC_Pack_ResourcesSupplier
 typedef struct LIBMATTI_MC_PackSelectionConfig
 {
     int required;
-    int fixedPosition; // Java: PackPosition, ONLY_FIXED/BELOW_NAME/AFTER_NAME -> 1 means fixed
+    int fixedPosition;// Java: PackPosition, ONLY_FIXED/BELOW_NAME/AFTER_NAME -> 1 means fixed
     int hidden;
 } LIBMATTI_MC_PackSelectionConfig;
 
@@ -41,13 +42,13 @@ typedef enum
 
 struct LIBMATTI_MC_Pack
 {
-    // Java: private final PackLocationInfo location
+// Java: private final PackLocationInfo location
     LIBMATTI_MC_PackLocationInfo *location;
-    // Java: private final Pack.ResourcesSupplier resourcesSupplier
+// Java: private final Pack.ResourcesSupplier resourcesSupplier
     const LIBMATTI_MC_Pack_ResourcesSupplier *resourcesSupplier;
-    // Java: private final PackMetadataSection metadata
+// Java: private final PackMetadataSection metadata
     LIBMATTI_MC_PackMetadataSection *metadata;
-    // Java: private final PackSelectionConfig selectionConfig
+// Java: private final PackSelectionConfig selectionConfig
     LIBMATTI_MC_PackSelectionConfig selectionConfig;
 };
 

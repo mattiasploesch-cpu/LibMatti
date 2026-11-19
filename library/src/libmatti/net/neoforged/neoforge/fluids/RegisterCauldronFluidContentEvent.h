@@ -1,4 +1,5 @@
-// Port of net.neoforged.neoforge.fluids.RegisterCauldronFluidContentEvent.
+
+
 
 #ifndef MATTICRAFT_NEOFORGE_FLUIDS_REGISTERCAULDRONFLUIDCONTENTEVENT_H
 #define MATTICRAFT_NEOFORGE_FLUIDS_REGISTERCAULDRONFLUIDCONTENTEVENT_H
@@ -12,7 +13,7 @@ typedef struct LIBMATTI_NEOFORGE_Fluids_RegisterCauldronFluidContentEvent
 struct LIBMATTI_NEOFORGE_Fluids_RegisterCauldronFluidContentEvent
 {
     LIBMATTI_BUS_Event base;
-    // Java: the registered (block, fluid) mappings - the port keeps the block names
+// Java: the registered (block, fluid) mappings - the port keeps the block names
     char **blocks;
     size_t registrationCount;
     size_t registrationCapacity;
@@ -31,4 +32,4 @@ void LIBMATTI_NEOFORGE_Fluids_RegisterCauldronFluidContentEvent_Free(
 void LIBMATTI_NEOFORGE_Fluids_RegisterCauldronFluidContentEvent_Register(
     LIBMATTI_NEOFORGE_Fluids_RegisterCauldronFluidContentEvent *event, const char *blockName);
 
-#endif //MATTICRAFT_NEOFORGE_FLUIDS_REGISTERCAULDRONFLUIDCONTENTEVENT_H
+#endif

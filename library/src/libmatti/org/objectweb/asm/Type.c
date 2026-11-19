@@ -1,4 +1,5 @@
-// Port of org.objectweb.asm.Type.
+
+
 
 #include "Type.h"
 
@@ -197,7 +198,8 @@ int LIBMATTI_ASM_Type_Equals(const LIBMATTI_ASM_Type *type, const LIBMATTI_ASM_T
 char *LIBMATTI_ASM_Type_GetMethodDescriptor(const LIBMATTI_ASM_Type *returnType,
                                             LIBMATTI_ASM_Type **argumentTypes, size_t argumentCount)
 {
-    size_t length = 2; // '(' and ')'
+    size_t length = 2;
+
     for (size_t i = 0; i < argumentCount; i++) length += strlen(argumentTypes[i]->descriptor);
     length += strlen(returnType != NULL ? returnType->descriptor : "V");
 

@@ -1,4 +1,5 @@
-// Port of net.minecraft.server.packs.metadata.pack.PackFormat.
+
+
 
 #include "libmatti/net/minecraft/server/packs/repository/PackFormat.h"
 
@@ -34,8 +35,8 @@ int LIBMATTI_MC_PackFormat_LastPreMinorVersion(int packType)
 {
     switch (packType)
     {
-        case 0 /* CLIENT_RESOURCES */: return 64;
-        case 1 /* SERVER_DATA */: return 81;
+        case 0  : return 64;
+        case 1  : return 81;
     }
     return 64;
 }
@@ -43,7 +44,7 @@ int LIBMATTI_MC_PackFormat_LastPreMinorVersion(int packType)
 int LIBMATTI_MC_PackFormat_IntermediaryFormat_EffectiveMinMajorVersion(
     const LIBMATTI_MC_PackFormat_IntermediaryFormat *holder)
 {
-    // Java: min.isPresent() ? (supported.isPresent() ? min(min.major, supported.min) : min.major)
+// Java: min.isPresent() ? (supported.isPresent() ? min(min.major, supported.min) : min.major)
     //                     : (supported.isPresent() ? supported.min : Integer.MAX_VALUE)
     if (holder->hasMin)
     {
@@ -85,7 +86,7 @@ int LIBMATTI_MC_PackFormat_IntermediaryFormat_Validate(const LIBMATTI_MC_PackFor
 {
     *outError = NULL;
 
-    // Java: if (min.isPresent() != max.isPresent()) -> error "missing field"
+// Java: if (min.isPresent() != max.isPresent()) -> error "missing field"
     if (holder->hasMin != holder->hasMax)
     {
         size_t length = strlen(name) + 64;
@@ -94,7 +95,7 @@ int LIBMATTI_MC_PackFormat_IntermediaryFormat_Validate(const LIBMATTI_MC_PackFor
         *outError = message;
         return 0;
     }
-    // Java: else if (isOverlay && supported.isEmpty()) -> error "missing required field"
+// Java: else if (isOverlay && supported.isEmpty()) -> error "missing required field"
     if (isOverlay && !holder->hasSupported)
     {
         size_t length = strlen(name) + strlen(key) + 128;
@@ -106,7 +107,7 @@ int LIBMATTI_MC_PackFormat_IntermediaryFormat_Validate(const LIBMATTI_MC_PackFor
         *outError = message;
         return 0;
     }
-    // Java: else if (min.isPresent()) -> validateNewFormat
+// Java: else if (min.isPresent()) -> validateNewFormat
     if (holder->hasMin)
     {
         int min = holder->min.major;
@@ -200,7 +201,7 @@ int LIBMATTI_MC_PackFormat_IntermediaryFormat_Validate(const LIBMATTI_MC_PackFor
         *outRange = LIBMATTI_MC_InclusiveRange_Of(holder->min.major, holder->max.major);
         return 1;
     }
-    // Java: else if (supported.isPresent()) -> validateOldFormat
+// Java: else if (supported.isPresent()) -> validateOldFormat
     if (holder->hasSupported)
     {
         int min = holder->supported.minInclusive;
@@ -240,7 +241,7 @@ int LIBMATTI_MC_PackFormat_IntermediaryFormat_Validate(const LIBMATTI_MC_PackFor
         *outRange = LIBMATTI_MC_InclusiveRange_Of(min, max);
         return 1;
     }
-    // Java: else if (isPack && format.isPresent())
+// Java: else if (isPack && format.isPresent())
     if (isPack && holder->hasFormat)
     {
         int format = holder->format;
@@ -258,7 +259,7 @@ int LIBMATTI_MC_PackFormat_IntermediaryFormat_Validate(const LIBMATTI_MC_PackFor
         *outRange = LIBMATTI_MC_InclusiveRange_OfSingle(format);
         return 1;
     }
-    // Java: else -> error "could not be parsed"
+// Java: else -> error "could not be parsed"
     {
         size_t length = strlen(name) + 96;
         char *message = malloc(length);
@@ -277,7 +278,7 @@ LIBMATTI_MC_PackFormat_IntermediaryFormat LIBMATTI_MC_PackFormat_IntermediaryFor
     holder.min = LIBMATTI_MC_PackFormat_Of(range->minInclusive, 0);
     holder.hasMax = 1;
     holder.max = LIBMATTI_MC_PackFormat_Of(range->maxInclusive, 0);
-    // Java: inclusiverange = range.map(PackFormat::major); format/supported present only when
+// Java: inclusiverange = range.map(PackFormat::major); format/supported present only when
     // the lastPreMinorVersion sits inside the range
     if (LIBMATTI_MC_InclusiveRange_IsValueInRange(range, lastPreMinorVersion))
     {
@@ -295,7 +296,7 @@ int LIBMATTI_MC_PackFormat_ValidateHolderList(const LIBMATTI_MC_PackFormat_Inter
 {
     *outError = NULL;
 
-    // Java: i = min of effectiveMinMajorVersion over the holders, orElse MAX_VALUE
+// Java: i = min of effectiveMinMajorVersion over the holders, orElse MAX_VALUE
     int minEffective = INT_MAX;
     for (size_t i = 0; i < count; i++)
     {
@@ -306,7 +307,7 @@ int LIBMATTI_MC_PackFormat_ValidateHolderList(const LIBMATTI_MC_PackFormat_Inter
     for (size_t i = 0; i < count; i++)
     {
         const LIBMATTI_MC_PackFormat_IntermediaryFormat *holder = &formats[i];
-        // Java: warn "Unknown or broken overlay entry" for a fully empty holder
+// Java: warn "Unknown or broken overlay entry" for a fully empty holder
         if (!holder->hasMin && !holder->hasMax && !holder->hasSupported)
         {
             char *message = malloc(160);
@@ -316,7 +317,7 @@ int LIBMATTI_MC_PackFormat_ValidateHolderList(const LIBMATTI_MC_PackFormat_Inter
         }
         LIBMATTI_MC_InclusiveRange range;
         char *error = NULL;
-        // Java: validate(i <= p_425651_, ...) - the effective-min check relaxes the deprecated key
+// Java: validate(i <= p_425651_, ...) - the effective-min check relaxes the deprecated key
         if (!LIBMATTI_MC_PackFormat_IntermediaryFormat_Validate(holder, lastPreMinorVersion, 0,
                                                                 minEffective <= lastPreMinorVersion, overlays[i],
                                                                 "formats", &range, &error))

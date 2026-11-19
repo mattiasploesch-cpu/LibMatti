@@ -1,4 +1,5 @@
-// Port of net.neoforged.neoforgespi.transformation.ProcessorName.
+
+
 
 #include "libmatti/net/neoforged/neoforgespi/transformation/ProcessorName.h"
 
@@ -36,26 +37,26 @@ static int path_matches(const char *s)
 
 LIBMATTI_NEOFORGESPI_ProcessorName *LIBMATTI_NEOFORGESPI_ProcessorName_New(const char *namespace, const char *path)
 {
-    // Java: Objects.requireNonNull(namespace, "namespace")
+// Java: Objects.requireNonNull(namespace, "namespace")
     if (namespace == NULL)
     {
         LIBMATTI_ML_Logger_Error(LIBMATTI_ML_LogManager_GetLogger(), NULL, "NullPointerException: namespace");
         return NULL;
     }
-    // Java: Objects.requireNonNull(path, "path")
+// Java: Objects.requireNonNull(path, "path")
     if (path == NULL)
     {
         LIBMATTI_ML_Logger_Error(LIBMATTI_ML_LogManager_GetLogger(), NULL, "NullPointerException: path");
         return NULL;
     }
-    // Java: if (!NAMESPACE_PATTERN.asMatchPredicate().test(namespace)) throw new IllegalArgumentException(...)
+// Java: if (!NAMESPACE_PATTERN.asMatchPredicate().test(namespace)) throw new IllegalArgumentException(...)
     if (!namespace_matches(namespace))
     {
         LIBMATTI_ML_Logger_Error(LIBMATTI_ML_LogManager_GetLogger(), NULL,
                                  "Invalid namespace for processor name: {}", namespace);
         return NULL;
     }
-    // Java: if (!PATH_PATTERN.asMatchPredicate().test(path)) throw new IllegalArgumentException(...)
+// Java: if (!PATH_PATTERN.asMatchPredicate().test(path)) throw new IllegalArgumentException(...)
     if (!path_matches(path))
     {
         LIBMATTI_ML_Logger_Error(LIBMATTI_ML_LogManager_GetLogger(), NULL,
@@ -71,7 +72,7 @@ LIBMATTI_NEOFORGESPI_ProcessorName *LIBMATTI_NEOFORGESPI_ProcessorName_New(const
 
 LIBMATTI_NEOFORGESPI_ProcessorName *LIBMATTI_NEOFORGESPI_ProcessorName_Parse(const char *fullName)
 {
-    // Java: var parts = fullName.split(":", 2); if (parts.length != 2) throw new IllegalArgumentException(...)
+// Java: var parts = fullName.split(":", 2); if (parts.length != 2) throw new IllegalArgumentException(...)
     const char *separator = strchr(fullName, ':');
     if (separator == NULL)
     {
@@ -96,7 +97,7 @@ void LIBMATTI_NEOFORGESPI_ProcessorName_Free(LIBMATTI_NEOFORGESPI_ProcessorName 
 
 char *LIBMATTI_NEOFORGESPI_ProcessorName_ToString(const LIBMATTI_NEOFORGESPI_ProcessorName *name)
 {
-    // Java: return namespace + ":" + path
+// Java: return namespace + ":" + path
     size_t length = strlen(name->namespace) + 1 + strlen(name->path);
     char *result = malloc(length + 1);
     snprintf(result, length + 1, "%s:%s", name->namespace, name->path);
@@ -106,7 +107,7 @@ char *LIBMATTI_NEOFORGESPI_ProcessorName_ToString(const LIBMATTI_NEOFORGESPI_Pro
 int LIBMATTI_NEOFORGESPI_ProcessorName_CompareTo(const LIBMATTI_NEOFORGESPI_ProcessorName *name,
                                                  const LIBMATTI_NEOFORGESPI_ProcessorName *other)
 {
-    // Java: Comparator.comparing(ProcessorName::namespace).thenComparing(ProcessorName::path)
+// Java: Comparator.comparing(ProcessorName::namespace).thenComparing(ProcessorName::path)
     int namespaceResult = strcmp(name->namespace, other->namespace);
     if (namespaceResult != 0) return namespaceResult;
     return strcmp(name->path, other->path);

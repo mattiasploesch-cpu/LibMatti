@@ -1,8 +1,9 @@
-// Port of net.minecraft.core.component.PatchedDataComponentMap and DataComponentPatch.
-// Java's patched map layers an Optional-valued patch over the item's prototype map:
-// a present Optional overrides, an empty Optional removes. The C port keeps the same
-// semantics with a parallel (type, present, value) patch array over a prototype map.
-// DataComponentPatch is the same (type, present, value) list without a prototype.
+
+
+
+
+
+
 
 #ifndef MATTICRAFT_MC_CORE_COMPONENT_PATCHEDDATACOMPONENTMAP_H
 #define MATTICRAFT_MC_CORE_COMPONENT_PATCHEDDATACOMPONENTMAP_H
@@ -20,15 +21,15 @@ typedef struct LIBMATTI_MC_DataComponentPatch LIBMATTI_MC_DataComponentPatch;
 // Java: public final class PatchedDataComponentMap implements DataComponentMap
 typedef struct LIBMATTI_MC_PatchedDataComponentMap
 {
-    // Java: private final DataComponentMap prototype
+// Java: private final DataComponentMap prototype
     const LIBMATTI_MC_DataComponentMap *prototype;
-    // Java: Reference2ObjectMap<DataComponentType<?>, Optional<?>> patch
+// Java: Reference2ObjectMap<DataComponentType<?>, Optional<?>> patch
     LIBMATTI_MC_DataComponentType **patchTypes;
     bool *patchPresent;
     void **patchValues;
     size_t patchSize;
     size_t patchCapacity;
-    // Java: boolean copyOnWrite
+// Java: boolean copyOnWrite
     bool copyOnWrite;
 } LIBMATTI_MC_PatchedDataComponentMap;
 
@@ -63,7 +64,8 @@ LIBMATTI_MC_DataComponentPatch *LIBMATTI_MC_PatchedDataComponentMap_AsPatch(
 // Java: public PatchedDataComponentMap copy()
 LIBMATTI_MC_PatchedDataComponentMap *LIBMATTI_MC_PatchedDataComponentMap_Copy(
         const LIBMATTI_MC_PatchedDataComponentMap *map);
-// C-port ownership drop (the map itself, never the values)
+
+
 void LIBMATTI_MC_PatchedDataComponentMap_Free(LIBMATTI_MC_PatchedDataComponentMap *map);
 // Java: keySet() - the union of prototype and patch keys (set semantics over an array)
 LIBMATTI_MC_DataComponentType **LIBMATTI_MC_PatchedDataComponentMap_KeySet(
@@ -98,4 +100,4 @@ void LIBMATTI_MC_DataComponentPatch_Free(LIBMATTI_MC_DataComponentPatch *patch);
 }
 #endif
 
-#endif //MATTICRAFT_MC_CORE_COMPONENT_PATCHEDDATACOMPONENTMAP_H
+#endif

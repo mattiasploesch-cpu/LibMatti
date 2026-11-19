@@ -1,4 +1,5 @@
-// Port of java.lang.module.Configuration.
+
+
 
 #ifndef MATTICRAFT_CONFIGURATION_H
 #define MATTICRAFT_CONFIGURATION_H
@@ -11,7 +12,7 @@
 // Java: class Configuration
 typedef struct LIBMATTI_JL_Configuration
 {
-    LIBMATTI_JL_ResolvedModule **modules; // Java: Set<ResolvedModule> modules()
+    LIBMATTI_JL_ResolvedModule **modules;// Java: Set<ResolvedModule> modules()
     size_t moduleCount;
 } LIBMATTI_JL_Configuration;
 
@@ -36,4 +37,4 @@ LIBMATTI_JL_Configuration *LIBMATTI_JL_Configuration_ResolveAndBind(LIBMATTI_JL_
 
 void LIBMATTI_JL_Configuration_Free(LIBMATTI_JL_Configuration *configuration);
 
-#endif //MATTICRAFT_CONFIGURATION_H
+#endif

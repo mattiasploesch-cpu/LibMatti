@@ -1,4 +1,5 @@
-// Port of cpw.mods.modlauncher.ClassTransformer.
+
+
 
 #ifndef MATTICRAFT_MODLAUNCHER_CLASSTRANSFORMER_H
 #define MATTICRAFT_MODLAUNCHER_CLASSTRANSFORMER_H
@@ -38,4 +39,4 @@ unsigned char *LIBMATTI_ML_ClassTransformer_Transform(LIBMATTI_ML_ClassTransform
 LIBMATTI_ML_TransformingClassLoader *LIBMATTI_ML_ClassTransformer_GetTransformingClassLoader(
     const LIBMATTI_ML_ClassTransformer *transformer);
 
-#endif //MATTICRAFT_MODLAUNCHER_CLASSTRANSFORMER_H
+#endif

@@ -1,4 +1,5 @@
-// Port of net.neoforged.bus.ConsumerEventHandler.
+
+
 
 #include "libmatti/net/neoforged/bus/ConsumerEventHandler.h"
 
@@ -62,7 +63,7 @@ LIBMATTI_BUS_ConsumerEventHandler_WithPredicate *LIBMATTI_BUS_ConsumerEventHandl
     handler->base.consumer = consumer;
     handler->predicate = predicate;
 
-    // Java: this.withoutCheck = new ConsumerEventHandler(consumer);
+// Java: this.withoutCheck = new ConsumerEventHandler(consumer);
     handler->withoutCheck.self = &handler->base;
     handler->withoutCheck.invoke = consumer_invoke;
     handler->withoutCheck.toString = consumer_to_string;

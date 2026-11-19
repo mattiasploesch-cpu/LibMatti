@@ -1,7 +1,8 @@
-// Port of org.objectweb.asm.tree.MethodNode.
-// The C port keeps the original Code attribute bytes so that an untouched
-// method is written back verbatim; the parsed instruction list is used when a
-// transformer modified the method.
+
+
+
+
+
 
 #ifndef MATTICRAFT_ASMT_METHODNODE_H
 #define MATTICRAFT_ASMT_METHODNODE_H
@@ -25,31 +26,31 @@ typedef struct
 // Java: public class MethodNode
 typedef struct LIBMATTI_ASMT_MethodNode
 {
-    // Java: public int access; public String name, desc, signature; public List<String> exceptions
+// Java: public int access; public String name, desc, signature; public List<String> exceptions
     int access;
     char *name;
     char *desc;
     char *signature;
     char **exceptions;
     size_t exceptionCount;
-    // Java: public InsnList instructions; public List<TryCatchBlockNode> tryCatchBlocks
+// Java: public InsnList instructions; public List<TryCatchBlockNode> tryCatchBlocks
     LIBMATTI_ASMT_InsnList instructions;
     LIBMATTI_ASMT_TryCatchBlockNode *tryCatchBlocks;
     size_t tryCatchBlockCount;
-    // Java: public int maxStack, maxLocals
+// Java: public int maxStack, maxLocals
     int maxStack;
     int maxLocals;
     int hasCode;
-    // Java: the Code attribute is kept raw as long as it was not rewritten
+// Java: the Code attribute is kept raw as long as it was not rewritten
     unsigned char *rawCode;
     size_t rawCodeLength;
-    // Java: public List<Attribute> attrs
+// Java: public List<Attribute> attrs
     LIBMATTI_ASM_Attribute *attrs;
     size_t attrCount;
-    // Java: public List<AnnotationNode> visibleAnnotations
+// Java: public List<AnnotationNode> visibleAnnotations
     LIBMATTI_ASMT_AnnotationNode **visibleAnnotations;
     size_t visibleAnnotationCount;
-    // Java: public List<AnnotationNode> invisibleAnnotations
+// Java: public List<AnnotationNode> invisibleAnnotations
     LIBMATTI_ASMT_AnnotationNode **invisibleAnnotations;
     size_t invisibleAnnotationCount;
 } LIBMATTI_ASMT_MethodNode;
@@ -70,4 +71,4 @@ void LIBMATTI_ASMT_MethodNode_Free(LIBMATTI_ASMT_MethodNode *node);
 // Java: public void accept(ClassVisitor) - visit the node's top-level data
 void LIBMATTI_ASMT_MethodNode_Visit(const LIBMATTI_ASMT_MethodNode *node, void *visitor);
 
-#endif //MATTICRAFT_ASMT_METHODNODE_H
+#endif

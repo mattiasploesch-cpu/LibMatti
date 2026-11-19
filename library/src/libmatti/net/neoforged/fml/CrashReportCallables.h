@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.CrashReportCallables.
+
+
 
 #ifndef MATTICRAFT_FML_CRASHREPORTCALLABLES_H
 #define MATTICRAFT_FML_CRASHREPORTCALLABLES_H
@@ -26,4 +27,4 @@ LIBMATTI_FML_ISystemReportExtender **LIBMATTI_FML_CrashReportCallables_AllCrashC
 // Java: public static Stream<String> getHeaders(); caller frees the array and each element
 char **LIBMATTI_FML_CrashReportCallables_GetHeaders(size_t *count);
 
-#endif //MATTICRAFT_FML_CRASHREPORTCALLABLES_H
+#endif

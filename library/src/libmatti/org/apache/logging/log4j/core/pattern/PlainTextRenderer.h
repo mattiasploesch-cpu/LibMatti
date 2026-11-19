@@ -5,4 +5,4 @@
 
 LIBMATTI_L4J_TextRenderer *LIBMATTI_L4J_PlainTextRenderer_GetInstance(void);
 
-#endif //MATTICRAFT_L4J_PLAINTEXTRENDERER_H
+#endif

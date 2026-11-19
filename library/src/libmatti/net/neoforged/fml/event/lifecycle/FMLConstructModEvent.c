@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.event.lifecycle.FMLConstructModEvent.
+
+
 
 #include "libmatti/net/neoforged/fml/event/lifecycle/FMLConstructModEvent.h"
 

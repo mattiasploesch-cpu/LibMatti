@@ -1,4 +1,5 @@
-// Port of java.util.BitSet (implementation).
+
+
 
 #include "libmatti/java/util/BitSet.h"
 
@@ -9,7 +10,7 @@
 
 static void trim_words(LIBMATTI_JU_BitSet *set)
 {
-    // Java: wordsInUse = findHighestUsedWord + 1 - trailing zero words drop out
+// Java: wordsInUse = findHighestUsedWord + 1 - trailing zero words drop out
     while (set->wordsInUse > 0 && set->words[set->wordsInUse - 1] == 0)
         set->wordsInUse--;
 }
@@ -49,7 +50,7 @@ LIBMATTI_JU_BitSet *LIBMATTI_JU_BitSet_ValueOf(const uint64_t *longs, size_t cou
     LIBMATTI_JU_BitSet *set = LIBMATTI_JU_BitSet_New();
     if (set == NULL)
         return NULL;
-    // Java: valueOf trims trailing zero words on the way in
+// Java: valueOf trims trailing zero words on the way in
     while (count > 0 && longs[count - 1] == 0)
         count--;
     if (count > 0 && ensure_words(set, count))
@@ -99,7 +100,7 @@ void LIBMATTI_JU_BitSet_Clear(LIBMATTI_JU_BitSet *set, size_t bitIndex)
 
 void LIBMATTI_JU_BitSet_ClearAll(LIBMATTI_JU_BitSet *set)
 {
-    // Java: clear() zeroes words[0..wordsInUse) and resets wordsInUse
+// Java: clear() zeroes words[0..wordsInUse) and resets wordsInUse
     if (set->wordsInUse > 0)
         memset(set->words, 0, set->wordsInUse * sizeof(uint64_t));
     set->wordsInUse = 0;
@@ -177,7 +178,7 @@ size_t LIBMATTI_JU_BitSet_Length(const LIBMATTI_JU_BitSet *set)
 {
     if (set == NULL || set->wordsInUse == 0)
         return 0;
-    // Java: 64*(wordsInUse-1) + (64 - numberOfLeadingZeros(words[wordsInUse-1]))
+// Java: 64*(wordsInUse-1) + (64 - numberOfLeadingZeros(words[wordsInUse-1]))
     uint64_t top = set->words[set->wordsInUse - 1];
     return (set->wordsInUse - 1) * 64 + 64 - (size_t) __builtin_clzll(top);
 }
@@ -259,7 +260,7 @@ uint64_t *LIBMATTI_JU_BitSet_ToLongArray(const LIBMATTI_JU_BitSet *set, size_t *
     if (set == NULL)
         return NULL;
     if (set->wordsInUse == 0)
-        return calloc(1, sizeof(uint64_t)); // Java: empty long[] when nothing is set
+        return calloc(1, sizeof(uint64_t));// Java: empty long[] when nothing is set
     uint64_t *copy = malloc(set->wordsInUse * sizeof(uint64_t));
     if (copy != NULL)
     {
@@ -283,7 +284,7 @@ bool LIBMATTI_JU_BitSet_Equals(const LIBMATTI_JU_BitSet *a, const LIBMATTI_JU_Bi
 
 uint32_t LIBMATTI_JU_BitSet_HashCode(const LIBMATTI_JU_BitSet *set)
 {
-    // Java: hashCode xor-folds each word rotated by 64*wordIndex % 32
+// Java: hashCode xor-folds each word rotated by 64*wordIndex % 32
     if (set == NULL)
         return 0;
     uint32_t h = 1234;

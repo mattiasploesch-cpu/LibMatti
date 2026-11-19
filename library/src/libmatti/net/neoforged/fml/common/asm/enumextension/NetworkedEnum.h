@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.common.asm.enumextension.NetworkedEnum.
+
+
 
 #ifndef MATTICRAFT_FML_COMMON_ASM_ENUMEXTENSION_NETWORKEDENUM_H
 #define MATTICRAFT_FML_COMMON_ASM_ENUMEXTENSION_NETWORKEDENUM_H
@@ -28,4 +29,4 @@ typedef enum
 // Java: NetworkCheck.name()
 const char *LIBMATTI_FML_NetworkedEnum_NetworkCheck_Name(LIBMATTI_FML_NetworkedEnum_NetworkCheck check);
 
-#endif //MATTICRAFT_FML_COMMON_ASM_ENUMEXTENSION_NETWORKEDENUM_H
+#endif

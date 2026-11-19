@@ -1,4 +1,5 @@
-// Port of net.minecraft.client.renderer.block.model.BlockElementFace (implementation).
+
+
 
 #include "libmatti/net/minecraft/client/renderer/block/model/BlockElementFace.h"
 
@@ -12,14 +13,14 @@ static int rotate_vertex_index(int rotation, int vertexIndex)
 // Java: public float getVertexU(int index)
 float LIBMATTI_MC_BlockElementFace_UVs_GetVertexU(const LIBMATTI_MC_BlockElementFace_UVs *uvs, int index)
 {
-    // Java: return index != 0 && index != 1 ? this.maxU : this.minU;
+// Java: return index != 0 && index != 1 ? this.maxU : this.minU;
     return (index != 0 && index != 1) ? uvs->maxU : uvs->minU;
 }
 
 // Java: public float getVertexV(int index)
 float LIBMATTI_MC_BlockElementFace_UVs_GetVertexV(const LIBMATTI_MC_BlockElementFace_UVs *uvs, int index)
 {
-    // Java: return index != 0 && index != 3 ? this.maxV : this.minV;
+// Java: return index != 0 && index != 3 ? this.maxV : this.minV;
     return (index != 0 && index != 3) ? uvs->maxV : uvs->minV;
 }
 

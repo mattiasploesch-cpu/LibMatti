@@ -1,6 +1,7 @@
-// Port of net.neoforged.fml.loading.LoadingModList.
-// Java's IdentityHashMap folds into the C port's pointer arrays: the mod files are
-// compared by pointer identity, which is the same semantics.
+
+
+
+
 
 #ifndef MATTICRAFT_FML_LOADING_LOADINGMODLIST_H
 #define MATTICRAFT_FML_LOADING_LOADINGMODLIST_H
@@ -35,18 +36,18 @@ struct LIBMATTI_FML_LoadingModList
     LIBMATTI_FML_ModInfo **sortedList;
     size_t sortedCount;
     LIBMATTI_FML_ModDependencyMap modDependencies;
-    // Java: Map<String, ModFileInfo> fileById
+// Java: Map<String, ModFileInfo> fileById
     char **fileByIdKeys;
     LIBMATTI_FML_ModFileInfo **fileByIdValues;
     size_t fileByIdCount;
-    // Java: @Nullable private volatile Map<String, IModFile> fileByPackage
+// Java: @Nullable private volatile Map<String, IModFile> fileByPackage
     char **fileByPackageKeys;
     LIBMATTI_NEOFORGESPI_IModFile **fileByPackageValues;
     size_t fileByPackageCount;
     int fileByPackageBuilt;
     LIBMATTI_FML_ModLoadingIssue **modLoadingIssues;
     size_t modLoadingIssueCount;
-    // Java: Set<IModFile> allModFiles
+// Java: Set<IModFile> allModFiles
     LIBMATTI_NEOFORGESPI_IModFile **allModFiles;
     size_t allModFileCount;
 };
@@ -97,4 +98,4 @@ void LIBMATTI_FML_LoadingModList_AddIssues(LIBMATTI_FML_LoadingModList *list,
 LIBMATTI_NEOFORGESPI_IModFile **LIBMATTI_FML_LoadingModList_GetPackageIndex(LIBMATTI_FML_LoadingModList *list,
                                                                            const char ***packageNames, size_t *count);
 
-#endif //MATTICRAFT_FML_LOADING_LOADINGMODLIST_H
+#endif

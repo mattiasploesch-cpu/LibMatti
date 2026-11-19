@@ -1,10 +1,12 @@
-// Port of net.minecraft.client.renderer.SectionBufferBuilderPack (implementation).
+
+
 
 #include "libmatti/net/minecraft/client/renderer/chunk/SectionBufferBuilderPack.h"
 
 #include <stdlib.h>
 
-// The buffers are freed on close(); the pack owns them.
+
+
 LIBMATTI_MC_SectionBufferBuilderPack *LIBMATTI_MC_SectionBufferBuilderPack_New(void)
 {
     LIBMATTI_MC_SectionBufferBuilderPack *pack = calloc(1, sizeof(LIBMATTI_MC_SectionBufferBuilderPack));
@@ -54,7 +56,7 @@ void LIBMATTI_MC_SectionBufferBuilderPack_ClearAll(LIBMATTI_MC_SectionBufferBuil
 
 long long LIBMATTI_MC_SectionBufferBuilderPack_MaxBytes(void)
 {
-    // Java: the four layer sizes summed.
+// Java: the four layer sizes summed.
     long long total = 0;
     for (int layer = 0; layer < LIBMATTI_MC_ChunkSectionLayer_COUNT; layer++)
         total += LIBMATTI_MC_ChunkSectionLayer_BufferSize((LIBMATTI_MC_ChunkSectionLayer) layer);

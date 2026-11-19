@@ -1,7 +1,8 @@
-// Port of com.mojang.blaze3d.opengl.GlBuffer (subclass of GpuBuffer).
-// Java stores the GL handle, the DirectStateAccess strategy and an optional
-// persistent mapped view; the port uses the GlStateManager layer for every
-// handle operation.
+
+
+
+
+
 
 #ifndef MATTICRAFT_BLAZE3D_BUFFERS_GLBUFFER_H
 #define MATTICRAFT_BLAZE3D_BUFFERS_GLBUFFER_H

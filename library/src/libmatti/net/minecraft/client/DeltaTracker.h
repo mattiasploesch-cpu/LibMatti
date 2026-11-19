@@ -1,7 +1,8 @@
-// Port of net.minecraft.client.DeltaTracker (the 1.21.11 timer lives here as
-// DeltaTracker.Timer; net.minecraft.util.Timer was removed). Java's interface
-// and its two implementations collapse into one struct: the DefaultValue field
-// doubles as the fixed value, the Timer fields carry the running state.
+
+
+
+
+
 
 #ifndef MATTICRAFT_NET_MINECRAFT_CLIENT_DELTATRACKER_H
 #define MATTICRAFT_NET_MINECRAFT_CLIENT_DELTATRACKER_H
@@ -13,7 +14,7 @@ typedef float (*LIBMATTI_MC_DeltaTrackerTargetMspt)(float msPerTick);
 
 typedef struct LIBMATTI_MC_DeltaTracker
 {
-    // Java: private final float msPerTick
+// Java: private final float msPerTick
     float msPerTick;
     LIBMATTI_MC_DeltaTrackerTargetMspt targetMsptProvider;
 
@@ -26,7 +27,7 @@ typedef struct LIBMATTI_MC_DeltaTracker
     int paused;
     int frozen;
 
-    // Java: DeltaTracker.DefaultValue (ZERO/ONE) - fixed value when the tracker
+// Java: DeltaTracker.DefaultValue (ZERO/ONE) - fixed value when the tracker
     // is a constant; -1.0f means "the running Timer fields above are live".
     float fixedValue;
 } LIBMATTI_MC_DeltaTracker;
@@ -58,4 +59,4 @@ float LIBMATTI_MC_DeltaTracker_GetGameTimeDeltaPartialTick(const LIBMATTI_MC_Del
 // Java: public float getRealtimeDeltaTicks()
 float LIBMATTI_MC_DeltaTracker_GetRealtimeDeltaTicks(const LIBMATTI_MC_DeltaTracker *tracker);
 
-#endif //MATTICRAFT_NET_MINECRAFT_CLIENT_DELTATRACKER_H
+#endif

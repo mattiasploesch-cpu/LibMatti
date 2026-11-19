@@ -1,6 +1,7 @@
-// Port of net.neoforged.fml.classloading.ModuleClassLoader.
-// This classloader implements child-first classloading for any module that is defined locally.
-// Note: it is a different Java class from cpw.mods.cl.ModuleClassLoader (bsl/sjh/cl).
+
+
+
+
 
 #ifndef MATTICRAFT_FML_CLASSLOADING_MODULECLASSLODER_H
 #define MATTICRAFT_FML_CLASSLOADING_MODULECLASSLODER_H
@@ -12,7 +13,8 @@
 
 #include <stddef.h>
 
-// external (JVM-backed), opaque: java.lang.module.ModuleLayer
+
+
 typedef struct LIBMATTI_JL_ModuleLayer LIBMATTI_JL_ModuleLayer;
 
 // Java: private static final class ModuleInfo implements AutoCloseable
@@ -22,12 +24,12 @@ struct LIBMATTI_FML_ModuleInfo
 {
     char *name;
     LIBMATTI_JL_ModuleReference *moduleReference;
-    // Java: private final ReentrantLock lock - the ported launcher loads on one thread
+// Java: private final ReentrantLock lock - the ported launcher loads on one thread
     // Java: private volatile ModuleReader cachedReader
     LIBMATTI_FML_JarContentsModuleReader *cachedReader;
-    // Java: private volatile boolean closed
+// Java: private volatile boolean closed
     int closed;
-    // Java: private final ProtectionDomain protectionDomain
+// Java: private final ProtectionDomain protectionDomain
     // TODO: java.security.ProtectionDomain (CodeSource, Permissions, AllPermission) is JVM-backed
     void *protectionDomain;
 };
@@ -37,28 +39,28 @@ typedef struct LIBMATTI_FML_ModuleClassLoader LIBMATTI_FML_ModuleClassLoader;
 
 struct LIBMATTI_FML_ModuleClassLoader
 {
-    // Java: public class ModuleClassLoader extends ClassLoader
+// Java: public class ModuleClassLoader extends ClassLoader
     LIBMATTI_JL_ClassLoader base;
 
-    // Java: private final Map<String, ModuleInfo> moduleInfoCache
+// Java: private final Map<String, ModuleInfo> moduleInfoCache
     LIBMATTI_FML_ModuleInfo **moduleInfos;
     size_t moduleInfoCount;
-    // Java: private final Map<String, ModuleInfo> packageLookup
+// Java: private final Map<String, ModuleInfo> packageLookup
     char **lookupPackages;
     LIBMATTI_FML_ModuleInfo **lookupModules;
     size_t lookupCount;
-    // Java: private final Map<String, ClassLoader> parentLoaders
+// Java: private final Map<String, ClassLoader> parentLoaders
     char **parentLoaderPackages;
     LIBMATTI_JL_ClassLoader **parentLoaders;
     size_t parentLoaderCount;
-    // Java: private final Configuration configuration
+// Java: private final Configuration configuration
     LIBMATTI_JL_Configuration *configuration;
-    // Java: private ClassLoader fallbackClassLoader
+// Java: private ClassLoader fallbackClassLoader
     LIBMATTI_JL_ClassLoader *fallbackClassLoader;
-    // Java: private volatile boolean closed = false
+// Java: private volatile boolean closed = false
     int closed;
 
-    // Java: protected byte[] maybeTransformClassBytes(byte[] bytes, String name, @Nullable String context)
+// Java: protected byte[] maybeTransformClassBytes(byte[] bytes, String name, @Nullable String context)
     // Java overrides this in TransformingClassLoader; the C port uses a function pointer.
     unsigned char *(*maybeTransformClassBytes)(LIBMATTI_FML_ModuleClassLoader *self, const unsigned char *bytes,
                                                size_t length, const char *name, const char *context,
@@ -127,4 +129,4 @@ void LIBMATTI_FML_ModuleClassLoader_SetFallbackClassLoader(LIBMATTI_FML_ModuleCl
 LIBMATTI_JL_Configuration *LIBMATTI_FML_ModuleClassLoader_GetConfiguration(
     const LIBMATTI_FML_ModuleClassLoader *classLoader);
 
-#endif //MATTICRAFT_FML_CLASSLOADING_MODULECLASSLODER_H
+#endif

@@ -1,4 +1,5 @@
-// Port of cpw.mods.modlauncher.api.ITransformationService.
+
+
 
 #include "libmatti/cpw/modlauncher/api/ITransformationService.h"
 
@@ -11,14 +12,14 @@ void LIBMATTI_MLA_ITransformationService_Arguments(
     LIBMATTI_MLA_ITransformationService *service,
     LIBMATTI_JOPT_OptionSpec *(*builder)(const char *name, const char *description, void *userdata), void *userdata)
 {
-    // Java: default void arguments(...) {}
+// Java: default void arguments(...) {}
     if (service->arguments != NULL) service->arguments(service, builder, userdata);
 }
 
 void LIBMATTI_MLA_ITransformationService_ArgumentValues(LIBMATTI_MLA_ITransformationService *service,
                                                         LIBMATTI_MLA_ITransformationService_OptionResult *option)
 {
-    // Java: default void argumentValues(OptionResult option) {}
+// Java: default void argumentValues(OptionResult option) {}
     if (service->argumentValues != NULL) service->argumentValues(service, option);
 }
 
@@ -44,7 +45,7 @@ LIBMATTI_MLA_ITransformer **LIBMATTI_MLA_ITransformationService_Transformers(
 LIBMATTI_MLA_ITransformationService_Resource *LIBMATTI_MLA_ITransformationService_BeginScanning(
     LIBMATTI_MLA_ITransformationService *service, LIBMATTI_MLA_IEnvironment *environment, size_t *count)
 {
-    // Java: default List<Resource> beginScanning(...) { return List.of(); }
+// Java: default List<Resource> beginScanning(...) { return List.of(); }
     if (service->beginScanning == NULL)
     {
         *count = 0;
@@ -56,7 +57,7 @@ LIBMATTI_MLA_ITransformationService_Resource *LIBMATTI_MLA_ITransformationServic
 LIBMATTI_MLA_ITransformationService_Resource *LIBMATTI_MLA_ITransformationService_CompleteScan(
     LIBMATTI_MLA_ITransformationService *service, LIBMATTI_MLA_IModuleLayerManager *layerManager, size_t *count)
 {
-    // Java: default List<Resource> completeScan(...) { return List.of(); }
+// Java: default List<Resource> completeScan(...) { return List.of(); }
     if (service->completeScan == NULL)
     {
         *count = 0;

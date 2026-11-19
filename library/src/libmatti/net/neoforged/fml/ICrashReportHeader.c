@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.ICrashReportHeader.
+
+
 
 #include "libmatti/net/neoforged/fml/ICrashReportHeader.h"
 

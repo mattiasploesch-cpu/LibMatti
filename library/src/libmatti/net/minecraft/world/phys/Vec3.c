@@ -1,4 +1,5 @@
-// Port of net.minecraft.world.phys.Vec3.
+
+
 
 #include "libmatti/net/minecraft/world/phys/Vec3.h"
 

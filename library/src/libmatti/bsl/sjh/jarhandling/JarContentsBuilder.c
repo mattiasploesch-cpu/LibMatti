@@ -1,6 +1,7 @@
-//
-// Created by administrator on 09.09.26.
-//
+
+
+
+
 
 #include "JarContentsBuilder.h"
 
@@ -40,7 +41,8 @@ LIBMATTI_JH_JarContents *LIBMATTI_JH_JarContentsBuilder_Build(LIBMATTI_JH_JarCon
     LIBMATTI_JH_JarContents *contents = (LIBMATTI_JH_JarContents *)LIBMATTI_JH_JarContentsImpl_New(
         (const char **)builder->paths, builder->pathCount, builder->defaultManifest, builder->pathFilter);
 
-    // the default manifest ownership was transferred to the contents
+
+
     builder->defaultManifest = NULL;
 
     return contents;

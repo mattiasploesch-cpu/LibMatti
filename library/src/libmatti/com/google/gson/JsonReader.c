@@ -1,4 +1,5 @@
-// Port of com.google.gson.stream.JsonReader.
+
+
 
 #include "libmatti/com/google/gson/JsonReader.h"
 
@@ -189,7 +190,7 @@ static int peekKeyword(LIBMATTI_GSON_JsonReader *reader, int *token)
     size_t keywordLength = strlen(keyword);
     if (!matchesKeyword(reader, start, keyword))
     {
-        // Java: the keyword match is case-insensitive in lenient mode only
+// Java: the keyword match is case-insensitive in lenient mode only
         if (!reader->lenient) return 0;
     }
 
@@ -224,7 +225,7 @@ static int doPeek(LIBMATTI_GSON_JsonReader *reader)
         int c = nextNonWhitespace(reader);
         if (c == ']') return PEEKED_END_ARRAY;
         if (c == ',') goto read_value;
-        return PEEKED_EOF; // Java: throw syntaxError("Unterminated array")
+        return PEEKED_EOF;// Java: throw syntaxError("Unterminated array")
     }
 
     if (scope == SCOPE_EMPTY_OBJECT || scope == SCOPE_NONEMPTY_OBJECT)
@@ -233,7 +234,7 @@ static int doPeek(LIBMATTI_GSON_JsonReader *reader)
         {
             int c = nextNonWhitespace(reader);
             if (c == '}') return PEEKED_END_OBJECT;
-            if (c != ',') return PEEKED_EOF; // Java: throw syntaxError("Unterminated object")
+            if (c != ',') return PEEKED_EOF;// Java: throw syntaxError("Unterminated object")
         }
         else
         {
@@ -251,11 +252,11 @@ static int doPeek(LIBMATTI_GSON_JsonReader *reader)
             reader->peekedText = nextUnquotedValue(reader);
         }
         else
-            return PEEKED_EOF; // Java: throw syntaxError("Names must be double-quoted")
+            return PEEKED_EOF;// Java: throw syntaxError("Names must be double-quoted")
 
-        // Java: the ':' separating the name from its value
+// Java: the ':' separating the name from its value
         int colon = nextNonWhitespace(reader);
-        if (colon != ':') return PEEKED_EOF; // Java: throw syntaxError("Expected ':'")
+        if (colon != ':') return PEEKED_EOF;// Java: throw syntaxError("Expected ':'")
 
         setScope(reader, SCOPE_EXPECT_VALUE);
         return PEEKED_NAME;
@@ -269,7 +270,7 @@ static int doPeek(LIBMATTI_GSON_JsonReader *reader)
     {
         int c = nextNonWhitespace(reader);
         if (c == -1) return PEEKED_EOF;
-        reader->pos--; // Java: throw syntaxError("Expected EOF")
+        reader->pos--;// Java: throw syntaxError("Expected EOF")
         return PEEKED_EOF;
     }
 
@@ -308,7 +309,7 @@ read_value:
                 break;
         }
 
-        // Java: a number (or an unquoted value in lenient mode)
+// Java: a number (or an unquoted value in lenient mode)
         char first = reader->text[reader->pos];
         if (first == '-' || (first >= '0' && first <= '9'))
         {
@@ -322,7 +323,7 @@ read_value:
             return PEEKED_STRING;
         }
 
-        return PEEKED_EOF; // Java: throw syntaxError("Expected value")
+        return PEEKED_EOF;// Java: throw syntaxError("Expected value")
     }
 }
 
@@ -500,7 +501,7 @@ LIBMATTI_GSON_JsonReader *LIBMATTI_GSON_JsonReader_New(const char *text, size_t 
     reader->length = length;
     reader->peeked = PEEKED_NONE;
 
-    // Java: stack[stackSize++] = JsonScope.EMPTY_DOCUMENT;
+// Java: stack[stackSize++] = JsonScope.EMPTY_DOCUMENT;
     push(reader, SCOPE_EMPTY_DOCUMENT);
     return reader;
 }

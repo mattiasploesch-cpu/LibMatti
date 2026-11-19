@@ -1,5 +1,6 @@
-// The embedded vanilla block models (implementation). The JSONs mirror the
-// vanilla asset files 1:1 (cube_all, cube, stone, dirt).
+
+
+
 
 #include "libmatti/net/minecraft/client/resources/model/VanillaModels.h"
 

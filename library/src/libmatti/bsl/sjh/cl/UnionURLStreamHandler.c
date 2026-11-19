@@ -22,7 +22,8 @@ static LIBMATTI_UNION_UnionPath *uriToUnionPath(LIBMATTI_CL_URL *url)
     size_t keyLen = (size_t)(bang - ssp);
     const char *pathStr = bang + 1;
 
-    // percent-decode the key ('#' was encoded as %23 in toUri)
+
+
     char *decodedKey = malloc(keyLen + 1);
     size_t d = 0;
     for (size_t i = 0; i < keyLen; i++)
@@ -49,7 +50,8 @@ static LIBMATTI_UNION_UnionPath *uriToUnionPath(LIBMATTI_CL_URL *url)
             size_t partCount = 0;
             if (pathStr[0] != '\0')
             {
-                // split on '/'
+
+
                 const char *p = pathStr;
                 while (*p != '\0')
                 {
@@ -74,14 +76,14 @@ static LIBMATTI_UNION_UnionPath *uriToUnionPath(LIBMATTI_CL_URL *url)
 
 LIBMATTI_JI_InputStream *LIBMATTI_CL_UnionURLStreamHandler_InputStream(LIBMATTI_CL_URL *url)
 {
-    // Java: if (Paths.get(u.toURI()) instanceof UnionPath upath) return upath.buildInputStream();
+// Java: if (Paths.get(u.toURI()) instanceof UnionPath upath) return upath.buildInputStream();
     //       else throw new IllegalArgumentException("Invalid Path " + u.toURI() + " at UnionURLStreamHandler")
     LIBMATTI_UNION_UnionPath *path = uriToUnionPath(url);
-    if (path == NULL) return NULL; // Java: IllegalArgumentException
+    if (path == NULL) return NULL;// Java: IllegalArgumentException
 
     unsigned char *bytes = NULL;
     size_t length = 0;
-    // Java: buildInputStream() -> fileSystem.buildInputStream(this)
+// Java: buildInputStream() -> fileSystem.buildInputStream(this)
     int ok = LIBMATTI_UNION_UnionFileSystem_ReadAllBytes(path->fileSystem, path, &bytes, &length);
     LIBMATTI_UNION_UnionPath_Free(path);
     if (!ok)
@@ -97,11 +99,11 @@ LIBMATTI_JI_InputStream *LIBMATTI_CL_UnionURLStreamHandler_InputStream(LIBMATTI_
 long LIBMATTI_CL_UnionURLStreamHandler_GetLastModified(LIBMATTI_CL_URL *url)
 {
     LIBMATTI_UNION_UnionPath *path = uriToUnionPath(url);
-    if (path == NULL) return 0; // Java: RuntimeException/UncheckedIOException
+    if (path == NULL) return 0;// Java: RuntimeException/UncheckedIOException
     LIBMATTI_UNION_BasicFileAttributes attributes;
     int found = LIBMATTI_UNION_UnionFileSystem_ReadAttributesIfExists(path->fileSystem, path, &attributes);
     LIBMATTI_UNION_UnionPath_Free(path);
-    if (!found) return 0; // Java: UncheckedIOException
+    if (!found) return 0;// Java: UncheckedIOException
     // Java: Files.getLastModifiedTime(...).toMillis() - not tracked; Java IURLProvider default is 0
     return 0;
 }
@@ -109,11 +111,11 @@ long LIBMATTI_CL_UnionURLStreamHandler_GetLastModified(LIBMATTI_CL_URL *url)
 long LIBMATTI_CL_UnionURLStreamHandler_GetContentLength(LIBMATTI_CL_URL *url)
 {
     LIBMATTI_UNION_UnionPath *path = uriToUnionPath(url);
-    if (path == NULL) return -1; // Java: UncheckedIOException
+    if (path == NULL) return -1;// Java: UncheckedIOException
     LIBMATTI_UNION_BasicFileAttributes attributes;
     int found = LIBMATTI_UNION_UnionFileSystem_ReadAttributesIfExists(path->fileSystem, path, &attributes);
     LIBMATTI_UNION_UnionPath_Free(path);
-    if (!found) return -1; // Java: UncheckedIOException
+    if (!found) return -1;// Java: UncheckedIOException
     return (long)attributes.size;
 }
 

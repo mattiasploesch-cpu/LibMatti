@@ -64,7 +64,7 @@ int LIBMATTI_JU_Random_NextInt(LIBMATTI_JU_Random *random)
 
 int LIBMATTI_JU_Random_NextIntBound(LIBMATTI_JU_Random *random, int bound)
 {
-    // Java: the power-of-two and modulo paths, exactly
+// Java: the power-of-two and modulo paths, exactly
     if ((bound & -bound) == bound)
         return (int) ((bound * (long) next_bits(random, 31)) >> 31);
 
@@ -104,7 +104,7 @@ double LIBMATTI_JU_Random_NextDouble(LIBMATTI_JU_Random *random)
 
 double LIBMATTI_JU_Random_NextGaussian(LIBMATTI_JU_Random *random)
 {
-    // Java: the Box-Muller polar method with the cached second value
+// Java: the Box-Muller polar method with the cached second value
     if (random->haveNextNextGaussian)
     {
         random->haveNextNextGaussian = 0;

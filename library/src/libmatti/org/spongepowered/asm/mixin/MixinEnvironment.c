@@ -1,4 +1,5 @@
-// Port of org.spongepowered.asm.mixin.MixinEnvironment - the global-state part.
+
+
 
 #include "libmatti/org/spongepowered/asm/mixin/MixinEnvironment.h"
 
@@ -55,20 +56,21 @@ LIBMATTI_SP_MixinEnvironment_Phase *LIBMATTI_SP_MixinEnvironment_Phase_ForName(c
     return NULL;
 }
 
-// ---------------------------------------------------------------------------
-// CompatibilityLevel
-// ---------------------------------------------------------------------------
+
+
+
+
 
 int LIBMATTI_SP_MixinEnvironment_CompatibilityLevel_GetClassVersion(LIBMATTI_SP_MixinEnvironment_CompatibilityLevel level)
 {
-    // Java: classVersion Opcodes.V1_6 .. V25 (49 + ver for the port's purposes)
+// Java: classVersion Opcodes.V1_6 .. V25 (49 + ver for the port's purposes)
     return level < 0 ? 0 : 44 + level;
 }
 
 int LIBMATTI_SP_MixinEnvironment_CompatibilityLevel_IsAtLeast(LIBMATTI_SP_MixinEnvironment_CompatibilityLevel level,
                                                              LIBMATTI_SP_MixinEnvironment_CompatibilityLevel other)
 {
-    // Java: level == null || this.ver >= level.ver
+// Java: level == null || this.ver >= level.ver
     return other < 0 || level >= other;
 }
 
@@ -86,7 +88,7 @@ LIBMATTI_SP_MixinEnvironment_CompatibilityLevel LIBMATTI_SP_MixinEnvironment_Com
         if (strcmp(name, NAMES[i]) == 0)
             return (LIBMATTI_SP_MixinEnvironment_CompatibilityLevel) i;
 
-    // Java: valueOf throws IllegalArgumentException; the caller catches it
+// Java: valueOf throws IllegalArgumentException; the caller catches it
     return LIBMATTI_SP_MixinEnvironment_COMPAT_NONE;
 }
 
@@ -101,9 +103,10 @@ const char *LIBMATTI_SP_MixinEnvironment_CompatibilityLevel_Name(LIBMATTI_SP_Mix
     return NAMES[level];
 }
 
-// ---------------------------------------------------------------------------
-// Environment state
-// ---------------------------------------------------------------------------
+
+
+
+
 
 // Java: private static Phase currentPhase = Phase.NOT_INITIALISED;
 static LIBMATTI_SP_MixinEnvironment_Phase *currentPhase = &NOT_INITIALISED;
@@ -114,7 +117,7 @@ static void *environments[3] = {NULL, NULL, NULL};
 
 static void *phase_environment(LIBMATTI_SP_MixinEnvironment_Phase *phase)
 {
-    // Java: if (this.ordinal < 0) throw new IllegalArgumentException("Cannot access the NOT_INITIALISED environment");
+// Java: if (this.ordinal < 0) throw new IllegalArgumentException("Cannot access the NOT_INITIALISED environment");
     if (phase->ordinal < 0 || phase->ordinal > 2) return NULL;
 
     if (!phase->environmentCreated) phase->environmentCreated = 1;
@@ -129,7 +132,7 @@ void LIBMATTI_SP_MixinEnvironment_Init(LIBMATTI_SP_MixinEnvironment_Phase *phase
     currentPhase = phase;
     phase_environment(phase);
 
-    // Java: IMixinService service = MixinService.getService();
+// Java: IMixinService service = MixinService.getService();
     //       if (service instanceof MixinServiceAbstract) ((MixinServiceAbstract)service).wire(phase, new PhaseConsumer());
     // The FML service is not a MixinServiceAbstract in the port.
 }
@@ -161,7 +164,7 @@ LIBMATTI_SP_MixinEnvironment_CompatibilityLevel LIBMATTI_SP_MixinEnvironment_Get
 {
     if (compatibility == LIBMATTI_SP_MixinEnvironment_COMPAT_NONE)
     {
-        // Java: CompatibilityLevel minLevel = getMinCompatibilityLevel(); (JAVA_21 for FML)
+// Java: CompatibilityLevel minLevel = getMinCompatibilityLevel(); (JAVA_21 for FML)
         //       compatibility = optionLevel.isAtLeast(minLevel) ? optionLevel : minLevel;
         LIBMATTI_SP_IMixinService *service = LIBMATTI_SP_MixinService_GetService();
         LIBMATTI_SP_MixinEnvironment_CompatibilityLevel minLevel =
@@ -176,13 +179,13 @@ LIBMATTI_SP_MixinEnvironment_CompatibilityLevel LIBMATTI_SP_MixinEnvironment_Get
 // Java: public static void setCompatibilityLevel(CompatibilityLevel level)
 void LIBMATTI_SP_MixinEnvironment_SetCompatibilityLevel(LIBMATTI_SP_MixinEnvironment_CompatibilityLevel level)
 {
-    // Java: deprecated warning ("Set level via config instead!") - the port keeps the state machine
+// Java: deprecated warning ("Set level via config instead!") - the port keeps the state machine
     LIBMATTI_SP_MixinEnvironment_CompatibilityLevel currentLevel =
         LIBMATTI_SP_MixinEnvironment_GetCompatibilityLevel();
     if (level != currentLevel && LIBMATTI_SP_MixinEnvironment_CompatibilityLevel_IsAtLeast(level, currentLevel))
     {
         compatibility = level;
-        // Java: logger.info("Compatibility level set to {}", level); - the port's logger takes
+// Java: logger.info("Compatibility level set to {}", level); - the port's logger takes
         // the message only
         LIBMATTI_SP_ILogger_Info(LOGGER(), "Compatibility level set");
     }
@@ -191,7 +194,7 @@ void LIBMATTI_SP_MixinEnvironment_SetCompatibilityLevel(LIBMATTI_SP_MixinEnviron
 // Java: static void gotoPhase(Phase phase)
 void LIBMATTI_SP_MixinEnvironment_GotoPhase(LIBMATTI_SP_MixinEnvironment_Phase *phase)
 {
-    // Java: if (phase == null || phase.ordinal < 0) throw new IllegalArgumentException(...)
+// Java: if (phase == null || phase.ordinal < 0) throw new IllegalArgumentException(...)
     if (phase == NULL || phase->ordinal < 0) return;
 
     LIBMATTI_SP_IMixinService *service = LIBMATTI_SP_MixinService_GetService();

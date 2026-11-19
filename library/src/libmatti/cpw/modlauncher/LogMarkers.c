@@ -1,6 +1,7 @@
-//
-// Port of cpw.mods.modlauncher.LogMarkers.
-//
+
+
+
+
 
 #include "LogMarkers.h"
 

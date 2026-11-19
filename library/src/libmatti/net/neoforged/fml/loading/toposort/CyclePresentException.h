@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.loading.toposort.CyclePresentException.
+
+
 
 #ifndef MATTICRAFT_FML_LOADING_TOPOSORT_CYCLEPRESENTEXCEPTION_H
 #define MATTICRAFT_FML_LOADING_TOPOSORT_CYCLEPRESENTEXCEPTION_H
@@ -12,7 +13,7 @@
 typedef struct
 {
     LIBMATTI_JL_Throwable base;
-    // Java: private final Set<Set<?>> cycles
+// Java: private final Set<Set<?>> cycles
     void ***cycles;
     size_t *cycleSizes;
     size_t cycleCount;
@@ -34,4 +35,4 @@ char *LIBMATTI_FML_CyclePresentException_GetMessage(const LIBMATTI_FML_CyclePres
 
 void LIBMATTI_FML_CyclePresentException_Free(LIBMATTI_FML_CyclePresentException *exception);
 
-#endif //MATTICRAFT_FML_LOADING_TOPOSORT_CYCLEPRESENTEXCEPTION_H
+#endif

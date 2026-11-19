@@ -48,4 +48,4 @@ void LIBMATTI_JL_Throwable_PrintStackTrace(const LIBMATTI_JL_Throwable *throwabl
 void LIBMATTI_JL_Throwable_PrintStackTraceTo(const LIBMATTI_JL_Throwable *throwable,
                                              LIBMATTI_JI_PrintWriter *writer);
 
-#endif //MATTICRAFT_JAVA_LANG_THROWABLE_H
+#endif

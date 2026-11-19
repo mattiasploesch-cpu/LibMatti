@@ -1,4 +1,5 @@
-// Port of net.neoforged.neoforgespi.transformation.ClassProcessor.
+
+
 
 #ifndef MATTICRAFT_NEOFORGESPI_TRANSFORMATION_CLASSPROCESSOR_H
 #define MATTICRAFT_NEOFORGESPI_TRANSFORMATION_CLASSPROCESSOR_H
@@ -46,16 +47,16 @@ typedef struct LIBMATTI_NEOFORGESPI_ClassProcessor_SelectionContext
 // Java: final class TransformationContext implements SimpleTransformationContext
 typedef struct LIBMATTI_NEOFORGESPI_ClassProcessor_TransformationContext
 {
-    // Java: implements SimpleTransformationContext
+// Java: implements SimpleTransformationContext
     LIBMATTI_NEOFORGESPI_SimpleTransformationContext simple;
 
     const LIBMATTI_ASM_Type *type;
     LIBMATTI_ASMT_ClassNode *node;
     int empty;
-    // Java: BiConsumer<String, String[]> auditTrail
+// Java: BiConsumer<String, String[]> auditTrail
     void (*auditTrail)(const char *activity, const char *const *context, size_t contextCount, void *userdata);
     void *auditTrailUserdata;
-    // Java: Supplier<byte[]> initialSha256
+// Java: Supplier<byte[]> initialSha256
     unsigned char *(*initialSha256)(void *userdata, size_t *length);
     void *initialSha256Userdata;
 } LIBMATTI_NEOFORGESPI_ClassProcessor_TransformationContext;
@@ -101,7 +102,7 @@ typedef struct LIBMATTI_NEOFORGESPI_ClassProcessor LIBMATTI_NEOFORGESPI_ClassPro
 // Java: record LinkContext(SequencedMap<ProcessorName, ClassProcessor> processors, BytecodeProvider bytecodeProvider)
 typedef struct LIBMATTI_NEOFORGESPI_ClassProcessor_LinkContext
 {
-    // Java: SequencedMap<ProcessorName, ClassProcessor> processors - the insertion order
+// Java: SequencedMap<ProcessorName, ClassProcessor> processors - the insertion order
     const LIBMATTI_NEOFORGESPI_ProcessorName **processorNames;
     LIBMATTI_NEOFORGESPI_ClassProcessor **processors;
     size_t processorCount;
@@ -111,26 +112,26 @@ typedef struct LIBMATTI_NEOFORGESPI_ClassProcessor_LinkContext
 // Java: interface ClassProcessor - NULL is a Java default method
 struct LIBMATTI_NEOFORGESPI_ClassProcessor
 {
-    // Java: ProcessorName name()
+// Java: ProcessorName name()
     LIBMATTI_NEOFORGESPI_ProcessorName *(*name)(LIBMATTI_NEOFORGESPI_ClassProcessor *self);
-    // Java: default Set<ProcessorName> runsBefore(); caller frees the array
+// Java: default Set<ProcessorName> runsBefore(); caller frees the array
     const LIBMATTI_NEOFORGESPI_ProcessorName **(*runsBefore)(LIBMATTI_NEOFORGESPI_ClassProcessor *self, size_t *count);
-    // Java: default Set<ProcessorName> runsAfter(); caller frees the array
+// Java: default Set<ProcessorName> runsAfter(); caller frees the array
     const LIBMATTI_NEOFORGESPI_ProcessorName **(*runsAfter)(LIBMATTI_NEOFORGESPI_ClassProcessor *self, size_t *count);
-    // Java: default Set<String> generatesPackages(); caller frees the array
+// Java: default Set<String> generatesPackages(); caller frees the array
     const char **(*generatesPackages)(LIBMATTI_NEOFORGESPI_ClassProcessor *self, size_t *count);
-    // Java: default OrderingHint orderingHint()
+// Java: default OrderingHint orderingHint()
     LIBMATTI_NEOFORGESPI_ClassProcessor_OrderingHint (*orderingHint)(LIBMATTI_NEOFORGESPI_ClassProcessor *self);
-    // Java: boolean handlesClass(SelectionContext context)
+// Java: boolean handlesClass(SelectionContext context)
     int (*handlesClass)(LIBMATTI_NEOFORGESPI_ClassProcessor *self,
                         const LIBMATTI_NEOFORGESPI_ClassProcessor_SelectionContext *context);
-    // Java: ComputeFlags processClass(TransformationContext context)
+// Java: ComputeFlags processClass(TransformationContext context)
     LIBMATTI_NEOFORGESPI_ClassProcessor_ComputeFlags (*processClass)(
         LIBMATTI_NEOFORGESPI_ClassProcessor *self, LIBMATTI_NEOFORGESPI_ClassProcessor_TransformationContext *context);
-    // Java: default void afterProcessing(AfterProcessingContext context)
+// Java: default void afterProcessing(AfterProcessingContext context)
     void (*afterProcessing)(LIBMATTI_NEOFORGESPI_ClassProcessor *self,
                             const LIBMATTI_NEOFORGESPI_ClassProcessor_AfterProcessingContext *context);
-    // Java: default void link(LinkContext context)
+// Java: default void link(LinkContext context)
     void (*link)(LIBMATTI_NEOFORGESPI_ClassProcessor *self,
                  const LIBMATTI_NEOFORGESPI_ClassProcessor_LinkContext *context);
 };
@@ -158,4 +159,4 @@ void LIBMATTI_NEOFORGESPI_ClassProcessor_AfterProcessing(
 void LIBMATTI_NEOFORGESPI_ClassProcessor_Link(LIBMATTI_NEOFORGESPI_ClassProcessor *processor,
                                              const LIBMATTI_NEOFORGESPI_ClassProcessor_LinkContext *context);
 
-#endif //MATTICRAFT_NEOFORGESPI_TRANSFORMATION_CLASSPROCESSOR_H
+#endif

@@ -1,9 +1,10 @@
-// Port of net.neoforged.fml.ModLoader.
-// Java's executors map to the direct executor (every dispatch runs on the calling thread, which
-// keeps the loader's ordering) and the CompletableFuture port carries the task results; failures
-// surface through addLoadingIssue, which is also what Java's exception channels feed.
-// ModLoadingIssue.Severity comes from the exceptions: isMeaningfulException /
-// addLoadingIssuesFromException report through the Throwable port.
+
+
+
+
+
+
+
 
 #ifndef MATTICRAFT_FML_MODLOADER_H
 #define MATTICRAFT_FML_MODLOADER_H
@@ -32,9 +33,10 @@ int LIBMATTI_FML_ModLoader_HasErrors(void);
 
 // Java: public static void clearLoadingIssues()
 void LIBMATTI_FML_ModLoader_ClearLoadingIssues(void);
-// The port's channel for "an inner operation threw ModLoadingException and the caller
-// caught it": takes every pending issue out of the list (the caller owns them), leaving
-// the list empty. Java's catch (ModLoadingException e) e.getIssues() is the counterpart.
+
+
+
+
 LIBMATTI_FML_ModLoadingIssue **LIBMATTI_FML_ModLoader_TakeLoadingIssues(size_t *count);
 // Java: public static void clear()
 void LIBMATTI_FML_ModLoader_Clear(void);
@@ -87,4 +89,4 @@ void LIBMATTI_FML_ModLoader_PostEventWithWrapInModOrder(
     void (*pre)(LIBMATTI_FML_ModContainer *container, LIBMATTI_BUS_Event *event, void *userdata),
     void (*post)(LIBMATTI_FML_ModContainer *container, LIBMATTI_BUS_Event *event, void *userdata), void *userdata);
 
-#endif //MATTICRAFT_FML_MODLOADER_H
+#endif

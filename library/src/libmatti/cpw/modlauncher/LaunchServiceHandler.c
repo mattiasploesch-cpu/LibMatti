@@ -1,4 +1,5 @@
-// Port of cpw.mods.modlauncher.LaunchServiceHandler.
+
+
 
 #include "libmatti/cpw/modlauncher/LaunchServiceHandler.h"
 
@@ -22,7 +23,7 @@ LIBMATTI_ML_LaunchServiceHandler *LIBMATTI_ML_LaunchServiceHandler_New(LIBMATTI_
 {
     LIBMATTI_ML_LaunchServiceHandler *handler = calloc(1, sizeof(LIBMATTI_ML_LaunchServiceHandler));
 
-    // Java: ServiceLoaderUtils.streamServiceLoader(() -> ServiceLoader.load(
+// Java: ServiceLoaderUtils.streamServiceLoader(() -> ServiceLoader.load(
     //          layerHandler.getLayer(Layer.BOOT).orElseThrow(), ILaunchHandlerService.class), ...)
     //          .collect(Collectors.toMap(ILaunchHandlerService::name, LaunchServiceHandlerDecorator::new))
     LIBMATTI_JL_ModuleLayer *bootLayer = LIBMATTI_ML_ModuleLayerHandler_GetLayer(layerHandler,
@@ -50,7 +51,7 @@ LIBMATTI_ML_LaunchServiceHandler *LIBMATTI_ML_LaunchServiceHandler_New(LIBMATTI_
     }
     free(services);
 
-    // Java: () -> String.join(",", launchHandlerLookup.keySet())
+// Java: () -> String.join(",", launchHandlerLookup.keySet())
     size_t namesLength = 1;
     for (size_t i = 0; i < handler->count; i++) namesLength += strlen(handler->names[i]) + 1;
     char *names = malloc(namesLength);
@@ -79,7 +80,7 @@ void LIBMATTI_ML_LaunchServiceHandler_Free(LIBMATTI_ML_LaunchServiceHandler *han
 static LIBMATTI_ML_LaunchServiceHandlerDecorator *decorator_for(LIBMATTI_ML_LaunchServiceHandler *handler,
                                                                const char *name)
 {
-    // Java: HashMap.get(null) / containsKey(null) - an absent target is not found
+// Java: HashMap.get(null) / containsKey(null) - an absent target is not found
     if (name == NULL) return NULL;
 
     for (size_t i = 0; i < handler->count; i++)
@@ -91,14 +92,14 @@ LIBMATTI_MLA_ILaunchHandlerService *LIBMATTI_ML_LaunchServiceHandler_FindLaunchH
     LIBMATTI_ML_LaunchServiceHandler *handler, const char *name)
 {
     LIBMATTI_ML_LaunchServiceHandlerDecorator *decorator = decorator_for(handler, name);
-    // Java: Optional.ofNullable(lookup.getOrDefault(name, null)).map(LaunchServiceHandlerDecorator::service)
+// Java: Optional.ofNullable(lookup.getOrDefault(name, null)).map(LaunchServiceHandlerDecorator::service)
     return decorator != NULL ? LIBMATTI_ML_LaunchServiceHandlerDecorator_Service(decorator) : NULL;
 }
 
 // Java: static List<String> hideAccessToken(String[] arguments)
 char **LIBMATTI_ML_LaunchServiceHandler_HideAccessToken(int argc, char *argv[], size_t *count)
 {
-    // Java: "❄❄❄❄❄❄❄❄"
+// Java: "❄❄❄❄❄❄❄❄"
     static const char *SNOWFLAKES = "\xE2\x9D\x84\xE2\x9D\x84\xE2\x9D\x84\xE2\x9D\x84"
                                    "\xE2\x9D\x84\xE2\x9D\x84\xE2\x9D\x84\xE2\x9D\x84";
 
@@ -126,13 +127,13 @@ static int launch_target(LIBMATTI_ML_LaunchServiceHandler *handler, const char *
 
     if (decorator == NULL)
     {
-        // Java: launchHandlerLookup.get(target) -> NPE
+// Java: launchHandlerLookup.get(target) -> NPE
         LIBMATTI_ML_Logger_Error(LIBMATTI_ML_LogManager_GetLogger(), &LIBMATTI_ML_MARKER_MODLAUNCHER,
                                  "Cannot find launch target {}, unable to launch", target);
         return 1;
     }
 
-    // Java: final NamedPath[] paths = launchServiceHandlerDecorator.service().getPaths()
+// Java: final NamedPath[] paths = launchServiceHandlerDecorator.service().getPaths()
     //       launchPluginHandler.announceLaunch(classLoader, paths)
     size_t specialPathCount = 0;
     LIBMATTI_MLA_NamedPath *paths = LIBMATTI_MLA_ILaunchHandlerService_GetPaths(decorator->service,
@@ -141,7 +142,7 @@ static int launch_target(LIBMATTI_ML_LaunchServiceHandler *handler, const char *
 
     size_t hiddenCount = 0;
     char **hidden = LIBMATTI_ML_LaunchServiceHandler_HideAccessToken(argc, argv, &hiddenCount);
-    // Java: List.toString() -> "[a, b]"
+// Java: List.toString() -> "[a, b]"
     size_t length = 3;
     for (size_t i = 0; i < hiddenCount; i++) length += strlen(hidden[i]) + 2;
     char *arguments = malloc(length);
@@ -173,7 +174,7 @@ int LIBMATTI_ML_LaunchServiceHandler_Launch(LIBMATTI_ML_LaunchServiceHandler *ha
                                             LIBMATTI_ML_TransformingClassLoader *classLoader,
                                             LIBMATTI_ML_LaunchPluginHandler *launchPluginHandler)
 {
-    // Java: String launchTarget = argumentHandler.getLaunchTarget(); String[] args = argumentHandler.buildArgumentList()
+// Java: String launchTarget = argumentHandler.getLaunchTarget(); String[] args = argumentHandler.buildArgumentList()
     const char *launchTarget = LIBMATTI_ML_ArgumentHandler_GetLaunchTarget(argumentHandler);
     size_t argCount = 0;
     char **args = LIBMATTI_ML_ArgumentHandler_BuildArgumentList(argumentHandler, &argCount);
@@ -195,7 +196,7 @@ int LIBMATTI_ML_LaunchServiceHandler_ValidateLaunchTarget(LIBMATTI_ML_LaunchServ
         LIBMATTI_ML_Logger_Error(LIBMATTI_ML_LogManager_GetLogger(), &LIBMATTI_ML_MARKER_MODLAUNCHER,
                                  "Cannot find launch target {}, unable to launch",
                                  launchTarget != NULL ? launchTarget : "");
-        // Java: throw new RuntimeException("Cannot find launch target")
+// Java: throw new RuntimeException("Cannot find launch target")
         return 0;
     }
 

@@ -9,7 +9,7 @@ typedef struct
 {
     LIBMATTI_FML_JarModuleInfo base;
     char *name;
-    // Java: @Nullable String version
+// Java: @Nullable String version
     char *version;
 } AuomaticModuleJarModuleInfo;
 
@@ -30,18 +30,18 @@ static LIBMATTI_JL_ModuleDescriptor *createDescriptor(void *self, LIBMATTI_FML_J
 {
     AuomaticModuleJarModuleInfo *moduleInfo = self;
 
-    // Java: var bld = ModuleDescriptor.newAutomaticModule(name());
+// Java: var bld = ModuleDescriptor.newAutomaticModule(name());
     LIBMATTI_JL_ModuleDescriptor *builder = LIBMATTI_JL_ModuleDescriptor_Create(moduleInfo->name, NULL, 0);
     LIBMATTI_JL_ModuleDescriptor_AddModifier(builder, LIBMATTI_JL_MODIFIER_AUTOMATIC);
 
-    // Java: if (version() != null) bld.version(version());
+// Java: if (version() != null) bld.version(version());
     if (moduleInfo->version != NULL)
         LIBMATTI_JL_ModuleDescriptor_SetVersion(builder, moduleInfo->version);
 
-    // Java: ModuleDescriptorFactory.scanAutomaticModule(contents, bld)
+// Java: ModuleDescriptorFactory.scanAutomaticModule(contents, bld)
     LIBMATTI_FML_ModuleDescriptorFactory_ScanAutomaticModule(contents, builder, NULL, 0);
 
-    // Java: return bld.build()
+// Java: return bld.build()
     return builder;
 }
 
@@ -59,14 +59,14 @@ LIBMATTI_FML_JarModuleInfo *LIBMATTI_FML_AuomaticModuleJarModuleInfo_From(LIBMAT
 {
     AuomaticModuleJarModuleInfo *moduleInfo = calloc(1, sizeof(AuomaticModuleJarModuleInfo));
 
-    // Java: var nav = ModuleDescriptorFactory.computeNameAndVersion(contents.getPrimaryPath());
+// Java: var nav = ModuleDescriptorFactory.computeNameAndVersion(contents.getPrimaryPath());
     LIBMATTI_FML_NameAndVersion *nav =
         LIBMATTI_FML_ModuleDescriptorFactory_ComputeNameAndVersion(LIBMATTI_FML_JarContents_GetPrimaryPath(contents));
     moduleInfo->name = strdup(nav->name);
     moduleInfo->version = nav->version != NULL ? strdup(nav->version) : NULL;
     LIBMATTI_FML_NameAndVersion_Free(nav);
 
-    // Java: contents.getManifest().getMainAttributes().getValue("Automatic-Module-Name")
+// Java: contents.getManifest().getMainAttributes().getValue("Automatic-Module-Name")
     const char *automaticModuleName =
         LIBMATTI_JU_Manifest_GetMainValue(LIBMATTI_FML_JarContents_GetManifest(contents), "Automatic-Module-Name");
     if (automaticModuleName != NULL)

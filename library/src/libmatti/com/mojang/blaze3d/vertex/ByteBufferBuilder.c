@@ -41,7 +41,7 @@ LIBMATTI_B3D_ByteBufferBuilder *LIBMATTI_B3D_ByteBufferBuilder_NewMax(int initia
     LIBMATTI_B3D_ByteBufferBuilder *builder = calloc(1, sizeof(LIBMATTI_B3D_ByteBufferBuilder));
     builder->capacity = initialCapacity;
     builder->maxCapacity = maxCapacity;
-    // Java: this.pointer = ALLOCATOR.malloc(p_408080_); OOM on 0.
+// Java: this.pointer = ALLOCATOR.malloc(p_408080_); OOM on 0.
     builder->pointer = malloc((size_t) initialCapacity);
     if (builder->pointer == NULL)
     {
@@ -65,7 +65,7 @@ void LIBMATTI_B3D_ByteBufferBuilder_Free(LIBMATTI_B3D_ByteBufferBuilder *builder
 {
     if (builder == NULL)
         return;
-    // Java: public void close() - frees the pointer, generation -1 invalidates
+// Java: public void close() - frees the pointer, generation -1 invalidates
     // every outstanding Result.
     if (builder->pointer != NULL)
     {
@@ -96,7 +96,7 @@ static int ensure_capacity(LIBMATTI_B3D_ByteBufferBuilder *builder, long long re
     if (required > builder->maxCapacity)
         return 0;
 
-    // Java: long i = Math.min(this.capacity, 2097152L);
+// Java: long i = Math.min(this.capacity, 2097152L);
     //       long j = Mth.clamp(this.capacity + i, required, this.maxCapacity);
     long long growth = builder->capacity < MAX_GROWTH_SIZE ? builder->capacity : MAX_GROWTH_SIZE;
     long long newCapacity = builder->capacity + growth;
@@ -114,7 +114,7 @@ unsigned char *LIBMATTI_B3D_ByteBufferBuilder_Reserve(LIBMATTI_B3D_ByteBufferBui
     if (!ensure_capacity(builder, end))
         return NULL;
     builder->writeOffset = end;
-    // Java: return Math.addExact(this.pointer, i);
+// Java: return Math.addExact(this.pointer, i);
     return builder->pointer + offset;
 }
 
@@ -126,7 +126,7 @@ LIBMATTI_B3D_ByteBufferBuilder_Result *LIBMATTI_B3D_ByteBufferBuilder_Build(LIBM
     long long size = builder->writeOffset - offset;
     if (size == 0)
         return NULL;
-    // Java: throw on results larger than INT_MAX; the port returns NULL.
+// Java: throw on results larger than INT_MAX; the port returns NULL.
     if (size > 2147483647LL)
         return NULL;
 
@@ -154,7 +154,7 @@ static void discard_results(LIBMATTI_B3D_ByteBufferBuilder *builder)
 
 void LIBMATTI_B3D_ByteBufferBuilder_Clear(LIBMATTI_B3D_ByteBufferBuilder *builder)
 {
-    // Java: if (this.resultCount > 0) LOGGER.warn("Clearing BufferBuilder with unused batches");
+// Java: if (this.resultCount > 0) LOGGER.warn("Clearing BufferBuilder with unused batches");
     if (builder->resultCount > 0)
         LIBMATTI_ML_Logger_Warn(logger(), NULL, "Clearing BufferBuilder with unused batches");
     LIBMATTI_B3D_ByteBufferBuilder_Discard(builder);

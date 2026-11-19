@@ -1,4 +1,5 @@
-// Port of com.mojang.brigadier.CommandDispatcher, ParseResults and ResultConsumer.
+
+
 
 #ifndef MATTICRAFT_BR_COMMANDDISPATCHER_H
 #define MATTICRAFT_BR_COMMANDDISPATCHER_H
@@ -17,7 +18,7 @@ typedef struct LIBMATTI_BR_ParseResults
 {
     LIBMATTI_BR_CommandContextBuilder *context;
     LIBMATTI_BR_StringReader reader;
-    // Java: private final Map<CommandNode<S>, CommandSyntaxException> errors
+// Java: private final Map<CommandNode<S>, CommandSyntaxException> errors
     LIBMATTI_BR_CommandNode **errorNodes;
     LIBMATTI_BR_CommandSyntaxException **errors;
     size_t errorCount;
@@ -28,9 +29,9 @@ void LIBMATTI_BR_ParseResults_Free(LIBMATTI_BR_ParseResults *results);
 // Java: public class CommandDispatcher<S>
 typedef struct LIBMATTI_BR_CommandDispatcher
 {
-    // Java: private final RootCommandNode<S> root
+// Java: private final RootCommandNode<S> root
     LIBMATTI_BR_CommandNode *root;
-    // Java: private ResultConsumer<S> consumer
+// Java: private ResultConsumer<S> consumer
     LIBMATTI_BR_ResultConsumer consumer;
     void *consumerUserdata;
 } LIBMATTI_BR_CommandDispatcher;

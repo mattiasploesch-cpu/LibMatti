@@ -1,5 +1,6 @@
-// Port of net.minecraft.core.IdMapper - the id <-> value bijection
-// (BlockColors keys its color providers by the block registry id through it).
+
+
+
 
 #ifndef MATTICRAFT_CORE_IDMAPPER_H
 #define MATTICRAFT_CORE_IDMAPPER_H
@@ -12,8 +13,10 @@ extern "C" {
 // The port keeps both directions in parallel arrays (the map stays small).
 typedef struct LIBMATTI_JL_IdMapper
 {
-    void **values; // insertion order
-    int *ids;      // parallel: ids[i] is the id of values[i]
+    void **values;
+
+    int *ids;
+
     int size;
     int capacity;
 } LIBMATTI_JL_IdMapper;
@@ -38,4 +41,4 @@ int LIBMATTI_JL_IdMapper_Size(const LIBMATTI_JL_IdMapper *mapper);
 }
 #endif
 
-#endif //MATTICRAFT_CORE_IDMAPPER_H
+#endif

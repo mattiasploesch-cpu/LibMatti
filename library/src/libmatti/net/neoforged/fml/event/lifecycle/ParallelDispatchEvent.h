@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.event.lifecycle.ParallelDispatchEvent.
+
+
 
 #ifndef MATTICRAFT_FML_EVENT_LIFECYCLE_PARALLELDISPATCHEVENT_H
 #define MATTICRAFT_FML_EVENT_LIFECYCLE_PARALLELDISPATCHEVENT_H
@@ -11,9 +12,9 @@ typedef struct LIBMATTI_FML_Event_Lifecycle_ParallelDispatchEvent LIBMATTI_FML_E
 
 struct LIBMATTI_FML_Event_Lifecycle_ParallelDispatchEvent
 {
-    // Java: extends ModLifecycleEvent
+// Java: extends ModLifecycleEvent
     LIBMATTI_FML_Event_Lifecycle_ModLifecycleEvent base;
-    // Java: private final DeferredWorkQueue workQueue;
+// Java: private final DeferredWorkQueue workQueue;
     LIBMATTI_FML_DeferredWorkQueue *workQueue;
 };
 
@@ -34,4 +35,4 @@ LIBMATTI_JUC_CompletableFuture *LIBMATTI_FML_Event_Lifecycle_ParallelDispatchEve
     const LIBMATTI_FML_Event_Lifecycle_ParallelDispatchEvent *event, LIBMATTI_FML_DeferredWorkQueue_Supplier work,
     void *userdata);
 
-#endif //MATTICRAFT_FML_EVENT_LIFECYCLE_PARALLELDISPATCHEVENT_H
+#endif

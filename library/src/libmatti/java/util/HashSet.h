@@ -1,6 +1,7 @@
-// Port of java.util.HashSet<String> (the set type the codebase actually uses:
-// package sets, module name sets, config sets). Strings are copied on add and
-// owned by the set.
+
+
+
+
 
 #ifndef MATTICRAFT_JAVA_UTIL_HASHSET_H
 #define MATTICRAFT_JAVA_UTIL_HASHSET_H
@@ -36,7 +37,8 @@ void LIBMATTI_JU_HashSet_ForEach(const LIBMATTI_JU_HashSet *set,
 // Java: public Set.copyOf(c) - copies the strings into a new set
 LIBMATTI_JU_HashSet *LIBMATTI_JU_HashSet_CopyOf(const char *const *items, size_t count);
 
-// The strings are set-owned; valid until the set is modified or freed.
+
+
 char **LIBMATTI_JU_HashSet_ToArray(const LIBMATTI_JU_HashSet *set, size_t *count);
 
-#endif //MATTICRAFT_JAVA_UTIL_HASHSET_H
+#endif

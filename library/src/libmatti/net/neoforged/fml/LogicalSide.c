@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.LogicalSide.
+
+
 
 #include "libmatti/net/neoforged/fml/LogicalSide.h"
 

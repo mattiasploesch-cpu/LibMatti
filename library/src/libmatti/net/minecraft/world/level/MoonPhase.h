@@ -1,4 +1,5 @@
-// Port of net.minecraft.world.level.MoonPhase.
+
+
 
 #ifndef MATTICRAFT_MC_WORLD_LEVEL_MOONPHASE_H
 #define MATTICRAFT_MC_WORLD_LEVEL_MOONPHASE_H

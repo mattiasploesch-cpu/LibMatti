@@ -1,7 +1,8 @@
-// Port of com.mojang.blaze3d.opengl.GlStateManager - the state cache layer.
-// Every setter compares against the cached struct first and only touches GL on
-// a real change, exactly like the Java original. Thread assertions go through
-// RenderSystem (implemented in RenderSystem.c).
+
+
+
+
+
 
 #include "libmatti/com/mojang/blaze3d/opengl/GlStateManager.h"
 
@@ -222,7 +223,7 @@ void LIBMATTI_B3D_GlStateManager_DeleteTexture(int texture)
 {
     LIBMATTI_B3D_RenderSystem_AssertOnRenderThread();
     LIBMATTI_GL_glDeleteTextures(1, (const unsigned int *) &texture);
-    // Java: clear the binding in every texture unit state.
+// Java: clear the binding in every texture unit state.
     for (int i = 0; i < TEXTURE_COUNT; i++)
     {
         if (TEXTURES[i].binding == texture)
@@ -528,7 +529,7 @@ void LIBMATTI_B3D_GlStateManager_GetShaderInfoLog(int shader, int maxLength, int
 {
     LIBMATTI_B3D_RenderSystem_AssertOnRenderThread();
     (void) maxLength;
-    // Java: GL20.glGetShaderInfoLog returns the log string; the binding's
+// Java: GL20.glGetShaderInfoLog returns the log string; the binding's
     // variant returns a driver-owned buffer (never NULL after link failure).
     const char *log = LIBMATTI_GL_glGetShaderInfoLog((unsigned int) shader);
     if (infoLog != NULL)
@@ -558,7 +559,7 @@ void LIBMATTI_B3D_GlStateManager_GetProgramInfoLog(int program, int maxLength, i
 
 void LIBMATTI_B3D_GlStateManager_BindFramebuffer(unsigned int target, unsigned int framebuffer)
 {
-    // Java: READ (36008) and WRITE (36009) are tracked independently; binding
+// Java: READ (36008) and WRITE (36009) are tracked independently; binding
     // GL_FRAMEBUFFER (36160) updates both.
     if ((target == 36008 || target == 36160) && readFbo != (int) framebuffer)
     {

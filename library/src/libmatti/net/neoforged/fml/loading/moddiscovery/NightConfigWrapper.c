@@ -9,9 +9,9 @@
 
 struct LIBMATTI_FML_NightConfigWrapper
 {
-    // Java: private final UnmodifiableConfig config
+// Java: private final UnmodifiableConfig config
     LIBMATTI_NC_Config *config;
-    // Java: private IModFileInfo file
+// Java: private IModFileInfo file
     LIBMATTI_NEOFORGESPI_IModFileInfo *file;
     LIBMATTI_NEOFORGESPI_IConfigurable configurable;
 };
@@ -19,7 +19,7 @@ struct LIBMATTI_FML_NightConfigWrapper
 // Java: public NightConfigWrapper(UnmodifiableConfig config)
 LIBMATTI_FML_NightConfigWrapper *LIBMATTI_FML_NightConfigWrapper_New(LIBMATTI_NC_Config *config)
 {
-    // Java: if (config instanceof ConcurrentConfig) throw new IllegalArgumentException(...)
+// Java: if (config instanceof ConcurrentConfig) throw new IllegalArgumentException(...)
     LIBMATTI_FML_NightConfigWrapper *wrapper = calloc(1, sizeof(LIBMATTI_FML_NightConfigWrapper));
     wrapper->config = config;
     wrapper->configurable.self = wrapper;
@@ -80,7 +80,8 @@ LIBMATTI_JU_HashMap *LIBMATTI_FML_NightConfigWrapper_ValueMap(LIBMATTI_NC_Config
         case LIBMATTI_NC_VALUE_DOUBLE:
         case LIBMATTI_NC_VALUE_CONFIG:
         case LIBMATTI_NC_VALUE_LIST:
-            // Java keeps the boxed value; the port keeps the NC value handle (owned by the config)
+
+
             LIBMATTI_JU_HashMap_Put(map, key, &values[i]);
             break;
         default:
@@ -101,7 +102,7 @@ int LIBMATTI_FML_NightConfigWrapper_GetConfigElement(void *self, const char *con
     switch (value->type)
     {
     case LIBMATTI_NC_VALUE_CONFIG:
-        // Java: ((UnmodifiableConfig) value).valueMap()
+// Java: ((UnmodifiableConfig) value).valueMap()
         out->type = LIBMATTI_NEOFORGESPI_IConfigurable_MAP;
         out->map = value->config;
         return 1;
@@ -112,7 +113,8 @@ int LIBMATTI_FML_NightConfigWrapper_GetConfigElement(void *self, const char *con
                 "The configuration path is invalid. I wasn't expecting a multi-object list", wrapper->file);
             return 0;
         }
-        // Java returns the raw List; the port only represents a list of strings
+
+
         for (size_t i = 0; i < value->listCount; i++)
             if (value->list[i].type != LIBMATTI_NC_VALUE_STRING) return 0;
 
@@ -134,12 +136,14 @@ int LIBMATTI_FML_NightConfigWrapper_GetConfigElement(void *self, const char *con
         out->integer = value->integer;
         return 1;
     case LIBMATTI_NC_VALUE_LONG:
-        // Java returns the Long; the port's value type only carries an int
+
+
         out->type = LIBMATTI_NEOFORGESPI_IConfigurable_INT;
         out->integer = (int) value->longValue;
         return 1;
     default:
-        // Java returns the Double as-is
+
+
         return 0;
     }
 }
@@ -158,13 +162,13 @@ LIBMATTI_NEOFORGESPI_IConfigurable **LIBMATTI_FML_NightConfigWrapper_GetConfigLi
         *count = 0;
         return NULL;
     }
-    if (value == NULL) // Java: getOrElse(path, ArrayList::new)
+    if (value == NULL)// Java: getOrElse(path, ArrayList::new)
     {
         *count = 0;
         return NULL;
     }
 
-    // Java: stream().map(NightConfigWrapper::new).map(cw -> cw.setFile(file)).toList()
+// Java: stream().map(NightConfigWrapper::new).map(cw -> cw.setFile(file)).toList()
     // The wrappers live as long as the mod infos, so they are not released here.
     LIBMATTI_NEOFORGESPI_IConfigurable **result = calloc(value->listCount, sizeof(*result));
     size_t actual = 0;

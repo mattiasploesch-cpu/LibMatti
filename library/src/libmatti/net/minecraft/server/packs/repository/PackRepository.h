@@ -1,5 +1,6 @@
-// Port of net.minecraft.server.packs.repository.RepositorySource and
-// net.minecraft.server.packs.repository.PackRepository.
+
+
+
 
 #ifndef MATTICRAFT_MC_PACKS_REPOSITORY_PACKREPOSITORY_H
 #define MATTICRAFT_MC_PACKS_REPOSITORY_PACKREPOSITORY_H
@@ -11,25 +12,25 @@
 // Java: interface RepositorySource
 typedef struct LIBMATTI_MC_RepositorySource
 {
-    // Java: void loadPacks(Consumer<Pack>)
+// Java: void loadPacks(Consumer<Pack>)
     void (*loadPacks)(const struct LIBMATTI_MC_RepositorySource *self, void *userData,
                       void (*onPack)(void *userData, Pack *pack));
 } LIBMATTI_MC_RepositorySource;
 
 typedef struct LIBMATTI_MC_PackRepository
 {
-    // Java: private final Set<RepositorySource> sources
+// Java: private final Set<RepositorySource> sources
     LIBMATTI_MC_RepositorySource **sources;
     size_t sourceCount;
-    // Java: private final Map<String, Pack> available
+// Java: private final Map<String, Pack> available
     char **availableIds;
     Pack **availablePacks;
     size_t availableCount;
-    // Java: private final Map<String, Pack> selected
+// Java: private final Map<String, Pack> selected
     char **selectedIds;
     Pack **selectedPacks;
     size_t selectedCount;
-    // Java: private final UnaryOperator<Map<String, Pack>> rebuildConfig
+// Java: private final UnaryOperator<Map<String, Pack>> rebuildConfig
     // The port keeps the comparator callback; NULL uses Pack.compareTo.
     void *rebuildConfigUserData;
     int (*reorder)(void *userData, Pack *const *packs, size_t count, Pack ***outReordered, size_t *outReorderedCount);
@@ -38,7 +39,8 @@ typedef struct LIBMATTI_MC_PackRepository
 // Java: public PackRepository(RepositorySource... sources)
 LIBMATTI_MC_PackRepository *LIBMATTI_MC_PackRepository_New(const LIBMATTI_MC_RepositorySource *const *sources,
                                                            size_t sourceCount);
-// NeoForge constructor with the rebuild-config operator; pass NULL for vanilla behaviour
+
+
 LIBMATTI_MC_PackRepository *LIBMATTI_MC_PackRepository_NewWithReorder(
     const LIBMATTI_MC_RepositorySource *const *sources, size_t sourceCount,
     void *rebuildConfigUserData,

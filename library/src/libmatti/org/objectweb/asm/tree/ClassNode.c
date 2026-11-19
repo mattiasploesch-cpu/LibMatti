@@ -1,4 +1,5 @@
-// Port of org.objectweb.asm.tree.ClassNode.
+
+
 
 #include "libmatti/org/objectweb/asm/tree/ClassNode.h"
 

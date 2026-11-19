@@ -9,12 +9,13 @@
 extern "C" {
 #endif
 
-// Compiles the terrain program once and returns it (0 on failure, like the
-// font shader path). The out locations are the uniforms the draw sets.
+
+
+
 unsigned int LIBMATTI_MC_SectionShader_Compile(int *mvpLocation, int *originLocation, int *useTextureLocation);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif //MATTICRAFT_MC_CLIENT_RENDERER_CHUNK_SECTIONSHADER_H
+#endif

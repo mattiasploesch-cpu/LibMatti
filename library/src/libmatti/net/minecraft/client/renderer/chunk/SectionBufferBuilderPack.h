@@ -1,5 +1,6 @@
-// Port of net.minecraft.client.renderer.SectionBufferBuilderPack - one
-// ByteBufferBuilder per ChunkSectionLayer with the fixed byte sizes.
+
+
+
 
 #ifndef MATTICRAFT_MC_CLIENT_RENDERER_SECTIONBUFFERBUILDERPACK_H
 #define MATTICRAFT_MC_CLIENT_RENDERER_SECTIONBUFFERBUILDERPACK_H
@@ -14,12 +15,12 @@ extern "C" {
 // Java: public class SectionBufferBuilderPack implements AutoCloseable
 typedef struct LIBMATTI_MC_SectionBufferBuilderPack
 {
-    // Java: private final Map<ChunkSectionLayer, ByteBufferBuilder> buffers
+// Java: private final Map<ChunkSectionLayer, ByteBufferBuilder> buffers
     LIBMATTI_B3D_ByteBufferBuilder *buffers[LIBMATTI_MC_ChunkSectionLayer_COUNT];
-    // Java: private static final long TOTAL_BYTES - the port tracks the sum
+// Java: private static final long TOTAL_BYTES - the port tracks the sum
     // for the pack-limit bookkeeping.
     long long totalBytes;
-    // Java: private boolean closed
+// Java: private boolean closed
     int closed;
 } LIBMATTI_MC_SectionBufferBuilderPack;
 
@@ -43,4 +44,4 @@ long long LIBMATTI_MC_SectionBufferBuilderPack_MaxBytes(void);
 }
 #endif
 
-#endif //MATTICRAFT_MC_CLIENT_RENDERER_SECTIONBUFFERBUILDERPACK_H
+#endif

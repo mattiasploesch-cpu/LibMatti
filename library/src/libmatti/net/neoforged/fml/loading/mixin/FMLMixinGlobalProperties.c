@@ -74,7 +74,7 @@ static const char *get_property_string(void *self, LIBMATTI_SP_IPropertyKey key,
     const char *value = entry != NULL ? entry->value : NULL;
     pthread_mutex_unlock(&PROPERTIES_MUTEX);
 
-    // Java: Objects.requireNonNullElse((String) PROPERTIES.get(getKeyName(key)), defaultValue)
+// Java: Objects.requireNonNullElse((String) PROPERTIES.get(getKeyName(key)), defaultValue)
     return value != NULL ? value : defaultValue;
 }
 

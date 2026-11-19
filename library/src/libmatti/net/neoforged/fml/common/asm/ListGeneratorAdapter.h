@@ -17,4 +17,4 @@ typedef LIBMATTI_ASM_COMMONS_GeneratorAdapter LIBMATTI_FML_ListGeneratorAdapter;
 LIBMATTI_FML_ListGeneratorAdapter *LIBMATTI_FML_ListGeneratorAdapter_New(LIBMATTI_ASMT_InsnList *insnList);
 void LIBMATTI_FML_ListGeneratorAdapter_Free(LIBMATTI_FML_ListGeneratorAdapter *adapter);
 
-#endif //MATTICRAFT_FML_COMMON_ASM_LISTGENERATORADAPTER_H
+#endif

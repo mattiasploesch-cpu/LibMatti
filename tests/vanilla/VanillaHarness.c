@@ -1,7 +1,8 @@
-// Vanilla bootstrap harness: runs Bootstrap.bootStrap() and checks the generated vanilla
-// content - the registry counts, the declaration order, the DefaultedMappedRegistry defaults
-// and the BlockItem back-links. The RegisterEvent side (modded entries next to the vanilla
-// ones) runs through the client with the example mod.
+
+
+
+
+
 
 #include "libmatti/net/minecraft/Bootstrap.h"
 #include "libmatti/net/minecraft/core/MappedRegistry.h"
@@ -30,7 +31,7 @@ static void check(int condition, const char *what)
 
 int main(void)
 {
-    // Java: Bootstrap.bootStrap() - createContents fills BLOCK/ITEM, freeze, validate
+// Java: Bootstrap.bootStrap() - createContents fills BLOCK/ITEM, freeze, validate
     LIBMATTI_MC_Bootstrap_BootStrap();
     check(LIBMATTI_MC_Bootstrap_IsBootstrapped(), "bootstrapped");
 
@@ -42,7 +43,7 @@ int main(void)
     check(LIBMATTI_MC_MappedRegistry_Size(itemRegistry) == LIBMATTI_MC_VanillaItems_COUNT,
           "item registry holds every vanilla item");
 
-    // Java: the declaration order - Blocks.AIR is id 0, Blocks.STONE id 1
+// Java: the declaration order - Blocks.AIR is id 0, Blocks.STONE id 1
     LIBMATTI_MC_Identifier *airLocation = LIBMATTI_MC_Identifier_Parse("minecraft:air");
     LIBMATTI_MC_Identifier *stoneLocation = LIBMATTI_MC_Identifier_Parse("minecraft:stone");
     LIBMATTI_MC_Block *air = LIBMATTI_MC_MappedRegistry_GetValue(blockRegistry, airLocation);
@@ -53,11 +54,11 @@ int main(void)
     check(LIBMATTI_MC_MappedRegistry_GetId(blockRegistry, air) == 0, "air id is 0");
     check(LIBMATTI_MC_MappedRegistry_GetId(blockRegistry, stone) == 1, "stone id is 1");
 
-    // Java: DefaultedMappedRegistry - BLOCK falls back to the air block
+// Java: DefaultedMappedRegistry - BLOCK falls back to the air block
     check(LIBMATTI_MC_MappedRegistry_GetValueOrDefault(blockRegistry, NULL) == air,
           "block default is air");
 
-    // Java: Items.AIR is the item id 0. registerBlock(Blocks.AIR, AirItem::new) constructs
+// Java: Items.AIR is the item id 0. registerBlock(Blocks.AIR, AirItem::new) constructs
     // the AirItem with the block, so the port keeps the back-link like every registerBlock
     // result (the Item-subclass split is the game port's part).
     LIBMATTI_MC_Item *itemAir = LIBMATTI_MC_VanillaItems_AIR();
@@ -67,16 +68,16 @@ int main(void)
     check(LIBMATTI_MC_MappedRegistry_GetValueOrDefault(itemRegistry, NULL) == itemAir,
           "item default is air");
 
-    // Java: Item.BY_BLOCK - the stone BlockItem places the stone block
+// Java: Item.BY_BLOCK - the stone BlockItem places the stone block
     LIBMATTI_MC_Item *itemStone = LIBMATTI_MC_VanillaItems_GetByName("STONE");
     check(itemStone != NULL && itemStone->block == stone, "item stone links to block stone");
 
-    // Java: the block-item id pairs match (registerBlock uses the block id)
+// Java: the block-item id pairs match (registerBlock uses the block id)
     check(strcmp(LIBMATTI_MC_VanillaItems_IdOf(itemStone),
                  LIBMATTI_MC_VanillaBlocks_IdOf(stone)) == 0,
           "stone item id equals the block id");
 
-    // Java: the registries are frozen after bootStrap (RegistrationInfo.BUILT_IN = stable)
+// Java: the registries are frozen after bootStrap (RegistrationInfo.BUILT_IN = stable)
     check(LIBMATTI_MC_MappedRegistry_RegistryLifecycle(blockRegistry).kind == LIBMATTI_MJS_Lifecycle_STABLE,
           "block lifecycle stable");
 

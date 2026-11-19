@@ -1,4 +1,5 @@
-// Port of net.neoforged.neoforge.internal.RegistrationEvents.
+
+
 
 #include "libmatti/net/neoforged/neoforge/internal/RegistrationEvents.h"
 
@@ -48,13 +49,14 @@ void LIBMATTI_NEOFORGE_RegistrationEvents_ModifyComponents(void)
 void LIBMATTI_NEOFORGE_RegistrationEvents_Init(void *userdata)
 {
     (void) userdata;
-    // Java order, kept 1:1:
-    //   CauldronFluidContent.init();       // must be before capability event
-    //   CapabilityHooks.init();            // must be after cauldron event
-    //   ForcedChunkManager.init();
-    //   RegistryManager.initDataMaps();
-    //   modifyComponents();
-    //   PoiTypeExtender.extendPoiTypes();
+
+
+
+
+
+
+
+
     LIBMATTI_NEOFORGE_CauldronFluidContent_Init();
     LIBMATTI_NEOFORGE_CapabilityHooks_Init();
     LIBMATTI_NEOFORGE_ForcedChunkManager_Init();

@@ -1,4 +1,5 @@
-// Port of net.minecraft.core.SectionPos (implementation).
+
+
 
 #include "libmatti/net/minecraft/core/SectionPos.h"
 
@@ -132,7 +133,7 @@ LIBMATTI_MC_BlockPos *LIBMATTI_MC_SectionPos_HighCornerPos(const LIBMATTI_MC_Sec
 
 LIBMATTI_MC_BlockPos *LIBMATTI_MC_SectionPos_RelativeToBlockPos(const LIBMATTI_MC_SectionPos *pos, short offset)
 {
-    // Java: BlockPos.containing(offset & 15, offset >> 4 & 15, offset >> 8 & 15)
+// Java: BlockPos.containing(offset & 15, offset >> 4 & 15, offset >> 8 & 15)
     // relative to the origin (the offset packs y << 8 | z << 4 | x).
     int relX = offset & 15;
     int relY = (offset >> 8) & 15;

@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.ModList.
+
+
 
 #include "libmatti/net/neoforged/fml/ModList.h"
 
@@ -24,10 +25,11 @@ static LIBMATTI_NEOFORGESPI_IModInfo *first_mod_info(const LIBMATTI_NEOFORGESPI_
 {
     size_t count;
     LIBMATTI_NEOFORGESPI_IModInfo **mods = LIBMATTI_NEOFORGESPI_IModFile_GetModInfos(modFile, &count);
-    // Java returns the impl's own list, so the array must not be freed here
+
+
     if (count == 0)
     {
-        // Java: List.getFirst() throws NoSuchElementException
+// Java: List.getFirst() throws NoSuchElementException
         LIBMATTI_ML_Logger_Error(LOGGER(), NULL, "No mod infos in mod file {}",
                                  LIBMATTI_NEOFORGESPI_IModFile_GetFileName(modFile));
         return NULL;
@@ -90,7 +92,7 @@ char *LIBMATTI_FML_ModList_FileToLine(const LIBMATTI_NEOFORGESPI_IModFile *modFi
 
     const LIBMATTI_NEOFORGESPI_ArtifactVersion *version = LIBMATTI_NEOFORGESPI_IModInfo_GetVersion(mainMod);
 
-    // Java: ((ModFileInfo) mf.getModFileInfo()).getCodeSigningFingerprint().orElse("NOSIGNATURE")
+// Java: ((ModFileInfo) mf.getModFileInfo()).getCodeSigningFingerprint().orElse("NOSIGNATURE")
     LIBMATTI_FML_ModFileInfo *modFileInfo =
         (LIBMATTI_FML_ModFileInfo *)LIBMATTI_NEOFORGESPI_IModFile_GetModFileInfo(modFile);
     char *fingerprint = NULL;
@@ -120,7 +122,7 @@ static char *crash_report_generator(void *userdata)
 static void add_file_by_id(LIBMATTI_FML_ModList *modList, const char *modId,
                            LIBMATTI_NEOFORGESPI_IModFileInfo *modFileInfo)
 {
-    // Java: Collectors.toUnmodifiableMap rejects a duplicate key by throwing
+// Java: Collectors.toUnmodifiableMap rejects a duplicate key by throwing
     for (size_t i = 0; i < modList->fileByIdCount; i++)
     {
         if (strcmp(modList->fileById[i].modId, modId) != 0) continue;
@@ -163,7 +165,8 @@ static void build_file_by_id(LIBMATTI_FML_ModList *modList)
         LIBMATTI_NEOFORGESPI_IModInfo **mods =
             LIBMATTI_NEOFORGESPI_IModFileInfo_GetMods(modList->modFiles[i], &count);
 
-        // Java returns the impl's own list, so the array must not be freed here
+
+
         for (size_t j = 0; j < count; j++)
             add_file_by_id(modList, LIBMATTI_NEOFORGESPI_IModInfo_GetModId(mods[j]),
                            LIBMATTI_NEOFORGESPI_IModInfo_GetOwningFile(mods[j]));
@@ -216,7 +219,8 @@ char *LIBMATTI_FML_ModList_CrashReport(LIBMATTI_FML_ModList *modList)
 
     free(files);
 
-    // Java returns a new String, so the caller owns the result
+
+
     char *report = strdup(LIBMATTI_JL_StringBuilder_ToString(builder));
     LIBMATTI_JL_StringBuilder_Free(builder);
     return report;
@@ -244,13 +248,13 @@ LIBMATTI_NEOFORGESPI_IModFileInfo *LIBMATTI_FML_ModList_GetModFileById(const LIB
 void LIBMATTI_FML_ModList_SetLoadedMods(LIBMATTI_FML_ModList *modList, LIBMATTI_FML_ModContainer **containers,
                                        size_t count)
 {
-    // Java: this.mods = modContainers;
+// Java: this.mods = modContainers;
     free(modList->mods);
     modList->modCount = count;
     modList->mods = malloc(sizeof(*modList->mods) * (count + 1));
     for (size_t i = 0; i < count; i++) modList->mods[i] = containers[i];
 
-    // Java: sortedContainers = modContainers.stream()
+// Java: sortedContainers = modContainers.stream()
     //         .sorted(Comparator.comparingInt(c -> sortedList.indexOf(c.getModInfo()))).toList();
     // Stream.sorted() is stable, hence the insertion sort.
     free(modList->sortedContainers);
@@ -269,7 +273,7 @@ void LIBMATTI_FML_ModList_SetLoadedMods(LIBMATTI_FML_ModList *modList, LIBMATTI_
         modList->sortedContainers[j] = containers[i];
     }
 
-    // Java: indexedMods = modContainers.stream().collect(Collectors.toMap(ModContainer::getModId, Function.identity()));
+// Java: indexedMods = modContainers.stream().collect(Collectors.toMap(ModContainer::getModId, Function.identity()));
     free(modList->indexedMods);
     modList->indexedMods = malloc(sizeof(*modList->indexedMods) * (count + 1));
     modList->indexedModCount = count;
@@ -315,7 +319,7 @@ LIBMATTI_NEOFORGESPI_ModFileScanData **LIBMATTI_FML_ModList_GetAllScanData(LIBMA
 {
     if (modList->modFileScanData == NULL)
     {
-        // Java: sortedList.stream().map(IModInfo::getOwningFile).filter(Objects::nonNull)
+// Java: sortedList.stream().map(IModInfo::getOwningFile).filter(Objects::nonNull)
         //         .map(IModFileInfo::getFile).distinct().map(IModFile::getScanResult).collect(Collectors.toList())
         LIBMATTI_NEOFORGESPI_IModFile **files = malloc(sizeof(*files) * (modList->sortedCount + 1));
         size_t fileCount = 0;

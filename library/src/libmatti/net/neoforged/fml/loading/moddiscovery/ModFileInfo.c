@@ -145,13 +145,13 @@ LIBMATTI_FML_ModFileInfo *LIBMATTI_FML_ModFileInfo_New(
     modFileInfo->modFile = modFile;
     modFileInfo->config = config;
 
-    // Java: configFileConsumer.accept(this); (nightconfig's wrapper::setFile)
+// Java: configFileConsumer.accept(this); (nightconfig's wrapper::setFile)
     if (configFileConsumer != NULL)
         configFileConsumer(LIBMATTI_FML_ModFileInfo_AsModFileInfo(modFileInfo), userdata);
 
-    // Java: var modLoader = config.<String>getConfigElement("modLoader").orElse(null);
+// Java: var modLoader = config.<String>getConfigElement("modLoader").orElse(null);
     char *modLoader = configString(config, "modLoader");
-    // Java: config.<String>getConfigElement("loaderVersion").map(MavenVersionAdapter::createFromVersionSpec).orElse(null);
+// Java: config.<String>getConfigElement("loaderVersion").map(MavenVersionAdapter::createFromVersionSpec).orElse(null);
     char *loaderVersion = configString(config, "loaderVersion");
     LIBMATTI_NEOFORGESPI_VersionRange *modLoaderVersion =
         loaderVersion != NULL ? LIBMATTI_NEOFORGESPI_MavenVersionAdapter_CreateFromVersionSpec(loaderVersion) : NULL;
@@ -170,13 +170,13 @@ LIBMATTI_FML_ModFileInfo *LIBMATTI_FML_ModFileInfo_New(
     }
     free(loaderVersion);
 
-    // Java: this.languageSpecs = new ArrayList<>(List.of(new LanguageSpec(modLoader, modLoaderVersion)));
+// Java: this.languageSpecs = new ArrayList<>(List.of(new LanguageSpec(modLoader, modLoaderVersion)));
     modFileInfo->languageSpecs = calloc(1, sizeof(LIBMATTI_NEOFORGESPI_IModFileInfo_LanguageSpec));
     modFileInfo->languageSpecs[0].languageName = modLoader;
     modFileInfo->languageSpecs[0].acceptedVersions = modLoaderVersion;
     modFileInfo->languageSpecCount = 1;
 
-    // Java: this.license = config.<String>getConfigElement("license").orElse("");
+// Java: this.license = config.<String>getConfigElement("license").orElse("");
     modFileInfo->license = configString(config, "license");
     if (modFileInfo->license == NULL) modFileInfo->license = strdup("");
     if (isBlank(modFileInfo->license))
@@ -188,14 +188,14 @@ LIBMATTI_FML_ModFileInfo *LIBMATTI_FML_ModFileInfo_New(
         return NULL;
     }
 
-    // Java: this.showAsResourcePack = config.<Boolean>getConfigElement("showAsResourcePack").orElse(false);
+// Java: this.showAsResourcePack = config.<Boolean>getConfigElement("showAsResourcePack").orElse(false);
     if (!configBool(config, "showAsResourcePack", &modFileInfo->showAsResourcePack))
         modFileInfo->showAsResourcePack = 0;
-    // Java: this.showAsDataPack = config.<Boolean>getConfigElement("showAsDataPack").orElse(false);
+// Java: this.showAsDataPack = config.<Boolean>getConfigElement("showAsDataPack").orElse(false);
     if (!configBool(config, "showAsDataPack", &modFileInfo->showAsDataPack))
         modFileInfo->showAsDataPack = 0;
 
-    // Java: this.usesServices = config.<List<String>>getConfigElement("services").orElse(List.of());
+// Java: this.usesServices = config.<List<String>>getConfigElement("services").orElse(List.of());
     LIBMATTI_NEOFORGESPI_IConfigurable_Value services;
     if (LIBMATTI_NEOFORGESPI_IConfigurable_GetElement(config, "services", &services) &&
         services.type == LIBMATTI_NEOFORGESPI_IConfigurable_STRING_LIST)
@@ -205,16 +205,16 @@ LIBMATTI_FML_ModFileInfo *LIBMATTI_FML_ModFileInfo_New(
         for (size_t i = 0; i < services.listCount; i++) modFileInfo->usesServices[i] = strdup(services.list[i]);
     }
 
-    // Java: this.properties = config.<Map<String, Object>>getConfigElement("properties").orElse(Collections.emptyMap());
+// Java: this.properties = config.<Map<String, Object>>getConfigElement("properties").orElse(Collections.emptyMap());
     LIBMATTI_NEOFORGESPI_IConfigurable_Value properties;
     if (LIBMATTI_NEOFORGESPI_IConfigurable_GetElement(config, "properties", &properties) &&
         properties.type == LIBMATTI_NEOFORGESPI_IConfigurable_MAP)
         modFileInfo->properties = LIBMATTI_FML_NightConfigWrapper_ValueMap(properties.map);
 
-    // Java: this.modFile.setFileProperties(this.properties);
+// Java: this.modFile.setFileProperties(this.properties);
     LIBMATTI_FML_ModFile_SetFileProperties(modFile, modFileInfo->properties);
 
-    // Java: this.issueURL = config.<String>getConfigElement("issueTrackerURL").map(StringUtils::toURL).orElse(null);
+// Java: this.issueURL = config.<String>getConfigElement("issueTrackerURL").map(StringUtils::toURL).orElse(null);
     char *issueTrackerUrl = configString(config, "issueTrackerURL");
     if (issueTrackerUrl != NULL)
     {
@@ -222,7 +222,7 @@ LIBMATTI_FML_ModFileInfo *LIBMATTI_FML_ModFileInfo_New(
         free(issueTrackerUrl);
     }
 
-    // Java: List<? extends IConfigurable> modConfigs = config.getConfigList("mods");
+// Java: List<? extends IConfigurable> modConfigs = config.getConfigList("mods");
     const char *key[] = {"mods"};
     size_t modConfigCount = 0;
     LIBMATTI_NEOFORGESPI_IConfigurable **modConfigs =
@@ -237,7 +237,7 @@ LIBMATTI_FML_ModFileInfo *LIBMATTI_FML_ModFileInfo_New(
         return NULL;
     }
 
-    // Java: this.mods = modConfigs.stream().map(mi -> (IModInfo) new ModInfo(this, mi)).toList();
+// Java: this.mods = modConfigs.stream().map(mi -> (IModInfo) new ModInfo(this, mi)).toList();
     modFileInfo->mods = calloc(modConfigCount, sizeof(LIBMATTI_NEOFORGESPI_IModInfo *));
     for (size_t i = 0; i < modConfigCount; i++)
     {
@@ -250,12 +250,13 @@ LIBMATTI_FML_ModFileInfo *LIBMATTI_FML_ModFileInfo_New(
         modFileInfo->mods[modFileInfo->modCount++] = LIBMATTI_FML_ModInfo_AsModInfo(modInfo);
     }
 
-    // Java: LOGGER.debug(LogMarkers.LOADING, "Found valid mod file {} with {} mods - versions {}", ...)
+// Java: LOGGER.debug(LogMarkers.LOADING, "Found valid mod file {} with {} mods - versions {}", ...)
     LIBMATTI_ML_Logger_Debug(LOGGER(), &LIBMATTI_FML_MARKER_LOADING, "Found valid mod file {} with mods",
                              LIBMATTI_NEOFORGESPI_IModFile_GetFileName(
                                  (LIBMATTI_NEOFORGESPI_IModFile *) &modFile->modFile));
 
-    // The wrappers themselves are owned by the mod infos, only the list is ours.
+
+
     free(modConfigs);
 
     return modFileInfo;
@@ -267,7 +268,7 @@ LIBMATTI_FML_ModFileInfo *LIBMATTI_FML_ModFileInfo_NewWithLanguageSpecs(
     LIBMATTI_FML_ModFileInfo_ConfigFileConsumer configFileConsumer, void *userdata,
     const LIBMATTI_NEOFORGESPI_IModFileInfo_LanguageSpec *languageSpecs, size_t languageSpecCount)
 {
-    // Java: this(file, config, configFileConsumer); this.languageSpecs.addAll(languageSpecs);
+// Java: this(file, config, configFileConsumer); this.languageSpecs.addAll(languageSpecs);
     LIBMATTI_FML_ModFileInfo *modFileInfo =
         LIBMATTI_FML_ModFileInfo_New(modFile, config, configFileConsumer, userdata);
     if (modFileInfo == NULL) return NULL;

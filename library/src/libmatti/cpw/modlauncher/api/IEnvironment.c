@@ -1,11 +1,12 @@
-//
-// Port of the static members of cpw.mods.modlauncher.api.IEnvironment
-// (Keys + the ModList list type).
-//
-// Java builds the keys in the IEnvironment.Keys static initializer; the C port
-// creates the KeyBuilders lazily on first use, which has the same effect
-// (KeyBuilder.get() self-heals into the owner map).
-//
+
+
+
+
+
+
+
+
+
 
 #include "IEnvironment.h"
 
@@ -99,9 +100,10 @@ LIBMATTI_MLA_Key *LIBMATTI_MLA_IEnvironment_Keys_MlImplVersion(void)
     return LIBMATTI_MLA_KeyBuilder_Get(mlImplVersionBuilder);
 }
 
-// ---------------------------------------------------------------------------
-// ModList - the C model of List<Map<String,String>>
-// ---------------------------------------------------------------------------
+
+
+
+
 
 typedef struct
 {

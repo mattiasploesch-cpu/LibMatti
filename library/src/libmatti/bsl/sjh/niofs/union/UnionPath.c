@@ -1,6 +1,7 @@
-//
-// Created by administrator on 09.09.26.
-//
+
+
+
+
 
 #include "UnionPath.h"
 
@@ -65,7 +66,8 @@ static void get_path_parts(const char *longstring, char ***outParts, size_t *out
         }
 
         size_t index = (size_t)(slash - clean);
-        if (index != startIndex) // skip double slash and slash at start/end
+        if (index != startIndex)
+
         {
             char *part = malloc(index - startIndex + 1);
             memcpy(part, clean + startIndex, index - startIndex);
@@ -84,7 +86,7 @@ static void get_path_parts(const char *longstring, char ***outParts, size_t *out
 
 LIBMATTI_UNION_UnionPath *LIBMATTI_UNION_UnionPath_New(LIBMATTI_UNION_UnionFileSystem *fileSystem, const char **pathParts, size_t partCount)
 {
-    // Java: UnionPath(UnionFileSystem, String... pathParts)
+// Java: UnionPath(UnionFileSystem, String... pathParts)
     // Joins the non-empty parts with '/', detects absolute, then re-splits
     size_t totalLength = 1;
     size_t nonEmpty = 0;
@@ -134,7 +136,8 @@ void LIBMATTI_UNION_UnionPath_Free(LIBMATTI_UNION_UnionPath *path)
     for (size_t i = 0; i < path->partCount; i++) free(path->pathParts[i]);
     free(path->pathParts);
 
-    // The normalized path may be the path itself or a separate cached instance
+
+
     if (path->normalized != NULL && path->normalized != path)
         LIBMATTI_UNION_UnionPath_Free(path->normalized);
 
@@ -188,13 +191,13 @@ LIBMATTI_UNION_UnionPath *LIBMATTI_UNION_UnionPath_GetName(const LIBMATTI_UNION_
 
 LIBMATTI_UNION_UnionPath *LIBMATTI_UNION_UnionPath_Subpath(const LIBMATTI_UNION_UnionPath *path, size_t beginIndex, size_t endIndex)
 {
-    // Java: UnionPath(false) for the special empty case
+// Java: UnionPath(false) for the special empty case
     if (!path->absolute && path->partCount == 0 && beginIndex == 0 && endIndex == 1)
         return union_path_new_absolute(path->fileSystem, 0, NULL, 0);
 
     if (!path->absolute && beginIndex == 0 && endIndex == path->partCount)
     {
-        // Java: returns this
+// Java: returns this
         return (LIBMATTI_UNION_UnionPath *)path;
     }
 
@@ -236,7 +239,7 @@ LIBMATTI_UNION_UnionPath *LIBMATTI_UNION_UnionPath_Normalize(const LIBMATTI_UNIO
 {
     if (path->normalized != NULL) return path->normalized;
 
-    // Java: Deque logic - "." is skipped, ".." pops the previous part
+// Java: Deque logic - "." is skipped, ".." pops the previous part
     char **normParts = NULL;
     size_t normCount = 0;
 
@@ -246,13 +249,15 @@ LIBMATTI_UNION_UnionPath *LIBMATTI_UNION_UnionPath_Normalize(const LIBMATTI_UNIO
 
         if (strcmp(part, ".") == 0)
         {
-            // skip
+
+
         }
         else if (strcmp(part, "..") == 0)
         {
             if (normCount == 0 || strcmp(normParts[normCount - 1], "..") == 0)
             {
-                // .. on an empty path is allowed, keep it
+
+
                 normParts = realloc(normParts, sizeof(char *) * (normCount + 1));
                 normParts[normCount] = strdup(part);
                 normCount++;
@@ -285,7 +290,7 @@ LIBMATTI_UNION_UnionPath *LIBMATTI_UNION_UnionPath_Normalize(const LIBMATTI_UNIO
 LIBMATTI_UNION_UnionPath *LIBMATTI_UNION_UnionPath_Resolve(const LIBMATTI_UNION_UnionPath *path, const LIBMATTI_UNION_UnionPath *other)
 {
     if (other->absolute)
-        return (LIBMATTI_UNION_UnionPath *)other; // Java: returns the other path unchanged
+        return (LIBMATTI_UNION_UnionPath *)other;// Java: returns the other path unchanged
 
     size_t mergedCount = path->partCount + other->partCount;
     char **merged = calloc(mergedCount, sizeof(char *));
@@ -295,7 +300,7 @@ LIBMATTI_UNION_UnionPath *LIBMATTI_UNION_UnionPath_Resolve(const LIBMATTI_UNION_
 
     LIBMATTI_UNION_UnionPath *result = union_path_new_absolute(path->fileSystem, path->absolute, (const char **)merged, mergedCount);
 
-    // Java: merged is a new List referencing the same strings; only the array is freed here
+// Java: merged is a new List referencing the same strings; only the array is freed here
     free(merged);
 
     return result;
@@ -345,7 +350,8 @@ LIBMATTI_UNION_UnionPath *LIBMATTI_UNION_UnionPath_Relativize(const LIBMATTI_UNI
 
             LIBMATTI_UNION_UnionPath *result = union_path_new_absolute(path->fileSystem, 0, (const char **)merged, mergedCount);
 
-            // merged borrows from upDots and subpath; only the array is freed here
+
+
             free(merged);
             for (size_t j = 0; j < remaining; j++) free(upDots[j]);
             free(upDots);
@@ -357,7 +363,7 @@ LIBMATTI_UNION_UnionPath *LIBMATTI_UNION_UnionPath_Relativize(const LIBMATTI_UNI
 
 char *LIBMATTI_UNION_UnionPath_ToString(const LIBMATTI_UNION_UnionPath *path)
 {
-    // Java: (absolute ? "/" : "") + String.join("/", pathParts)
+// Java: (absolute ? "/" : "") + String.join("/", pathParts)
     size_t total = (path->absolute ? 1 : 0) + 1;
 
     for (size_t i = 0; i < path->partCount; i++)
@@ -394,7 +400,7 @@ int LIBMATTI_UNION_UnionPath_Equals(const LIBMATTI_UNION_UnionPath *path, const 
 
 LIBMATTI_JN_URI *LIBMATTI_UNION_UnionPath_ToUri(const LIBMATTI_UNION_UnionPath *path)
 {
-    // Java: new URI(getScheme(), null, key + "!" + toAbsolutePath(), null)
+// Java: new URI(getScheme(), null, key + "!" + toAbsolutePath(), null)
     // C: build the string "union:" + key + "!" + absolute path and parse it
     char *key = LIBMATTI_UNION_UnionFileSystem_GetKey(path->fileSystem);
 
@@ -412,7 +418,8 @@ LIBMATTI_JN_URI *LIBMATTI_UNION_UnionPath_ToUri(const LIBMATTI_UNION_UnionPath *
 
     char *absoluteString = LIBMATTI_UNION_UnionPath_ToString(absolutePath);
 
-    // the key may contain '#' (makeKey suffix), which must be percent-encoded in the URI
+
+
     size_t keyLength = strlen(key);
     size_t total = strlen("union:") + keyLength * 3 + 1 + strlen(absoluteString) + 1;
     char *spec = malloc(total);

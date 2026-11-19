@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.loading.modscan.ModFieldVisitor.
+
+
 
 #include "libmatti/net/neoforged/fml/loading/modscan/ModFieldVisitor.h"
 

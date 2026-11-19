@@ -1,5 +1,6 @@
-// Port of cpw.mods.modlauncher.serviceapi.ILaunchPluginService.
-// Java's default methods become optional function pointers: NULL is "the default".
+
+
+
 
 #ifndef MATTICRAFT_MODLAUNCHER_ILAUNCHPLUGINSERVICE_H
 #define MATTICRAFT_MODLAUNCHER_ILAUNCHPLUGINSERVICE_H
@@ -39,36 +40,36 @@ typedef struct LIBMATTI_MLS_ITransformerLoader
 // Java: interface ILaunchPluginService
 typedef struct LIBMATTI_MLS_ILaunchPluginService
 {
-    // Java: String name()
+// Java: String name()
     const char *(*name)(struct LIBMATTI_MLS_ILaunchPluginService *self);
-    // Java: EnumSet<Phase> handlesClass(Type classType, boolean isEmpty)
+// Java: EnumSet<Phase> handlesClass(Type classType, boolean isEmpty)
     int (*handlesClass)(struct LIBMATTI_MLS_ILaunchPluginService *self, const LIBMATTI_ASM_Type *classType,
                         int isEmpty);
-    // Java: default EnumSet<Phase> handlesClass(Type, boolean, String reason)
+// Java: default EnumSet<Phase> handlesClass(Type, boolean, String reason)
     int (*handlesClassWithReason)(struct LIBMATTI_MLS_ILaunchPluginService *self, const LIBMATTI_ASM_Type *classType,
                                   int isEmpty, const char *reason);
-    // Java: default boolean processClass(Phase, ClassNode, Type)
+// Java: default boolean processClass(Phase, ClassNode, Type)
     int (*processClass)(struct LIBMATTI_MLS_ILaunchPluginService *self, LIBMATTI_MLS_Phase phase,
                         LIBMATTI_ASMT_ClassNode *classNode, const LIBMATTI_ASM_Type *classType);
-    // Java: default boolean processClass(Phase, ClassNode, Type, String reason)
+// Java: default boolean processClass(Phase, ClassNode, Type, String reason)
     int (*processClassWithReason)(struct LIBMATTI_MLS_ILaunchPluginService *self, LIBMATTI_MLS_Phase phase,
                                   LIBMATTI_ASMT_ClassNode *classNode, const LIBMATTI_ASM_Type *classType,
                                   const char *reason);
-    // Java: default int processClassWithFlags(Phase, ClassNode, Type, String reason)
+// Java: default int processClassWithFlags(Phase, ClassNode, Type, String reason)
     int (*processClassWithFlags)(struct LIBMATTI_MLS_ILaunchPluginService *self, LIBMATTI_MLS_Phase phase,
                                  LIBMATTI_ASMT_ClassNode *classNode, const LIBMATTI_ASM_Type *classType,
                                  const char *reason);
-    // Java: default void offerResource(Path resource, String name)
+// Java: default void offerResource(Path resource, String name)
     void (*offerResource)(struct LIBMATTI_MLS_ILaunchPluginService *self, const char *resource, const char *name);
-    // Java: default void addResources(List<SecureJar> resources)
+// Java: default void addResources(List<SecureJar> resources)
     void (*addResources)(struct LIBMATTI_MLS_ILaunchPluginService *self, LIBMATTI_JH_SecureJar **resources,
                          size_t resourceCount);
-    // Java: default void initializeLaunch(ITransformerLoader, NamedPath[] specialPaths)
+// Java: default void initializeLaunch(ITransformerLoader, NamedPath[] specialPaths)
     void (*initializeLaunch)(struct LIBMATTI_MLS_ILaunchPluginService *self, LIBMATTI_MLS_ITransformerLoader *loader,
                              LIBMATTI_MLA_NamedPath *specialPaths, size_t specialPathCount);
-    // Java: default <T> T getExtension() { return null; }
+// Java: default <T> T getExtension() { return null; }
     void *(*getExtension)(struct LIBMATTI_MLS_ILaunchPluginService *self);
-    // Java: default void customAuditConsumer(String className, Consumer<String[]> auditDataAcceptor)
+// Java: default void customAuditConsumer(String className, Consumer<String[]> auditDataAcceptor)
     void (*customAuditConsumer)(struct LIBMATTI_MLS_ILaunchPluginService *self, const char *className,
                                 void (*auditDataAcceptor)(char **data, size_t count, void *userdata), void *userdata);
 } LIBMATTI_MLS_ILaunchPluginService;
@@ -96,4 +97,4 @@ void LIBMATTI_MLS_ILaunchPluginService_CustomAuditConsumer(
     LIBMATTI_MLS_ILaunchPluginService *service, const char *className,
     void (*auditDataAcceptor)(char **data, size_t count, void *userdata), void *userdata);
 
-#endif //MATTICRAFT_MODLAUNCHER_ILAUNCHPLUGINSERVICE_H
+#endif

@@ -1,8 +1,9 @@
-// Port of com.mojang.blaze3d.opengl.GlStateManager (1.21.11: the GL state
-// cache layer). Java caches every GL state in static structs so repeated
-// setters with the same value are no-ops. The C port keeps the same state
-// structs; every call routes through LIBMATTI_GL_* and asserts the render
-// thread like RenderSystem.assertOnRenderThread().
+
+
+
+
+
+
 
 #ifndef MATTICRAFT_BLAZE3D_OPENGL_GLSTATESMANAGER_H
 #define MATTICRAFT_BLAZE3D_OPENGL_GLSTATESMANAGER_H
@@ -23,19 +24,27 @@ typedef struct LIBMATTI_B3D_TextureState
 // Java: GlStateManager.DepthState - mode is a BooleanState(GL_DEPTH_TEST).
 typedef struct LIBMATTI_B3D_DepthState
 {
-    int mode;   // 1 = enabled, 0 = disabled (BooleanState.enabled)
-    int mask;   // 1 = true (GL depth mask)
-    int func;   // GL enum, default GL_LESS (513)
+    int mode;
+
+    int mask;
+
+    int func;
+
 } LIBMATTI_B3D_DepthState;
 
 // Java: GlStateManager.BlendState - mode is a BooleanState(GL_BLEND).
 typedef struct LIBMATTI_B3D_BlendState
 {
-    int mode;      // 1 = enabled
-    int srcRgb;    // default GL_ONE (1)
-    int dstRgb;    // default GL_ZERO (0)
-    int srcAlpha;  // default GL_ONE (1)
-    int dstAlpha;  // default GL_ZERO (0)
+    int mode;
+
+    int srcRgb;
+
+    int dstRgb;
+
+    int srcAlpha;
+
+    int dstAlpha;
+
 } LIBMATTI_B3D_BlendState;
 
 // Java: GlStateManager.CullState - enable is a BooleanState(GL_CULL_FACE).
@@ -56,7 +65,8 @@ typedef struct LIBMATTI_B3D_PolygonOffsetState
 typedef struct LIBMATTI_B3D_ColorLogicState
 {
     int enable;
-    int op;  // default GL_COPY (5379)
+    int op;
+
 } LIBMATTI_B3D_ColorLogicState;
 
 // Java: GlStateManager.ScissorState - mode is BooleanState(GL_SCISSOR_TEST).

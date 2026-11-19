@@ -1,4 +1,5 @@
-// Port of cpw.mods.modlauncher.LaunchServiceHandlerDecorator.
+
+
 
 #ifndef MATTICRAFT_MODLAUNCHER_LAUNCHSERVICEHANDLERDECORATOR_H
 #define MATTICRAFT_MODLAUNCHER_LAUNCHSERVICEHANDLERDECORATOR_H
@@ -19,4 +20,4 @@ int LIBMATTI_ML_LaunchServiceHandlerDecorator_Launch(LIBMATTI_ML_LaunchServiceHa
 LIBMATTI_MLA_ILaunchHandlerService *LIBMATTI_ML_LaunchServiceHandlerDecorator_Service(
     const LIBMATTI_ML_LaunchServiceHandlerDecorator *decorator);
 
-#endif //MATTICRAFT_MODLAUNCHER_LAUNCHSERVICEHANDLERDECORATOR_H
+#endif

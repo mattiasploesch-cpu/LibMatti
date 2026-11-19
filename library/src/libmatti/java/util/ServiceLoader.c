@@ -1,4 +1,5 @@
-// Port of java.util.ServiceLoader.
+
+
 
 #include "libmatti/java/util/ServiceLoader.h"
 
@@ -38,7 +39,7 @@ static LIBMATTI_JU_ServiceLoader *load_for(const char *serviceType)
 
 LIBMATTI_JU_ServiceLoader *LIBMATTI_JU_ServiceLoader_Load(const void *layer, const char *serviceType)
 {
-    // Java: the layer restricts which modules may contribute providers; the C port
+// Java: the layer restricts which modules may contribute providers; the C port
     // has a single registry, so the layer is not used to filter.
     (void)layer;
     return load_for(serviceType);

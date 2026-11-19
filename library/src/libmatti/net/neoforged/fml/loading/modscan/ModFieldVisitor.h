@@ -1,6 +1,7 @@
-// Port of net.neoforged.fml.loading.modscan.ModFieldVisitor.
-// Java extends FieldVisitor; the port's ClassReader only accepts a ClassNode, so the
-// visitor is driven from the node's annotation list (see ModClassVisitor_VisitNode).
+
+
+
+
 
 #ifndef MATTICRAFT_FML_LOADING_MODSCAN_MODFIELDVISITOR_H
 #define MATTICRAFT_FML_LOADING_MODSCAN_MODFIELDVISITOR_H
@@ -24,4 +25,4 @@ void LIBMATTI_FML_ModFieldVisitor_Free(LIBMATTI_FML_ModFieldVisitor *visitor);
 LIBMATTI_FML_ModAnnotationVisitor *LIBMATTI_FML_ModFieldVisitor_VisitAnnotation(
     LIBMATTI_FML_ModFieldVisitor *visitor, const char *annotationName, int runtimeVisible);
 
-#endif //MATTICRAFT_FML_LOADING_MODSCAN_MODFIELDVISITOR_H
+#endif

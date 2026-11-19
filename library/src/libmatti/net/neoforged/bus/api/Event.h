@@ -12,9 +12,9 @@ typedef struct LIBMATTI_BUS_Event LIBMATTI_BUS_Event;
 
 struct LIBMATTI_BUS_Event
 {
-    // Java: Object.getClass()
+// Java: Object.getClass()
     LIBMATTI_JL_Class *clazz;
-    // Java: boolean isCanceled = false;
+// Java: boolean isCanceled = false;
     int isCanceled;
 };
 
@@ -24,4 +24,4 @@ void LIBMATTI_BUS_Event_Init(LIBMATTI_BUS_Event *event, LIBMATTI_JL_Class *clazz
 // Java: Event.class
 LIBMATTI_JL_Class *LIBMATTI_BUS_Event_Class(void);
 
-#endif //MATTICRAFT_BUS_API_EVENT_H
+#endif

@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.util.PathPrettyPrinting.
+
+
 
 #ifndef MATTICRAFT_FML_UTIL_PATHPRETTYPRINTING_H
 #define MATTICRAFT_FML_UTIL_PATHPRETTYPRINTING_H
@@ -10,4 +11,4 @@ void LIBMATTI_FML_PathPrettyPrinting_AddSubstitution(const char *root, const cha
 // Java: public static String prettyPrint(Path path)
 char *LIBMATTI_FML_PathPrettyPrinting_PrettyPrint(const char *path);
 
-#endif //MATTICRAFT_FML_UTIL_PATHPRETTYPRINTING_H
+#endif

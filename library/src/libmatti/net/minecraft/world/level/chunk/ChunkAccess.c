@@ -1,4 +1,5 @@
-// Port of net.minecraft.world.level.chunk.ChunkAccess.
+
+
 
 #include "libmatti/net/minecraft/world/level/chunk/ChunkAccess.h"
 
@@ -19,13 +20,13 @@ void LIBMATTI_MC_ChunkAccess_Init(LIBMATTI_MC_ChunkAccess *chunk, const LIBMATTI
     chunk->inhabitedTime = inhabitedTime;
     chunk->sectionCount = LIBMATTI_MC_LevelHeightAccessor_GetSectionsCount(heightAccessor);
 
-    // Java: this.sections = new LevelChunkSection[getSectionsCount()] +
+// Java: this.sections = new LevelChunkSection[getSectionsCount()] +
     // replaceMissingSections (every NULL slot becomes an empty section)
     chunk->sections = calloc((size_t) chunk->sectionCount, sizeof(LIBMATTI_MC_LevelChunkSection *));
     for (int i = 0; i < chunk->sectionCount; i++)
         chunk->sections[i] = LIBMATTI_MC_LevelChunkSection_New();
 
-    // Java: protected final @Nullable ShortList[] postProcessing - one list per section
+// Java: protected final @Nullable ShortList[] postProcessing - one list per section
     chunk->postProcessingCount = chunk->sectionCount;
     chunk->postProcessing = calloc((size_t) chunk->postProcessingCount, sizeof(LIBMATTI_MC_PostProcessingList));
 }
@@ -42,7 +43,7 @@ LIBMATTI_MC_LevelChunkSection *LIBMATTI_MC_ChunkAccess_GetSection(LIBMATTI_MC_Ch
 
 LIBMATTI_MC_BlockState *LIBMATTI_MC_ChunkAccess_GetBlockStateXYZ(const LIBMATTI_MC_ChunkAccess *chunk, int x, int y, int z)
 {
-    // Java: the try-body of LevelChunk.getBlockState - section lookup, air outside
+// Java: the try-body of LevelChunk.getBlockState - section lookup, air outside
     int index = LIBMATTI_MC_LevelHeightAccessor_GetSectionIndex(&chunk->levelHeightAccessor, y);
     if (index < 0 || index >= chunk->sectionCount)
         return LIBMATTI_MC_Block_DefaultBlockState(LIBMATTI_MC_VanillaBlocks_AIR());
@@ -75,7 +76,7 @@ int LIBMATTI_MC_ChunkAccess_GetHighestSectionPosition(const LIBMATTI_MC_ChunkAcc
 
 bool LIBMATTI_MC_ChunkAccess_IsYSpaceEmpty(const LIBMATTI_MC_ChunkAccess *chunk, int from, int to)
 {
-    // Java: clamps + a 16-step section walk
+// Java: clamps + a 16-step section walk
     if (from < chunk->levelHeightAccessor.minY)
         from = chunk->levelHeightAccessor.minY;
     int maxY = LIBMATTI_MC_LevelHeightAccessor_GetMaxY(&chunk->levelHeightAccessor);
@@ -93,7 +94,7 @@ bool LIBMATTI_MC_ChunkAccess_IsYSpaceEmpty(const LIBMATTI_MC_ChunkAccess *chunk,
 
 struct LIBMATTI_MC_Heightmap *LIBMATTI_MC_ChunkAccess_GetOrCreateHeightmapUnprimed(LIBMATTI_MC_ChunkAccess *chunk, int type)
 {
-    // Java: heightmaps.computeIfAbsent(type, t -> new Heightmap(this, t))
+// Java: heightmaps.computeIfAbsent(type, t -> new Heightmap(this, t))
     if (type < 0 || type >= LIBMATTI_MC_Heightmap_TYPES_COUNT)
         return NULL;
     if (chunk->heightmaps[type] == NULL)
@@ -107,13 +108,13 @@ struct LIBMATTI_MC_Heightmap *LIBMATTI_MC_ChunkAccess_GetOrCreateHeightmapUnprim
 
 bool LIBMATTI_MC_ChunkAccess_HasPrimedHeightmap(const LIBMATTI_MC_ChunkAccess *chunk, int type)
 {
-    // Java: hasPrimedHeightmap - a stored entry means primed
+// Java: hasPrimedHeightmap - a stored entry means primed
     return type >= 0 && type < LIBMATTI_MC_Heightmap_TYPES_COUNT && chunk->heightmaps[type] != NULL;
 }
 
 int LIBMATTI_MC_ChunkAccess_GetHeight(LIBMATTI_MC_ChunkAccess *chunk, int type, int x, int z)
 {
-    // Java: getHeight - prime on demand when missing, then firstAvailable - 1
+// Java: getHeight - prime on demand when missing, then firstAvailable - 1
     if (!LIBMATTI_MC_ChunkAccess_HasPrimedHeightmap(chunk, type))
     {
         LIBMATTI_MC_HeightmapTypes one = (LIBMATTI_MC_HeightmapTypes) type;
@@ -131,7 +132,7 @@ void LIBMATTI_MC_ChunkAccess_SetHeightmapRaw(LIBMATTI_MC_ChunkAccess *chunk, int
 
 size_t LIBMATTI_MC_ChunkAccess_GetBlockEntitiesPos(const LIBMATTI_MC_ChunkAccess *chunk, int64_t *out, size_t capacity)
 {
-    // Java: the union of pendingBlockEntities.keySet() and blockEntities.keySet()
+// Java: the union of pendingBlockEntities.keySet() and blockEntities.keySet()
     size_t count = 0;
     for (int i = 0; i < chunk->blockEntityCount && count < capacity; i++)
         out[count++] = chunk->blockEntities[i].packedPos;
@@ -155,7 +156,7 @@ size_t LIBMATTI_MC_ChunkAccess_GetBlockEntitiesPos(const LIBMATTI_MC_ChunkAccess
 
 void LIBMATTI_MC_ChunkAccess_SetBlockEntityNbt(LIBMATTI_MC_ChunkAccess *chunk, void *tag, const LIBMATTI_MC_BlockPos *pos)
 {
-    // Java: if (!blockEntities.containsKey(pos)) pendingBlockEntities.put(pos, tag)
+// Java: if (!blockEntities.containsKey(pos)) pendingBlockEntities.put(pos, tag)
     int64_t packed = LIBMATTI_MC_BlockPos_AsLong(pos);
     for (int i = 0; i < chunk->blockEntityCount; i++)
     {
@@ -194,7 +195,7 @@ void *LIBMATTI_MC_ChunkAccess_GetPendingBlockEntityNbt(const LIBMATTI_MC_ChunkAc
 
 void LIBMATTI_MC_ChunkAccess_MarkPosForPostprocessing(LIBMATTI_MC_ChunkAccess *chunk, const LIBMATTI_MC_BlockPos *pos, int index)
 {
-    // Java: logs "not supported" on the base; LevelChunk overrides through ProtoChunk
+// Java: logs "not supported" on the base; LevelChunk overrides through ProtoChunk
     (void) chunk;
     (void) pos;
     (void) index;

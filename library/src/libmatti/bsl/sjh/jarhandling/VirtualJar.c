@@ -1,6 +1,7 @@
-//
-// Created by administrator on 09.09.26.
-//
+
+
+
+
 
 #include "VirtualJar.h"
 
@@ -21,9 +22,10 @@ static int virtual_filter_false(const char *entry, const char *basePath, void *u
 
 static const LIBMATTI_UNION_UnionPathFilter VIRTUAL_FILTER = {virtual_filter_false, NULL};
 
-// ---------------------------------------------------------------------------
-// VirtualJarModuleDataProvider
-// ---------------------------------------------------------------------------
+
+
+
+
 
 static const char *virtual_provider_name(LIBMATTI_JH_ModuleDataProvider *self)
 {
@@ -40,7 +42,7 @@ static LIBMATTI_JL_ModuleDescriptor *virtual_provider_descriptor(LIBMATTI_JH_Mod
 static LIBMATTI_JN_URI *virtual_provider_uri(LIBMATTI_JH_ModuleDataProvider *self)
 {
     (void)self;
-    return NULL; // Java: @Nullable URI uri() { return null; }
+    return NULL;// Java: @Nullable URI uri() { return null; }
 }
 
 static int virtual_provider_find_file(LIBMATTI_JH_ModuleDataProvider *self, const char *name, LIBMATTI_JN_URI **out)
@@ -48,7 +50,7 @@ static int virtual_provider_find_file(LIBMATTI_JH_ModuleDataProvider *self, cons
     (void)self;
     (void)name;
     (void)out;
-    return 0; // Java: Optional.empty()
+    return 0;// Java: Optional.empty()
 }
 
 static int virtual_provider_open(LIBMATTI_JH_ModuleDataProvider *self, const char *name, LIBMATTI_JI_InputStream **out)
@@ -56,7 +58,7 @@ static int virtual_provider_open(LIBMATTI_JH_ModuleDataProvider *self, const cha
     (void)self;
     (void)name;
     (void)out;
-    return 0; // Java: Optional.empty()
+    return 0;// Java: Optional.empty()
 }
 
 static LIBMATTI_JU_Manifest *virtual_provider_get_manifest(LIBMATTI_JH_ModuleDataProvider *self)
@@ -65,9 +67,10 @@ static LIBMATTI_JU_Manifest *virtual_provider_get_manifest(LIBMATTI_JH_ModuleDat
     return provider->jar->manifest;
 }
 
-// ---------------------------------------------------------------------------
-// VirtualJar
-// ---------------------------------------------------------------------------
+
+
+
+
 
 static LIBMATTI_JH_ModuleDataProvider *virtual_module_data_provider(LIBMATTI_JH_SecureJar *self)
 {
@@ -145,20 +148,20 @@ static const LIBMATTI_JH_SecureJarVTable VIRTUAL_JAR_VTABLE = {
 LIBMATTI_JH_VirtualJar *LIBMATTI_JH_VirtualJar_New(const char *name, const char *referencePath,
                                                    char **packages, size_t packageCount)
 {
-    // Java: if (!Files.exists(referencePath)) throw IllegalArgumentException
+// Java: if (!Files.exists(referencePath)) throw IllegalArgumentException
     if (access(referencePath, F_OK) != 0) return NULL;
 
     LIBMATTI_JH_VirtualJar *jar = calloc(1, sizeof(LIBMATTI_JH_VirtualJar));
     jar->base.vtable = &VIRTUAL_JAR_VTABLE;
     jar->manifest = LIBMATTI_JU_Manifest_CreateEmpty();
 
-    // Java: ModuleDescriptor.newAutomaticModule(name).packages(Set.of(packages)).build()
+// Java: ModuleDescriptor.newAutomaticModule(name).packages(Set.of(packages)).build()
     jar->moduleDescriptor = LIBMATTI_JL_ModuleDescriptor_Create(name, NULL, 0);
     LIBMATTI_JL_ModuleDescriptor_AddModifier(jar->moduleDescriptor, LIBMATTI_JL_MODIFIER_AUTOMATIC);
     for (size_t i = 0; i < packageCount; i++)
         LIBMATTI_JL_ModuleDescriptor_AddPackage(jar->moduleDescriptor, packages[i]);
 
-    // Java: UFSP.newFileSystem((path, basePath) -> false, referencePath)
+// Java: UFSP.newFileSystem((path, basePath) -> false, referencePath)
     const char *refs[1] = {referencePath};
     jar->dummyFileSystem = LIBMATTI_UNION_UnionFileSystemProvider_NewFileSystem(
         LIBMATTI_UNION_UnionFileSystemProvider_Get(), (LIBMATTI_UNION_UnionPathFilter *)&VIRTUAL_FILTER, refs, 1);

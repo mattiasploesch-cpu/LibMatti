@@ -1,4 +1,5 @@
-// Port-only companion of net.neoforged.fml.javafmlmod.FMLModContainer. See ModLibrary.h.
+
+
 
 #include "libmatti/net/neoforged/fml/loading/ModLibrary.h"
 
@@ -38,8 +39,9 @@ static char *entrypoint_name(const char *modId)
     return name;
 }
 
-// Java refuses to define a class from a file that is not bytecode; the port refuses to dlopen a file
-// that is not an ELF shared object.
+
+
+
 static int isSharedObject(const char *path)
 {
     unsigned char magic[4];
@@ -64,7 +66,7 @@ LIBMATTI_FML_ModLibrary *LIBMATTI_FML_ModLibrary_Load(const char *path, const ch
         return NULL;
     }
 
-    // Java: the module layer's class loader defines the classes and puts them in the mod's module;
+// Java: the module layer's class loader defines the classes and puts them in the mod's module;
     // RTLD_GLOBAL does the same for the mod's symbols, so mods can call each other.
     void *handle = dlopen(path, RTLD_NOW | RTLD_GLOBAL);
     if (handle == NULL)
@@ -103,8 +105,9 @@ void LIBMATTI_FML_ModLibrary_Free(LIBMATTI_FML_ModLibrary *library)
 {
     if (library == NULL) return;
 
-    // The shared object stays mapped: Java's classes stay defined for the lifetime of the layer too,
-    // and the mod's functions are still reachable through the event handlers it registered.
+
+
+
     free(library->path);
     free(library->entrypointName);
     free(library);

@@ -1,8 +1,9 @@
-// Port of org.spongepowered.asm.mixin.MixinEnvironment (the global-state part of
-// sponge-mixin 0.17.3+mixin.0.8.7). The transformer-facing half of the class (options,
-// token providers, remappers) belongs to the bytecode transformer the port replaces with
-// the native hook table; Phase, Side, CompatibilityLevel, the phase transitions
-// (init/gotoPhase) and the compatibility level are exactly what the loader drives.
+
+
+
+
+
+
 
 #ifndef MATTICRAFT_SP_ASM_MIXIN_MIXINENVIRONMENT_H
 #define MATTICRAFT_SP_ASM_MIXIN_MIXINENVIRONMENT_H
@@ -12,11 +13,11 @@ typedef struct LIBMATTI_SP_MixinEnvironment_Phase LIBMATTI_SP_MixinEnvironment_P
 
 struct LIBMATTI_SP_MixinEnvironment_Phase
 {
-    // Java: final int ordinal
+// Java: final int ordinal
     int ordinal;
-    // Java: final String name
+// Java: final String name
     const char *name;
-    // Java: the environment per phase; the port keeps the environments by ordinal
+// Java: the environment per phase; the port keeps the environments by ordinal
     int environmentCreated;
 };
 
@@ -42,7 +43,7 @@ typedef enum
 // Java: public static enum CompatibilityLevel (the levels the FML layer touches)
 typedef enum
 {
-    LIBMATTI_SP_MixinEnvironment_COMPAT_NONE = -1, // Java: a null max level (service returns null)
+    LIBMATTI_SP_MixinEnvironment_COMPAT_NONE = -1,// Java: a null max level (service returns null)
     LIBMATTI_SP_MixinEnvironment_COMPAT_JAVA_6,
     LIBMATTI_SP_MixinEnvironment_COMPAT_JAVA_7,
     LIBMATTI_SP_MixinEnvironment_COMPAT_JAVA_8,
@@ -98,4 +99,4 @@ void LIBMATTI_SP_MixinEnvironment_GotoPhase(LIBMATTI_SP_MixinEnvironment_Phase *
 // Java: void registerConfig(String config) (package-private; Mixins calls it)
 void LIBMATTI_SP_MixinEnvironment_RegisterConfig(void *environment, const char *config);
 
-#endif //MATTICRAFT_SP_ASM_MIXIN_MIXINENVIRONMENT_H
+#endif

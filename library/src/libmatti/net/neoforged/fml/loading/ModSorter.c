@@ -41,9 +41,9 @@ typedef struct
     size_t modFileCount;
     LIBMATTI_FML_ModInfo **sortedList;
     size_t sortedCount;
-    // Java: Map<ModInfo, List<ModInfo>> modDependencies
+// Java: Map<ModInfo, List<ModInfo>> modDependencies
     LIBMATTI_FML_ModDependencyMap modDependencies;
-    // Java: Map<String, IModInfo> modIdNameLookup
+// Java: Map<String, IModInfo> modIdNameLookup
     char **lookupKeys;
     LIBMATTI_NEOFORGESPI_IModInfo **lookupValues;
     size_t lookupCount;
@@ -91,20 +91,20 @@ static int buildUniqueList(ModSorter *sorter)
     if (data == NULL)
         return 0;
 
-    // Java: uniqueModListData.discardedFiles().forEach(ModFile::close);
+// Java: uniqueModListData.discardedFiles().forEach(ModFile::close);
     for (size_t i = 0; i < data->discardedFileCount; i++)
         LIBMATTI_FML_ModFile_Close(data->discardedFiles[i]);
 
     sorter->modFiles = data->modFiles;
     sorter->modFileCount = data->modFileCount;
 
-    // Java: detectSystemMods(uniqueModListData.modFilesByFirstId());
+// Java: detectSystemMods(uniqueModListData.modFilesByFirstId());
     const char *systemModNames[16];
     size_t systemModNameCount = 0;
     systemModNames[systemModNameCount++] = "minecraft";
     systemModNames[systemModNameCount++] = "neoforge";
 
-    // Java: modFiles.stream().map(mf -> mf.getContents().getManifest().getMainAttributes().getValue("FML-System-Mods")).filter(Objects::nonNull).findFirst()
+// Java: modFiles.stream().map(mf -> mf.getContents().getManifest().getMainAttributes().getValue("FML-System-Mods")).filter(Objects::nonNull).findFirst()
     for (size_t i = 0; i < sorter->modFileCount; i++)
     {
         LIBMATTI_JU_Manifest *manifest = LIBMATTI_FML_JarContents_GetManifest(
@@ -135,7 +135,7 @@ static int buildUniqueList(ModSorter *sorter)
         }
     }
 
-    // Java: modIdNameLookup = uniqueModListData.modFiles().stream().flatMap(mf -> mf.getModInfos().stream()).collect(toMap(IModInfo::getModId, mi -> mi));
+// Java: modIdNameLookup = uniqueModListData.modFiles().stream().flatMap(mf -> mf.getModInfos().stream()).collect(toMap(IModInfo::getModId, mi -> mi));
     for (size_t i = 0; i < sorter->modFileCount; i++)
     {
         size_t modInfoCount = 0;
@@ -160,7 +160,8 @@ static int buildUniqueList(ModSorter *sorter)
         }
     }
 
-    // the mod file array is handed to the sorter; release the rest of the builder data
+
+
     data->modFiles = NULL;
     LIBMATTI_FML_UniqueModListData_Free(data);
 
@@ -173,7 +174,7 @@ static void addDependency(ModSorter *sorter, LIBMATTI_FML_Graph *graph, LIBMATTI
     LIBMATTI_FML_ModInfo *self = LIBMATTI_FML_ModInfo_AsConcrete(
         LIBMATTI_NEOFORGESPI_IModInfo_ModVersion_GetOwner(dep));
     LIBMATTI_NEOFORGESPI_IModInfo *targetModInfo = lookup(sorter, LIBMATTI_NEOFORGESPI_IModInfo_ModVersion_GetModId(dep));
-    // Java: if (!(targetModInfo instanceof ModInfo target)) return;
+// Java: if (!(targetModInfo instanceof ModInfo target)) return;
     if (targetModInfo == NULL || targetModInfo->self == NULL) return;
     LIBMATTI_FML_ModInfo *target = LIBMATTI_FML_ModInfo_AsConcrete(targetModInfo);
     if (self == target) return;
@@ -223,7 +224,7 @@ static int sortMods(ModSorter *sorter, LIBMATTI_FML_ModLoadingIssue ***issues, s
     *issues = NULL;
     *issueCount = 0;
 
-    // Java: infos = modFiles.stream().flatMap(mf -> mf.getModInfos().stream()).map(ModInfo.class::cast).collect(toMap(identity(), e -> counter.incrementAndGet()));
+// Java: infos = modFiles.stream().flatMap(mf -> mf.getModInfos().stream()).map(ModInfo.class::cast).collect(toMap(identity(), e -> counter.incrementAndGet()));
     ModInfoOrder order = {0};
     LIBMATTI_FML_Graph *graph = LIBMATTI_FML_Graph_New(1, 0);
 
@@ -244,7 +245,7 @@ static int sortMods(ModSorter *sorter, LIBMATTI_FML_ModLoadingIssue ***issues, s
         }
     }
 
-    // Java: modFiles.stream().map(ModFile::getModInfos).mapMulti(Iterable::forEach).map(IModInfo::getDependencies).mapMulti(Iterable::forEach).forEach(dep -> addDependency(graph, dep));
+// Java: modFiles.stream().map(ModFile::getModInfos).mapMulti(Iterable::forEach).map(IModInfo::getDependencies).mapMulti(Iterable::forEach).forEach(dep -> addDependency(graph, dep));
     for (size_t i = 0; i < sorter->modFileCount; i++)
     {
         size_t modInfoCount = 0;
@@ -260,7 +261,7 @@ static int sortMods(ModSorter *sorter, LIBMATTI_FML_ModLoadingIssue ***issues, s
         }
     }
 
-    // Java: FMLConfig.getDependencyOverrides().forEach((id, overrides) -> {
+// Java: FMLConfig.getDependencyOverrides().forEach((id, overrides) -> {
     //           var target = (ModInfo) modIdNameLookup.get(id);
     //           if (target == null) issues.add(warning("fml.modloadingissue.depoverride.unknown_target", id));
     //           else for (var override : overrides) {
@@ -288,13 +289,14 @@ static int sortMods(ModSorter *sorter, LIBMATTI_FML_ModLoadingIssue ***issues, s
             }
             else if (!overrides[o]->remove)
             {
-                // Add ordering dependency overrides (random order -> target AFTER dependency)
+
+
                 LIBMATTI_FML_Graph_PutEdge(graph, dep, target);
             }
         }
     }
 
-    // Java: sorted = TopologicalSort.topologicalSort(graph, Comparator.comparing(infos::get));
+// Java: sorted = TopologicalSort.topologicalSort(graph, Comparator.comparing(infos::get));
     size_t sortedCount = 0;
     LIBMATTI_FML_CyclePresentException *cycles = NULL;
     void **sorted = LIBMATTI_FML_TopologicalSort_TopologicalSort(graph, modInfoComparator, &order, &sortedCount,
@@ -307,7 +309,7 @@ static int sortMods(ModSorter *sorter, LIBMATTI_FML_ModLoadingIssue ***issues, s
                                  message);
         free(message);
 
-        // Java: dataList = cycles.stream().map(cycle -> cycle.stream().map(IModInfo::getModId).sorted().collect(joining(", "))).map(list -> ModLoadingIssue.error("fml.modloadingissue.cycle", list).withCause(e)).toList();
+// Java: dataList = cycles.stream().map(cycle -> cycle.stream().map(IModInfo::getModId).sorted().collect(joining(", "))).map(list -> ModLoadingIssue.error("fml.modloadingissue.cycle", list).withCause(e)).toList();
         size_t *cycleSizes = NULL;
         size_t cycleCount = 0;
         void ***cycleNodes = LIBMATTI_FML_CyclePresentException_GetCycles(cycles, &cycleSizes, &cycleCount);
@@ -345,7 +347,7 @@ static int sortMods(ModSorter *sorter, LIBMATTI_FML_ModLoadingIssue ***issues, s
     for (size_t i = 0; i < sortedCount; i++) sorter->sortedList[i] = sorted[i];
     sorter->sortedCount = sortedCount;
 
-    // Java: this.modDependencies = sorted.stream().collect(toMap(mi -> mi, mi -> List.copyOf(graph.predecessors(mi))));
+// Java: this.modDependencies = sorted.stream().collect(toMap(mi -> mi, mi -> List.copyOf(graph.predecessors(mi))));
     sorter->modDependencies.keys = malloc(sizeof(LIBMATTI_FML_ModInfo *) * (sortedCount > 0 ? sortedCount : 1));
     sorter->modDependencies.values = malloc(sizeof(LIBMATTI_FML_ModInfo **) * (sortedCount > 0 ? sortedCount : 1));
     sorter->modDependencies.valueCounts = malloc(sizeof(size_t) * (sortedCount > 0 ? sortedCount : 1));
@@ -363,7 +365,7 @@ static int sortMods(ModSorter *sorter, LIBMATTI_FML_ModLoadingIssue ***issues, s
         free(predecessors);
     }
 
-    // Java: this.modFiles = sorted.stream().map(mi -> mi.getOwningFile().getFile()).distinct().toList();
+// Java: this.modFiles = sorted.stream().map(mi -> mi.getOwningFile().getFile()).distinct().toList();
     LIBMATTI_FML_ModFile **files = malloc(sizeof(LIBMATTI_FML_ModFile *) * (sortedCount > 0 ? sortedCount : 1));
     size_t fileCount = 0;
     for (size_t i = 0; i < sortedCount; i++)
@@ -442,7 +444,7 @@ static int standardLookup(const char *modId, const LIBMATTI_NEOFORGESPI_VersionR
     {
         if (strcmp(lookupContext->result->modVersionKeys[i], modId) != 0) continue;
         const LIBMATTI_NEOFORGESPI_ArtifactVersion *version = lookupContext->result->modVersionValues[i];
-        // Java: range.containsVersion(version) || version.toString().equals("0.0NONE")
+// Java: range.containsVersion(version) || version.toString().equals("0.0NONE")
         return LIBMATTI_NEOFORGESPI_MavenVersionAdapter_ContainsVersion(declaredRange, version) ||
                strcmp(version->version, "0.0NONE") == 0;
     }
@@ -452,7 +454,7 @@ static int standardLookup(const char *modId, const LIBMATTI_NEOFORGESPI_VersionR
 static int modVersionNotContained(LIBMATTI_NEOFORGESPI_IModInfo_ModVersion *mv,
                                   const LIBMATTI_FML_DependencyResolutionResult *result)
 {
-    // Java: FMLLoader.getCurrent().getVersionSupportMatrix()
+// Java: FMLLoader.getCurrent().getVersionSupportMatrix()
     LIBMATTI_FML_VersionSupportMatrix *matrix = (LIBMATTI_FML_VersionSupportMatrix *)
         LIBMATTI_FML_FMLLoader_GetVersionSupportMatrix(LIBMATTI_FML_FMLLoader_GetCurrent());
 
@@ -467,7 +469,7 @@ static LIBMATTI_FML_DependencyResolutionResult verifyDependencyVersions(ModSorte
 {
     LIBMATTI_FML_DependencyResolutionResult result = {0};
 
-    // Java: var modVersions = modFiles.stream().map(ModFile::getModInfos).mapMulti(Iterable::forEach).collect(toMap(IModInfo::getModId, IModInfo::getVersion));
+// Java: var modVersions = modFiles.stream().map(ModFile::getModInfos).mapMulti(Iterable::forEach).collect(toMap(IModInfo::getModId, IModInfo::getVersion));
     result.modVersionKeys = malloc(sizeof(char *) * (sorter->modFileCount > 0 ? sorter->modFileCount : 1));
     result.modVersionValues = malloc(sizeof(LIBMATTI_NEOFORGESPI_ArtifactVersion *) *
                                      (sorter->modFileCount > 0 ? sorter->modFileCount : 1));
@@ -485,7 +487,7 @@ static LIBMATTI_FML_DependencyResolutionResult verifyDependencyVersions(ModSorte
         }
     }
 
-    // Java: var modRequirements = modVersionDependencies.values().stream().<IModInfo.ModVersion>mapMulti(Iterable::forEach).filter(mv -> mv.getSide().isCorrectSide()).collect(toSet());
+// Java: var modRequirements = modVersionDependencies.values().stream().<IModInfo.ModVersion>mapMulti(Iterable::forEach).filter(mv -> mv.getSide().isCorrectSide()).collect(toSet());
     LIBMATTI_NEOFORGESPI_IModInfo_ModVersion **requirements = NULL;
     size_t requirementCount = 0;
     for (size_t i = 0; i < sorter->modFileCount; i++)
@@ -495,7 +497,7 @@ static LIBMATTI_FML_DependencyResolutionResult verifyDependencyVersions(ModSorte
             sorter->modFiles[i]->modFileInfo, &modInfoCount);
         for (size_t j = 0; j < modInfoCount; j++)
         {
-            // Java: consider overrides and invalidate dependencies that are removed
+// Java: consider overrides and invalidate dependencies that are removed
             const char *modId = LIBMATTI_NEOFORGESPI_IModInfo_GetModId(modInfos[j]);
             size_t overrideCount = 0;
             LIBMATTI_FML_FMLConfig_DependencyOverride **overrides =
@@ -510,7 +512,7 @@ static LIBMATTI_FML_DependencyResolutionResult verifyDependencyVersions(ModSorte
                     continue;
                 if (overrideCount > 0)
                 {
-                    // Java: ids = overrides.filter(DependencyOverride::remove).map(::modId).toSet();
+// Java: ids = overrides.filter(DependencyOverride::remove).map(::modId).toSet();
                     //       filter(v -> !ids.contains(v.getModId()))
                     const char *dependencyModId =
                         LIBMATTI_NEOFORGESPI_IModInfo_ModVersion_GetModId(dependencies[k]);
@@ -534,7 +536,7 @@ static LIBMATTI_FML_DependencyResolutionResult verifyDependencyVersions(ModSorte
                              formatNumber((long long) requirementCount), formatNumber((long long) mandatoryRequired),
                              formatNumber((long long) (requirementCount - mandatoryRequired)));
 
-    // Java: var missingVersions = modRequirements.stream().filter(mv -> (mv.getType() == REQUIRED || (modVersions.containsKey(mv.getModId()) && mv.getType() == OPTIONAL)) && this.modVersionNotContained(mv, modVersions)).collect(toSet());
+// Java: var missingVersions = modRequirements.stream().filter(mv -> (mv.getType() == REQUIRED || (modVersions.containsKey(mv.getModId()) && mv.getType() == OPTIONAL)) && this.modVersionNotContained(mv, modVersions)).collect(toSet());
     for (size_t i = 0; i < requirementCount; i++)
     {
         LIBMATTI_NEOFORGESPI_IModInfo_DependencyType type =
@@ -562,7 +564,7 @@ static LIBMATTI_FML_DependencyResolutionResult verifyDependencyVersions(ModSorte
                              formatNumber((long long) mandatoryMissing),
                              formatNumber((long long) (result.versionResolutionCount - mandatoryMissing)));
 
-    // Java: var incompatibleVersions / discouragedVersions
+// Java: var incompatibleVersions / discouragedVersions
     for (size_t i = 0; i < requirementCount; i++)
     {
         LIBMATTI_NEOFORGESPI_IModInfo_DependencyType type =
@@ -670,7 +672,7 @@ LIBMATTI_FML_ModLoadingIssue **LIBMATTI_FML_DependencyResolutionResult_BuildWarn
                         LIBMATTI_NEOFORGESPI_IModInfo_ModVersion_GetOwner(mv)))));
     }
 
-    // Java: Stream.of(ModLoadingIssue.warning("fml.modloadingissue.discouragedmod.proceed"))
+// Java: Stream.of(ModLoadingIssue.warning("fml.modloadingissue.discouragedmod.proceed"))
     issues[(*count)++] = LIBMATTI_FML_ModLoadingIssue_Warning("fml.modloadingissue.discouragedmod.proceed", NULL, 0);
     return issues;
 }
@@ -724,7 +726,7 @@ LIBMATTI_FML_ModLoadingIssue **LIBMATTI_FML_DependencyResolutionResult_BuildErro
 LIBMATTI_FML_LoadingModList *LIBMATTI_FML_ModSorter_Sort(LIBMATTI_FML_ModFile **modFiles, size_t modFileCount,
                                                          LIBMATTI_FML_ModLoadingIssue **issues, size_t issueCount)
 {
-    // Java: split the mod files into plugin, game library and game content
+// Java: split the mod files into plugin, game library and game content
     LIBMATTI_FML_ModFile **pluginContent = malloc(sizeof(LIBMATTI_FML_ModFile *) * (modFileCount > 0 ? modFileCount : 1));
     size_t pluginCount = 0;
     LIBMATTI_FML_ModFile **gameLibraryContent = malloc(sizeof(LIBMATTI_FML_ModFile *) * (modFileCount > 0 ? modFileCount : 1));
@@ -753,7 +755,8 @@ LIBMATTI_FML_LoadingModList *LIBMATTI_FML_ModSorter_Sort(LIBMATTI_FML_ModFile **
     return list;
 }
 
-// Java has no destructor; the C port releases what sort() allocated
+
+
 static void freeSorter(ModSorter *sorter)
 {
     free(sorter->systemMods);
@@ -796,7 +799,7 @@ LIBMATTI_FML_LoadingModList *LIBMATTI_FML_ModSorter_SortByType(
 
     if (!buildUniqueList(&sorter))
     {
-        // Java: catch (ModLoadingException e) { return LoadingModList.of(plugins, gameLibraries, ms.systemMods, ..., concat(issues, e.getIssues()), Map.of()); }
+// Java: catch (ModLoadingException e) { return LoadingModList.of(plugins, gameLibraries, ms.systemMods, ..., concat(issues, e.getIssues()), Map.of()); }
         size_t systemCount = 0;
         LIBMATTI_FML_ModInfo **systemModInfos = malloc(sizeof(LIBMATTI_FML_ModInfo *) * (sorter.systemModCount > 0 ? sorter.systemModCount : 1));
         for (size_t i = 0; i < sorter.systemModCount; i++)
@@ -813,7 +816,7 @@ LIBMATTI_FML_LoadingModList *LIBMATTI_FML_ModSorter_SortByType(
     LIBMATTI_FML_DependencyResolutionResult resolutionResult = verifyDependencyVersions(&sorter);
     LIBMATTI_FML_LoadingModList *list;
 
-    // Java: if (!resolutionResult.versionResolution.isEmpty() || !resolutionResult.incompatibilities.isEmpty())
+// Java: if (!resolutionResult.versionResolution.isEmpty() || !resolutionResult.incompatibilities.isEmpty())
     if (resolutionResult.versionResolutionCount > 0 || resolutionResult.incompatibilityCount > 0)
     {
         size_t errorCount = 0;
@@ -873,7 +876,7 @@ LIBMATTI_FML_LoadingModList *LIBMATTI_FML_ModSorter_SortByType(
         }
     }
 
-    // Java: if (!resolutionResult.discouraged.isEmpty()) list.getModLoadingIssues().addAll(resolutionResult.buildWarningMessages());
+// Java: if (!resolutionResult.discouraged.isEmpty()) list.getModLoadingIssues().addAll(resolutionResult.buildWarningMessages());
     if (resolutionResult.discouragedCount > 0)
     {
         size_t warningCount = 0;
@@ -883,7 +886,7 @@ LIBMATTI_FML_LoadingModList *LIBMATTI_FML_ModSorter_SortByType(
         free(warnings);
     }
 
-    // Java: close any mod-files discarded due to dependency constraint issues
+// Java: close any mod-files discarded due to dependency constraint issues
     for (size_t i = 0; i < sorter.modFileCount; i++)
     {
         if (LIBMATTI_FML_LoadingModList_Contains(list,

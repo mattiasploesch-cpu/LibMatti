@@ -1,7 +1,8 @@
-// Port of net.minecraft.client.renderer.texture.AbstractTexture,
-// ReloadableTexture, SimpleTexture, DynamicTexture, TickableTexture and
-// MissingTextureAtlasSprite. Java's abstract class family becomes one struct
-// with a kind discriminator; the texture upload runs through GlStateManager.
+
+
+
+
+
 
 #ifndef MATTICRAFT_MC_CLIENT_RENDERER_TEXTURE_ABSTRACTTEXTURE_H
 #define MATTICRAFT_MC_CLIENT_RENDERER_TEXTURE_ABSTRACTTEXTURE_H
@@ -39,23 +40,27 @@ struct LIBMATTI_MC_AbstractTexture
 {
     LIBMATTI_MC_TextureKind kind;
 
-    // Java: protected GpuTexture texture; GpuTextureView textureView
-    unsigned int texture;      // the GL texture name, 0 until loaded
-    unsigned int textureView;  // the port: the same GL name
-    // Java: protected GpuSampler sampler (repeat/nearest by default)
-    int addressModeClamp; // 0 = REPEAT (default), 1 = CLAMP_TO_EDGE
-    int filterLinear;     // 0 = NEAREST (default), 1 = LINEAR
+// Java: protected GpuTexture texture; GpuTextureView textureView
+    unsigned int texture;
 
-    // Java: ReloadableTexture - the resource this texture loads from
+    unsigned int textureView;// the port: the same GL name
+    // Java: protected GpuSampler sampler (repeat/nearest by default)
+    int addressModeClamp;
+
+    int filterLinear;
+
+
+// Java: ReloadableTexture - the resource this texture loads from
     LIBMATTI_MC_Identifier *resourceId;
 
-    // Java: TickableTexture - the atlas overrides this
+// Java: TickableTexture - the atlas overrides this
     LIBMATTI_MC_TickableTexture_Tick tick;
 
-    // DynamicTexture: Java: private NativeImage pixels
+// DynamicTexture: Java: private NativeImage pixels
     LIBMATTI_B3D_NativeImage *pixels;
 
-    // TextureAtlas fields (only when kind == ATLAS)
+
+
     void *atlasData;
 };
 
@@ -64,14 +69,16 @@ void LIBMATTI_MC_AbstractTexture_Close(LIBMATTI_MC_AbstractTexture *texture);
 // Java: public GpuTexture getTexture() - 0 before initialization
 unsigned int LIBMATTI_MC_AbstractTexture_GetTexture(const LIBMATTI_MC_AbstractTexture *texture);
 
-// ---------------------------------------------------------------------------
-// TextureContents (record TextureContents(NativeImage, TextureMetadataSection))
-// ---------------------------------------------------------------------------
+
+
+
+
 
 typedef struct LIBMATTI_MC_TextureContents
 {
     LIBMATTI_B3D_NativeImage *image;
-    LIBMATTI_MC_TextureMetadataSection *metadata; // NULL when absent
+    LIBMATTI_MC_TextureMetadataSection *metadata;
+
 } LIBMATTI_MC_TextureContents;
 
 // Java: public static TextureContents load(ResourceManager, Identifier)
@@ -85,9 +92,10 @@ int LIBMATTI_MC_TextureContents_Blur(const LIBMATTI_MC_TextureContents *contents
 int LIBMATTI_MC_TextureContents_Clamp(const LIBMATTI_MC_TextureContents *contents);
 void LIBMATTI_MC_TextureContents_Free(LIBMATTI_MC_TextureContents *contents);
 
-// ---------------------------------------------------------------------------
-// ReloadableTexture / SimpleTexture / DynamicTexture constructors
-// ---------------------------------------------------------------------------
+
+
+
+
 
 // Java: public SimpleTexture(Identifier resourceId)
 LIBMATTI_MC_AbstractTexture *LIBMATTI_MC_SimpleTexture_New(const LIBMATTI_MC_Identifier *resourceId);
@@ -106,18 +114,20 @@ LIBMATTI_MC_TextureContents *LIBMATTI_MC_ReloadableTexture_LoadContents(
 // Java: DynamicTexture.upload()
 void LIBMATTI_MC_DynamicTexture_Upload(LIBMATTI_MC_AbstractTexture *texture);
 
-// ---------------------------------------------------------------------------
-// MissingTextureAtlasSprite
-// ---------------------------------------------------------------------------
+
+
+
+
 
 // Java: public static NativeImage generateMissingImage() - the 16x16 checkerboard
 LIBMATTI_B3D_NativeImage *LIBMATTI_MC_MissingTextureAtlasSprite_GenerateMissingImage(void);
 // Java: public static Identifier getLocation() - "minecraft:missingno"
 LIBMATTI_MC_Identifier *LIBMATTI_MC_MissingTextureAtlasSprite_GetLocation(void);
 
-// ---------------------------------------------------------------------------
-// The GL upload the textures share (TextureUtil/CommandEncoder writeToTexture)
-// ---------------------------------------------------------------------------
+
+
+
+
 
 // Java: GlCommandEncoder.writeToTexture - uploads the RGBA raster to the
 // texture through GlStateManager (pixel store, TexImage2D + TexSubImage2D).
@@ -127,4 +137,4 @@ void LIBMATTI_MC_Texture_WriteToTexture(unsigned int glTexture, const LIBMATTI_B
 }
 #endif
 
-#endif //MATTICRAFT_MC_CLIENT_RENDERER_TEXTURE_ABSTRACTTEXTURE_H
+#endif

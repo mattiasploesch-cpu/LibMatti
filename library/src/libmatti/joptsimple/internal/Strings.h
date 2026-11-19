@@ -3,4 +3,4 @@
 
 extern const char *const LIBMATTI_JOPT_Strings_LINE_SEPARATOR;
 
-#endif //MATTICRAFT_JOPTSIMPLE_INTERNAL_STRINGS_H
+#endif

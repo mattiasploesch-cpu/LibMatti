@@ -1,7 +1,8 @@
-// Port of com.mojang.blaze3d.vertex.ByteBufferBuilder.
-// Java allocates through MemoryUtil and hands out Result views by (offset,
-// capacity, generation); the port keeps the same generation scheme so a Result
-// from a discarded batch is detected as invalid exactly like Java.
+
+
+
+
+
 
 #ifndef MATTICRAFT_BLAZE3D_VERTEX_BYTEBUFFERBUILDER_H
 #define MATTICRAFT_BLAZE3D_VERTEX_BYTEBUFFERBUILDER_H

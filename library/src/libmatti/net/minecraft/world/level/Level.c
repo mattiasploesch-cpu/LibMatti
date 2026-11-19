@@ -1,4 +1,5 @@
-// Port of net.minecraft.world.level.Level (the in-memory part).
+
+
 
 #include <math.h>
 
@@ -24,7 +25,7 @@ LIBMATTI_MC_Level *LIBMATTI_MC_Level_New(int minY, int height, const char *dimen
 {
     LIBMATTI_MC_Level *level = calloc(1, sizeof(LIBMATTI_MC_Level));
     level->heightAccessor = LIBMATTI_MC_LevelHeightAccessor_Create(minY, height);
-    // Java: ResourceKey.create(Registries.ROOT_REGISTRY_NAME path, Identifier)
+// Java: ResourceKey.create(Registries.ROOT_REGISTRY_NAME path, Identifier)
     level->dimension = LIBMATTI_MC_ResourceKey_CreateRegistryKeyParsed(dimension);
     level->isClientSide = isClientSide;
     return level;
@@ -48,7 +49,7 @@ LIBMATTI_MC_LevelChunk *LIBMATTI_MC_Level_GetChunk(struct LIBMATTI_MC_Level *lev
 
 void LIBMATTI_MC_Level_SetChunk(struct LIBMATTI_MC_Level *level, LIBMATTI_MC_LevelChunk *chunk)
 {
-    // Java: the chunk cache replaces an existing entry for the same position
+// Java: the chunk cache replaces an existing entry for the same position
     int64_t key = LIBMATTI_MC_ChunkPos_AsLong(chunk->base.chunkPos.x, chunk->base.chunkPos.z);
     for (int i = 0; i < level->chunkCount; i++)
     {
@@ -70,7 +71,7 @@ void LIBMATTI_MC_Level_SetChunk(struct LIBMATTI_MC_Level *level, LIBMATTI_MC_Lev
 
 LIBMATTI_MC_LevelChunk *LIBMATTI_MC_Level_GetChunkAt(struct LIBMATTI_MC_Level *level, const LIBMATTI_MC_BlockPos *pos)
 {
-    // Java: getChunkAt = getChunk(SectionPos.blockToSectionCoord(x), blockToSectionCoord(z))
+// Java: getChunkAt = getChunk(SectionPos.blockToSectionCoord(x), blockToSectionCoord(z))
     // - and Java's getChunk(x, z) is getChunk(FULL, load=true), so the block access
     // paths create the chunk like the chunk source's "should always be able to
     // create a chunk" fallback
@@ -87,7 +88,7 @@ bool LIBMATTI_MC_Level_HasChunk(struct LIBMATTI_MC_Level *level, int chunkX, int
 
 LIBMATTI_MC_BlockState *LIBMATTI_MC_Level_GetBlockState(struct LIBMATTI_MC_Level *level, const LIBMATTI_MC_BlockPos *pos)
 {
-    // Java: VOID_AIR outside the valid bounds
+// Java: VOID_AIR outside the valid bounds
     if (!LIBMATTI_MC_Level_IsInValidBounds(level, pos))
         return LIBMATTI_MC_Block_DefaultBlockState(LIBMATTI_MC_VanillaBlocks_GetByName("VOID_AIR"));
 
@@ -100,7 +101,7 @@ LIBMATTI_MC_BlockState *LIBMATTI_MC_Level_GetBlockState(struct LIBMATTI_MC_Level
 bool LIBMATTI_MC_Level_SetBlockAndFlags(struct LIBMATTI_MC_Level *level, const LIBMATTI_MC_BlockPos *pos, LIBMATTI_MC_BlockState *state, int flags, int recursionLeft)
 {
     (void) recursionLeft;
-    // Java: setBlock(pos, state, flags, recursion) - the bounds check, the chunk
+// Java: setBlock(pos, state, flags, recursion) - the bounds check, the chunk
     // write, then the update side effects (neighbour updates + sends stay with the
     // game port)
     if (!LIBMATTI_MC_Level_IsInValidBounds(level, pos))
@@ -112,7 +113,7 @@ bool LIBMATTI_MC_Level_SetBlockAndFlags(struct LIBMATTI_MC_Level *level, const L
     if (chunk == NULL)
         return false;
 
-    // Java: Level.setBlock - the old block entity is removed when the block changes
+// Java: Level.setBlock - the old block entity is removed when the block changes
     LIBMATTI_MC_BlockState *oldState = LIBMATTI_MC_LevelChunk_SetBlockState(chunk, pos, state, flags);
     if (oldState == NULL)
         return false;
@@ -124,7 +125,7 @@ bool LIBMATTI_MC_Level_SetBlockAndFlags(struct LIBMATTI_MC_Level *level, const L
             LIBMATTI_MC_LevelChunk_RemoveBlockEntity(chunk, pos);
     }
 
-    // Java: (flags & UPDATE_NEIGHBORS) != 0 -> updateNeighborsAt(pos, block)
+// Java: (flags & UPDATE_NEIGHBORS) != 0 -> updateNeighborsAt(pos, block)
     if ((flags & LIBMATTI_MC_Level_UPDATE_NEIGHBORS) != 0)
         LIBMATTI_MC_Level_UpdateNeighborsAt(level, pos, LIBMATTI_MC_BlockState_GetBlock(state));
     return true;
@@ -132,20 +133,20 @@ bool LIBMATTI_MC_Level_SetBlockAndFlags(struct LIBMATTI_MC_Level *level, const L
 
 bool LIBMATTI_MC_Level_SetBlock(struct LIBMATTI_MC_Level *level, const LIBMATTI_MC_BlockPos *pos, LIBMATTI_MC_BlockState *state, int flags)
 {
-    // Java: setBlock(pos, state, flags) = setBlock(pos, state, flags, 512)
+// Java: setBlock(pos, state, flags) = setBlock(pos, state, flags, 512)
     return LIBMATTI_MC_Level_SetBlockAndFlags(level, pos, state, flags, 512);
 }
 
 bool LIBMATTI_MC_Level_RemoveBlock(struct LIBMATTI_MC_Level *level, const LIBMATTI_MC_BlockPos *pos, int flags)
 {
-    // Java: removeBlock = setBlock(pos, fluidState.createLegacyBlock(), flags) - the
+// Java: removeBlock = setBlock(pos, fluidState.createLegacyBlock(), flags) - the
     // port has no fluids, so removal is air
     return LIBMATTI_MC_Level_SetBlock(level, pos, LIBMATTI_MC_Block_DefaultBlockState(LIBMATTI_MC_VanillaBlocks_AIR()), flags);
 }
 
 bool LIBMATTI_MC_Level_DestroyBlock(struct LIBMATTI_MC_Level *level, const LIBMATTI_MC_BlockPos *pos, bool drop)
 {
-    // Java: destroyBlock(pos, drop) - the drop side is game-port content
+// Java: destroyBlock(pos, drop) - the drop side is game-port content
     (void) drop;
     LIBMATTI_MC_BlockState *state = LIBMATTI_MC_Level_GetBlockState(level, pos);
     if (LIBMATTI_MC_BlockState_GetBlock(state) == (void *) LIBMATTI_MC_VanillaBlocks_AIR())
@@ -160,7 +161,7 @@ bool LIBMATTI_MC_Level_IsOutsideBuildHeight(struct LIBMATTI_MC_Level *level, con
 
 static bool is_in_world_bounds_horizontal(const LIBMATTI_MC_BlockPos *pos)
 {
-    // Java: Math.abs(x) < getMaxHorizontal() && Math.abs(z) < getMaxHorizontal()
+// Java: Math.abs(x) < getMaxHorizontal() && Math.abs(z) < getMaxHorizontal()
     int x = LIBMATTI_MC_Vec3i_GetX(&pos->base);
     int z = LIBMATTI_MC_Vec3i_GetZ(&pos->base);
     return x > -LIBMATTI_MC_BlockPos_MAX_HORIZONTAL_COORDINATE && x < LIBMATTI_MC_BlockPos_MAX_HORIZONTAL_COORDINATE
@@ -224,7 +225,7 @@ LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Level_GetDimension(struct LIBMATTI_MC_Level
 
 LIBMATTI_MC_BlockEntity *LIBMATTI_MC_Level_GetBlockEntity(struct LIBMATTI_MC_Level *level, const LIBMATTI_MC_BlockPos *pos)
 {
-    // Java: getBlockEntity through the chunk
+// Java: getBlockEntity through the chunk
     LIBMATTI_MC_LevelChunk *chunk = LIBMATTI_MC_Level_GetChunkAt(level, pos);
     return chunk != NULL ? LIBMATTI_MC_LevelChunk_GetBlockEntity(chunk, pos) : NULL;
 }
@@ -236,7 +237,7 @@ int LIBMATTI_MC_Level_GetLightEmission(struct LIBMATTI_MC_Level *level, const LI
 
 void LIBMATTI_MC_Level_UpdateNeighborsAt(struct LIBMATTI_MC_Level *level, const LIBMATTI_MC_BlockPos *pos, const LIBMATTI_MC_Block *block)
 {
-    // Java: updateNeighborsAt - the neighbour updater is game-port content
+// Java: updateNeighborsAt - the neighbour updater is game-port content
     (void) level;
     (void) pos;
     (void) block;
@@ -252,7 +253,8 @@ int LIBMATTI_MC_Level_GetChunkCount(struct LIBMATTI_MC_Level *level)
 // flattened into the level until the P5 tick loop needs the per-section maps)
 // ---------------------------------------------------------------------------
 
-// the entity-count helper (the count lives in the struct as an int)
+
+
 static int entityCount_of(struct LIBMATTI_MC_Level *level)
 {
     return level->entityCount;
@@ -273,7 +275,7 @@ bool LIBMATTI_MC_Level_AddEntity(struct LIBMATTI_MC_Level *level, struct LIBMATT
         level->entityCapacity = next;
     }
     level->entities[level->entityCount++] = entity;
-    entity->level = level; // Java: entity.setLevel + entity.setAddedToLevel
+    entity->level = level;// Java: entity.setLevel + entity.setAddedToLevel
     return true;
 }
 
@@ -321,7 +323,7 @@ int LIBMATTI_MC_Level_GetEntitiesInBox(struct LIBMATTI_MC_Level *level, double m
         const LIBMATTI_MC_AABB *bb = LIBMATTI_MC_Entity_GetBoundingBox(level->entities[i]);
         if (bb == NULL)
             continue;
-        // Java: AABB.intersects - the interval overlap on all three axes
+// Java: AABB.intersects - the interval overlap on all three axes
         if (bb->maxX < minX || bb->minX > maxX)
             continue;
         if (bb->maxY < minY || bb->minY > maxY)
@@ -345,7 +347,7 @@ int LIBMATTI_MC_Level_GetBlockCollisions(struct LIBMATTI_MC_Level *level, double
 {
     if (level == NULL || out == NULL)
         return 0;
-    // Java: the walk bounds floor to the int grid (the BlockCollisions ctor
+// Java: the walk bounds floor to the int grid (the BlockCollisions ctor
     // clamps into the world); the port keeps the plain floor sweep
     int x0 = (int) floor(minX - 1.0e-7);
     int y0 = (int) floor(minY - 1.0e-7);
@@ -370,7 +372,7 @@ int LIBMATTI_MC_Level_GetBlockCollisions(struct LIBMATTI_MC_Level *level, double
                 const LIBMATTI_MC_Block *block = (const LIBMATTI_MC_Block *) LIBMATTI_MC_BlockState_GetBlock(state);
                 if (block == NULL || block->properties == NULL || !block->properties->hasCollision)
                     continue;
-                // Java: the shape yields its bounding boxes; the full block is the
+// Java: the shape yields its bounding boxes; the full block is the
                 // unit cube of the position
                 LIBMATTI_MC_AABB *shape = LIBMATTI_MC_AABB_New(x, y, z, x + 1.0, y + 1.0, z + 1.0);
                 if (shape != NULL)

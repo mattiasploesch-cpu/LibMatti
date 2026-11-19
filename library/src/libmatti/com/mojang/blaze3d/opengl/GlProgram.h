@@ -1,5 +1,6 @@
-// Port of com.mojang.blaze3d.opengl.GlProgram - the linked shader program with
-// its Uniform map (Sampler/Ubo/Utb), built by GlProgram.link.
+
+
+
 
 #ifndef MATTICRAFT_BLAZE3D_OPENGL_GLPROGRAM_H
 #define MATTICRAFT_BLAZE3D_OPENGL_GLPROGRAM_H
@@ -31,8 +32,8 @@ typedef struct LIBMATTI_B3D_GlProgram
     int programId;
     char *debugLabel;
     LIBMATTI_B3D_GlProgramUniformEntry *uniforms;
-    int nextUboBinding;   // Java: int i (ubo binding counter)
-    int nextSamplerIndex; // Java: int j (sampler counter)
+    int nextUboBinding;// Java: int i (ubo binding counter)
+    int nextSamplerIndex;// Java: int j (sampler counter)
 } LIBMATTI_B3D_GlProgram;
 
 // Java: public static GlProgram link(GlShaderModule, GlShaderModule, VertexFormat, String)

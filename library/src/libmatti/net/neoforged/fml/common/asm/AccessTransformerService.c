@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.common.asm.AccessTransformerService.
+
+
 
 #include "libmatti/net/neoforged/fml/common/asm/AccessTransformerService.h"
 
@@ -31,7 +32,7 @@ static LIBMATTI_NEOFORGESPI_ClassProcessor_ComputeFlags process_class(
     LIBMATTI_NEOFORGESPI_ClassProcessor_TransformationContext *context)
 {
     LIBMATTI_FML_AccessTransformerService *service = (LIBMATTI_FML_AccessTransformerService *) self;
-    // Java: context.type().getInternalName()
+// Java: context.type().getInternalName()
     char *internalName = LIBMATTI_ASM_Type_GetInternalName(context->type);
     int transformed = LIBMATTI_AT_AccessTransformerEngine_Transform(service->engine, context->node, internalName);
     free(internalName);

@@ -1,7 +1,8 @@
-//
-// Created by administrator on 09.09.26.
-//
-// Port of cpw.mods.jarhandling.JarContentsBuilder.
+
+
+
+
+
 
 #ifndef MATTICRAFT_JARCONTENTSBUILDER_H
 #define MATTICRAFT_JARCONTENTSBUILDER_H
@@ -17,9 +18,10 @@ typedef struct
 {
     char **paths;
     size_t pathCount;
-    // Java: Supplier<Manifest> defaultManifest - takes ownership of the given manifest
+// Java: Supplier<Manifest> defaultManifest - takes ownership of the given manifest
     LIBMATTI_JU_Manifest *defaultManifest;
-    LIBMATTI_UNION_UnionPathFilter *pathFilter; // NULL = no filter
+    LIBMATTI_UNION_UnionPathFilter *pathFilter;
+
 } LIBMATTI_JH_JarContentsBuilder;
 
 LIBMATTI_JH_JarContentsBuilder *LIBMATTI_JH_JarContentsBuilder_New(void);
@@ -35,4 +37,4 @@ void LIBMATTI_JH_JarContentsBuilder_PathFilter(LIBMATTI_JH_JarContentsBuilder *b
 LIBMATTI_JH_JarContents *LIBMATTI_JH_JarContentsBuilder_Build(LIBMATTI_JH_JarContentsBuilder *builder);
 void LIBMATTI_JH_JarContentsBuilder_Free(LIBMATTI_JH_JarContentsBuilder *builder);
 
-#endif //MATTICRAFT_JARCONTENTSBUILDER_H
+#endif

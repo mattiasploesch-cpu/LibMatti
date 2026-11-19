@@ -1,6 +1,7 @@
-// Port of net.minecraft.world.phys.Vec3 (the immutable double triple).
-// Java allocates a fresh object per operation; the C port keeps the same semantics -
-// every operation returns a new heap object the caller owns.
+
+
+
+
 
 #ifndef MATTICRAFT_NET_MINECRAFT_WORLD_PHYS_VEC3_H
 #define MATTICRAFT_NET_MINECRAFT_WORLD_PHYS_VEC3_H
@@ -15,7 +16,7 @@ extern "C" {
 // Java: public class Vec3 implements Position
 typedef struct LIBMATTI_MC_Vec3
 {
-    // Java: public final double x / y / z
+// Java: public final double x / y / z
     double x;
     double y;
     double z;
@@ -126,4 +127,4 @@ int LIBMATTI_MC_Vec3_Equals(const LIBMATTI_MC_Vec3 *a, const LIBMATTI_MC_Vec3 *b
 }
 #endif
 
-#endif //MATTICRAFT_NET_MINECRAFT_WORLD_PHYS_VEC3_H
+#endif

@@ -1,8 +1,9 @@
-// Port of net.minecraft.world.entity.EntityType. Java models the type as the
-// registry object carrying the factory, the MobCategory, the sync/tracking
-// settings and the EntityDimensions; the C port keeps the same fields plus the
-// Builder chain and the registry helpers (register through
-// BuiltInRegistries.ENTITY_TYPE like Java's static block).
+
+
+
+
+
+
 
 #ifndef MATTICRAFT_MC_WORLD_ENTITY_ENTITYTYPE_H
 #define MATTICRAFT_MC_WORLD_ENTITY_ENTITYTYPE_H
@@ -33,32 +34,33 @@ typedef struct LIBMATTI_MC_Entity *(*LIBMATTI_MC_EntityFactory)(
 // Java: public class EntityType<T extends Entity>
 typedef struct LIBMATTI_MC_EntityType
 {
-    // Java: private final EntityType.EntityFactory<T> factory
+// Java: private final EntityType.EntityFactory<T> factory
     LIBMATTI_MC_EntityFactory factory;
-    // Java: private final MobCategory category
+// Java: private final MobCategory category
     LIBMATTI_MC_MobCategory category;
-    // Java: private final boolean serialize / summon / fireImmune / canSpawnFarFromPlayer
+// Java: private final boolean serialize / summon / fireImmune / canSpawnFarFromPlayer
     bool serialize;
     bool summon;
     bool fireImmune;
     bool canSpawnFarFromPlayer;
-    // Java: private final ImmutableSet<Block> immuneTo - NULL = empty set
+// Java: private final ImmutableSet<Block> immuneTo - NULL = empty set
     const void *const *immuneTo;
     size_t immuneToCount;
-    // Java: private final EntityDimensions dimensions
+// Java: private final EntityDimensions dimensions
     LIBMATTI_MC_EntityDimensions *dimensions;
-    // Java: private final float spawnDimensionsScale
+// Java: private final float spawnDimensionsScale
     float spawnDimensionsScale;
-    // Java: private final int clientTrackingRange / updateInterval
+// Java: private final int clientTrackingRange / updateInterval
     int clientTrackingRange;
     int updateInterval;
-    // Java: private final String descriptionId - "entity.<ns>.<path>"
+// Java: private final String descriptionId - "entity.<ns>.<path>"
     char *descriptionId;
-    // Java: private final Optional<ResourceKey<LootTable>> lootTable - NULL = empty
+// Java: private final Optional<ResourceKey<LootTable>> lootTable - NULL = empty
     void *lootTable;
-    // Java: private final boolean allowedInPeaceful
+// Java: private final boolean allowedInPeaceful
     bool allowedInPeaceful;
-    // the registered id (the registry key path; the registry lookup derives from it)
+
+
     char *id;
 } LIBMATTI_MC_EntityType;
 
@@ -69,7 +71,8 @@ typedef struct LIBMATTI_MC_EntityTypeBuilder LIBMATTI_MC_EntityTypeBuilder;
 LIBMATTI_MC_EntityTypeBuilder *LIBMATTI_MC_EntityTypeBuilder_Of(LIBMATTI_MC_EntityFactory factory, LIBMATTI_MC_MobCategory category);
 // Java: public static <T> Builder<T> createNothing(MobCategory) - a NULL factory
 LIBMATTI_MC_EntityTypeBuilder *LIBMATTI_MC_EntityTypeBuilder_CreateNothing(LIBMATTI_MC_MobCategory category);
-// The builder chain (each returns the builder, Java-style)
+
+
 LIBMATTI_MC_EntityTypeBuilder *LIBMATTI_MC_EntityTypeBuilder_Sized(LIBMATTI_MC_EntityTypeBuilder *builder, float width, float height);
 LIBMATTI_MC_EntityTypeBuilder *LIBMATTI_MC_EntityTypeBuilder_EyeHeight(LIBMATTI_MC_EntityTypeBuilder *builder, float eyeHeight);
 LIBMATTI_MC_EntityTypeBuilder *LIBMATTI_MC_EntityTypeBuilder_NoLootTable(LIBMATTI_MC_EntityTypeBuilder *builder);
@@ -107,7 +110,8 @@ int LIBMATTI_MC_EntityType_UpdateInterval(const LIBMATTI_MC_EntityType *type);
 bool LIBMATTI_MC_EntityType_TrackDeltas(const LIBMATTI_MC_EntityType *type);
 // Java: public String getDescriptionId()
 const char *LIBMATTI_MC_EntityType_GetDescriptionId(const LIBMATTI_MC_EntityType *type);
-// the registered id path (the port keeps it on the type)
+
+
 const char *LIBMATTI_MC_EntityType_GetId(const LIBMATTI_MC_EntityType *type);
 void LIBMATTI_MC_EntityType_Free(LIBMATTI_MC_EntityType *type);
 
@@ -123,4 +127,4 @@ LIBMATTI_MC_EntityType *LIBMATTI_MC_EntityType_ByString(const char *name);
 }
 #endif
 
-#endif //MATTICRAFT_MC_WORLD_ENTITY_ENTITYTYPE_H
+#endif

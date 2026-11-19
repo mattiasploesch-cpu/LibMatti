@@ -1,5 +1,6 @@
-// Port of the io.netty surface: ByteBuf over the ByteBuffer port and a plain
-// TCP channel for Bootstrap.connect.
+
+
+
 
 #include "libmatti/io/netty/bootstrap/Bootstrap.h"
 
@@ -12,9 +13,10 @@
 #include <sys/socket.h>
 #include <unistd.h>
 
-// ---------------------------------------------------------------------------
-// Unpooled / ByteBuf
-// ---------------------------------------------------------------------------
+
+
+
+
 
 LIBMATTI_NT_ByteBuf *LIBMATTI_NT_Unpooled_Buffer(size_t initialCapacity)
 {
@@ -72,9 +74,10 @@ int LIBMATTI_NT_ByteBuf_ReadVarInt(LIBMATTI_NT_ByteBuf *buf, int *ok)
     return value;
 }
 
-// ---------------------------------------------------------------------------
-// Bootstrap / Channel
-// ---------------------------------------------------------------------------
+
+
+
+
 
 LIBMATTI_NT_Channel *LIBMATTI_NT_Bootstrap_Connect(const char *host, int port)
 {
@@ -85,7 +88,7 @@ LIBMATTI_NT_Channel *LIBMATTI_NT_Bootstrap_Connect(const char *host, int port)
     struct sockaddr_in address = {0};
     address.sin_family = AF_INET;
     address.sin_port = htons((uint16_t) port);
-    // Java: InetAddress.getByName - the port accepts dotted quads (a resolver
+// Java: InetAddress.getByName - the port accepts dotted quads (a resolver
     // is the host's job)
     if (inet_pton(AF_INET, host, &address.sin_addr) != 1)
     {
@@ -100,7 +103,11 @@ LIBMATTI_NT_Channel *LIBMATTI_NT_Bootstrap_Connect(const char *host, int port)
     }
 
     int nodelay = 1;
-    setsockopt(fd, IPPROTO_TCP, TCP_NODELAY, &nodelay, sizeof(nodelay));
+    setsockopt(fd, IPPROTO_TCP, TCP_NODELAY, (const char *) &nodelay, sizeof(nodelay));
+#if defined(_WIN32)
+    u_long nonblocking = 1;
+    ioctlsocket(fd, FIONBIO, &nonblocking);
+#endif
 
     LIBMATTI_NT_Channel *channel = calloc(1, sizeof(LIBMATTI_NT_Channel));
     channel->fd = fd;
@@ -132,7 +139,7 @@ int LIBMATTI_NT_Channel_WriteAndFlush(LIBMATTI_NT_Channel *channel, LIBMATTI_NT_
         return 0;
     size_t length = LIBMATTI_JN_ByteBuffer_Position(buf);
     unsigned char *array = LIBMATTI_JN_ByteBuffer_Array(buf);
-    // Java: writeAndFlush - one send
+// Java: writeAndFlush - one send
     ssize_t written = send(channel->fd, array, length, 0);
     return written == (ssize_t) length;
 }

@@ -1,7 +1,8 @@
-// Port of net.neoforged.jarjar.metadata (ContainedJarIdentifier,
-// ContainedJarMetadata, ContainedVersion, Metadata).
-// Jar-in-jar at .so level: the manifest section ".jarjar" lists the contained
-// artifacts the loader resolves from its own library set.
+
+
+
+
+
 
 #ifndef MATTICRAFT_JARJAR_METADATA_H
 #define MATTICRAFT_JARJAR_METADATA_H
@@ -44,4 +45,4 @@ LIBMATTI_JARJAR_Metadata *LIBMATTI_JARJAR_MetadataIOHandler_FromJSONText(const c
 // Java: toJSONText()
 char *LIBMATTI_JARJAR_MetadataIOHandler_ToJSONText(const LIBMATTI_JARJAR_Metadata *metadata);
 
-#endif //MATTICRAFT_JARJAR_METADATA_H
+#endif

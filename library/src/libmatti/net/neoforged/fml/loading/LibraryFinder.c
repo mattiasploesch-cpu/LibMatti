@@ -10,15 +10,15 @@
 // Java: static Path findLibsPath()
 char *LIBMATTI_FML_LibraryFinder_FindLibsPath(void)
 {
-    // Java: var libraryDirectoryProp = System.getProperty("libraryDirectory");
+// Java: var libraryDirectoryProp = System.getProperty("libraryDirectory");
     const char *libraryDirectoryProp = LIBMATTI_JL_System_GetProperty("libraryDirectory");
     if (libraryDirectoryProp == NULL)
     {
-        // Java: throw new IllegalStateException("Missing libraryDirectory system property")
+// Java: throw new IllegalStateException("Missing libraryDirectory system property")
         return NULL;
     }
 
-    // Java: if (!Files.isDirectory(libsPath)) throw new IllegalStateException("libraryDirectory system property refers to a non-directory: " + libsPath);
+// Java: if (!Files.isDirectory(libsPath)) throw new IllegalStateException("libraryDirectory system property refers to a non-directory: " + libsPath);
     if (!LIBMATTI_JNF_Files_IsDirectory(libraryDirectoryProp))
     {
         return NULL;

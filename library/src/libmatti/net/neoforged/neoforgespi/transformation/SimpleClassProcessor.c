@@ -1,4 +1,5 @@
-// Port of net.neoforged.neoforgespi.transformation.SimpleClassProcessor.
+
+
 
 #include "libmatti/net/neoforged/neoforgespi/transformation/SimpleClassProcessor.h"
 
@@ -26,7 +27,7 @@ int LIBMATTI_NEOFORGESPI_SimpleClassProcessor_HandlesClass(
     LIBMATTI_NEOFORGESPI_SimpleClassProcessor *self,
     const LIBMATTI_NEOFORGESPI_ClassProcessor_SelectionContext *context)
 {
-    // Java: return targets.contains(context.type().getClassName())
+// Java: return targets.contains(context.type().getClassName())
     initialise_targets(self);
 
     char *className = LIBMATTI_ASM_Type_GetClassName(context->type);
@@ -45,7 +46,7 @@ LIBMATTI_NEOFORGESPI_ClassProcessor_ComputeFlags LIBMATTI_NEOFORGESPI_SimpleClas
     LIBMATTI_NEOFORGESPI_SimpleClassProcessor *self,
     LIBMATTI_NEOFORGESPI_ClassProcessor_TransformationContext *context)
 {
-    // Java: transform(context.node(), context); return ComputeFlags.COMPUTE_FRAMES
+// Java: transform(context.node(), context); return ComputeFlags.COMPUTE_FRAMES
     self->transform(self, LIBMATTI_NEOFORGESPI_ClassProcessor_TransformationContext_Node(context),
                     &context->simple);
     return LIBMATTI_NEOFORGESPI_ClassProcessor_ComputeFlags_COMPUTE_FRAMES;

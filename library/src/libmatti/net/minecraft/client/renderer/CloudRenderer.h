@@ -1,17 +1,18 @@
-// Port of net.minecraft.client.renderer.CloudRenderer (1.21.11).
-//
-// Java packs the clouds.png cells into long cell data (color + the four
-// neighbour-emptiness flags), builds the cell mesh around the camera cell
-// (flat top quads for FAST, extruded boxes for FANCY, faces culled against
-// the neighbour flags) and scrolls it with the game time. The port keeps
-// every constant and the mesh algorithm 1:1; the texture source is the
-// generated 256x256 clouds image (the same generation path the celestial
-// atlas uses - the vendor repo carries no binary assets).
-//
-// The draw rides the position+texture cloud program: Java's clouds.vsh/fsh
-// transform the cell quads with the clip matrix and tint through CloudInfo;
-// the port bakes the world-space positions into the mesh and sets the tint
-// as a uniform (the same DynamicTransforms equivalence the SkyRenderer uses).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 #ifndef MATTICRAFT_MC_CLIENT_RENDERER_CLOUDRENDERER_H
 #define MATTICRAFT_MC_CLIENT_RENDERER_CLOUDRENDERER_H
@@ -75,4 +76,4 @@ void LIBMATTI_MC_CloudRenderer_MarkForRebuild(LIBMATTI_MC_CloudRenderer *rendere
 }
 #endif
 
-#endif //MATTICRAFT_MC_CLIENT_RENDERER_CLOUDRENDERER_H
+#endif

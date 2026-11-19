@@ -1,8 +1,9 @@
-// Port of net.minecraft.world.level.block.state.BlockBehaviour - the Properties part
-// (the StateArgumentPredicate/StatePredicate functional interfaces and every
-// Blocks.java-facing builder method with Java's exact defaults).
-// The behaviour dispatch (getShape, tick, ...) stays with the game port; the port
-// carries the data model that the registry objects and BlockStates need.
+
+
+
+
+
+
 
 #ifndef MATTICRAFT_MC_BLOCKSTATE_BLOCKBEHAVIOUR_H
 #define MATTICRAFT_MC_BLOCKSTATE_BLOCKBEHAVIOUR_H
@@ -30,64 +31,64 @@ typedef int (*LIBMATTI_MC_BlockBehaviour_StateArgumentPredicate)(const struct LI
 // Java: public static class BlockBehaviour.Properties
 typedef struct LIBMATTI_MC_BlockBehaviour_Properties
 {
-    // Java: Function<BlockState, MapColor> mapColor = state -> MapColor.NONE;
+// Java: Function<BlockState, MapColor> mapColor = state -> MapColor.NONE;
     const LIBMATTI_MC_MapColor *mapColor;
-    // Java: boolean hasCollision = true
+// Java: boolean hasCollision = true
     int hasCollision;
-    // Java: SoundType soundType = SoundType.STONE
+// Java: SoundType soundType = SoundType.STONE
     const LIBMATTI_MC_SoundType *soundType;
-    // Java: ToIntFunction<BlockState> lightEmission = state -> 0
+// Java: ToIntFunction<BlockState> lightEmission = state -> 0
     int lightEmission;
-    // Java: float explosionResistance / destroyTime
+// Java: float explosionResistance / destroyTime
     float explosionResistance;
     float destroyTime;
-    // Java: boolean requiresCorrectToolForDrops
+// Java: boolean requiresCorrectToolForDrops
     int requiresCorrectToolForDrops;
-    // Java: boolean isRandomlyTicking
+// Java: boolean isRandomlyTicking
     int isRandomlyTicking;
-    // Java: float friction = 0.6F / speedFactor = 1.0F / jumpFactor = 1.0F
+// Java: float friction = 0.6F / speedFactor = 1.0F / jumpFactor = 1.0F
     float friction;
     float speedFactor;
     float jumpFactor;
-    // Java: private @Nullable ResourceKey<Block> id - set through setId
+// Java: private @Nullable ResourceKey<Block> id - set through setId
     LIBMATTI_MC_ResourceKey *id;
-    // Java: the loot table key derived from the id (blocks/<path>) or noLootTable
+// Java: the loot table key derived from the id (blocks/<path>) or noLootTable
     int hasLootTable;
-    // Java: private DependantName<Block, String> descriptionId - "block.<ns>.<path>"
+// Java: private DependantName<Block, String> descriptionId - "block.<ns>.<path>"
     char *descriptionId;
-    // Java: boolean canOcclude = true
+// Java: boolean canOcclude = true
     int canOcclude;
-    // Java: boolean isAir / ignitedByLava / liquid / forceSolidOff / forceSolidOn
+// Java: boolean isAir / ignitedByLava / liquid / forceSolidOff / forceSolidOn
     int isAir;
     int ignitedByLava;
     int liquid;
     int forceSolidOff;
     int forceSolidOn;
-    // Java: PushReaction pushReaction = PushReaction.NORMAL
+// Java: PushReaction pushReaction = PushReaction.NORMAL
     LIBMATTI_MC_PushReaction pushReaction;
-    // Java: boolean spawnTerrainParticles = true
+// Java: boolean spawnTerrainParticles = true
     int spawnTerrainParticles;
-    // Java: NoteBlockInstrument instrument = NoteBlockInstrument.HARP
+// Java: NoteBlockInstrument instrument = NoteBlockInstrument.HARP
     LIBMATTI_MC_NoteBlockInstrument instrument;
-    // Java: boolean replaceable
+// Java: boolean replaceable
     int replaceable;
-    // Java: BlockBehaviour.StateArgumentPredicate<EntityType<?>> isValidSpawn = (state, getter, pos, type) ->
+// Java: BlockBehaviour.StateArgumentPredicate<EntityType<?>> isValidSpawn = (state, getter, pos, type) ->
     //       state.isFaceSturdy(getter, pos, Direction.UP) && state.getLightEmission() < 14
     LIBMATTI_MC_BlockBehaviour_StateArgumentPredicate isValidSpawn;
-    // Java: BlockBehaviour.StatePredicate isRedstoneConductor = (state, getter, pos) ->
+// Java: BlockBehaviour.StatePredicate isRedstoneConductor = (state, getter, pos) ->
     //       state.isCollisionShapeFullBlock(getter, pos)
     LIBMATTI_MC_BlockBehaviour_StatePredicate isRedstoneConductor;
-    // Java: BlockBehaviour.StatePredicate isSuffocating / isViewBlocking = (state, getter, pos) ->
+// Java: BlockBehaviour.StatePredicate isSuffocating / isViewBlocking = (state, getter, pos) ->
     //       state.blocksMotion() && state.isCollisionShapeFullBlock(getter, pos)
     LIBMATTI_MC_BlockBehaviour_StatePredicate isSuffocating;
     LIBMATTI_MC_BlockBehaviour_StatePredicate isViewBlocking;
-    // Java: BlockBehaviour.StatePredicate hasPostProcess = (state, getter, pos) -> false
+// Java: BlockBehaviour.StatePredicate hasPostProcess = (state, getter, pos) -> false
     LIBMATTI_MC_BlockBehaviour_StatePredicate hasPostProcess;
-    // Java: BlockBehaviour.StatePredicate emissiveRendering = (state, getter, pos) -> false
+// Java: BlockBehaviour.StatePredicate emissiveRendering = (state, getter, pos) -> false
     LIBMATTI_MC_BlockBehaviour_StatePredicate emissiveRendering;
-    // Java: boolean dynamicShape
+// Java: boolean dynamicShape
     int dynamicShape;
-    // Java: the EntityBlock vtable (NeoForge's ExtendableBlockEntity paths set
+// Java: the EntityBlock vtable (NeoForge's ExtendableBlockEntity paths set
     // it; NULL = the block is not an EntityBlock). A forward pointer to avoid
     // a circular include.
     void *entityBlock;
@@ -196,4 +197,4 @@ const char *LIBMATTI_MC_BlockBehaviour_Properties_EffectiveDescription(
 }
 #endif
 
-#endif //MATTICRAFT_MC_BLOCKSTATE_BLOCKBEHAVIOUR_H
+#endif

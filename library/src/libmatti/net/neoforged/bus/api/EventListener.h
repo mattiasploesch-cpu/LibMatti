@@ -15,11 +15,11 @@ struct LIBMATTI_BUS_EventListener
 {
     void *self;
 
-    // Java: public abstract void invoke(Event event)
+// Java: public abstract void invoke(Event event)
     void (*invoke)(void *self, LIBMATTI_BUS_Event *event);
-    // Java: instanceof IWrapperListener -> getWithoutCheck(); NULL when the listener is not a wrapper
+// Java: instanceof IWrapperListener -> getWithoutCheck(); NULL when the listener is not a wrapper
     LIBMATTI_BUS_EventListener *(*getWithoutCheck)(void *self);
-    // Java: public String toString()
+// Java: public String toString()
     char *(*toString)(void *self);
 };
 
@@ -28,4 +28,4 @@ void LIBMATTI_BUS_EventListener_Invoke(const LIBMATTI_BUS_EventListener *listene
 // Java: public String toString()
 char *LIBMATTI_BUS_EventListener_ToString(const LIBMATTI_BUS_EventListener *listener);
 
-#endif //MATTICRAFT_BUS_API_EVENTLISTENER_H
+#endif

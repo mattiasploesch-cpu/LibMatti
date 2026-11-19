@@ -1,4 +1,5 @@
-// Port of joptsimple.util.PathConverter.
+
+
 
 #include "libmatti/joptsimple/PathConverter.h"
 

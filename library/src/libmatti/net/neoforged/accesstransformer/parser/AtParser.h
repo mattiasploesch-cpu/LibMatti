@@ -1,5 +1,6 @@
-// Port of net.neoforged.accesstransformer.parser.AtParser.
-// Parses accesstransformer.cfg lines into (Target, Transformation) pairs.
+
+
+
 
 #ifndef MATTICRAFT_AT_ATPARSER_H
 #define MATTICRAFT_AT_ATPARSER_H
@@ -23,4 +24,4 @@ LIBMATTI_AT_AtEntry **LIBMATTI_AT_AtParser_Parse(const char *text, const char *o
 
 void LIBMATTI_AT_AtParser_FreeEntries(LIBMATTI_AT_AtEntry **entries, size_t count);
 
-#endif //MATTICRAFT_AT_ATPARSER_H
+#endif

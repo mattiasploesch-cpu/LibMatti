@@ -39,4 +39,4 @@ const char *LIBMATTI_FML_ModLibrary_Path(const LIBMATTI_FML_ModLibrary *library)
 const char *LIBMATTI_FML_ModLibrary_EntrypointName(const LIBMATTI_FML_ModLibrary *library);
 int LIBMATTI_FML_ModLibrary_HasEntrypoint(const LIBMATTI_FML_ModLibrary *library);
 
-#endif //MATTICRAFT_FML_LOADING_MODLIBRARY_H
+#endif

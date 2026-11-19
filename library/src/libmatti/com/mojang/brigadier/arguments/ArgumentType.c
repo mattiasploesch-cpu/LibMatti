@@ -1,4 +1,5 @@
-// Port of com.mojang.brigadier.arguments.*: the built-in argument types.
+
+
 
 #include "libmatti/com/mojang/brigadier/arguments/ArgumentType.h"
 
@@ -127,7 +128,7 @@ int LIBMATTI_BR_ArgumentType_ParseBool(const LIBMATTI_BR_ArgumentType *type, LIB
 int LIBMATTI_BR_ArgumentType_ParseInt(const LIBMATTI_BR_ArgumentType *type, LIBMATTI_BR_StringReader *reader,
                                       LIBMATTI_BR_CommandSyntaxException **outException)
 {
-    // Java: final int start = reader.getCursor(); final int result = reader.readInt();
+// Java: final int start = reader.getCursor(); final int result = reader.readInt();
     int start = LIBMATTI_BR_StringReader_GetCursor(reader);
     int result = LIBMATTI_BR_StringReader_ReadInt(reader, outException);
     if (*outException != NULL) return 0;
@@ -254,7 +255,7 @@ double LIBMATTI_BR_ArgumentType_ParseDouble(const LIBMATTI_BR_ArgumentType *type
 char *LIBMATTI_BR_ArgumentType_ParseString(const LIBMATTI_BR_ArgumentType *type, LIBMATTI_BR_StringReader *reader,
                                            LIBMATTI_BR_CommandSyntaxException **outException)
 {
-    // Java: StringArgumentType.parse
+// Java: StringArgumentType.parse
     if (type->stringType == LIBMATTI_BR_StringType_GREEDY_PHRASE)
     {
         char *text = LIBMATTI_BR_StringReader_GetRemaining(reader);
@@ -274,7 +275,7 @@ char *LIBMATTI_BR_StringArgumentType_EscapeIfRequired(const char *input)
     {
         if (!LIBMATTI_BR_StringReader_IsAllowedInUnquotedString(*p))
         {
-            // Java: escape(input) -> "\"" + input.replace("\\", "\\\\").replace("\"", "\\\"") + "\""
+// Java: escape(input) -> "\"" + input.replace("\\", "\\\\").replace("\"", "\\\"") + "\""
             size_t extra = 0;
             for (const char *q = input; *q != '\0'; q++)
             {

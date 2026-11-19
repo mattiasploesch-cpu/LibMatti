@@ -1,4 +1,5 @@
-// Port of net.minecraft.world.entity.player.Input (implementation).
+
+
 
 #include "libmatti/net/minecraft/world/entity/player/Input.h"
 

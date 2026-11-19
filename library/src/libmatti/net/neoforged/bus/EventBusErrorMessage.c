@@ -1,4 +1,5 @@
-// Port of net.neoforged.bus.EventBusErrorMessage.
+
+
 
 #include "libmatti/net/neoforged/bus/EventBusErrorMessage.h"
 
@@ -12,7 +13,7 @@
 
 struct LIBMATTI_BUS_EventBusErrorMessage
 {
-    // Java: private final Event event; - commented out in Java
+// Java: private final Event event; - commented out in Java
     int index;
     LIBMATTI_BUS_EventListener **listeners;
     size_t listenerCount;
@@ -65,7 +66,7 @@ char *LIBMATTI_BUS_EventBusErrorMessage_FormatTo(const LIBMATTI_BUS_EventBusErro
         free(listener);
     }
 
-    // Java: final StringWriter sw = new StringWriter(); throwable.printStackTrace(new PrintWriter(sw));
+// Java: final StringWriter sw = new StringWriter(); throwable.printStackTrace(new PrintWriter(sw));
     //       buffer.append(sw.getBuffer());
     LIBMATTI_JI_StringWriter *sw = LIBMATTI_JI_StringWriter_New();
     LIBMATTI_JI_PrintWriter *pw = LIBMATTI_JI_PrintWriter_New(&sw->base);

@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.loading.LibraryFinder.
+
+
 
 #ifndef MATTICRAFT_FML_LOADING_LIBRARYFINDER_H
 #define MATTICRAFT_FML_LOADING_LIBRARYFINDER_H
@@ -13,4 +14,4 @@ char *LIBMATTI_FML_LibraryFinder_FindPathForMaven(const char *group, const char 
 // Java: public static Path findPathForMaven(MavenCoordinate artifact)
 char *LIBMATTI_FML_LibraryFinder_FindPathForMavenCoordinate(const LIBMATTI_FML_MavenCoordinate *artifact);
 
-#endif //MATTICRAFT_FML_LOADING_LIBRARYFINDER_H
+#endif

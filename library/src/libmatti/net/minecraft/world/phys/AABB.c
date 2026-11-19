@@ -1,4 +1,5 @@
-// Port of net.minecraft.world.phys.AABB.
+
+
 
 #include "libmatti/net/minecraft/world/phys/AABB.h"
 

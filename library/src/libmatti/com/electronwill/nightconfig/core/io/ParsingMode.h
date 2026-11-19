@@ -1,4 +1,5 @@
-// Port of com.electronwill.nightconfig.core.io.ParsingMode.
+
+
 
 #ifndef MATTICRAFT_NC_CORE_IO_PARSINGMODE_H
 #define MATTICRAFT_NC_CORE_IO_PARSINGMODE_H
@@ -20,4 +21,4 @@ LIBMATTI_NC_Value *LIBMATTI_NC_ParsingMode_Put(LIBMATTI_NC_ParsingMode mode, LIB
                                                const char **path, size_t pathLength,
                                                const LIBMATTI_NC_Value *value);
 
-#endif //MATTICRAFT_NC_CORE_IO_PARSINGMODE_H
+#endif

@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.mclanguageprovider.MinecraftModContainer.
+
+
 
 #include "libmatti/net/neoforged/fml/mclanguageprovider/MinecraftModContainer.h"
 
@@ -9,7 +10,7 @@ LIBMATTI_FML_MinecraftModContainer *LIBMATTI_FML_MinecraftModContainer_New(LIBMA
 {
     LIBMATTI_FML_MinecraftModContainer *container = calloc(1, sizeof(LIBMATTI_FML_MinecraftModContainer));
     LIBMATTI_FML_ModContainer_Init(&container->base, info);
-    // Java: the subclass adds no fields ModContainer does not already release
+// Java: the subclass adds no fields ModContainer does not already release
     container->base.free = NULL;
     return container;
 }

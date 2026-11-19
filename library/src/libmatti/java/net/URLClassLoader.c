@@ -34,7 +34,8 @@ void LIBMATTI_JL_URLClassLoader_Close(LIBMATTI_JL_ClassLoader *classLoader)
 {
     if (classLoader == NULL) return;
 
-    // Java closes the jar files it opened; the C port releases the class path entries it built
+
+
     LIBMATTI_JL_ClassLoader_SetClassPath(classLoader, NULL, 0);
 }
 

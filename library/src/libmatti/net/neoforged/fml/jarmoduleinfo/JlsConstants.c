@@ -10,9 +10,11 @@ const char *const LIBMATTI_FML_JlsConstants_RESERVED_KEYWORDS[] = {
     "implements", "import", "instanceof", "int", "interface", "long", "native", "new", "package", "private",
     "protected", "public", "return", "short", "static", "strictfp", "super", "switch", "synchronized", "this",
     "throw", "throws", "transient", "try", "void", "volatile", "while",
-    // Not really keywords, but "boolean literals"
+
+
     "true", "false",
-    // Not really a keyword, but the "null literal"
+
+
     "null",
     "_",
 };
@@ -43,7 +45,7 @@ int LIBMATTI_FML_JlsConstants_IsJavaIdentifier(const char *str)
         if (strcmp(str, LIBMATTI_FML_JlsConstants_RESERVED_KEYWORDS[i]) == 0)
             return 0;
 
-    // Java: this iterates over the Unicode code points instead of UTF-16 characters
+// Java: this iterates over the Unicode code points instead of UTF-16 characters
     for (size_t i = 0; str[i] != '\0'; i++)
     {
         if (i == 0 && !isJavaIdentifierStart(str[i]))
@@ -78,7 +80,7 @@ int LIBMATTI_FML_JlsConstants_IsTypeName(const char *name)
 {
     size_t lastSeparator = 0;
 
-    // Java: iterate all segments
+// Java: iterate all segments
     for (const char *nextSeparator = strchr(name, '.'); nextSeparator != NULL;
          nextSeparator = strchr(name + lastSeparator, '.'))
     {

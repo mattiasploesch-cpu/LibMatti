@@ -1,5 +1,6 @@
-// Port of org.joml.Quaternionf.
-// Formulas follow vendor/JOML src/main/java/org/joml/Quaternionf.java.
+
+
+
 
 #include "libmatti/org/joml/Quaternionf.h"
 
@@ -34,7 +35,7 @@ LIBMATTI_JOML_Quaternionf *LIBMATTI_JOML_Quaternionf_Identity(LIBMATTI_JOML_Quat
 
 void LIBMATTI_JOML_Quaternionf_FromAxisAngle(LIBMATTI_JOML_Quaternionf *q, float angle, float ax, float ay, float az)
 {
-    // Java: rotationAxis - the axis must be normalized
+// Java: rotationAxis - the axis must be normalized
     float length = sqrtf(ax * ax + ay * ay + az * az);
     if (length != 1.0f)
     {
@@ -65,7 +66,7 @@ LIBMATTI_JOML_Quaternionf *LIBMATTI_JOML_Quaternionf_RotateAxis(LIBMATTI_JOML_Qu
     float sin = sinf(h);
     float rx = ax * sin, ry = ay * sin, rz = az * sin, rw = cosf(h);
 
-    // Java: this.set(rw * x + rx * -w + ry * z - rz * y, ...)
+// Java: this.set(rw * x + rx * -w + ry * z - rz * y, ...)
     float nx = rw * q->x + rx * q->w + ry * q->z - rz * q->y;
     float ny = rw * q->y + ry * q->w + rz * q->x - rx * q->z;
     float nz = rw * q->z + rz * q->w + rx * q->y - ry * q->x;
@@ -116,7 +117,7 @@ LIBMATTI_JOML_Quaternionf *LIBMATTI_JOML_Quaternionf_Conjugate(LIBMATTI_JOML_Qua
 LIBMATTI_JOML_Quaternionf *LIBMATTI_JOML_Quaternionf_Slerp(LIBMATTI_JOML_Quaternionf *q,
                                                            const LIBMATTI_JOML_Quaternionf *target, float alpha)
 {
-    // Java: cosom = dot; handle the negative-dot shortest path
+// Java: cosom = dot; handle the negative-dot shortest path
     float cosom = q->x * target->x + q->y * target->y + q->z * target->z + q->w * target->w;
     float qx = target->x, qy = target->y, qz = target->z, qw = target->w;
     if (cosom < 0.0f)
@@ -128,7 +129,7 @@ LIBMATTI_JOML_Quaternionf *LIBMATTI_JOML_Quaternionf_Slerp(LIBMATTI_JOML_Quatern
     float scale0, scale1;
     if (1.0f - cosom > 1.0e-6f)
     {
-        // Java: the standard slerp with the sine interpolation
+// Java: the standard slerp with the sine interpolation
         float omega = acosf(cosom);
         float sinom = sinf(omega);
         scale0 = sinf((1.0f - alpha) * omega) / sinom;
@@ -136,7 +137,7 @@ LIBMATTI_JOML_Quaternionf *LIBMATTI_JOML_Quaternionf_Slerp(LIBMATTI_JOML_Quatern
     }
     else
     {
-        // Java: lerp fallback for nearly identical quaternions
+// Java: lerp fallback for nearly identical quaternions
         scale0 = 1.0f - alpha;
         scale1 = alpha;
     }

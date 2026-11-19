@@ -1,11 +1,12 @@
-// Port of net.minecraft.client.renderer.CloudRenderer (implementation).
-//
-// The mesh builder mirrors the Java lines: the diamond iteration over the
-// camera cell ring (buildMesh), the neighbour-flag face culling for the
-// extruded FANCY cells (buildExtrudedCell), the flat FAST cell and the
-// encodeFace cell offsets. Java uploads packed cell bytes and expands them
-// in the vertex shader; the port expands at build time into position+uv
-// triangles - the resulting geometry is the same.
+
+
+
+
+
+
+
+
+
 
 #include "libmatti/net/minecraft/client/renderer/CloudRenderer.h"
 
@@ -41,41 +42,43 @@ typedef struct TextureData
 struct LIBMATTI_MC_CloudRenderer
 {
     TextureData texture;
-    // Java: private boolean needsRebuild
+// Java: private boolean needsRebuild
     int needsRebuild;
-    // Java: private int prevCellX / prevCellZ
+// Java: private int prevCellX / prevCellZ
     int prevCellX;
     int prevCellZ;
     LIBMATTI_MC_Cloud_RelativeCameraPos prevRelativeCameraPos;
     LIBMATTI_MC_CloudStatus prevType;
-    // The expanded triangle mesh (Java: the UTB ring buffer's packed cells;
+// The expanded triangle mesh (Java: the UTB ring buffer's packed cells;
     // the port keeps expanded position+uv triangles and uploads on rebuild).
     float *meshVertices;
     int meshVertexCount;
-    int meshCapacity; // in vertices
+    int meshCapacity;
+
     unsigned int meshVbo;
     unsigned int cloudProgram;
     unsigned int cloudTexture;
-    // Java: private int quadCount (the port counts triangles)
+// Java: private int quadCount (the port counts triangles)
     int triangleCount;
 };
 
-// ---------------------------------------------------------------------------
-// The clouds texture (256x256): Java reads textures/environment/clouds.png;
-// the vendor repo carries no binary assets, so the port generates the same
-// kind of wrapped blob field.
-// ---------------------------------------------------------------------------
+
+
+
+
+
+
 
 static int is_cell_empty(unsigned int argb)
 {
-    // Java: ARGB.alpha(p) < 10
+// Java: ARGB.alpha(p) < 10
     return (int) ((argb >> 24) & 0xFFu) < 10;
 }
 
 static unsigned long pack_cell_data(unsigned int color, int northEmpty, int eastEmpty,
                                     int southEmpty, int westEmpty)
 {
-    // Java: (long) color << 4 | north << 3 | east << 2 | south << 1 | west
+// Java: (long) color << 4 | north << 3 | east << 2 | south << 1 | west
     return ((unsigned long) color << 4)
          | ((unsigned long) (northEmpty ? 1 : 0) << NORTH_EMPTY_BIT)
          | ((unsigned long) (eastEmpty ? 1 : 0) << EAST_EMPTY_BIT)
@@ -88,8 +91,9 @@ static int is_east_empty(unsigned long cell) { return (int) ((cell >> EAST_EMPTY
 static int is_south_empty(unsigned long cell) { return (int) ((cell >> SOUTH_EMPTY_BIT) & 1UL); }
 static int is_west_empty(unsigned long cell) { return (int) ((cell >> WEST_EMPTY_BIT) & 1UL); }
 
-// The blob field: a seeded scatter of rounded blobs, wrapped on the 256x256
-// torus (the vanilla texture tiles the same way).
+
+
+
 static unsigned int *generate_cloud_image(int *outW, int *outH)
 {
     const int size = 256;
@@ -117,7 +121,8 @@ static unsigned int *generate_cloud_image(int *outW, int *outH)
                 {
                     int x = (cx + dx + size) % size;
                     int y = (cy + dy + size) % size;
-                    image[x + y * size] = 0xFFFFFFFFu; // white, alpha 255
+                    image[x + y * size] = 0xFFFFFFFFu;
+
                 }
             }
         }
@@ -164,33 +169,41 @@ static int prepare_texture(TextureData *data)
     return 1;
 }
 
-// ---------------------------------------------------------------------------
-// The mesh builder - 1:1 with Java's buildMesh / tryBuildCell /
-// buildFlatCell / buildExtrudedCell / encodeFace. The mesh cells carry the
-// RELATIVE ring offsets (l, i1) only, exactly like Java's packed encoding;
-// the shader-origin supplies the base (see Render).
-// ---------------------------------------------------------------------------
 
-// The quad corners per face direction in the cell's local block space, wound
-// so the two triangles (0,1,2)(2,1,3) face outward. Direction order is
-// Direction.get3DDataValue(): DOWN 0, UP 1, NORTH 2, SOUTH 3, WEST 4, EAST 5.
+
+
+
+
+
+
+
+
+
+
+
 typedef struct FaceQuad
 {
     float corners[4][3];
 } FaceQuad;
 
 static const FaceQuad face_quads[6] = {
-    // DOWN (y = 0)
+
+
     {{{0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 12.0f}, {12.0f, 0.0f, 12.0f}, {12.0f, 0.0f, 0.0f}}},
-    // UP (y = 4)
+
+
     {{{0.0f, 4.0f, 0.0f}, {12.0f, 4.0f, 0.0f}, {12.0f, 4.0f, 12.0f}, {0.0f, 4.0f, 12.0f}}},
-    // NORTH (z = 0)
+
+
     {{{12.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 4.0f, 0.0f}, {12.0f, 4.0f, 0.0f}}},
-    // SOUTH (z = 12)
+
+
     {{{0.0f, 0.0f, 12.0f}, {12.0f, 0.0f, 12.0f}, {12.0f, 4.0f, 12.0f}, {0.0f, 4.0f, 12.0f}}},
-    // WEST (x = 0)
+
+
     {{{0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 12.0f}, {0.0f, 4.0f, 12.0f}, {0.0f, 4.0f, 0.0f}}},
-    // EAST (x = 12)
+
+
     {{{12.0f, 0.0f, 12.0f}, {12.0f, 0.0f, 0.0f}, {12.0f, 4.0f, 0.0f}, {12.0f, 4.0f, 12.0f}}},
 };
 
@@ -210,12 +223,13 @@ static void append_face(LIBMATTI_MC_CloudRenderer *renderer, int relCellX, int r
         renderer->meshCapacity = newCapacity;
     }
     const FaceQuad *quad = &face_quads[direction];
-    // The cell origin from the RELATIVE ring offset (Java: (cell >> 1) * 12
+// The cell origin from the RELATIVE ring offset (Java: (cell >> 1) * 12
     // reconstructed in the shader on top of the CloudInfo origin).
     float originX = (float) (relCellX * 12);
     float originZ = (float) (relCellZ * 12);
-    // The uv: the texture repeats per cell (the cloud texture tiles over the
-    // cell grid; the sampled footprint is one 12x4 face slice).
+
+
+
     const float uvs[4][2] = {{0.0f, 0.0f}, {0.75f, 0.0f}, {0.75f, 0.25f}, {0.0f, 0.25f}};
     static const int triangleOrder[6] = {0, 1, 2, 2, 1, 3};
     float *base = renderer->meshVertices + renderer->meshVertexCount * 5;
@@ -244,17 +258,22 @@ static void build_extruded_cell(LIBMATTI_MC_CloudRenderer *renderer,
                                 int relCellX, int relCellZ, unsigned long cell)
 {
     if (relativePos != LIBMATTI_MC_Cloud_BELOW_CLOUDS)
-        append_face(renderer, relCellX, relCellZ, 1, 0); // UP
+        append_face(renderer, relCellX, relCellZ, 1, 0);
+
     if (relativePos != LIBMATTI_MC_Cloud_ABOVE_CLOUDS)
-        append_face(renderer, relCellX, relCellZ, 0, 0); // DOWN
+        append_face(renderer, relCellX, relCellZ, 0, 0);
+
     if (is_north_empty(cell) && relCellZ > 0)
-        append_face(renderer, relCellX, relCellZ, 2, 0); // NORTH
+        append_face(renderer, relCellX, relCellZ, 2, 0);
+
     if (is_south_empty(cell) && relCellZ < 0)
-        append_face(renderer, relCellX, relCellZ, 3, 0); // SOUTH
+        append_face(renderer, relCellX, relCellZ, 3, 0);
+
     if (is_west_empty(cell) && relCellX > 0)
-        append_face(renderer, relCellX, relCellZ, 4, 0); // WEST
+        append_face(renderer, relCellX, relCellZ, 4, 0);
+
     if (is_east_empty(cell) && relCellX < 0)
-        append_face(renderer, relCellX, relCellZ, 5, 0); // EAST
+        append_face(renderer, relCellX, relCellZ, 5, 0);// EAST
     // Java: boolean flag = abs(x) <= 1 && abs(z) <= 1 - the inside faces.
     if (relCellX >= -1 && relCellX <= 1 && relCellZ >= -1 && relCellZ <= 1)
     {
@@ -388,7 +407,8 @@ static unsigned int ensure_cloud_texture(LIBMATTI_MC_CloudRenderer *renderer)
         return 0;
     for (long i = 0; i < (long) renderer->texture.width * renderer->texture.height; i++)
     {
-        // Empty cells pack as 0 (alpha 0); populated cells carry the color.
+
+
         unsigned int argb = (unsigned int) (renderer->texture.cells[i] >> 4);
         pixels[i * 4 + 0] = (unsigned char) ((argb >> 16) & 0xFFu);
         pixels[i * 4 + 1] = (unsigned char) ((argb >> 8) & 0xFFu);
@@ -405,7 +425,8 @@ static unsigned int ensure_cloud_texture(LIBMATTI_MC_CloudRenderer *renderer)
     return renderer->cloudTexture;
 }
 
-// The VAO for the mesh (position 3f + uv 2f, the celestial layout).
+
+
 static unsigned int create_cloud_vao(unsigned int vbo)
 {
     unsigned int vaos[1];
@@ -423,16 +444,17 @@ static unsigned int create_cloud_vao(unsigned int vbo)
     return vaos[0];
 }
 
-// ---------------------------------------------------------------------------
-// Lifecycle + render
-// ---------------------------------------------------------------------------
+
+
+
+
 
 LIBMATTI_MC_CloudRenderer *LIBMATTI_MC_CloudRenderer_New(void)
 {
     LIBMATTI_MC_CloudRenderer *renderer = calloc(1, sizeof(LIBMATTI_MC_CloudRenderer));
     if (renderer == NULL)
         return NULL;
-    // Java: prevCellX = Integer.MIN_VALUE
+// Java: prevCellX = Integer.MIN_VALUE
     renderer->prevCellX = -2147483647 - 1;
     renderer->prevCellZ = -2147483647 - 1;
     renderer->prevRelativeCameraPos = LIBMATTI_MC_Cloud_INSIDE_CLOUDS;
@@ -481,11 +503,11 @@ void LIBMATTI_MC_CloudRenderer_Render(LIBMATTI_MC_CloudRenderer *renderer,
 {
     if (renderer == NULL || status == LIBMATTI_MC_CloudStatus_OFF)
         return;
-    // Java: int i = options.cloudRange().get() * 16; int j = ceil(i / 12f)
+// Java: int i = options.cloudRange().get() * 16; int j = ceil(i / 12f)
     int cells = cloudRangeCells > 0 ? cloudRangeCells : 12;
     int fancy = status == LIBMATTI_MC_CloudStatus_FANCY;
 
-    // Java: float f = cloudHeight - cameraPos.y; float f1 = f + 4.0F
+// Java: float f = cloudHeight - cameraPos.y; float f1 = f + 4.0F
     float f = cloudHeight - (float) camY;
     float f1 = f + 4.0f;
     LIBMATTI_MC_Cloud_RelativeCameraPos relativePos;
@@ -496,10 +518,10 @@ void LIBMATTI_MC_CloudRenderer_Render(LIBMATTI_MC_CloudRenderer *renderer,
     else
         relativePos = LIBMATTI_MC_Cloud_INSIDE_CLOUDS;
 
-    // Java: float f2 = gameTime % (width * 400) + partialTick
+// Java: float f2 = gameTime % (width * 400) + partialTick
     long period = (long) renderer->texture.width * LIBMATTI_MC_Cloud_TICKS_PER_CELL;
     float f2 = (float) (gameTime % period) + partialTick;
-    // Java: d0 = camX + f2 * 0.03; d1 = camZ + 3.96 - the drift + the fixed
+// Java: d0 = camX + f2 * 0.03; d1 = camZ + 3.96 - the drift + the fixed
     // z offset, wrapped into the texture's cell extent.
     double d0 = camX + f2 * 0.030000001f;
     double d1 = camZ + 3.96;
@@ -509,7 +531,7 @@ void LIBMATTI_MC_CloudRenderer_Render(LIBMATTI_MC_CloudRenderer *renderer,
     d1 -= (double) LIBMATTI_MC_Mth_FloorD(d1 / d3) * d3;
     int cellX = (int) LIBMATTI_MC_Mth_FloorD(d0 / LIBMATTI_MC_Cloud_CELL_SIZE_IN_BLOCKS);
     int cellZ = (int) LIBMATTI_MC_Mth_FloorD(d1 / LIBMATTI_MC_Cloud_CELL_SIZE_IN_BLOCKS);
-    // Java: float f3 = d0 - cellX * 12; float f4 = d1 - cellZ * 12
+// Java: float f3 = d0 - cellX * 12; float f4 = d1 - cellZ * 12
     float f3 = (float) (d0 - cellX * LIBMATTI_MC_Cloud_CELL_SIZE_IN_BLOCKS);
     float f4 = (float) (d1 - cellZ * LIBMATTI_MC_Cloud_CELL_SIZE_IN_BLOCKS);
 
@@ -547,11 +569,12 @@ void LIBMATTI_MC_CloudRenderer_Render(LIBMATTI_MC_CloudRenderer *renderer,
     if (texture == 0)
         return;
 
-    // The world anchor. The mesh carries the RELATIVE ring offsets, so the
-    // shader origin reconstructs the base. Java's origin (-f3, f, -f4) lives
-    // in the camera-relative space of its model-view; the port's view already
-    // carries the full camera transform, so the origin is world space:
-    // x/z = camera - the wrapped fraction, y = camera + f = the cloud height.
+
+
+
+
+
+
     float originX = (float) camX - f3;
     float originY = (float) camY + f;
     float originZ = (float) camZ - f4;
@@ -586,7 +609,7 @@ void LIBMATTI_MC_CloudRenderer_Render(LIBMATTI_MC_CloudRenderer *renderer,
     if (cloudVao == 0)
         return;
     LIBMATTI_GL_glBindVertexArray(cloudVao);
-    // Java: drawIndexed(0, 0, 6 * quadCount, 1) over the sequential quad
+// Java: drawIndexed(0, 0, 6 * quadCount, 1) over the sequential quad
     // index buffer; the port's mesh carries the expanded triangles.
     LIBMATTI_GL_glDrawArrays(LIBMATTI_GL_GL_TRIANGLES, 0, renderer->meshVertexCount);
     LIBMATTI_GL_glBindVertexArray(0);

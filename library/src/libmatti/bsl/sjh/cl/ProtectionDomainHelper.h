@@ -1,4 +1,5 @@
-// Port of cpw.mods.cl.ProtectionDomainHelper.
+
+
 
 #ifndef MATTICRAFT_PROTECTIONDOMAINHELPER_H
 #define MATTICRAFT_PROTECTIONDOMAINHELPER_H
@@ -37,4 +38,4 @@ void *LIBMATTI_CL_ProtectionDomainHelper_TryDefinePackage(const char *name, cons
                                                          LIBMATTI_CL_DefinePackage definePackage,
                                                          LIBMATTI_CL_GetDefinedPackage getDefinedPackage);
 
-#endif //MATTICRAFT_PROTECTIONDOMAINHELPER_H
+#endif

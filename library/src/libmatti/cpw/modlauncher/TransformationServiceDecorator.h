@@ -1,4 +1,5 @@
-// Port of cpw.mods.modlauncher.TransformationServiceDecorator.
+
+
 
 #ifndef MATTICRAFT_MODLAUNCHER_TRANSFORMATIONSERVICEDECORATOR_H
 #define MATTICRAFT_MODLAUNCHER_TRANSFORMATIONSERVICEDECORATOR_H
@@ -44,4 +45,4 @@ LIBMATTI_MLA_ITransformationService_Resource *LIBMATTI_ML_TransformationServiceD
     LIBMATTI_ML_TransformationServiceDecorator *decorator, LIBMATTI_MLA_IModuleLayerManager *moduleLayerManager,
     size_t *count);
 
-#endif //MATTICRAFT_MODLAUNCHER_TRANSFORMATIONSERVICEDECORATOR_H
+#endif

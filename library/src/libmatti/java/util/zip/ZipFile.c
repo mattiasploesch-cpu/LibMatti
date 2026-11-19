@@ -1,8 +1,9 @@
-// Port of java.util.zip.ZipFile.
-//
-// Java parses the central directory on first access and reads entry data through
-// the local file header on demand. The port keeps the file open for the ZipFile's
-// lifetime, reads the central directory eagerly and inflates entry data on read.
+
+
+
+
+
+
 
 #include "libmatti/java/util/zip/ZipFile.h"
 
@@ -12,7 +13,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-// The signatures of the classic ZIP format
+
+
 #define SIG_LOCAL_HEADER 0x04034b50u
 #define SIG_CENTRAL_DIRECTORY 0x02014b50u
 #define SIG_END_OF_CENTRAL_DIRECTORY 0x06054b50u
@@ -21,7 +23,7 @@ struct LIBMATTI_JU_ZipFile
 {
     FILE *file;
     long long fileSize;
-    // Java: the central directory records, in file order
+// Java: the central directory records, in file order
     LIBMATTI_JU_ZipEntry **entries;
     size_t entryCount;
 };
@@ -47,7 +49,7 @@ LIBMATTI_JU_ZipFile *LIBMATTI_JU_ZipFile_Open(const char *path)
     }
     long long size = ftell(file);
 
-    // Java: the EOCD record is searched from the end; the comment may be up to
+// Java: the EOCD record is searched from the end; the comment may be up to
     // 64KiB, so the scan window covers it
     unsigned char maxScan[22 + 65536];
     long long scanSize = size < (long long) sizeof(maxScan) ? size : (long long) sizeof(maxScan);
@@ -62,7 +64,7 @@ LIBMATTI_JU_ZipFile *LIBMATTI_JU_ZipFile_Open(const char *path)
         return NULL;
     }
 
-    // Java: ZipFile.open uses ZipFile.Source.findEND - the last EOCD in the window
+// Java: ZipFile.open uses ZipFile.Source.findEND - the last EOCD in the window
     long long eocdOffset = -1;
     for (long long i = scanSize - 22; i >= 0; i--)
     {
@@ -89,7 +91,7 @@ LIBMATTI_JU_ZipFile *LIBMATTI_JU_ZipFile_Open(const char *path)
     if (entryCount > 0)
         zipFile->entries = calloc(entryCount, sizeof(LIBMATTI_JU_ZipEntry *));
 
-    // Java: Source.init - the central directory records follow each other back to back
+// Java: Source.init - the central directory records follow each other back to back
     if (fseek(file, (long) centralDirectoryOffset, SEEK_SET) != 0)
     {
         LIBMATTI_JU_ZipFile_Free(zipFile);
@@ -125,7 +127,7 @@ LIBMATTI_JU_ZipFile *LIBMATTI_JU_ZipFile_Open(const char *path)
         entry->isDirectory = nameLength > 0 && entry->name[nameLength - 1] == '/';
         if (entry->isDirectory) entry->name[nameLength - 1] = '\0';
 
-        // Java: skips the extra field and the comment to the next record
+// Java: skips the extra field and the comment to the next record
         size_t skip = (size_t) extraLength + commentLength;
         unsigned char *junk = malloc(skip);
         if (skip > 0 && fread(junk, 1, skip, file) != skip)
@@ -179,11 +181,11 @@ unsigned char *LIBMATTI_JU_ZipFile_Read(const LIBMATTI_JU_ZipFile *zipFile, cons
                                         size_t *outLength)
 {
     *outLength = 0;
-    // Java: directories read to an empty stream
+// Java: directories read to an empty stream
     if (entry->isDirectory || entry->uncompressedSize == 0)
         return calloc(1, 1);
 
-    // Java: getInputStream reads through the local file header - the lengths there can be
+// Java: getInputStream reads through the local file header - the lengths there can be
     // zero with a data descriptor, so the sizes come from the central directory
     unsigned char header[30];
     if (fseek(zipFile->file, (long) entry->localHeaderOffset, SEEK_SET) != 0) return NULL;
@@ -205,7 +207,7 @@ unsigned char *LIBMATTI_JU_ZipFile_Read(const LIBMATTI_JU_ZipFile *zipFile, cons
         return NULL;
     }
 
-    // Java: ZipEntry.STORED entries are copied; DEFLATED entries run through the inflater
+// Java: ZipEntry.STORED entries are copied; DEFLATED entries run through the inflater
     unsigned char *data;
     if (entry->method == 0)
     {

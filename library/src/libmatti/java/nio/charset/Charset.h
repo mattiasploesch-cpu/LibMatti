@@ -1,7 +1,8 @@
-// Port of java.nio.charset (Charset/StandardCharsets/CharBuffer).
-// The charsets the loader and game need: UTF-8 (the port's native charset),
-// US-ASCII and ISO-8859-1. Java decodes into a CharBuffer; the port decodes
-// into a freshly allocated char* (caller frees).
+
+
+
+
+
 
 #ifndef MATTICRAFT_JAVA_NIO_CHARSET_H
 #define MATTICRAFT_JAVA_NIO_CHARSET_H
@@ -31,7 +32,8 @@ char *LIBMATTI_JN_Charset_Decode(const char *charsetName, const unsigned char *b
 // Java: CharBuffer - the decode target; the port keeps the string + position
 typedef struct
 {
-    char *text;      // malloc'd
+    char *text;
+
     size_t length;
     size_t position;
 } LIBMATTI_JN_CharBuffer;
@@ -40,4 +42,4 @@ LIBMATTI_JN_CharBuffer *LIBMATTI_JN_CharBuffer_Wrap(const char *text);
 void LIBMATTI_JN_CharBuffer_Free(LIBMATTI_JN_CharBuffer *buffer);
 size_t LIBMATTI_JN_CharBuffer_Remaining(const LIBMATTI_JN_CharBuffer *buffer);
 
-#endif //MATTICRAFT_JAVA_NIO_CHARSET_H
+#endif

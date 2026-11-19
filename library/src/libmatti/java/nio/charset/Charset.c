@@ -19,15 +19,17 @@ char *LIBMATTI_JN_Charset_DecodeUtf8(const unsigned char *bytes, size_t length)
         }
         else if ((b & 0xE0) == 0xC0 && i + 1 < length)
         {
-            // Java: the 2-byte sequence, overlong forms map to U+FFFD
+// Java: the 2-byte sequence, overlong forms map to U+FFFD
             unsigned cp = ((b & 0x1Fu) << 6) | (bytes[i + 1] & 0x3Fu);
-            out[outIndex++] = (char) (cp < 0x80 ? '?' : cp); // overlong -> replacement char in the caller's view
+            out[outIndex++] = (char) (cp < 0x80 ? '?' : cp);
+
             i += 2;
         }
         else if ((b & 0xF0) == 0xE0 && i + 2 < length)
         {
             unsigned cp = ((b & 0x0Fu) << 12) | ((bytes[i + 1] & 0x3Fu) << 6) | (bytes[i + 2] & 0x3Fu);
-            // UTF-8 in C is 8-bit units; encode the code point back to UTF-8
+
+
             out[outIndex++] = (char) (0xE0 | (cp >> 12));
             out[outIndex++] = (char) (0x80 | ((cp >> 6) & 0x3F));
             out[outIndex++] = (char) (0x80 | (cp & 0x3F));
@@ -45,7 +47,7 @@ char *LIBMATTI_JN_Charset_DecodeUtf8(const unsigned char *bytes, size_t length)
         }
         else
         {
-            // Java: CodingErrorAction.REPLACE -> U+FFFD; the port inserts '?'
+// Java: CodingErrorAction.REPLACE -> U+FFFD; the port inserts '?'
             out[outIndex++] = '?';
             i++;
         }
@@ -74,7 +76,8 @@ char *LIBMATTI_JN_Charset_DecodeIso8859_1(const unsigned char *bytes, size_t len
 
 unsigned char *LIBMATTI_JN_Charset_EncodeUtf8(const char *string, size_t *outLength)
 {
-    // The port's strings are already UTF-8; encode = validate + copy
+
+
     size_t length = strlen(string);
     unsigned char *out = malloc(length);
     memcpy(out, string, length);

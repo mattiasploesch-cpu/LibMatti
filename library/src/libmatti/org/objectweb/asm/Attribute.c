@@ -1,4 +1,5 @@
-// Port of org.objectweb.asm.Attribute (raw form).
+
+
 
 #include "libmatti/org/objectweb/asm/Attribute.h"
 

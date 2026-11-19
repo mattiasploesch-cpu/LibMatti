@@ -1,5 +1,6 @@
-// Port of org.spongepowered.asm.launch.platform.MixinPlatformAgentAbstract
-// and org.spongepowered.asm.launch.platform.MixinPlatformAgentDefault.
+
+
+
 
 #include "libmatti/org/spongepowered/asm/launch/platform/MixinPlatformAgentDefault.h"
 
@@ -17,9 +18,10 @@ static LIBMATTI_SP_ILogger *LOGGER(void)
     return service != NULL ? service->getLogger(service->self, "mixin") : NULL;
 }
 
-// ---------------------------------------------------------------------------
-// MixinPlatformAgentAbstract (the base behaviour)
-// ---------------------------------------------------------------------------
+
+
+
+
 
 // Java: public AcceptResult accept(MixinPlatformManager manager, IContainerHandle handle)
 //       { this.manager = manager; this.handle = handle; return AcceptResult.ACCEPTED; }
@@ -71,9 +73,10 @@ void LIBMATTI_SP_MixinPlatformAgentAbstract_Init(LIBMATTI_SP_MixinPlatformAgentA
     agent->base.inject = abstract_inject;
 }
 
-// ---------------------------------------------------------------------------
-// MixinPlatformAgentDefault
-// ---------------------------------------------------------------------------
+
+
+
+
 
 // Java: public void prepare()
 static void default_prepare(void *self)
@@ -82,24 +85,24 @@ static void default_prepare(void *self)
     LIBMATTI_SP_MixinPlatformManager *manager = agent->manager;
     LIBMATTI_SP_ContainerHandle *handle = agent->handle;
 
-    // Java: String compatibilityLevel = this.handle.getAttribute(ManifestAttributes.COMPATIBILITY);
+// Java: String compatibilityLevel = this.handle.getAttribute(ManifestAttributes.COMPATIBILITY);
     const char *compatibilityLevel = handle->getAttribute(handle->self, LIBMATTI_SP_Constants_ATTR_COMPATIBILITY);
     if (compatibilityLevel != NULL)
     {
-        // Java: this.manager.setCompatibilityLevel(compatibilityLevel);
+// Java: this.manager.setCompatibilityLevel(compatibilityLevel);
         LIBMATTI_SP_MixinPlatformManager_SetCompatibilityLevel(manager, compatibilityLevel);
     }
 
-    // Java: String mixinConfigs = this.handle.getAttribute(ManifestAttributes.MIXINCONFIGS);
+// Java: String mixinConfigs = this.handle.getAttribute(ManifestAttributes.MIXINCONFIGS);
     const char *mixinConfigs = handle->getAttribute(handle->self, LIBMATTI_SP_Constants_ATTR_MIXINCONFIGS);
     if (mixinConfigs != NULL)
     {
-        // Java: for (String config : mixinConfigs.split(",")) this.manager.addConfig(config.trim(), this.handle);
+// Java: for (String config : mixinConfigs.split(",")) this.manager.addConfig(config.trim(), this.handle);
         char *split = strdup(mixinConfigs);
         char *saveptr = NULL;
         for (char *token = strtok_r(split, ",", &saveptr); token != NULL; token = strtok_r(NULL, ",", &saveptr))
         {
-            // Java: config.trim() - the tokenizer already dropped the separators; trim spaces
+// Java: config.trim() - the tokenizer already dropped the separators; trim spaces
             while (*token == ' ' || *token == '\t') token++;
             char *end = token + strlen(token);
             while (end > token && (end[-1] == ' ' || end[-1] == '\t')) *--end = '\0';
@@ -108,11 +111,11 @@ static void default_prepare(void *self)
         free(split);
     }
 
-    // Java: String tokenProviders = this.handle.getAttribute(ManifestAttributes.TOKENPROVIDERS);
+// Java: String tokenProviders = this.handle.getAttribute(ManifestAttributes.TOKENPROVIDERS);
     const char *tokenProviders = handle->getAttribute(handle->self, LIBMATTI_SP_Constants_ATTR_TOKENPROVIDERS);
     if (tokenProviders != NULL)
     {
-        // Java: for (String provider : tokenProviders.split(",")) this.manager.addTokenProvider(provider.trim());
+// Java: for (String provider : tokenProviders.split(",")) this.manager.addTokenProvider(provider.trim());
         char *split = strdup(tokenProviders);
         char *saveptr = NULL;
         for (char *token = strtok_r(split, ",", &saveptr); token != NULL; token = strtok_r(NULL, ",", &saveptr))
@@ -125,11 +128,11 @@ static void default_prepare(void *self)
         free(split);
     }
 
-    // Java: String connectorClass = this.handle.getAttribute(ManifestAttributes.MIXINCONNECTOR);
+// Java: String connectorClass = this.handle.getAttribute(ManifestAttributes.MIXINCONNECTOR);
     const char *connectorClass = handle->getAttribute(handle->self, LIBMATTI_SP_Constants_ATTR_MIXINCONNECTOR);
     if (connectorClass != NULL)
     {
-        // Java: this.manager.addConnector(connectorClass.trim());
+// Java: this.manager.addConnector(connectorClass.trim());
         LIBMATTI_SP_MixinPlatformManager_AddConnector(manager, connectorClass);
     }
 }

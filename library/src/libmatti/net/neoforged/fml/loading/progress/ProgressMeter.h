@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.loading.progress.ProgressMeter.
+
+
 
 #ifndef MATTICRAFT_FML_PROGRESS_PROGRESSMETER_H
 #define MATTICRAFT_FML_PROGRESS_PROGRESSMETER_H
@@ -32,4 +33,4 @@ void LIBMATTI_FML_ProgressMeter_SetAbsolute(LIBMATTI_FML_ProgressMeter *progress
 // Java: public void label(String message) - C names the setter after the Java method
 void LIBMATTI_FML_ProgressMeter_SetLabel(LIBMATTI_FML_ProgressMeter *progressMeter, const char *message);
 
-#endif //MATTICRAFT_FML_PROGRESS_PROGRESSMETER_H
+#endif

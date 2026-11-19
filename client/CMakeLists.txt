@@ -13,7 +13,7 @@ add_executable(matticraft
 # static link the linker drops every object nothing in the executable references
 # (for example a config spec a mod registers).
 target_link_libraries(matticraft
-        PRIVATE $<LINK_LIBRARY:WHOLE_ARCHIVE,matti>
+        PRIVATE $<LINK_LIBRARY:WHOLE_ARCHIVE,matti> matti_rust
 )
 
 # The selftest phase (client/src/selftest.c) runs the harness binaries of the
@@ -33,6 +33,17 @@ target_compile_definitions(matticraft PRIVATE
 set_target_properties(matticraft PROPERTIES
         ENABLE_EXPORTS ON
 )
+
+# Ship the native libraries inside the binary: only glibc comes from the host.
+if(COMMAND matti_embed_native_bundle)
+    matti_embed_native_bundle(matticraft)
+endif()
+if(COMMAND matti_embed_ui_assets)
+    matti_embed_ui_assets(matticraft)
+endif()
+if(COMMAND matti_embed_rust_artifacts)
+    matti_embed_rust_artifacts(matticraft matti_rust ".matti_rust")
+endif()
 
 # Demo mods: ELF shared objects (.so) whose manifest lives in the ELF section
 # ".matti_manifest". The bootstrap launcher reads it exactly like the manifest

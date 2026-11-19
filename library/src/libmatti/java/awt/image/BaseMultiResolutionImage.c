@@ -10,7 +10,7 @@ LIBMATTI_JAWT_IM_BaseMultiResolutionImage *LIBMATTI_JAWT_IM_BaseMultiResolutionI
     image->resolutionVariants = resolutionVariants;
     image->resolutionVariantCount = count;
 
-    // Java: getWidth(observer) / getHeight(observer) delegate to the base image
+// Java: getWidth(observer) / getHeight(observer) delegate to the base image
     // (a variant that could not be read stays null, as ImageIO.read returns null)
     for (size_t i = 0; i < count; i++)
     {

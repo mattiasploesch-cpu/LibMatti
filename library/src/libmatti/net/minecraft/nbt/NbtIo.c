@@ -1,7 +1,8 @@
-// Port of net.minecraft.nbt.NbtIo. The DataInput/DataOutput layer is a memory
-// cursor with Java's big-endian encoding and writeUTF's modified UTF-8 (the port
-// maps it to plain UTF-8, the ASCII game strings are identical); the gzip layer
-// is zlib like Java's GZIP* streams.
+
+
+
+
+
 
 #include "libmatti/net/minecraft/nbt/NbtIo.h"
 
@@ -39,9 +40,10 @@ static unsigned char *nbt_file_read_all(const char *path, size_t *length)
     return data;
 }
 
-// ---------------------------------------------------------------------------
-// the DataInput/DataOutput cursor
-// ---------------------------------------------------------------------------
+
+
+
+
 
 typedef struct
 {
@@ -49,9 +51,10 @@ typedef struct
     size_t length;
     size_t position;
     int overflow;
-    // Java: the NbtAccounter every load runs through
+// Java: the NbtAccounter every load runs through
     LIBMATTI_MC_NbtAccounter *accounter;
-    // output side (write mode)
+
+
     uint8_t *out;
     size_t outCapacity;
     size_t outLength;
@@ -226,7 +229,7 @@ static char *read_string(Stream *stream)
 static void write_string(Stream *stream, const char *text)
 {
     size_t length = strlen(text);
-    // Java: writeUTF stores the UTF-8 encoded length as an unsigned short
+// Java: writeUTF stores the UTF-8 encoded length as an unsigned short
     write_short(stream, (int16_t) (uint16_t) length);
     stream_put(stream, text, length);
 }
@@ -244,9 +247,10 @@ static void skip_string(Stream *stream)
     stream->position += 2 + length;
 }
 
-// ---------------------------------------------------------------------------
-// the tag load/store (TagTypes.getType(id).load(input, accounter))
-// ---------------------------------------------------------------------------
+
+
+
+
 
 static LIBMATTI_MC_Nbt_Tag *load_tag(Stream *stream, uint8_t id);
 
@@ -306,7 +310,7 @@ static LIBMATTI_MC_Nbt_Tag *load_list_contents(Stream *stream)
             free(list);
             return NULL;
         }
-        // Java: addAndUnwrap - the {"" : tag} wrapper compounds unwrap on load
+// Java: addAndUnwrap - the {"" : tag} wrapper compounds unwrap on load
         LIBMATTI_MC_Nbt_ListTag_AddAndUnwrap(list, tag);
     }
     return (LIBMATTI_MC_Nbt_Tag *) list;
@@ -495,7 +499,7 @@ static void store_tag(Stream *stream, const LIBMATTI_MC_Nbt_Tag *tag)
         write_int(stream, (int32_t) list->count);
         for (size_t i = 0; i < list->count; i++)
         {
-            // Java: wrapIfNeeded - non-compound lists wrap every element
+// Java: wrapIfNeeded - non-compound lists wrap every element
             if (elementType != LIBMATTI_MC_Nbt_TAG_COMPOUND &&
                 list->elements[i]->id != elementType)
             {
@@ -534,9 +538,10 @@ static void store_tag(Stream *stream, const LIBMATTI_MC_Nbt_Tag *tag)
     }
 }
 
-// ---------------------------------------------------------------------------
-// the public surface
-// ---------------------------------------------------------------------------
+
+
+
+
 
 // Java: public static CompoundTag read(DataInput) - readUnnamedTag + the compound cast
 LIBMATTI_MC_Nbt_CompoundTag *LIBMATTI_MC_Nbt_NbtIo_Read(const uint8_t *data, size_t length,
@@ -558,7 +563,7 @@ LIBMATTI_MC_Nbt_CompoundTag *LIBMATTI_MC_Nbt_NbtIo_Read(const uint8_t *data, siz
         LIBMATTI_ML_Logger_Error(logger, NULL, "Root tag must be a named compound tag");
         return NULL;
     }
-    // Java: skipString then the type's load
+// Java: skipString then the type's load
     skip_string(&stream);
     LIBMATTI_MC_Nbt_Tag *tag = load_tag(&stream, typeId);
     if (tag == NULL || stream.overflow)
@@ -596,11 +601,12 @@ LIBMATTI_MC_Nbt_CompoundTag *LIBMATTI_MC_Nbt_NbtIo_ReadCompressed(const uint8_t 
 
     z_stream zs;
     memset(&zs, 0, sizeof(zs));
-    // +32 lets zlib accept the gzip wrapper (Java: GZIPInputStream)
+// +32 lets zlib accept the gzip wrapper (Java: GZIPInputStream)
     if (inflateInit2(&zs, 15 + 32) != Z_OK)
         return NULL;
 
-    // the compressed size is unknown; inflate until the stream ends
+
+
     size_t capacity = length * 4 + 1024;
     uint8_t *out = malloc(capacity);
     size_t outLength = 0;
@@ -644,7 +650,7 @@ int LIBMATTI_MC_Nbt_NbtIo_WriteCompressed(LIBMATTI_MC_Nbt_CompoundTag *compound,
 
     z_stream zs;
     memset(&zs, 0, sizeof(zs));
-    // Java: GZIPOutputStream
+// Java: GZIPOutputStream
     if (deflateInit2(&zs, Z_DEFAULT_COMPRESSION, Z_DEFLATED, 15 + 16, 8, Z_DEFAULT_STRATEGY) != Z_OK)
     {
         free(raw);

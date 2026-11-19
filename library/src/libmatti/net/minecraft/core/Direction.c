@@ -1,4 +1,5 @@
-// Port of net.minecraft.core.Direction.
+
+
 
 #include "libmatti/net/minecraft/core/Direction.h"
 
@@ -123,7 +124,7 @@ LIBMATTI_MC_Direction LIBMATTI_MC_Direction_Get(LIBMATTI_MC_Direction_AxisDirect
         if (DATA[i].axisDirection == axisDirection && DATA[i].axis == axis)
             return (LIBMATTI_MC_Direction) i;
     }
-    // Java: throw new IllegalArgumentException("No such direction: " + ...)
+// Java: throw new IllegalArgumentException("No such direction: " + ...)
     LIBMATTI_ML_Logger *logger = LIBMATTI_ML_LogManager_GetLogger();
     LIBMATTI_ML_Logger_Error(logger, NULL, "No such direction");
     return LIBMATTI_MC_Direction_DOWN;
@@ -157,7 +158,7 @@ static LIBMATTI_MC_Direction get_clock_wise_x(LIBMATTI_MC_Direction direction)
     case LIBMATTI_MC_Direction_NORTH: return LIBMATTI_MC_Direction_DOWN;
     case LIBMATTI_MC_Direction_SOUTH: return LIBMATTI_MC_Direction_UP;
     default:
-        // Java: throw new IllegalStateException("Unable to get X-rotated facing of " + this)
+// Java: throw new IllegalStateException("Unable to get X-rotated facing of " + this)
         return direction;
     }
 }
@@ -214,7 +215,7 @@ LIBMATTI_MC_Direction LIBMATTI_MC_Direction_GetClockWise(LIBMATTI_MC_Direction d
     case LIBMATTI_MC_Direction_WEST: return LIBMATTI_MC_Direction_NORTH;
     case LIBMATTI_MC_Direction_EAST: return LIBMATTI_MC_Direction_SOUTH;
     default:
-        // Java: throw new IllegalStateException("Unable to get Y-rotated facing of " + this)
+// Java: throw new IllegalStateException("Unable to get Y-rotated facing of " + this)
         return direction;
     }
 }
@@ -319,7 +320,7 @@ float LIBMATTI_MC_Direction_GetYRot(LIBMATTI_MC_Direction direction)
     case LIBMATTI_MC_Direction_WEST: return 90.0f;
     case LIBMATTI_MC_Direction_EAST: return -90.0f;
     default:
-        // Java: throw new IllegalStateException("No y-Rot for vertical axis: " + ...)
+// Java: throw new IllegalStateException("No y-Rot for vertical axis: " + ...)
         return 0.0f;
     }
 }

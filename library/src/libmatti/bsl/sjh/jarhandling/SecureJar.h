@@ -1,7 +1,8 @@
-//
-// Created by administrator on 09.09.26.
-//
-// Port of cpw.mods.jarhandling.SecureJar.
+
+
+
+
+
 
 #ifndef MATTICRAFT_SECUREJAR_H
 #define MATTICRAFT_SECUREJAR_H
@@ -48,14 +49,14 @@ typedef struct LIBMATTI_JH_ModuleDataProvider
 {
     const char *(*name)(struct LIBMATTI_JH_ModuleDataProvider *self);
     LIBMATTI_JL_ModuleDescriptor *(*descriptor)(struct LIBMATTI_JH_ModuleDataProvider *self);
-    // Java: @Nullable URI uri() - returns a new URI, caller frees
+// Java: @Nullable URI uri() - returns a new URI, caller frees
     LIBMATTI_JN_URI *(*uri)(struct LIBMATTI_JH_ModuleDataProvider *self);
-    // Java: Optional<URI> findFile(String name) - 1 if found, *out is a new URI
+// Java: Optional<URI> findFile(String name) - 1 if found, *out is a new URI
     int (*findFile)(struct LIBMATTI_JH_ModuleDataProvider *self, const char *name, LIBMATTI_JN_URI **out);
-    // Java: Optional<InputStream> open(String name) - 1 if found, *out is a new stream
+// Java: Optional<InputStream> open(String name) - 1 if found, *out is a new stream
     int (*open)(struct LIBMATTI_JH_ModuleDataProvider *self, const char *name, LIBMATTI_JI_InputStream **out);
     LIBMATTI_JU_Manifest *(*getManifest)(struct LIBMATTI_JH_ModuleDataProvider *self);
-    // TODO: verifyAndGetSigners (signing)
+// TODO: verifyAndGetSigners (signing)
 } LIBMATTI_JH_ModuleDataProvider;
 
 // Java: interface SecureJar - implemented by Jar and VirtualJar via a vtable
@@ -95,4 +96,4 @@ LIBMATTI_UNION_UnionPath *LIBMATTI_JH_SecureJar_GetRootPath(const LIBMATTI_JH_Se
 // Java: close() - closes the underlying resources, frees the jar
 void LIBMATTI_JH_SecureJar_Close(LIBMATTI_JH_SecureJar *jar);
 
-#endif //MATTICRAFT_SECUREJAR_H
+#endif

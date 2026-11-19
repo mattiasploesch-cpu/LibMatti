@@ -1,4 +1,5 @@
-// Port of cpw.mods.modlauncher.LaunchServiceHandler.
+
+
 
 #ifndef MATTICRAFT_MODLAUNCHER_LAUNCHSERVICEHANDLER_H
 #define MATTICRAFT_MODLAUNCHER_LAUNCHSERVICEHANDLER_H
@@ -15,7 +16,7 @@
 // Java: class LaunchServiceHandler
 typedef struct LIBMATTI_ML_LaunchServiceHandler
 {
-    // Java: Map<String, LaunchServiceHandlerDecorator> launchHandlerLookup
+// Java: Map<String, LaunchServiceHandlerDecorator> launchHandlerLookup
     char **names;
     LIBMATTI_ML_LaunchServiceHandlerDecorator *decorators;
     size_t count;
@@ -44,4 +45,4 @@ int LIBMATTI_ML_LaunchServiceHandler_Launch(LIBMATTI_ML_LaunchServiceHandler *ha
 int LIBMATTI_ML_LaunchServiceHandler_ValidateLaunchTarget(LIBMATTI_ML_LaunchServiceHandler *handler,
                                                           LIBMATTI_ML_ArgumentHandler *argumentHandler);
 
-#endif //MATTICRAFT_MODLAUNCHER_LAUNCHSERVICEHANDLER_H
+#endif

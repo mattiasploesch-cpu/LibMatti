@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.DeferredWorkQueue.
+
+
 
 #include "libmatti/net/neoforged/fml/DeferredWorkQueue.h"
 
@@ -23,20 +24,20 @@ typedef struct
     LIBMATTI_FML_ModContainer *owner;
     LIBMATTI_FML_DeferredWorkQueue_Task task;
     void *userdata;
-    // Java: CompletableFuture<?> future - the future enqueueWork returned
+// Java: CompletableFuture<?> future - the future enqueueWork returned
     LIBMATTI_JUC_CompletableFuture *future;
 } TaskInfo;
 
 struct LIBMATTI_FML_DeferredWorkQueue
 {
-    // Java: private final ConcurrentLinkedDeque<TaskInfo> tasks
+// Java: private final ConcurrentLinkedDeque<TaskInfo> tasks
     TaskInfo *tasks;
     size_t taskCount;
     char *name;
-    // Java: RuntimeException aggregate of the failed tasks
+// Java: RuntimeException aggregate of the failed tasks
     char **failures;
     size_t failureCount;
-    // Java: the TaskInfo the running task belongs to (for FailTask from inside the task)
+// Java: the TaskInfo the running task belongs to (for FailTask from inside the task)
     TaskInfo *running;
 };
 
@@ -79,7 +80,7 @@ LIBMATTI_JUC_CompletableFuture *LIBMATTI_FML_DeferredWorkQueue_EnqueueWork(
     queue->tasks[queue->taskCount].owner = owner;
     queue->tasks[queue->taskCount].task = work;
     queue->tasks[queue->taskCount].userdata = userdata;
-    // Java: CompletableFuture.runAsync(work, r -> taskInfo.task = r) - the executor stores the runnable
+// Java: CompletableFuture.runAsync(work, r -> taskInfo.task = r) - the executor stores the runnable
     // on the TaskInfo, so the future completes when runTasks() runs it
     queue->tasks[queue->taskCount].future = LIBMATTI_JUC_CompletableFuture_New();
     return queue->tasks[queue->taskCount++].future;
@@ -90,7 +91,7 @@ LIBMATTI_JUC_CompletableFuture *LIBMATTI_FML_DeferredWorkQueue_EnqueueWorkSuppli
     LIBMATTI_FML_DeferredWorkQueue *queue, LIBMATTI_FML_ModContainer *owner,
     LIBMATTI_FML_DeferredWorkQueue_Supplier work, void *userdata)
 {
-    // Java: CompletableFuture.supplyAsync(work, r -> taskInfo.task = r); the port's supplier adapts
+// Java: CompletableFuture.supplyAsync(work, r -> taskInfo.task = r); the port's supplier adapts
     // to the task signature (the value would only be observable through the future)
     return LIBMATTI_FML_DeferredWorkQueue_EnqueueWork(queue, owner, (LIBMATTI_FML_DeferredWorkQueue_Task)work,
                                                       userdata);
@@ -105,7 +106,7 @@ void LIBMATTI_FML_DeferredWorkQueue_FailTask(const char *message)
     TaskInfo *task = runningQueue->running;
     const char *modId = task->owner != NULL ? task->owner->modId : "unknown";
 
-    // Java: captureException(modId, aggregate, throwable) adds "modId: message" to the aggregate
+// Java: captureException(modId, aggregate, throwable) adds "modId: message" to the aggregate
     size_t size = strlen(modId) + strlen(message) + 8;
     char *failure = malloc(size);
     snprintf(failure, size, "%s: %s", modId, message);
@@ -113,7 +114,7 @@ void LIBMATTI_FML_DeferredWorkQueue_FailTask(const char *message)
                                      sizeof(*runningQueue->failures) * (runningQueue->failureCount + 1));
     runningQueue->failures[runningQueue->failureCount++] = failure;
 
-    // Java: the task's future completes exceptionally (CompletionException wrapping the cause)
+// Java: the task's future completes exceptionally (CompletionException wrapping the cause)
     LIBMATTI_JUC_CompletableFuture_CompleteExceptionally(task->future, NULL);
 
     LIBMATTI_ML_Logger_Error(LOGGER(), NULL, "Mod '{}' encountered an error in a deferred task: {}", modId, message);
@@ -131,24 +132,25 @@ static void make_runnable(LIBMATTI_FML_DeferredWorkQueue *queue, TaskInfo *task)
 {
     double start = timer_seconds();
 
-    // Java: ModLoadingContext.get().setActiveContainer(ti.owner);
+// Java: ModLoadingContext.get().setActiveContainer(ti.owner);
     LIBMATTI_FML_ModLoadingContext *context = LIBMATTI_FML_ModLoadingContext_Get();
     LIBMATTI_FML_ModLoadingContext_SetActiveContainer(context, task->owner);
 
-    // Java: try { ti.task.run(); } catch (Throwable t) { captureException(...) } - a C task cannot
+// Java: try { ti.task.run(); } catch (Throwable t) { captureException(...) } - a C task cannot
     // throw, so it completes the future exceptionally through FailTask (NULL message = success)
     queue->running = task;
     runningQueue = queue;
     task->task(task->userdata);
     runningQueue = NULL;
     queue->running = NULL;
-    // NULL message = success: the future completes normally (a failing task called FailTask,
-    // which already completed it exceptionally)
+
+
+
     LIBMATTI_JUC_CompletableFuture_Complete(task->future, NULL);
 
     LIBMATTI_FML_ModLoadingContext_SetActiveContainer(context, NULL);
 
-    // Java: if (timer.elapsed(TimeUnit.SECONDS) >= 1) LOGGER.warn(LOADING, "Mod '{}' took {} to run a deferred task.", ...)
+// Java: if (timer.elapsed(TimeUnit.SECONDS) >= 1) LOGGER.warn(LOADING, "Mod '{}' took {} to run a deferred task.", ...)
     double elapsed = timer_seconds() - start;
     if (elapsed >= 1)
     {
@@ -164,7 +166,7 @@ int LIBMATTI_FML_DeferredWorkQueue_RunTasks(LIBMATTI_FML_DeferredWorkQueue *queu
 {
     if (queue->taskCount == 0) return 0;
 
-    // Java: LOGGER.debug(LOADING, "Dispatching synchronous work for work queue {}: {} jobs", name, tasks.size());
+// Java: LOGGER.debug(LOADING, "Dispatching synchronous work for work queue {}: {} jobs", name, tasks.size());
     char jobCount[32];
     snprintf(jobCount, sizeof(jobCount), "%zu", queue->taskCount);
     LIBMATTI_ML_Logger_Debug(LOGGER(), &LIBMATTI_FML_Logging_LOADING,
@@ -175,11 +177,11 @@ int LIBMATTI_FML_DeferredWorkQueue_RunTasks(LIBMATTI_FML_DeferredWorkQueue *queu
         make_runnable(queue, &queue->tasks[i]);
     double elapsed = timer_seconds() - start;
 
-    // Java: runTasks threw the aggregate - the failed futures carry it now
+// Java: runTasks threw the aggregate - the failed futures carry it now
 
     if (queue->failureCount > 0)
     {
-        // Java: LOGGER.fatal(LOADING, "Synchronous work queue completed exceptionally in {}, see suppressed
+// Java: LOGGER.fatal(LOADING, "Synchronous work queue completed exceptionally in {}, see suppressed
         //       exceptions for details:", timer, aggregate); throw aggregate;
         char seconds[32];
         snprintf(seconds, sizeof(seconds), "%.3fs", elapsed);
@@ -189,7 +191,7 @@ int LIBMATTI_FML_DeferredWorkQueue_RunTasks(LIBMATTI_FML_DeferredWorkQueue *queu
         return (int)queue->failureCount;
     }
 
-    // Java: LOGGER.debug(LOADING, "Synchronous work queue completed in {}", timer);
+// Java: LOGGER.debug(LOADING, "Synchronous work queue completed in {}", timer);
     char seconds[32];
     snprintf(seconds, sizeof(seconds), "%.3fs", elapsed);
     LIBMATTI_ML_Logger_Debug(LOGGER(), &LIBMATTI_FML_Logging_LOADING, "Synchronous work queue completed in {}",

@@ -21,4 +21,4 @@ size_t LIBMATTI_JL_StringBuilder_Length(const LIBMATTI_JL_StringBuilder *builder
 char LIBMATTI_JL_StringBuilder_CharAt(const LIBMATTI_JL_StringBuilder *builder, size_t index);
 const char *LIBMATTI_JL_StringBuilder_ToString(const LIBMATTI_JL_StringBuilder *builder);
 
-#endif //MATTICRAFT_JAVA_LANG_STRINGBUILDER_H
+#endif

@@ -1,7 +1,8 @@
-// Port of net.neoforged.bus.LockHelper.
-// Java keeps a HashMap or an IdentityHashMap behind a lock and publishes a copy of it as the
-// lock-free read view. The C port keeps that structure over void* keys; pointer identity is what the
-// Java map gives for the keys the bus uses (Class and Method, which do not override equals).
+
+
+
+
+
 
 #ifndef MATTICRAFT_BUS_LOCKHELPER_H
 #define MATTICRAFT_BUS_LOCKHELPER_H
@@ -35,4 +36,4 @@ size_t LIBMATTI_BUS_LockHelper_GetReadMap(LIBMATTI_BUS_LockHelper *helper,
 // Java: public void clearAll()
 void LIBMATTI_BUS_LockHelper_ClearAll(LIBMATTI_BUS_LockHelper *helper);
 
-#endif //MATTICRAFT_BUS_LOCKHELPER_H
+#endif

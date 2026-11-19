@@ -1,4 +1,5 @@
-// Port of org.objectweb.asm.tree.AbstractInsnNode and the node constructors.
+
+
 
 #include "libmatti/org/objectweb/asm/tree/InsnNodes.h"
 

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Package Name="Matticraft"
+           Manufacturer="Matticraft"
+           Version="$(var.Version)"
+           UpgradeCode="6f1f6f7e-6a1c-4f0e-9f2a-2b7c5d9e4a11"
+           Scope="perMachine">
+    <MajorUpgrade DowngradeErrorMessage="A newer Matticraft is already installed." />
+    <MediaTemplate EmbedCab="yes" />
+
+    <StandardDirectory Id="ProgramFiles6432Folder">
+      <Directory Id="INSTALLFOLDER" Name="Matticraft">
+        <Component Id="LauncherExecutable" Guid="*">
+          <File Id="LauncherExe" Source="$(var.SourceDir)\matticraft-launcher.exe" KeyPath="yes">
+            <Shortcut Id="StartMenuShortcut"
+                      Directory="ProgramMenuFolder"
+                      Name="Matticraft"
+                      WorkingDirectory="INSTALLFOLDER"
+                      Advertise="yes" />
+            <Shortcut Id="DesktopShortcut"
+                      Directory="DesktopFolder"
+                      Name="Matticraft"
+                      WorkingDirectory="INSTALLFOLDER"
+                      Advertise="yes" />
+          </File>
+        </Component>
+        <Component Id="MainExecutable" Guid="*">
+          <File Id="VulkancraftExe" Source="$(var.SourceDir)\vulkancraft.exe" KeyPath="yes" />
+        </Component>
+        <Component Id="RunClientExecutable" Guid="*">
+          <File Id="RunClientExe" Source="$(var.SourceDir)\runClient.exe" KeyPath="yes" />
+        </Component>
+        <Component Id="SharedLibrary" Guid="*">
+          <File Id="MattiDll" Source="$(var.SourceDir)\matti.dll" KeyPath="yes" />
+        </Component>
+      </Directory>
+    </StandardDirectory>
+
+    <Feature Id="MainFeature" Title="Matticraft" Level="1">
+      <ComponentRef Id="LauncherExecutable" />
+      <ComponentRef Id="MainExecutable" />
+      <ComponentRef Id="RunClientExecutable" />
+      <ComponentRef Id="SharedLibrary" />
+    </Feature>
+  </Package>
+</Wix>

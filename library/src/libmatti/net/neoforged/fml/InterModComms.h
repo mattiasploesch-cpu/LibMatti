@@ -1,6 +1,7 @@
-// Port of net.neoforged.fml.InterModComms.
-// Java's Stream<IMCMessage> becomes a consumer callback; Java's spliterator removes every message it
-// yields, so the port drains the queue the same way.
+
+
+
+
 
 #ifndef MATTICRAFT_FML_INTERMODCOMMS_H
 #define MATTICRAFT_FML_INTERMODCOMMS_H
@@ -34,4 +35,4 @@ void LIBMATTI_FML_InterModComms_GetMessagesAll(
     const char *modId,
     void (*consumer)(const LIBMATTI_FML_InterModComms_IMCMessage *message, void *userdata), void *consumerUserdata);
 
-#endif //MATTICRAFT_FML_INTERMODCOMMS_H
+#endif

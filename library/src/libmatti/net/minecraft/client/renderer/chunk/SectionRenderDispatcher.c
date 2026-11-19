@@ -1,6 +1,7 @@
-// Port of net.minecraft.client.renderer.chunk.SectionRenderDispatcher (the
-// synchronous slice: section registry, compile-dirty pass, upload and draw)
-// plus the RenderSection accessors.
+
+
+
+
 
 #include "libmatti/net/minecraft/client/renderer/chunk/SectionRenderDispatcher.h"
 
@@ -19,15 +20,16 @@
 #include <stdlib.h>
 #include <string.h>
 
-// ---------------------------------------------------------------------------
-// RenderSection
-// ---------------------------------------------------------------------------
+
+
+
+
 
 LIBMATTI_MC_RenderSection *LIBMATTI_MC_RenderSection_New(int sectionX, int sectionY, int sectionZ)
 {
     LIBMATTI_MC_RenderSection *section = calloc(1, sizeof(LIBMATTI_MC_RenderSection));
     section->sectionPos = LIBMATTI_MC_SectionPos_Of(sectionX, sectionY, sectionZ);
-    section->dirty = 1; // Java: a fresh section compiles on the first pass.
+    section->dirty = 1;// Java: a fresh section compiles on the first pass.
     return section;
 }
 
@@ -75,9 +77,10 @@ int LIBMATTI_MC_RenderSection_HasRenderedLayer(const LIBMATTI_MC_RenderSection *
            && LIBMATTI_MC_CompiledSectionMesh_HasRenderedLayer(section->compiled, layer);
 }
 
-// ---------------------------------------------------------------------------
-// SectionRenderDispatcher
-// ---------------------------------------------------------------------------
+
+
+
+
 
 LIBMATTI_MC_SectionRenderDispatcher *LIBMATTI_MC_SectionRenderDispatcher_New(void)
 {
@@ -153,7 +156,7 @@ static LIBMATTI_MC_LevelChunkSection **build_region_sections(LIBMATTI_MC_Level *
     int centerY = LIBMATTI_MC_SectionPos_SectionY(pos);
     int centerZ = LIBMATTI_MC_SectionPos_SectionZ(pos);
 
-    // Java: LevelHeightAccessor.getMinSectionY - the section index base.
+// Java: LevelHeightAccessor.getMinSectionY - the section index base.
     LIBMATTI_MC_LevelHeightAccessor accessor = LIBMATTI_MC_Level_GetHeightAccessor(level);
     int minSectionY = LIBMATTI_MC_LevelHeightAccessor_GetMinSectionY(&accessor);
     int sectionsCount = LIBMATTI_MC_LevelHeightAccessor_GetSectionsCount(&accessor);
@@ -170,7 +173,7 @@ static LIBMATTI_MC_LevelChunkSection **build_region_sections(LIBMATTI_MC_Level *
 
                 LIBMATTI_MC_LevelChunk *chunk = LIBMATTI_MC_Level_GetChunk(level, sx >> 4, sz >> 4);
                 if (chunk == NULL)
-                    continue; // Java: VOID_AIR outside loaded chunks.
+                    continue;// Java: VOID_AIR outside loaded chunks.
                 if (sy < minSectionY || sy >= minSectionY + sectionsCount)
                     continue;
                 LIBMATTI_MC_LevelChunkSection *section =
@@ -208,7 +211,8 @@ void LIBMATTI_MC_SectionRenderDispatcher_CompileDirty(LIBMATTI_MC_SectionRenderD
         LIBMATTI_MC_CompiledSectionMesh *compiled = LIBMATTI_MC_SectionCompiler_Compile(
             dispatcher->compiler, section->sectionPos, region, dispatcher->pack);
 
-        LIBMATTI_MC_RenderSectionRegion_Free(region); // frees the section array, not the level's sections
+        LIBMATTI_MC_RenderSectionRegion_Free(region);
+
         LIBMATTI_MC_RenderSection_SetCompiled(section, compiled);
         section->dirty = 0;
         section->lastBuiltAtMs = nowMs;
@@ -223,10 +227,11 @@ typedef struct LayerVao
     unsigned int vao;
     unsigned int vbo;
     unsigned int ibo;
-    // The shared element index buffer over every section's vertices: the QUADS
-    // draw turns quad i into the two triangles (4i, 4i+1, 4i+2, 4i+2, 4i+1,
-    // 4i+3). Java 1.21.11 generates these in the render pass; the port uploads
-    // one reused buffer per layer.
+
+
+
+
+
     unsigned int indexDataBuffer;
     long long indexDataBytes;
 } LayerVao;
@@ -277,8 +282,9 @@ static unsigned int create_block_vao(unsigned int vbo, unsigned int ibo)
     LIBMATTI_GL_glBindBuffer(LIBMATTI_GL_GL_ARRAY_BUFFER, vbo);
     LIBMATTI_GL_glBindBuffer(LIBMATTI_GL_GL_ELEMENT_ARRAY_BUFFER, ibo);
 
-    // The BLOCK element order: Position (3f), Color (4ub), UV0 (2f), UV2 (2s),
-    // Normal (3b) + 1 padding byte. The offsets come from the format.
+
+
+
     for (int i = 0; i < LIBMATTI_B3D_VertexFormat_GetElementCount(format); i++)
     {
         const LIBMATTI_B3D_VertexFormatElement *element = LIBMATTI_B3D_VertexFormat_GetElement(format, i);
@@ -302,7 +308,7 @@ void LIBMATTI_MC_SectionRenderDispatcher_RenderLayer(
     if (dispatcher == NULL || program == 0)
         return;
     LIBMATTI_GL_glUseProgram(program);
-    // Java: the MVP + model-origin uniforms the terrain shader sets per draw.
+// Java: the MVP + model-origin uniforms the terrain shader sets per draw.
     // JOML's mXY fields are column X, row Y - the C struct memory matches GL's
     // column-major expectation, so the upload passes transpose = GL_FALSE (the
     // CPU clip probe places the platform quad at NDC +-0.37, z = 0.983).
@@ -328,7 +334,7 @@ void LIBMATTI_MC_SectionRenderDispatcher_RenderLayer(
         }
         const LIBMATTI_MC_SectionBuffers *buffers = LIBMATTI_MC_CompiledSectionMesh_GetBuffers(compiled, layer);
         if (buffers == NULL || buffers->vertexBuffer == NULL || buffers->indexCount <= 0)
-            continue;        // Java: LevelRenderer.renderLevel - section.isDirty? no: the frustum
+            continue;// Java: LevelRenderer.renderLevel - section.isDirty? no: the frustum
         // test (renderSection -> cullingFrustum.isVisible(aabb)) before the
         // draw; the section's 16^3 box in world coordinates (the port keeps
         // the origin uniform as the camera-relative offset so the box uses
@@ -353,7 +359,7 @@ void LIBMATTI_MC_SectionRenderDispatcher_RenderLayer(
             fprintf(stderr, "[CHUNKDEBUG] section %d: vao=%u vbo=%u ibo=%u indexCount=%d\n",
                     i, vao->vao, vao->vbo, buffers->vertexBuffer->handle, buffers->indexCount);
         }
-        // The compile pass allocates fresh GpuBuffers per rebuild (Java: the
+// The compile pass allocates fresh GpuBuffers per rebuild (Java: the
         // RenderSection's buffers swap), so the layer VAO must rebind whenever
         // the current mesh's handles differ from the ones it was built with.
         if (buffers->vertexBuffer->handle != 0
@@ -366,7 +372,7 @@ void LIBMATTI_MC_SectionRenderDispatcher_RenderLayer(
             }
             else if (vao->ibo == 0)
             {
-                // Java: the render pass owns the element indices - the port
+// Java: the render pass owns the element indices - the port
                 // allocates the shared IBO for the generated quad indices.
                 unsigned int ibos[1];
                 LIBMATTI_GL_glGenBuffers(1, ibos);
@@ -375,12 +381,14 @@ void LIBMATTI_MC_SectionRenderDispatcher_RenderLayer(
             if (vao->vao != 0)
                 LIBMATTI_GL_glDeleteVertexArrays(1, &vao->vao);
             vao->vao = create_block_vao(vao->vbo, vao->ibo);
-            vao->indexDataBytes = 0; // the new IBO starts empty
+            vao->indexDataBytes = 0;
+
         }
         if (vao->vao == 0 || vao->ibo == 0)
-            continue; // no GL context (headless): nothing to draw through.
+            continue;
 
-        // Java: the render pass generates the quad element indices over the
+
+// Java: the render pass generates the quad element indices over the
         // section's vertex count; the port uploads them into the shared IBO.
         upload_quad_indices(vao, buffers->indexCount / 6);
 

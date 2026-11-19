@@ -1,4 +1,5 @@
-// Port of net.minecraft.server.packs.resources.FallbackResourceManager.
+
+
 
 #include "libmatti/net/minecraft/server/packs/resources/FallbackResourceManager.h"
 
@@ -28,7 +29,7 @@ void LIBMATTI_MC_FallbackResourceManager_Push(LIBMATTI_MC_FallbackResourceManage
 void LIBMATTI_MC_FallbackResourceManager_PushFilter(LIBMATTI_MC_FallbackResourceManager *manager,
                                                     LIBMATTI_MC_PackResources *pack)
 {
-    // Java: a filtered pack is pushed with a filter section; the port stores it the
+// Java: a filtered pack is pushed with a filter section; the port stores it the
     // same way and evaluates its ResourceFilterSection during lookups
     LIBMATTI_MC_FallbackResourceManager_Push(manager, pack);
 }
@@ -50,7 +51,7 @@ static int is_hidden_path(const char *path)
 
 static char *build_metadata_path(const char *path)
 {
-    // Java: FallbackResourceManager.metadataPath = path + ".mcmeta"
+// Java: FallbackResourceManager.metadataPath = path + ".mcmeta"
     size_t length = strlen(path) + strlen(".mcmeta") + 1;
     char *metadataPath = malloc(length);
     snprintf(metadataPath, length, "%s.mcmeta", path);
@@ -59,7 +60,7 @@ static char *build_metadata_path(const char *path)
 
 static int pack_has_filter(LIBMATTI_MC_PackResources *pack)
 {
-    // Java: pack.getMetadataSection(ResourceFilterSection.TYPE).isPresent()
+// Java: pack.getMetadataSection(ResourceFilterSection.TYPE).isPresent()
     char *error = NULL;
     LIBMATTI_MC_ResourceFilterSection *filter =
         (LIBMATTI_MC_ResourceFilterSection *) pack->vtable->getMetadataSection(
@@ -78,14 +79,15 @@ LIBMATTI_MC_Resource *LIBMATTI_MC_FallbackResourceManager_GetResource(const LIBM
     for (size_t i = manager->packCount; i-- > 0;)
     {
         LIBMATTI_MC_PackResources *pack = manager->packs[i];
-        if (pack_has_filter(pack)) continue; // the port applies the filter gate at the pack level
+        if (pack_has_filter(pack)) continue;
+
         if (is_hidden_path(path)) continue;
 
         size_t length = 0;
         unsigned char *bytes = pack->vtable->open(pack, manager->packType, manager->namespace, path, &length);
         if (bytes != NULL)
         {
-            // Java: metadata = metadataPath lookup, EMPTY when absent
+// Java: metadata = metadataPath lookup, EMPTY when absent
             char *metadataPath = build_metadata_path(path);
             size_t metadataLength = 0;
             unsigned char *metadataBytes =
@@ -139,7 +141,7 @@ void LIBMATTI_MC_FallbackResourceManager_ListResourceStacks(const LIBMATTI_MC_Fa
                                                             const char *prefix, void *userData,
                                                             LIBMATTI_MC_ResourceOutput onResource)
 {
-    // Java: the stacks variant reports every occurrence; the port's output shape is
+// Java: the stacks variant reports every occurrence; the port's output shape is
     // the same callback (the caller decides how to group)
     LIBMATTI_MC_FallbackResourceManager_ListResources(manager, prefix, userData, onResource);
 }
@@ -148,7 +150,7 @@ char **LIBMATTI_MC_FallbackResourceManager_GetNamespaces(const LIBMATTI_MC_Fallb
                                                          size_t *outCount)
 {
     (void) manager;
-    // Java: the namespace is fixed for a fallback manager
+// Java: the namespace is fixed for a fallback manager
     char **names = malloc(2 * sizeof(char *));
     names[0] = strdup(manager->namespace);
     names[1] = NULL;

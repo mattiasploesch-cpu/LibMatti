@@ -1,4 +1,5 @@
-// Port of com.electronwill.nightconfig.core.io.CharsWrapper.
+
+
 
 #include "libmatti/com/electronwill/nightconfig/core/io/CharsWrapper.h"
 

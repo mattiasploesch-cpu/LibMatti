@@ -1,7 +1,8 @@
-// Port of org.joml.FrustumIntersection (implementation).
-// The plane extraction and the tests follow the vendored JOML source line
-// for line (allowTestSpheres = false: unnormalized planes, like the AAB
-// tests need them).
+
+
+
+
+
 
 #include "libmatti/org/joml/FrustumIntersection.h"
 
@@ -31,8 +32,9 @@ LIBMATTI_JOML_FrustumIntersection *LIBMATTI_JOML_FrustumIntersection_Set(
 LIBMATTI_JOML_FrustumIntersection *LIBMATTI_JOML_FrustumIntersection_SetEx(
     LIBMATTI_JOML_FrustumIntersection *fi, const LIBMATTI_JOML_Matrix4f *m, int allowTestSpheres)
 {
-    // JOML names the fields m<column><row> (the translation sits in
-    // m30..m32) - exactly the C struct's convention, so Java mXY() == C.mXY.
+
+
+
     fi->nxX = m->m00 + m->m03; fi->nxY = m->m10 + m->m13; fi->nxZ = m->m20 + m->m23; fi->nxW = m->m30 + m->m33;
     if (allowTestSpheres)
     {

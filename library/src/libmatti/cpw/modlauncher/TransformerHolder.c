@@ -1,4 +1,5 @@
-// Port of cpw.mods.modlauncher.TransformerHolder.
+
+
 
 #include "libmatti/cpw/modlauncher/TransformerHolder.h"
 

@@ -12,11 +12,11 @@ typedef struct LIBMATTI_BUS_GeneratedEventListener LIBMATTI_BUS_GeneratedEventLi
 
 struct LIBMATTI_BUS_GeneratedEventListener
 {
-    // Java: extends EventListener
+// Java: extends EventListener
     LIBMATTI_BUS_EventListener base;
-    // Java: private final Object instance; (only present in the non-static wrapper)
+// Java: private final Object instance; (only present in the non-static wrapper)
     void *instance;
-    // Java: the class-data MethodHandle - it is invoked with (instance, event)
+// Java: the class-data MethodHandle - it is invoked with (instance, event)
     void (*callback)(void *instance, LIBMATTI_BUS_Event *event);
 };
 
@@ -24,4 +24,4 @@ struct LIBMATTI_BUS_GeneratedEventListener
 LIBMATTI_BUS_GeneratedEventListener *LIBMATTI_BUS_GeneratedEventListener_New(
     void *instance, void (*callback)(void *instance, LIBMATTI_BUS_Event *event));
 
-#endif //MATTICRAFT_BUS_GENERATEDEVENTLISTENER_H
+#endif

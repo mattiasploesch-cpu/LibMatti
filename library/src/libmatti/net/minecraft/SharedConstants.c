@@ -1,4 +1,5 @@
-// Port of net.minecraft.SharedConstants.
+
+
 
 #include "libmatti/net/minecraft/SharedConstants.h"
 

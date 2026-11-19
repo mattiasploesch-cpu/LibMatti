@@ -25,21 +25,21 @@ typedef enum
 
 typedef struct LIBMATTI_GSON_JsonReader
 {
-    // Java: private final Reader in / private final char[] buffer
+// Java: private final Reader in / private final char[] buffer
     const char *text;
     size_t length;
     size_t pos;
-    // Java: private boolean lenient
+// Java: private boolean lenient
     int lenient;
-    // Java: private int[] stack - PEEKED_NONE / PEEKED_* of the enclosing scopes
+// Java: private int[] stack - PEEKED_NONE / PEEKED_* of the enclosing scopes
     int *stack;
     size_t stackSize;
     size_t stackCapacity;
-    // Java: private String peeked, peekedString
+// Java: private String peeked, peekedString
     int peeked;
     char *peekedText;
     int hasPeekedText;
-    // Java: private int peekedNumber / the peeked literal
+// Java: private int peekedNumber / the peeked literal
     char *peekedNumber;
     int hasPeekedNumber;
 } LIBMATTI_GSON_JsonReader;
@@ -74,4 +74,4 @@ void LIBMATTI_GSON_JsonReader_NextNull(LIBMATTI_GSON_JsonReader *reader);
 // Java: public void skipValue()
 void LIBMATTI_GSON_JsonReader_SkipValue(LIBMATTI_GSON_JsonReader *reader);
 
-#endif //MATTICRAFT_GSON_JSONREADER_H
+#endif

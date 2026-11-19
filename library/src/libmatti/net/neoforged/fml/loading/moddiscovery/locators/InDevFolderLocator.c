@@ -18,7 +18,7 @@ static LIBMATTI_ML_Logger *LOGGER(void)
 // "a/b/;c/d/;" -> "modid%%c:\\fish\\pepper;modid%%c:\\fish2\\pepper2\\;modid2%%c:\\fishy\\bums;modid2%%c:\\hmm"
 void LIBMATTI_FML_InDevFolderLocator_LoadFromSystemProperty(LIBMATTI_FML_InDevFolderLocator *locator)
 {
-    // Java: Optional.ofNullable(System.getenv("MOD_CLASSES")).orElse(System.getProperty("fml.modFolders", ""));
+// Java: Optional.ofNullable(System.getenv("MOD_CLASSES")).orElse(System.getProperty("fml.modFolders", ""));
     const char *modFolders = LIBMATTI_JL_System_Getenv("MOD_CLASSES");
     if (modFolders == NULL) modFolders = LIBMATTI_JL_System_GetProperty("fml.modFolders");
     if (modFolders == NULL || modFolders[0] == '\0')
@@ -26,7 +26,7 @@ void LIBMATTI_FML_InDevFolderLocator_LoadFromSystemProperty(LIBMATTI_FML_InDevFo
 
     LIBMATTI_ML_Logger_Info(LOGGER(), &LIBMATTI_FML_MARKER_CORE, "Got mod coordinates {} from env", modFolders);
 
-    // Java: groupedEntries = Arrays.stream(modFolders.split(File.pathSeparator))
+// Java: groupedEntries = Arrays.stream(modFolders.split(File.pathSeparator))
     //         .collect(groupingBy(inp -> { var splitIdx = inp.indexOf("%%"); return splitIdx != -1 ? inp.substring(0, splitIdx) : "defaultmodid"; },
     //                             mapping(inp -> new File(inp.substring(splitIdx + 2)), toList())));
     char *copy = strdup(modFolders);
@@ -43,7 +43,7 @@ void LIBMATTI_FML_InDevFolderLocator_LoadFromSystemProperty(LIBMATTI_FML_InDevFo
             file = separator + 2;
         }
 
-        // Java: virtualJarMemberIndex.put(file, virtualJar)
+// Java: virtualJarMemberIndex.put(file, virtualJar)
         size_t index = locator->memberCount;
         for (size_t i = 0; i < locator->memberCount; i++)
             if (strcmp(locator->memberValues[i]->name, groupId) == 0)
@@ -76,19 +76,19 @@ void LIBMATTI_FML_InDevFolderLocator_FindCandidates(void *self, LIBMATTI_NEOFORG
     LIBMATTI_FML_InDevFolderLocator *locator = self;
     LIBMATTI_FML_InDevFolderLocator_LoadFromSystemProperty(locator);
 
-    // Java: for (var entry : new HashSet<>(virtualJarMemberIndex.values()))
+// Java: for (var entry : new HashSet<>(virtualJarMemberIndex.values()))
     for (size_t i = 0; i < locator->memberCount; i++)
     {
         LIBMATTI_FML_VirtualJarManifestEntry *entry = locator->memberValues[i];
 
-        // Java: if (paths.stream().noneMatch(context::isLocated))
+// Java: if (paths.stream().noneMatch(context::isLocated))
         int located = 0;
         for (size_t j = 0; j < entry->fileCount && !located; j++)
             if (LIBMATTI_NEOFORGESPI_ILaunchContext_IsLocated(context, entry->files[j]))
                 located = 1;
         if (located) continue;
 
-        // Java: pipeline.addJarContent(JarContents.ofPaths(paths), DEFAULT, IncompatibleFileReporting.ERROR);
+// Java: pipeline.addJarContent(JarContents.ofPaths(paths), DEFAULT, IncompatibleFileReporting.ERROR);
         LIBMATTI_FML_JarContents *contents = LIBMATTI_FML_JarContents_OfPaths((const char **) entry->files,
                                                                              entry->fileCount);
         if (contents == NULL)

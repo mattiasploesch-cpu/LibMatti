@@ -1,5 +1,6 @@
-// Port of net.neoforged.accesstransformer.AccessTransformerEngineImpl
-// (+ AccessTransformerList and the Target.apply logic).
+
+
+
 
 #include "libmatti/net/neoforged/accesstransformer/api/AccessTransformerEngine.h"
 
@@ -65,7 +66,7 @@ int LIBMATTI_AT_AccessTransformerEngine_LoadAT(LIBMATTI_AT_AccessTransformerEngi
     if (entries == NULL)
         return 0;
 
-    // Java: the masterList merges by target; the last transformation wins
+// Java: the masterList merges by target; the last transformation wins
     for (size_t i = 0; i < count; i++)
         add_entry(engine, entries[i]->target, entries[i]->transformation);
     free(entries);
@@ -184,7 +185,7 @@ char **LIBMATTI_AT_AccessTransformerEngine_GetSourcesForTarget(const LIBMATTI_AT
 // Java: Modifier merges: the new visibility + optional final flip
 static int apply_access(int access, const LIBMATTI_AT_Transformation *transformation)
 {
-    // Java: the modifier replaces the visibility bits
+// Java: the modifier replaces the visibility bits
     access &= ~(LIBMATTI_ASM_ACC_PUBLIC | LIBMATTI_ASM_ACC_PRIVATE | LIBMATTI_ASM_ACC_PROTECTED);
     switch (transformation->modifier)
     {
@@ -201,7 +202,7 @@ static int apply_access(int access, const LIBMATTI_AT_Transformation *transforma
             break;
     }
 
-    // Java: the final state
+// Java: the final state
     if (transformation->finalState == LIBMATTI_AT_FinalState_MAKEFINAL)
         access |= LIBMATTI_ASM_ACC_FINAL;
     else if (transformation->finalState == LIBMATTI_AT_FinalState_REMOVEFINAL)
@@ -212,13 +213,13 @@ static int apply_access(int access, const LIBMATTI_AT_Transformation *transforma
 int LIBMATTI_AT_AccessTransformerEngine_Transform(LIBMATTI_AT_AccessTransformerEngine *engine,
                                                   LIBMATTI_ASMT_ClassNode *classNode, const char *internalName)
 {
-    // Java: if (!masterList.containsClassTarget(classType)) return false;
+// Java: if (!masterList.containsClassTarget(classType)) return false;
     if (!LIBMATTI_AT_AccessTransformerEngine_ContainsClassTarget(engine, internalName))
         return 0;
 
     int transformed = 0;
 
-    // Java: the class target and the wildcards
+// Java: the class target and the wildcards
     for (size_t i = 0; i < engine->entryCount; i++)
     {
         const LIBMATTI_AT_Target *target = engine->entries[i].target;
@@ -263,7 +264,7 @@ int LIBMATTI_AT_AccessTransformerEngine_Transform(LIBMATTI_AT_AccessTransformerE
             for (size_t m = 0; m < classNode->methodCount; m++)
             {
                 LIBMATTI_ASMT_MethodNode *method = classNode->methods[m];
-                // Java: the map key is name + desc
+// Java: the map key is name + desc
                 if (strcmp(method->name, target->memberName) == 0 &&
                     strcmp(method->desc, target->descriptor) == 0)
                 {

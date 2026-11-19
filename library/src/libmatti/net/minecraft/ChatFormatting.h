@@ -1,4 +1,5 @@
-// Port of net.minecraft.ChatFormatting.
+
+
 
 #ifndef MATTICRAFT_MC_CHATFORMATTING_H
 #define MATTICRAFT_MC_CHATFORMATTING_H
@@ -54,4 +55,4 @@ int LIBMATTI_MC_ChatFormatting_GetByName(const char *name, LIBMATTI_MC_ChatForma
 }
 #endif
 
-#endif //MATTICRAFT_MC_CHATFORMATTING_H
+#endif

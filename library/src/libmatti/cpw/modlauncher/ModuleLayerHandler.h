@@ -1,6 +1,7 @@
-//
-// Port of cpw.mods.modlauncher.ModuleLayerHandler.
-//
+
+
+
+
 
 #ifndef MATTICRAFT_MODLAUNCHER_MODULELAYERHANDLER_H
 #define MATTICRAFT_MODLAUNCHER_MODULELAYERHANDLER_H
@@ -60,4 +61,4 @@ void LIBMATTI_ML_ModuleLayerHandler_UpdateLayer(LIBMATTI_ML_ModuleLayerHandler *
                                                                void *userdata),
                                                 void *userdata);
 
-#endif //MATTICRAFT_MODLAUNCHER_MODULELAYERHANDLER_H
+#endif

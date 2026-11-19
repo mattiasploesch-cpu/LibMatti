@@ -1,4 +1,5 @@
-// Port of cpw.mods.modlauncher.TransformTargetLabel.
+
+
 
 #ifndef MATTICRAFT_MODLAUNCHER_TRANSFORMTARGETLABEL_H
 #define MATTICRAFT_MODLAUNCHER_TRANSFORMTARGETLABEL_H
@@ -47,4 +48,4 @@ char *LIBMATTI_ML_TransformTargetLabel_ToString(const LIBMATTI_ML_TransformTarge
 
 void LIBMATTI_ML_TransformTargetLabel_Free(LIBMATTI_ML_TransformTargetLabel *label);
 
-#endif //MATTICRAFT_MODLAUNCHER_TRANSFORMTARGETLABEL_H
+#endif

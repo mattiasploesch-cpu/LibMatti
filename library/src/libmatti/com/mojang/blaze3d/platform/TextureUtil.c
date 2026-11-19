@@ -1,6 +1,7 @@
-// Implementation of com.mojang.blaze3d.platform.TextureUtil: the solidify
-// breadth-first flood fill and the dark-colour fill for the mipmaps of
-// cutout textures.
+
+
+
+
 
 #include "libmatti/com/mojang/blaze3d/platform/TextureUtil.h"
 
@@ -30,7 +31,7 @@ void LIBMATTI_B3D_TextureUtil_Solidify(LIBMATTI_B3D_NativeImage *image)
     int head = 0;
     int tail = 0;
 
-    // Java: Arrays.fill(aint1, Integer.MAX_VALUE)
+// Java: Arrays.fill(aint1, Integer.MAX_VALUE)
     for (int i = 0; i < width * height; i++)
     {
         dist[i] = INT_MAX;
@@ -52,7 +53,7 @@ void LIBMATTI_B3D_TextureUtil_Solidify(LIBMATTI_B3D_NativeImage *image)
         }
     }
 
-    // Java: the IntArrayFIFOQueue BFS
+// Java: the IntArrayFIFOQueue BFS
     while (head < tail)
     {
         int index = queue[head++];
@@ -83,7 +84,7 @@ void LIBMATTI_B3D_TextureUtil_Solidify(LIBMATTI_B3D_NativeImage *image)
             int pixel = LIBMATTI_B3D_NativeImage_GetPixel(image, x, y);
             if (LIBMATTI_MC_ARGB_ALPHA(pixel) == 0)
             {
-                // Java: ARGB.color(0, aint[pack(x, y, i)]) - keep alpha 0
+// Java: ARGB.color(0, aint[pack(x, y, i)]) - keep alpha 0
                 LIBMATTI_B3D_NativeImage_SetPixel(image, x, y,
                                                   LIBMATTI_MC_ARGB_ColorAlpha(0, colour[PACK(x, y, width)] & 0xFFFFFF));
             }
@@ -120,7 +121,7 @@ void LIBMATTI_B3D_TextureUtil_FillEmptyAreasWithDarkColor(LIBMATTI_B3D_NativeIma
         }
     }
 
-    // Java: 3 * red / 4 etc - the darkened copy
+// Java: 3 * red / 4 etc - the darkened copy
     int red = 3 * LIBMATTI_MC_ARGB_RED(darkest) / 4;
     int green = 3 * LIBMATTI_MC_ARGB_GREEN(darkest) / 4;
     int blue = 3 * LIBMATTI_MC_ARGB_BLUE(darkest) / 4;

@@ -1,6 +1,8 @@
-// Port of net.neoforged.fml.loading.TracingPrintStream.
 
-// Dl_info/dladdr need the GNU extensions
+
+
+
+
 #define _GNU_SOURCE
 
 #include "libmatti/net/neoforged/fml/loading/TracingPrintStream.h"
@@ -13,7 +15,7 @@
 
 struct LIBMATTI_FML_TracingPrintStream
 {
-    // Java: private final Logger logger
+// Java: private final Logger logger
     LIBMATTI_ML_Logger *logger;
 };
 
@@ -41,13 +43,13 @@ static const char *get_prefix(void)
 
     void *frames[BASE_DEPTH + 4];
     int count = backtrace(frames, BASE_DEPTH + 4);
-    int index = count - 1 < BASE_DEPTH ? count - 1 : BASE_DEPTH; // Java: elems[Math.min(BASE_DEPTH, elems.length - 1)]
+    int index = count - 1 < BASE_DEPTH ? count - 1 : BASE_DEPTH;// Java: elems[Math.min(BASE_DEPTH, elems.length - 1)]
 
     const char *symbol = "?";
     Dl_info info;
     if (index >= 0 && dladdr(frames[index], &info) != 0 && info.dli_sname != NULL) symbol = info.dli_sname;
 
-    // Java: the Kotlin IoPackage and Throwable frames mask the origin
+// Java: the Kotlin IoPackage and Throwable frames mask the origin
     if (strncmp(symbol, "kotlin.io.", 10) == 0)
     {
         index = count - 1 < BASE_DEPTH + 2 ? count - 1 : BASE_DEPTH + 2;
@@ -59,7 +61,7 @@ static const char *get_prefix(void)
         if (index >= 0 && dladdr(frames[index], &info) != 0 && info.dli_sname != NULL) symbol = info.dli_sname;
     }
 
-    // Java: className:methodName:lineNumber - a C backtrace only names the function
+// Java: className:methodName:lineNumber - a C backtrace only names the function
     snprintf(prefix, sizeof(prefix), "[%s:0]: ", symbol);
     return prefix;
 }

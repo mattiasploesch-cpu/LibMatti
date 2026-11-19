@@ -102,9 +102,10 @@ static void logInvalid(const char *what, LIBMATTI_NEOFORGESPI_IModFileInfo *owni
                              value, pattern);
 }
 
-// ---------------------------------------------------------------------------
-// ModVersion
-// ---------------------------------------------------------------------------
+
+
+
+
 
 static const char *modVersion_getModId(void *self)
 {
@@ -178,7 +179,7 @@ static LIBMATTI_FML_ModVersion *mod_version_new(LIBMATTI_NEOFORGESPI_IModInfo *o
     modVersion->modId = configString(config, "modId");
     if (modVersion->modId == NULL)
     {
-        // Java: orElseThrow(() -> new InvalidModFileException("Missing required field modid in dependency", getOwningFile()))
+// Java: orElseThrow(() -> new InvalidModFileException("Missing required field modid in dependency", getOwningFile()))
         LIBMATTI_ML_Logger_Error(LOGGER(), NULL, "Missing required field modid in dependency");
         LIBMATTI_NEOFORGESPI_InvalidModFileException_New("Missing required field modid in dependency",
                                                         owningFileInfo);
@@ -186,7 +187,7 @@ static LIBMATTI_FML_ModVersion *mod_version_new(LIBMATTI_NEOFORGESPI_IModInfo *o
         return NULL;
     }
 
-    // Java: config.<String>getConfigElement("type").map(str -> str.toUpperCase(Locale.ROOT)).map(DependencyType::valueOf).orElse(REQUIRED)
+// Java: config.<String>getConfigElement("type").map(str -> str.toUpperCase(Locale.ROOT)).map(DependencyType::valueOf).orElse(REQUIRED)
     modVersion->type = LIBMATTI_NEOFORGESPI_IModInfo_DependencyType_REQUIRED;
     char *type = configString(config, "type");
     if (type != NULL)
@@ -203,14 +204,14 @@ static LIBMATTI_FML_ModVersion *mod_version_new(LIBMATTI_NEOFORGESPI_IModInfo *o
     modVersion->reason = configString(config, "reason");
     modVersion->reasonPresent = modVersion->reason != NULL;
 
-    // Java: config.<String>getConfigElement("versionRange").map(MavenVersionAdapter::createFromVersionSpec).orElse(UNBOUNDED)
+// Java: config.<String>getConfigElement("versionRange").map(MavenVersionAdapter::createFromVersionSpec).orElse(UNBOUNDED)
     char *versionRange = configString(config, "versionRange");
     modVersion->versionRange = versionRange != NULL
                                    ? LIBMATTI_NEOFORGESPI_MavenVersionAdapter_CreateFromVersionSpec(versionRange)
                                    : LIBMATTI_NEOFORGESPI_IModInfo_Unbounded();
     free(versionRange);
 
-    // Java: config.<String>getConfigElement("ordering").map(Ordering::valueOf).orElse(Ordering.NONE)
+// Java: config.<String>getConfigElement("ordering").map(Ordering::valueOf).orElse(Ordering.NONE)
     modVersion->ordering = LIBMATTI_NEOFORGESPI_IModInfo_Ordering_NONE;
     char *ordering = configString(config, "ordering");
     if (ordering != NULL)
@@ -222,7 +223,7 @@ static LIBMATTI_FML_ModVersion *mod_version_new(LIBMATTI_NEOFORGESPI_IModInfo *o
         free(ordering);
     }
 
-    // Java: config.<String>getConfigElement("side").map(DependencySide::valueOf).orElse(DependencySide.BOTH)
+// Java: config.<String>getConfigElement("side").map(DependencySide::valueOf).orElse(DependencySide.BOTH)
     modVersion->side = LIBMATTI_NEOFORGESPI_IModInfo_DependencySide_BOTH;
     char *side = configString(config, "side");
     if (side != NULL)
@@ -250,15 +251,16 @@ static void mod_version_free(LIBMATTI_FML_ModVersion *modVersion)
     if (modVersion == NULL) return;
     free(modVersion->modId);
     free(modVersion->reason);
-    // Java: the version range is shared via UNBOUNDED, so it is not owned here
+// Java: the version range is shared via UNBOUNDED, so it is not owned here
     if (modVersion->versionRange != LIBMATTI_NEOFORGESPI_IModInfo_Unbounded())
         LIBMATTI_NEOFORGESPI_MavenVersionAdapter_FreeRange(modVersion->versionRange);
     free(modVersion);
 }
 
-// ---------------------------------------------------------------------------
-// ModInfo
-// ---------------------------------------------------------------------------
+
+
+
+
 
 static LIBMATTI_NEOFORGESPI_IModFileInfo *modInfo_getOwningFile(void *self)
 {
@@ -267,7 +269,7 @@ static LIBMATTI_NEOFORGESPI_IModFileInfo *modInfo_getOwningFile(void *self)
 
 static void *modInfo_getLoader(void *self)
 {
-    // Java: return owningFile.getFile().getLoaders().getFirst();
+// Java: return owningFile.getFile().getLoaders().getFirst();
     LIBMATTI_FML_ModInfo *modInfo = self;
     size_t count = 0;
     LIBMATTI_NEOFORGESPI_IModLanguageLoader **loaders =
@@ -383,7 +385,7 @@ LIBMATTI_FML_ModInfo *LIBMATTI_FML_ModInfo_New(LIBMATTI_FML_ModFileInfo *owningF
     modInfo->owningFileInfo = owningFile != NULL ? LIBMATTI_FML_ModFileInfo_AsModFileInfo(owningFile) : NULL;
     modInfo->config = config;
 
-    // Java: this.modId = config.<String>getConfigElement("modId").orElseThrow(() -> new InvalidModFileException("Missing modId", owningFile));
+// Java: this.modId = config.<String>getConfigElement("modId").orElseThrow(() -> new InvalidModFileException("Missing modId", owningFile));
     modInfo->modId = configString(config, "modId");
     if (modInfo->modId == NULL)
     {
@@ -393,7 +395,7 @@ LIBMATTI_FML_ModInfo *LIBMATTI_FML_ModInfo_New(LIBMATTI_FML_ModFileInfo *owningF
         return NULL;
     }
 
-    // Java: if (!VALID_MODID.matcher(this.modId).matches()) { LOGGER.error(...); throw new InvalidModFileException(...); }
+// Java: if (!VALID_MODID.matcher(this.modId).matches()) { LOGGER.error(...); throw new InvalidModFileException(...); }
     if (!validModId(modInfo->modId))
     {
         logInvalid("modId", modInfo->owningFileInfo, modInfo->modId,
@@ -403,7 +405,7 @@ LIBMATTI_FML_ModInfo *LIBMATTI_FML_ModInfo_New(LIBMATTI_FML_ModFileInfo *owningF
         return NULL;
     }
 
-    // Java: this.namespace = config.<String>getConfigElement("namespace").orElse(this.modId);
+// Java: this.namespace = config.<String>getConfigElement("namespace").orElse(this.modId);
     char *namespace = configString(config, "namespace");
     modInfo->namespace = namespace != NULL ? namespace : strdup(modInfo->modId);
 
@@ -416,7 +418,7 @@ LIBMATTI_FML_ModInfo *LIBMATTI_FML_ModInfo_New(LIBMATTI_FML_ModFileInfo *owningF
         return NULL;
     }
 
-    // Java: this.version = config.<String>getConfigElement("version").map(s -> StringSubstitutor.replace(s, file)).map(DefaultArtifactVersion::new).orElse(DEFAULT_VERSION);
+// Java: this.version = config.<String>getConfigElement("version").map(s -> StringSubstitutor.replace(s, file)).map(DefaultArtifactVersion::new).orElse(DEFAULT_VERSION);
     char *version = configString(config, "version");
     if (version != NULL)
     {
@@ -428,7 +430,7 @@ LIBMATTI_FML_ModInfo *LIBMATTI_FML_ModInfo_New(LIBMATTI_FML_ModFileInfo *owningF
     }
     else
     {
-        // Java: private static final DefaultArtifactVersion DEFAULT_VERSION = new DefaultArtifactVersion("1")
+// Java: private static final DefaultArtifactVersion DEFAULT_VERSION = new DefaultArtifactVersion("1")
         modInfo->version = LIBMATTI_NEOFORGESPI_MavenVersionAdapter_CreateFromVersion("1");
     }
 
@@ -444,7 +446,7 @@ LIBMATTI_FML_ModInfo *LIBMATTI_FML_ModInfo_New(LIBMATTI_FML_ModFileInfo *owningF
     modInfo->displayName = configString(config, "displayName");
     if (modInfo->displayName == NULL) modInfo->displayName = strdup(modInfo->modId);
 
-    // Java: config.<String>getConfigElement("description").map(desc -> desc.replace("\r\n", "\n")).orElse("MISSING DESCRIPTION")
+// Java: config.<String>getConfigElement("description").map(desc -> desc.replace("\r\n", "\n")).orElse("MISSING DESCRIPTION")
     modInfo->description = configString(config, "description");
     if (modInfo->description == NULL)
     {
@@ -469,18 +471,18 @@ LIBMATTI_FML_ModInfo *LIBMATTI_FML_ModInfo_New(LIBMATTI_FML_ModFileInfo *owningF
         *write = '\0';
     }
 
-    // Java: this.logoFile = Optional.ofNullable(config.<String>getConfigElement("logoFile").orElseGet(() -> ownFile.flatMap(mf -> mf.<String>getConfigElement("logoFile")).orElse(null)));
+// Java: this.logoFile = Optional.ofNullable(config.<String>getConfigElement("logoFile").orElseGet(() -> ownFile.flatMap(mf -> mf.<String>getConfigElement("logoFile")).orElse(null)));
     modInfo->logoFile = configString(config, "logoFile");
     if (modInfo->logoFile == NULL)
         modInfo->logoFile = configString(LIBMATTI_FML_ModFileInfo_AsConfigurable(owningFile), "logoFile");
     modInfo->logoFilePresent = modInfo->logoFile != NULL;
 
-    // Java: this.logoBlur = config.<Boolean>getConfigElement("logoBlur").orElseGet(() -> ownFile.flatMap(f -> f.<Boolean>getConfigElement("logoBlur")).orElse(true));
+// Java: this.logoBlur = config.<Boolean>getConfigElement("logoBlur").orElseGet(() -> ownFile.flatMap(f -> f.<Boolean>getConfigElement("logoBlur")).orElse(true));
     if (!configBool(config, "logoBlur", &modInfo->logoBlur) &&
         !configBool(LIBMATTI_FML_ModFileInfo_AsConfigurable(owningFile), "logoBlur", &modInfo->logoBlur))
         modInfo->logoBlur = 1;
 
-    // Java: this.updateJSONURL = config.<String>getConfigElement("updateJSONURL").map(StringUtils::toURL);
+// Java: this.updateJSONURL = config.<String>getConfigElement("updateJSONURL").map(StringUtils::toURL);
     char *updateJson = configString(config, "updateJSONURL");
     if (updateJson != NULL)
     {
@@ -489,7 +491,7 @@ LIBMATTI_FML_ModInfo *LIBMATTI_FML_ModInfo_New(LIBMATTI_FML_ModFileInfo *owningF
         free(updateJson);
     }
 
-    // Java: this.modUrl = config.<String>getConfigElement("modUrl").map(StringUtils::toURL);
+// Java: this.modUrl = config.<String>getConfigElement("modUrl").map(StringUtils::toURL);
     char *modUrl = configString(config, "modUrl");
     if (modUrl != NULL)
     {
@@ -498,7 +500,7 @@ LIBMATTI_FML_ModInfo *LIBMATTI_FML_ModInfo_New(LIBMATTI_FML_ModFileInfo *owningF
         free(modUrl);
     }
 
-    // Java: this.dependencies = ownFile.map(mfi -> mfi.getConfigList("dependencies", this.modId)).orElse(emptyList())
+// Java: this.dependencies = ownFile.map(mfi -> mfi.getConfigList("dependencies", this.modId)).orElse(emptyList())
     //             .stream().map(dep -> new ModVersion(this, dep)).toList();
     if (owningFile != NULL)
     {
@@ -518,7 +520,7 @@ LIBMATTI_FML_ModInfo *LIBMATTI_FML_ModInfo_New(LIBMATTI_FML_ModFileInfo *owningF
         }
     }
 
-    // Java: this.features = ownFile.flatMap(mfi -> mfi.<Map<String, Object>>getConfigElement("features", this.modId))
+// Java: this.features = ownFile.flatMap(mfi -> mfi.<Map<String, Object>>getConfigElement("features", this.modId))
     //             .stream().flatMap(m -> m.entrySet().stream()).map(this::makeBound).toList();
     {
         LIBMATTI_NEOFORGESPI_IConfigurable *owningConfigurable = LIBMATTI_FML_ModFileInfo_AsConfigurable(
@@ -528,7 +530,7 @@ LIBMATTI_FML_ModInfo *LIBMATTI_FML_ModInfo_New(LIBMATTI_FML_ModFileInfo *owningF
         if (LIBMATTI_NEOFORGESPI_IConfigurable_GetConfigElement(owningConfigurable, featureKey, 2, &featureValue) &&
             featureValue.type == LIBMATTI_NEOFORGESPI_IConfigurable_CONFIG)
         {
-            // Java: the map is a night-config table; every entry is (featureName, boundString)
+// Java: the map is a night-config table; every entry is (featureName, boundString)
             LIBMATTI_NC_Config *featureTable = featureValue.map;
             size_t tableCount = 0;
             LIBMATTI_NC_Config_ValueMap(featureTable, &tableCount);
@@ -538,7 +540,7 @@ LIBMATTI_FML_ModInfo *LIBMATTI_FML_ModInfo_New(LIBMATTI_FML_ModFileInfo *owningF
                 LIBMATTI_NC_Value *bound = LIBMATTI_NC_Config_GetKey(featureTable, featureName);
                 if (bound == NULL || bound->type != LIBMATTI_NC_VALUE_STRING)
                 {
-                    // Java: throw new InvalidModFileException("Invalid feature bound {...} for key {...} only strings are accepted", this.owningFile);
+// Java: throw new InvalidModFileException("Invalid feature bound {...} for key {...} only strings are accepted", this.owningFile);
                     LIBMATTI_ML_Logger_Error(LOGGER(), NULL, "Invalid feature bound for key {}", featureName);
                     continue;
                 }
@@ -559,7 +561,7 @@ LIBMATTI_FML_ModInfo *LIBMATTI_FML_ModInfo_New(LIBMATTI_FML_ModFileInfo *owningF
         }
     }
 
-    // Java: this.properties = ownFile.flatMap(mfi -> mfi.<Map<String, Object>>getConfigElement("modproperties", this.modId)).orElse(emptyMap())
+// Java: this.properties = ownFile.flatMap(mfi -> mfi.<Map<String, Object>>getConfigElement("modproperties", this.modId)).orElse(emptyMap())
     {
         LIBMATTI_NEOFORGESPI_IConfigurable *owningConfigurable = LIBMATTI_FML_ModFileInfo_AsConfigurable(
             (LIBMATTI_FML_ModFileInfo *) modInfo->owningFileInfo);
@@ -568,7 +570,7 @@ LIBMATTI_FML_ModInfo *LIBMATTI_FML_ModInfo_New(LIBMATTI_FML_ModFileInfo *owningF
         if (LIBMATTI_NEOFORGESPI_IConfigurable_GetConfigElement(owningConfigurable, propertyKey, 2, &propertyValue) &&
             propertyValue.type == LIBMATTI_NEOFORGESPI_IConfigurable_CONFIG)
         {
-            // Java: the Map<String, Object> view of the config table (valueMap())
+// Java: the Map<String, Object> view of the config table (valueMap())
             modInfo->properties = LIBMATTI_FML_NightConfigWrapper_ValueMap(propertyValue.map);
         }
     }

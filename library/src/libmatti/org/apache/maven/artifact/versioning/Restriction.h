@@ -1,5 +1,6 @@
-// Port of org.apache.maven.artifact.versioning.Restriction.
-// The bounds are shared across restrictions in Java and never mutated; the C port owns them.
+
+
+
 
 #ifndef MATTICRAFT_MAVEN_ARTIFACT_VERSIONING_RESTRICTION_H
 #define MATTICRAFT_MAVEN_ARTIFACT_VERSIONING_RESTRICTION_H
@@ -39,4 +40,4 @@ int LIBMATTI_MAVEN_Restriction_HashCode(const LIBMATTI_MAVEN_Restriction *restri
 // Java: public String toString()
 char *LIBMATTI_MAVEN_Restriction_ToString(const LIBMATTI_MAVEN_Restriction *restriction);
 
-#endif //MATTICRAFT_MAVEN_ARTIFACT_VERSIONING_RESTRICTION_H
+#endif

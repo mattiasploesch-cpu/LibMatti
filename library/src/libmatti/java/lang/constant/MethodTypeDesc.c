@@ -33,13 +33,15 @@ static int is_object_type(const char *s, size_t *consumed)
     for (;;)
     {
         char c = s[i];
-        if (c == '\0') return 0; // unterminated
+        if (c == '\0') return 0;
+
         if (c == ';')
         {
             *consumed = i + 1;
             return 1;
         }
-        // JVMS 4.2.1: the class name must consist of at least one identifier
+
+
         if (i == 1 && (c == '/' || c == '[' || c == '.')) return 0;
         i++;
     }
@@ -66,14 +68,14 @@ int LIBMATTI_JLC_MethodTypeDesc_OfDescriptor(const char *descriptor)
     if (descriptor == NULL || descriptor[0] != '(') return 0;
 
     const char *p = descriptor + 1;
-    // Java: the parameter types
+// Java: the parameter types
     while (*p != ')')
     {
         size_t consumed = 0;
         if (!is_field_type(p, &consumed)) return 0;
         p += consumed;
     }
-    // Java: the return type, which may be void
+// Java: the return type, which may be void
     if (p[1] == 'V' && p[2] == '\0') return 1;
     size_t consumed = 0;
     if (!is_field_type(p + 1, &consumed)) return 0;

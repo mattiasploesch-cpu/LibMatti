@@ -1,15 +1,16 @@
-// Port of org.lwjgl.opengl (the GL binding: GL11, GL13, GL14, GL15, GL20,
-// GL20C, GL30, GL31, GL32, GL32C, GL33C, ARBBufferStorage, ARBTimerQuery,
-// ARBDirectStateAccess, ARBVertexAttribBinding, KHRDebug, EXTDebugLabel,
-// ARBDebugOutput). The port resolves the native libGL at runtime with
-// dlopen plus a glXGetProcAddress/eglGetProcAddress fallback chain, exactly
-// like the GLFW binding dlopen()s libglfw. A missing or unloaded library
-// means "not available" instead of a hard link error.
-//
-// Functions that are part of the ABI of every GL 1.1 driver (glBegin-era
-// fixed function and the glGet* family) are additionally looked up with
-// dlsym, like LWJGL's GLCapabilities.create() does for the core entry
-// points.
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 #ifndef MATTICRAFT_LWJGL_OPENGL_GL_H
 #define MATTICRAFT_LWJGL_OPENGL_GL_H
@@ -213,4 +214,4 @@ void LIBMATTI_GL_glPixelStorei(unsigned int pname, int param);
 }
 #endif
 
-#endif // MATTICRAFT_LWJGL_OPENGL_GL_H
+#endif

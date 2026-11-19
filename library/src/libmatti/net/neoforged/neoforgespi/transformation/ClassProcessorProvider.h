@@ -1,4 +1,5 @@
-// Port of net.neoforged.neoforgespi.transformation.ClassProcessorProvider.
+
+
 
 #ifndef MATTICRAFT_NEOFORGESPI_TRANSFORMATION_CLASSPROCESSORPROVIDER_H
 #define MATTICRAFT_NEOFORGESPI_TRANSFORMATION_CLASSPROCESSORPROVIDER_H
@@ -8,7 +9,7 @@
 // Java: record Context() - the record has no components
 typedef struct LIBMATTI_NEOFORGESPI_ClassProcessorProvider_Context
 {
-    // Java: the record has no components
+// Java: the record has no components
     char empty;
 } LIBMATTI_NEOFORGESPI_ClassProcessorProvider_Context;
 
@@ -20,7 +21,7 @@ typedef void (*LIBMATTI_NEOFORGESPI_ClassProcessorProvider_Collector)(
 // Java: public interface ClassProcessorProvider
 typedef struct LIBMATTI_NEOFORGESPI_ClassProcessorProvider
 {
-    // Java: void createProcessors(Context context, Collector collector)
+// Java: void createProcessors(Context context, Collector collector)
     void (*createProcessors)(struct LIBMATTI_NEOFORGESPI_ClassProcessorProvider *self,
                              const LIBMATTI_NEOFORGESPI_ClassProcessorProvider_Context *context,
                              LIBMATTI_NEOFORGESPI_ClassProcessorProvider_Collector collector, void *collectorUserdata);
@@ -32,4 +33,4 @@ void LIBMATTI_NEOFORGESPI_ClassProcessorProvider_CreateProcessors(
     const LIBMATTI_NEOFORGESPI_ClassProcessorProvider_Context *context,
     LIBMATTI_NEOFORGESPI_ClassProcessorProvider_Collector collector, void *collectorUserdata);
 
-#endif //MATTICRAFT_NEOFORGESPI_TRANSFORMATION_CLASSPROCESSORPROVIDER_H
+#endif

@@ -1,5 +1,6 @@
-// Port of net.minecraft.world.level.material.PushReaction
-// and net.minecraft.world.level.block.state.properties.NoteBlockInstrument.
+
+
+
 
 #ifndef MATTICRAFT_MC_WORLD_LEVEL_MATERIAL_PUSHREACTION_H
 #define MATTICRAFT_MC_WORLD_LEVEL_MATERIAL_PUSHREACTION_H

@@ -1,4 +1,5 @@
-// Port of java.lang.Thread.
+
+
 
 #ifndef MATTICRAFT_JAVA_LANG_THREAD_H
 #define MATTICRAFT_JAVA_LANG_THREAD_H
@@ -11,13 +12,13 @@ typedef struct LIBMATTI_JL_Thread LIBMATTI_JL_Thread;
 
 struct LIBMATTI_JL_Thread
 {
-    // Java: String getName()
+// Java: String getName()
     char *name;
-    // Java: long threadId()
+// Java: long threadId()
     long threadId;
-    // Java: ClassLoader getContextClassLoader()
+// Java: ClassLoader getContextClassLoader()
     LIBMATTI_JL_ClassLoader *contextClassLoader;
-    // Java: ThreadGroup getThreadGroup()
+// Java: ThreadGroup getThreadGroup()
     void *threadGroup;
     int interrupted;
 };
@@ -53,4 +54,4 @@ int LIBMATTI_JL_Thread_IsInterrupted(const LIBMATTI_JL_Thread *thread);
 // Java: public static void sleep(long millis)
 void LIBMATTI_JL_Thread_Sleep(long millis);
 
-#endif //MATTICRAFT_JAVA_LANG_THREAD_H
+#endif

@@ -1,4 +1,5 @@
-// Port of java.util.function.Consumer.
+
+
 
 #include "libmatti/java/util/function/Consumer.h"
 

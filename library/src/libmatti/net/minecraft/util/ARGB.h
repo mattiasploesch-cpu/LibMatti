@@ -1,5 +1,6 @@
-// Port of net.minecraft.util.ARGB (the color helpers MipmapGenerator and
-// TextureUtil use).
+
+
+
 
 #ifndef MATTICRAFT_NET_MINECRAFT_UTIL_ARGB_H
 #define MATTICRAFT_NET_MINECRAFT_UTIL_ARGB_H
@@ -111,4 +112,4 @@ static inline int LIBMATTI_MC_ARGB_MeanLinear(int a, int b, int c, int d)
     return LIBMATTI_MC_ARGB_Color(alpha, red, green, blue);
 }
 
-#endif //MATTICRAFT_NET_MINECRAFT_UTIL_ARGB_H
+#endif

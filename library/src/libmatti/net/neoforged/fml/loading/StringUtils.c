@@ -11,7 +11,7 @@
 // Java: public static String toLowerCase(String str)
 char *LIBMATTI_FML_StringUtils_ToLowerCase(const char *str)
 {
-    // Java: str.toLowerCase(Locale.ROOT)
+// Java: str.toLowerCase(Locale.ROOT)
     char *result = strdup(str);
     for (char *p = result; *p != '\0'; p++) *p = (char) tolower((unsigned char) *p);
     return result;
@@ -20,7 +20,7 @@ char *LIBMATTI_FML_StringUtils_ToLowerCase(const char *str)
 // Java: public static String toUpperCase(String str)
 char *LIBMATTI_FML_StringUtils_ToUpperCase(const char *str)
 {
-    // Java: str.toUpperCase(Locale.ROOT)
+// Java: str.toUpperCase(Locale.ROOT)
     char *result = strdup(str);
     for (char *p = result; *p != '\0'; p++) *p = (char) toupper((unsigned char) *p);
     return result;
@@ -44,7 +44,7 @@ int LIBMATTI_FML_StringUtils_EndsWith(const char *search, const char **endings, 
 // Java: public static URL toURL(String string)
 void *LIBMATTI_FML_StringUtils_ToURL(const char *string)
 {
-    // Java: if (string == null || string.trim().isEmpty() || string.contains("myurl.me") || string.contains("example.invalid")) return null;
+// Java: if (string == null || string.trim().isEmpty() || string.contains("myurl.me") || string.contains("example.invalid")) return null;
     if (string == NULL)
         return NULL;
 
@@ -58,7 +58,7 @@ void *LIBMATTI_FML_StringUtils_ToURL(const char *string)
         return NULL;
 
     LIBMATTI_JN_URL *url = LIBMATTI_JN_URL_New(string);
-    // Java: catch (MalformedURLException e) { throw new RuntimeException(e); }
+// Java: catch (MalformedURLException e) { throw new RuntimeException(e); }
     return url;
 }
 
@@ -73,7 +73,7 @@ static char *properties_lookup(const char *variable, void *self)
 
 char *LIBMATTI_FML_StringUtils_ParseStringFormat(const char *input, void *properties)
 {
-    // Java: return StrSubstitutor.replace(input, properties);
+// Java: return StrSubstitutor.replace(input, properties);
     return LIBMATTI_CL3_StrSubstitutor_Replace(input, properties_lookup, properties);
 }
 

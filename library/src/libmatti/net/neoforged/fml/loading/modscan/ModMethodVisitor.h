@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.loading.modscan.ModMethodVisitor.
+
+
 
 #ifndef MATTICRAFT_FML_LOADING_MODSCAN_MODMETHODVISITOR_H
 #define MATTICRAFT_FML_LOADING_MODSCAN_MODMETHODVISITOR_H
@@ -23,4 +24,4 @@ void LIBMATTI_FML_ModMethodVisitor_Free(LIBMATTI_FML_ModMethodVisitor *visitor);
 LIBMATTI_FML_ModAnnotationVisitor *LIBMATTI_FML_ModMethodVisitor_VisitAnnotation(
     LIBMATTI_FML_ModMethodVisitor *visitor, const char *annotationName, int runtimeVisible);
 
-#endif //MATTICRAFT_FML_LOADING_MODSCAN_MODMETHODVISITOR_H
+#endif

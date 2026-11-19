@@ -14,9 +14,9 @@
 // Java: public final class TomlWriter
 typedef struct LIBMATTI_NC_TomlWriter
 {
-    // Java: the writer's settings
+// Java: the writer's settings
     int lenientBareKeys;
-    // Java: Predicate<UnmodifiableConfig> writeTableInlinePredicate = UnmodifiableConfig::isEmpty
+// Java: Predicate<UnmodifiableConfig> writeTableInlinePredicate = UnmodifiableConfig::isEmpty
     //       - the port keeps only the default (empty tables inline)
     // Java: writeStringLiteralPredicate = str -> false, multiline per default predicate, no array
     //       indentation - all defaults, no setters used by the callers
@@ -24,7 +24,7 @@ typedef struct LIBMATTI_NC_TomlWriter
     const char *indent;
     const char *newline;
 
-    // Java: private int currentIndentLevel
+// Java: private int currentIndentLevel
     int currentIndentLevel;
 } LIBMATTI_NC_TomlWriter;
 
@@ -41,4 +41,4 @@ char *LIBMATTI_NC_TomlWriter_WriteToString(LIBMATTI_NC_TomlWriter *writer, const
 int LIBMATTI_NC_TomlWriter_WriteFile(LIBMATTI_NC_TomlWriter *writer, const LIBMATTI_NC_Config *config,
                                      const char *file);
 
-#endif //MATTICRAFT_NC_TOML_TOMLWRITER_H
+#endif

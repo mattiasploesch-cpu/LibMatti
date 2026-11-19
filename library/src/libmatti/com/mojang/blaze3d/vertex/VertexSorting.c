@@ -19,14 +19,14 @@ int *LIBMATTI_B3D_VertexSorting_SortByDistance(const LIBMATTI_B3D_CompactVectorA
         float dx = LIBMATTI_B3D_CompactVectorArray_GetX(centroids, i) - x;
         float dy = LIBMATTI_B3D_CompactVectorArray_GetY(centroids, i) - y;
         float dz = LIBMATTI_B3D_CompactVectorArray_GetZ(centroids, i) - z;
-        // Java: distanceSquared; ORTHOGRAPHIC_Z negates the z term through the
+// Java: distanceSquared; ORTHOGRAPHIC_Z negates the z term through the
         // distance function (byDistance(p -> -p.z())).
         if (invertZ)
             dz = -dz;
         distances[i] = dx * dx + dy * dy + dz * dz;
     }
 
-    // Java: IntArrays.mergeSort(aint, (a, b) -> Floats.compare(afloat[b], afloat[a]))
+// Java: IntArrays.mergeSort(aint, (a, b) -> Floats.compare(afloat[b], afloat[a]))
     // - descending by distance, stable.
     for (int width = 1; width < count; width *= 2)
     {
@@ -60,14 +60,14 @@ int *LIBMATTI_B3D_VertexSorting_SortByDistance(const LIBMATTI_B3D_CompactVectorA
 int *LIBMATTI_B3D_VertexSorting_DistanceToOrigin_Impl(const LIBMATTI_B3D_CompactVectorArray *centroids,
                                                       size_t *outCount)
 {
-    // Java: byDistance(0.0F, 0.0F, 0.0F).
+// Java: byDistance(0.0F, 0.0F, 0.0F).
     return LIBMATTI_B3D_VertexSorting_SortByDistance(centroids, 0.0f, 0.0f, 0.0f, 0, outCount);
 }
 
 int *LIBMATTI_B3D_VertexSorting_OrthographicZ_Impl(const LIBMATTI_B3D_CompactVectorArray *centroids,
                                                    size_t *outCount)
 {
-    // Java: byDistance(p_277433_ -> -p_277433_.z()).
+// Java: byDistance(p_277433_ -> -p_277433_.z()).
     return LIBMATTI_B3D_VertexSorting_SortByDistance(centroids, 0.0f, 0.0f, 0.0f, 1, outCount);
 }
 

@@ -1,8 +1,9 @@
-// Port of net.minecraft.world.level.chunk.LevelChunkSection.
-//
-// Java stores the 4096 states in a PalettedContainer; the in-memory port keeps a
-// plain BlockState* array (the palette compression belongs to the save-load
-// port). The block-count bookkeeping (nonEmpty/ticking/fluid) is 1:1.
+
+
+
+
+
+
 
 #ifndef MATTICRAFT_MC_WORLD_LEVEL_CHUNK_LEVELCHUNKSECTION_H
 #define MATTICRAFT_MC_WORLD_LEVEL_CHUNK_LEVELCHUNKSECTION_H
@@ -25,11 +26,11 @@ extern "C" {
 // Java: public class LevelChunkSection
 typedef struct LIBMATTI_MC_LevelChunkSection
 {
-    // Java: private short nonEmptyBlockCount / tickingBlockCount / tickingFluidCount
+// Java: private short nonEmptyBlockCount / tickingBlockCount / tickingFluidCount
     int16_t nonEmptyBlockCount;
     int16_t tickingBlockCount;
     int16_t tickingFluidCount;
-    // Java: private final PalettedContainer<BlockState> states - the palette +
+// Java: private final PalettedContainer<BlockState> states - the palette +
     // BitStorage port (SINGLE_VALUE/LINEAR/GLOBAL like Java's strategies)
     LIBMATTI_MC_PalettedContainer *states;
 } LIBMATTI_MC_LevelChunkSection;
@@ -57,4 +58,4 @@ void LIBMATTI_MC_LevelChunkSection_RecalcBlockCounts(LIBMATTI_MC_LevelChunkSecti
 }
 #endif
 
-#endif //MATTICRAFT_MC_WORLD_LEVEL_CHUNK_LEVELCHUNKSECTION_H
+#endif

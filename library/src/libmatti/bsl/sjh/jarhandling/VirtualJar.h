@@ -1,7 +1,8 @@
-//
-// Created by administrator on 09.09.26.
-//
-// Port of cpw.mods.jarhandling.VirtualJar.
+
+
+
+
+
 
 #ifndef MATTICRAFT_VIRTUALJAR_H
 #define MATTICRAFT_VIRTUALJAR_H
@@ -30,7 +31,8 @@ struct LIBMATTI_JH_VirtualJar
     LIBMATTI_JL_ModuleDescriptor *moduleDescriptor;
     LIBMATTI_JH_VirtualJarModuleDataProvider moduleData;
     LIBMATTI_UNION_UnionFileSystem *dummyFileSystem;
-    LIBMATTI_JU_Manifest *manifest; // new Manifest() - empty
+    LIBMATTI_JU_Manifest *manifest;
+
 };
 
 // Java: VirtualJar(String name, Path referencePath, String... packages)
@@ -38,4 +40,4 @@ struct LIBMATTI_JH_VirtualJar
 LIBMATTI_JH_VirtualJar *LIBMATTI_JH_VirtualJar_New(const char *name, const char *referencePath,
                                                    char **packages, size_t packageCount);
 
-#endif //MATTICRAFT_VIRTUALJAR_H
+#endif

@@ -1,4 +1,5 @@
-// Port of net.minecraft.world.item.equipment.ArmorType.
+
+
 
 #include "libmatti/net/minecraft/world/item/equipment/ArmorType.h"
 

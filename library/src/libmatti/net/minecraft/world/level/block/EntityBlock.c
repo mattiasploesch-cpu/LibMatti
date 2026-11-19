@@ -1,4 +1,5 @@
-// Port of net.minecraft.world.level.block.EntityBlock (implementation).
+
+
 
 #include "libmatti/net/minecraft/world/level/block/EntityBlock.h"
 
@@ -28,8 +29,9 @@ static LIBMATTI_MC_EntityBlock *entity_block_of(const LIBMATTI_MC_Block *block)
 {
     if (block == NULL)
         return NULL;
-    // the Block keeps the EntityBlock vtable on its behaviour properties (the
-    // optional-interface slot); NULL when the block has no entity behaviour.
+
+
+
     LIBMATTI_MC_BlockBehaviour_Properties *properties = LIBMATTI_MC_Block_GetProperties(block);
     if (properties == NULL)
         return NULL;

@@ -88,21 +88,25 @@ void LIBMATTI_JOML_Matrix3f_Transform(const LIBMATTI_JOML_Matrix3f *m, float *x,
 LIBMATTI_JOML_Matrix3f *LIBMATTI_JOML_Matrix3f_RotateTowards(LIBMATTI_JOML_Matrix3f *m, float dirX, float dirY,
                                                              float dirZ, float upX, float upY, float upZ)
 {
-    // Normalize direction
+
+
     float invDirLength = 1.0f / sqrtf(dirX * dirX + dirY * dirY + dirZ * dirZ);
     float ndirX = dirX * invDirLength;
     float ndirY = dirY * invDirLength;
     float ndirZ = dirZ * invDirLength;
-    // left = up x direction
+
+
     float leftX = upY * ndirZ - upZ * ndirY;
     float leftY = upZ * ndirX - upX * ndirZ;
     float leftZ = upX * ndirY - upY * ndirX;
-    // normalize left
+
+
     float invLeftLength = 1.0f / sqrtf(leftX * leftX + leftY * leftY + leftZ * leftZ);
     leftX *= invLeftLength;
     leftY *= invLeftLength;
     leftZ *= invLeftLength;
-    // up = direction x left
+
+
     float upnX = ndirY * leftZ - ndirZ * leftY;
     float upnY = ndirZ * leftX - ndirX * leftZ;
     float upnZ = ndirX * leftY - ndirY * leftX;

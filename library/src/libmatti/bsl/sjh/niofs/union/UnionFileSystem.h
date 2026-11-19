@@ -1,13 +1,14 @@
-//
-// Created by administrator on 09.09.26.
-//
-// Port of cpw.mods.niofs.union.UnionFileSystem.
-// In Java this delegates the actual archive reading to the JDK zip filesystem
-// (FileSystems.newFileSystem); here the artifact is a .so and its ELF sections
-// are read directly.
-// Entry mapping: the section ".matti_manifest" is exposed as "META-INF/MANIFEST.MF",
-// and every other section whose name is not a toolchain name (".text", ".rodata", ...)
-// is exposed as the entry of exactly that path.
+
+
+
+
+
+
+
+
+
+
+
 
 #ifndef MATTICRAFT_UNIONFILESYSTEM_H
 #define MATTICRAFT_UNIONFILESYSTEM_H
@@ -38,11 +39,14 @@ typedef struct LIBMATTI_UNION_UnionFileSystem
 {
     LIBMATTI_UNION_UnionFileSystemProvider *provider;
     char *key;
-    char **basePaths; // reversed + exists-filtered input: later elements are first in search order
+    char **basePaths;
+
     size_t basePathCount;
     int lastElementIndex;
-    LIBMATTI_UNION_UnionPathFilter *pathFilter; // NULL = no filter
-    LIBMATTI_UNION_EmbeddedElf **embeddedElfs; // .so bases only
+    LIBMATTI_UNION_UnionPathFilter *pathFilter;
+
+    LIBMATTI_UNION_EmbeddedElf **embeddedElfs;
+
     size_t embeddedElfCount;
     LIBMATTI_UNION_UnionPath *root;
 } LIBMATTI_UNION_UnionFileSystem;
@@ -83,4 +87,4 @@ int LIBMATTI_UNION_UnionFileSystem_Walk(const LIBMATTI_UNION_UnionFileSystem *fi
                                         int (*callback)(const char *relativePath, int isDirectory, void *userdata),
                                         void *userdata);
 
-#endif //MATTICRAFT_UNIONFILESYSTEM_H
+#endif

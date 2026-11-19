@@ -1,4 +1,5 @@
-// Port of net.neoforged.bus.api.IEventExceptionHandler.
+
+
 
 #include "libmatti/net/neoforged/bus/api/IEventExceptionHandler.h"
 

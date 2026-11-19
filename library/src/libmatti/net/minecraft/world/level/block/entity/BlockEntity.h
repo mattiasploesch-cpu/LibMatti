@@ -1,4 +1,5 @@
-// Port of net.minecraft.world.level.block.entity.BlockEntity.
+
+
 
 #ifndef MATTICRAFT_MC_WORLD_LEVEL_BLOCKENTITY_BLOCKENTITY_H
 #define MATTICRAFT_MC_WORLD_LEVEL_BLOCKENTITY_BLOCKENTITY_H
@@ -19,17 +20,17 @@ struct LIBMATTI_MC_Level;
 // Java: public abstract class BlockEntity
 typedef struct LIBMATTI_MC_BlockEntity
 {
-    // Java: private final BlockEntityType<?> type
+// Java: private final BlockEntityType<?> type
     const LIBMATTI_MC_BlockEntityType *type;
-    // Java: protected @Nullable Level level
+// Java: protected @Nullable Level level
     struct LIBMATTI_MC_Level *level;
-    // Java: protected final BlockPos worldPosition
+// Java: protected final BlockPos worldPosition
     LIBMATTI_MC_BlockPos worldPosition;
-    // Java: protected boolean remove
+// Java: protected boolean remove
     bool remove;
-    // Java: private BlockState blockState
+// Java: private BlockState blockState
     LIBMATTI_MC_BlockState *blockState;
-    // Java: private DataComponentMap components (EMPTY until the data-component
+// Java: private DataComponentMap components (EMPTY until the data-component
     // model lands on block entities)
     void *components;
 } LIBMATTI_MC_BlockEntity;
@@ -88,4 +89,4 @@ LIBMATTI_MC_BlockEntity *LIBMATTI_MC_BlockEntity_LoadStatic(struct LIBMATTI_MC_L
 }
 #endif
 
-#endif //MATTICRAFT_MC_WORLD_LEVEL_BLOCKENTITY_BLOCKENTITY_H
+#endif

@@ -1,6 +1,7 @@
-// Port of net.neoforged.fml.jarmoduleinfo.ModuleDescriptorFactory.
-// Java uses java.util.regex.Pattern for the JDK ModulePath sanitization rules; the
-// port implements the same matches with explicit scans.
+
+
+
+
 
 #ifndef MATTICRAFT_FML_JARMODULEINFO_MODULEDESCRIPTORFACTORY_H
 #define MATTICRAFT_FML_JARMODULEINFO_MODULEDESCRIPTORFACTORY_H
@@ -24,4 +25,4 @@ char **LIBMATTI_FML_ModuleDescriptorFactory_ScanModulePackages(LIBMATTI_FML_JarC
 // Java: private static String cleanModuleName(String mn) - returns a new string
 char *LIBMATTI_FML_ModuleDescriptorFactory_CleanModuleName(const char *name);
 
-#endif //MATTICRAFT_FML_JARMODULEINFO_MODULEDESCRIPTORFACTORY_H
+#endif

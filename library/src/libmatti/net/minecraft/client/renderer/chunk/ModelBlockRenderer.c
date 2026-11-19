@@ -1,5 +1,6 @@
-// Port of net.minecraft.client.renderer.FaceInfo + the FaceBakery slice the
-// section compiler needs (see ModelBlockRenderer.h).
+
+
+
 
 #include "libmatti/net/minecraft/client/renderer/chunk/ModelBlockRenderer.h"
 
@@ -17,17 +18,23 @@ static const float g_default_uv[4] = {0.0f, 0.0f, 16.0f, 16.0f};
 // the winding Java bakes and draws. Extents: 0 = MIN, 1 = MAX; per corner
 // (x, y, z).
 const unsigned char LIBMATTI_MC_FaceInfo_CORNERS[6][4][3] = {
-    // DOWN: (MIN_X, MIN_Y, MAX_Z), (MIN_X, MIN_Y, MIN_Z), (MAX_X, MIN_Y, MIN_Z), (MAX_X, MIN_Y, MAX_Z)
+
+
     {{0, 0, 1}, {0, 0, 0}, {1, 0, 0}, {1, 0, 1}},
-    // UP: (MIN_X, MAX_Y, MIN_Z), (MIN_X, MAX_Y, MAX_Z), (MAX_X, MAX_Y, MAX_Z), (MAX_X, MAX_Y, MIN_Z)
+
+
     {{0, 1, 0}, {0, 1, 1}, {1, 1, 1}, {1, 1, 0}},
-    // NORTH: (MAX_X, MAX_Y, MIN_Z), (MAX_X, MIN_Y, MIN_Z), (MIN_X, MIN_Y, MIN_Z), (MIN_X, MAX_Y, MIN_Z)
+
+
     {{1, 1, 0}, {1, 0, 0}, {0, 0, 0}, {0, 1, 0}},
-    // SOUTH: (MIN_X, MAX_Y, MAX_Z), (MIN_X, MIN_Y, MAX_Z), (MAX_X, MIN_Y, MAX_Z), (MAX_X, MAX_Y, MAX_Z)
+
+
     {{0, 1, 1}, {0, 0, 1}, {1, 0, 1}, {1, 1, 1}},
-    // WEST: (MIN_X, MAX_Y, MIN_Z), (MIN_X, MIN_Y, MIN_Z), (MIN_X, MIN_Y, MAX_Z), (MIN_X, MAX_Y, MAX_Z)
+
+
     {{0, 1, 0}, {0, 0, 0}, {0, 0, 1}, {0, 1, 1}},
-    // EAST: (MAX_X, MAX_Y, MAX_Z), (MAX_X, MIN_Y, MAX_Z), (MAX_X, MIN_Y, MIN_Z), (MAX_X, MAX_Y, MIN_Z)
+
+
     {{1, 1, 1}, {1, 0, 1}, {1, 0, 0}, {1, 1, 0}},
 };
 
@@ -110,7 +117,7 @@ void LIBMATTI_MC_ModelBlockRenderer_BakeCubeFace(LIBMATTI_MC_Direction facing,
 
         float elementU = LIBMATTI_MC_BlockElementFace_GetCornerU(g_default_uv, corner) / 16.0f;
         float elementV = LIBMATTI_MC_BlockElementFace_GetCornerV(g_default_uv, corner) / 16.0f;
-        // Java: sprite.getU(f) = u0 + (u1 - u0) * f, same for getV.
+// Java: sprite.getU(f) = u0 + (u1 - u0) * f, same for getV.
         outQuad->uv[corner][0] = spriteUv[0] + (spriteUv[2] - spriteUv[0]) * elementU;
         outQuad->uv[corner][1] = spriteUv[1] + (spriteUv[3] - spriteUv[1]) * elementV;
     }

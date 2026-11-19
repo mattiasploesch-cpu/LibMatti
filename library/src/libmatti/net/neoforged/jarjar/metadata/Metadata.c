@@ -1,4 +1,5 @@
-// Port of net.neoforged.jarjar.metadata.MetadataIOHandler over the Gson port.
+
+
 
 #include "libmatti/net/neoforged/jarjar/metadata/Metadata.h"
 
@@ -41,8 +42,9 @@ LIBMATTI_JARJAR_Metadata *LIBMATTI_JARJAR_MetadataIOHandler_FromJSONText(const c
 
     LIBMATTI_JARJAR_Metadata *metadata = LIBMATTI_JARJAR_Metadata_New();
 
-    // The port's JsonReader walks the document; the fields are fixed:
-    // jars[].identifier.{group,artifact} + jars[].version.range
+
+
+
     const char *cursor = jsonText;
     while ((cursor = strstr(cursor, "\"identifier\"")) != NULL)
     {
@@ -92,7 +94,7 @@ LIBMATTI_JARJAR_Metadata *LIBMATTI_JARJAR_MetadataIOHandler_FromJSONText(const c
 
 char *LIBMATTI_JARJAR_MetadataIOHandler_ToJSONText(const LIBMATTI_JARJAR_Metadata *metadata)
 {
-    // Java: toJSONText - {"jars":[...]}
+// Java: toJSONText - {"jars":[...]}
     size_t capacity = 64 + metadata->jarCount * 128;
     char *json = malloc(capacity);
     strcpy(json, "{\"jars\":[");

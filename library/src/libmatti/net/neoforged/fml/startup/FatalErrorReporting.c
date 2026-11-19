@@ -34,7 +34,7 @@ static LIBMATTI_JL_Throwable *unwrap_exception(LIBMATTI_JL_Throwable *t)
     LIBMATTI_JL_Throwable *cause = LIBMATTI_JL_Throwable_GetCause(t);
     if (cause == NULL) return t;
 
-    // Java: if (t instanceof InvocationTargetException) return cause;
+// Java: if (t instanceof InvocationTargetException) return cause;
     if (strcmp(LIBMATTI_JL_Throwable_GetName(t), LIBMATTI_JLR_InvocationTargetException_NAME) == 0) return cause;
     return t;
 }
@@ -54,7 +54,7 @@ static void collect_mod_loading_issues(LIBMATTI_JL_Throwable *t, LIBMATTI_FML_Mo
 {
     if (t == NULL) return;
 
-    // Java: if (t instanceof ModLoadingException e) issues.addAll(e.getIssues());
+// Java: if (t instanceof ModLoadingException e) issues.addAll(e.getIssues());
     if (strcmp(LIBMATTI_JL_Throwable_GetName(t), "net.neoforged.fml.ModLoadingException") == 0)
     {
         size_t exceptionIssueCount = 0;
@@ -64,13 +64,13 @@ static void collect_mod_loading_issues(LIBMATTI_JL_Throwable *t, LIBMATTI_FML_Mo
             add_issue(issues, issueCount, exceptionIssues[i]);
     }
 
-    // Java: for (var suppressed : t.getSuppressed()) collectModLoadingIssues(suppressed, issues);
+// Java: for (var suppressed : t.getSuppressed()) collectModLoadingIssues(suppressed, issues);
     size_t suppressedCount = 0;
     LIBMATTI_JL_Throwable **suppressed = LIBMATTI_JL_Throwable_GetSuppressed(t, &suppressedCount);
     for (size_t i = 0; i < suppressedCount; i++)
         collect_mod_loading_issues(suppressed[i], issues, issueCount);
 
-    // Java: if (t.getCause() != null) collectModLoadingIssues(t.getCause(), issues);
+// Java: if (t.getCause() != null) collectModLoadingIssues(t.getCause(), issues);
     collect_mod_loading_issues(LIBMATTI_JL_Throwable_GetCause(t), issues, issueCount);
 }
 
@@ -157,11 +157,11 @@ typedef struct
 // Java: private static void readImage(String filename, List<Image> images)
 static void read_image(const char *filename, ImageList *images)
 {
-    // Java: FatalErrorReporting.class.getResource(filename)
+// Java: FatalErrorReporting.class.getResource(filename)
     LIBMATTI_JL_Class *owner = LIBMATTI_JL_Class_Register(FML_FATAL_ERROR_REPORTING_NAME, NULL);
     LIBMATTI_JN_URL *resource = LIBMATTI_JL_Class_GetResource(owner, filename);
 
-    // Java: var image = ImageIO.read(FatalErrorReporting.class.getResource(filename));
+// Java: var image = ImageIO.read(FatalErrorReporting.class.getResource(filename));
     LIBMATTI_JAWT_Image *image = LIBMATTI_JXI_ImageIO_Read(resource);
     LIBMATTI_JN_URL_Free(resource);
 
@@ -177,17 +177,17 @@ static LIBMATTI_JAWT_IM_BaseMultiResolutionImage *create_multi_res_image(void)
     read_image("crash-64x64.png", &images);
     read_image("crash-128x128.png", &images);
 
-    // Java: new BaseMultiResolutionImage(images.toArray(Image[]::new))
+// Java: new BaseMultiResolutionImage(images.toArray(Image[]::new))
     return LIBMATTI_JAWT_IM_BaseMultiResolutionImage_New(images.items, images.count);
 }
 
 // Java: private static void showErrorUsingSwing(String message)
 static void show_error_using_swing(const char *message)
 {
-    // Java: try { UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName()); } catch (Exception ignored) {}
+// Java: try { UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName()); } catch (Exception ignored) {}
     LIBMATTI_JS_UIManager_SetLookAndFeel(LIBMATTI_JS_UIManager_GetSystemLookAndFeelClassName());
 
-    // Java: String html = "<html><body width='400'><strong>Fatal Startup Error</strong>" + "<p><pre>";
+// Java: String html = "<html><body width='400'><strong>Fatal Startup Error</strong>" + "<p><pre>";
     LIBMATTI_JL_StringBuilder *html = LIBMATTI_JL_StringBuilder_NewFromString(
         "<html><body width='400'><strong>Fatal Startup Error</strong><p><pre>");
 
@@ -195,11 +195,11 @@ static void show_error_using_swing(const char *message)
     LIBMATTI_JL_StringBuilder_Append(html, escaped);
     free(escaped);
 
-    // Java: var icon = new ImageIcon(createMultiResImage());
+// Java: var icon = new ImageIcon(createMultiResImage());
     LIBMATTI_JAWT_IM_BaseMultiResolutionImage *multiResImage = create_multi_res_image();
     LIBMATTI_JS_ImageIcon *icon = LIBMATTI_JS_ImageIcon_New((LIBMATTI_JAWT_Image *)multiResImage);
 
-    // Java: JOptionPane.showMessageDialog(null, html, "Fatal Error", JOptionPane.ERROR_MESSAGE, icon);
+// Java: JOptionPane.showMessageDialog(null, html, "Fatal Error", JOptionPane.ERROR_MESSAGE, icon);
     LIBMATTI_JS_JOptionPane_ShowMessageDialog(NULL, LIBMATTI_JL_StringBuilder_ToString(html), "Fatal Error",
                                               LIBMATTI_JS_JOptionPane_ERROR_MESSAGE, icon);
 
@@ -211,7 +211,7 @@ static void show_error_using_swing(const char *message)
 // Java: public static void reportFatalError(Throwable t)
 void LIBMATTI_FML_FatalErrorReporting_ReportFatalError(LIBMATTI_JL_Throwable *t)
 {
-    // Java: Path gameDir = t instanceof FatalStartupException ? fatalStartupException.getStartupArgs().gameDirectory() : null
+// Java: Path gameDir = t instanceof FatalStartupException ? fatalStartupException.getStartupArgs().gameDirectory() : null
     const char *gameDir = NULL;
     if (t != NULL && strcmp(LIBMATTI_JL_Throwable_GetName(t), FML_FATAL_STARTUP_EXCEPTION_NAME) == 0)
     {
@@ -226,12 +226,12 @@ void LIBMATTI_FML_FatalErrorReporting_ReportFatalError(LIBMATTI_JL_Throwable *t)
 void LIBMATTI_FML_FatalErrorReporting_ReportFatalErrorWithPaths(LIBMATTI_JL_Throwable *t, const char *gameDir,
                                                                const char *logFile, const char *crashReport)
 {
-    // Java: var issues = new ArrayList<ModLoadingIssue>(); collectModLoadingIssues(t, issues);
+// Java: var issues = new ArrayList<ModLoadingIssue>(); collectModLoadingIssues(t, issues);
     LIBMATTI_FML_ModLoadingIssue **issues = NULL;
     size_t issueCount = 0;
     collect_mod_loading_issues(t, &issues, &issueCount);
 
-    // Java: if (issues.isEmpty()) { ... } - the port's ModLoadingException channel is
+// Java: if (issues.isEmpty()) { ... } - the port's ModLoadingException channel is
     // register-with-ModLoader, so the exception chain is inspected for the same issues.
     if (issueCount == 0)
     {
@@ -250,12 +250,12 @@ void LIBMATTI_FML_FatalErrorReporting_ReportFatalErrorWithPaths(LIBMATTI_JL_Thro
         }
     }
 
-    // Java: if (issues.isEmpty()) { t = unwrapException(t); ...
+// Java: if (issues.isEmpty()) { t = unwrapException(t); ...
     if (issueCount == 0)
     {
         t = unwrap_exception(t);
 
-        // Java: var errorText = new StringBuilder(e.getMessage()); ...
+// Java: var errorText = new StringBuilder(e.getMessage()); ...
         //       else { var exceptionText = new StringBuilder(); appendAbbreviatedExceptionChain(t, exceptionText); }
         LIBMATTI_JL_StringBuilder *errorText;
         if (t != NULL && strcmp(LIBMATTI_JL_Throwable_GetName(t), FML_FATAL_STARTUP_EXCEPTION_NAME) == 0)
@@ -274,7 +274,7 @@ void LIBMATTI_FML_FatalErrorReporting_ReportFatalErrorWithPaths(LIBMATTI_JL_Thro
             append_abbreviated_exception_chain(t, errorText);
         }
 
-        // Java: issues.add(ModLoadingIssue.error("fml.modloadingissue.technical_error", errorText).withCause(t));
+// Java: issues.add(ModLoadingIssue.error("fml.modloadingissue.technical_error", errorText).withCause(t));
         LIBMATTI_FML_ModLoadingIssue *technicalIssue =
             LIBMATTI_FML_ModLoadingIssue_Error("fml.modloadingissue.technical_error", NULL, 0);
         technicalIssue = LIBMATTI_FML_ModLoadingIssue_WithAffectedPath(technicalIssue,
@@ -283,13 +283,13 @@ void LIBMATTI_FML_FatalErrorReporting_ReportFatalErrorWithPaths(LIBMATTI_JL_Thro
         LIBMATTI_JL_StringBuilder_Free(errorText);
     }
 
-    // Java: ImmediateWindowHandler.displayFatalErrorAndExit(issues,
+// Java: ImmediateWindowHandler.displayFatalErrorAndExit(issues,
     //           gameDir != null ? gameDir.resolve("mods") : null, logFile, crashReport);
     char *modsFolder = gameDir != NULL ? LIBMATTI_JNF_Path_Resolve(gameDir, "mods") : NULL;
     LIBMATTI_FML_ImmediateWindowHandler_DisplayFatalErrorAndExit(issues, issueCount, modsFolder, logFile, crashReport);
     free(modsFolder);
 
-    // Java: for (var issue : issues) { errorReport.append(FMLTranslations.translateIssue(issue)); }
+// Java: for (var issue : issues) { errorReport.append(FMLTranslations.translateIssue(issue)); }
     //       reportFatalError(errorReport.toString());
     LIBMATTI_JL_StringBuilder *report = LIBMATTI_JL_StringBuilder_NewFromString("Fatal Startup Error\n\n");
     for (size_t i = 0; i < issueCount; i++)
@@ -302,11 +302,12 @@ void LIBMATTI_FML_FatalErrorReporting_ReportFatalErrorWithPaths(LIBMATTI_JL_Thro
     LIBMATTI_FML_FatalErrorReporting_ReportFatalErrorMessage(LIBMATTI_JL_StringBuilder_ToString(report));
     LIBMATTI_JL_StringBuilder_Free(report);
 
-    // The issues array is locally owned; the issues themselves stay with their owners
-    // (the ModLoadingException instances or the technical issue created above).
+
+
+
     for (size_t i = 0; i < issueCount; i++)
     {
-        // Java: the technical issue is only referenced here - free the ones the port created
+// Java: the technical issue is only referenced here - free the ones the port created
         if (strcmp(issues[i]->translationKey, "fml.modloadingissue.technical_error") == 0)
             LIBMATTI_FML_ModLoadingIssue_Free(issues[i]);
     }
@@ -317,35 +318,35 @@ void LIBMATTI_FML_FatalErrorReporting_ReportFatalErrorWithPaths(LIBMATTI_JL_Thro
 void LIBMATTI_FML_FatalErrorReporting_ReportFatalErrorOnConsole(LIBMATTI_JL_Throwable *t)
 {
     t = unwrap_exception(t);
-    // Java: t.printStackTrace();
+// Java: t.printStackTrace();
     LIBMATTI_JL_Throwable_PrintStackTrace(t);
 }
 
 // Java: public static void reportFatalError(String message)
 void LIBMATTI_FML_FatalErrorReporting_ReportFatalErrorMessage(const char *message)
 {
-    // Java: System.setProperty("java.awt.headless", "false"); // Overriding what MC set
+// Java: System.setProperty("java.awt.headless", "false"); // Overriding what MC set
     LIBMATTI_JL_System_SetProperty("java.awt.headless", "false");
 
-    // Java: if (!GraphicsEnvironment.isHeadless()) { showErrorUsingSwing(message); }
+// Java: if (!GraphicsEnvironment.isHeadless()) { showErrorUsingSwing(message); }
     if (!LIBMATTI_JAWT_GraphicsEnvironment_IsHeadless())
     {
         show_error_using_swing(message);
     }
     else
     {
-        // Java: TinyFD refuses to let us use quotes
+// Java: TinyFD refuses to let us use quotes
         //       message = message.replace('"', '`'); message = message.replace('\'', '`');
         char *replaced = replace_all(message, "\"", "`");
         char *next = replace_all(replaced, "'", "`");
         free(replaced);
 
-        // Java: TinyFileDialogs.tinyfd_messageBox("NeoForge - Fatal Startup Error", message, "ok", "error", 1);
+// Java: TinyFileDialogs.tinyfd_messageBox("NeoForge - Fatal Startup Error", message, "ok", "error", 1);
         LIBMATTI_LWJGL_TINYFD_TinyFileDialogs_TinyfdMessageBox("NeoForge - Fatal Startup Error", next, "ok", "error",
                                                               1);
         free(next);
     }
 
-    // Java: System.exit(1);
+// Java: System.exit(1);
     LIBMATTI_JL_System_Exit(1);
 }

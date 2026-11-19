@@ -1,7 +1,8 @@
-// Port of com.mojang.blaze3d.preprocessor.GlslPreprocessor.
-// Java splits the source into a String list through the moj_import regex and
-// emits #line directives; the C port keeps the two-pass structure (imports
-// first, then version lifting) over one output buffer with line bookkeeping.
+
+
+
+
+
 
 #ifndef MATTICRAFT_BLAZE3D_PREPROCESSOR_GLSLPREPROCESSOR_H
 #define MATTICRAFT_BLAZE3D_PREPROCESSOR_GLSLPREPROCESSOR_H

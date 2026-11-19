@@ -45,4 +45,4 @@ LIBMATTI_L4J_TextRenderer *LIBMATTI_L4J_Options_GetTextRenderer(const LIBMATTI_L
 char **LIBMATTI_L4J_Options_GetIgnorePackages(const LIBMATTI_L4J_Options *options, size_t *count);
 const char *LIBMATTI_L4J_Options_GetSeparator(const LIBMATTI_L4J_Options *options);
 
-#endif //MATTICRAFT_L4J_THROWABLEPATTERNCONVERTER_H
+#endif

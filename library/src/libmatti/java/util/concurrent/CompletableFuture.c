@@ -15,7 +15,8 @@ struct LIBMATTI_JUC_CompletableFuture
 {
     int done;
     int exceptional;
-    void *result;     // value on normal completion, the Throwable on exceptional
+    void *result;
+
     Dependent *dependents;
     size_t dependentCount;
     size_t dependentCapacity;
@@ -28,7 +29,8 @@ static void notify_dependents(LIBMATTI_JUC_CompletableFuture *future)
         Dependent *dependent = &future->dependents[i];
         if (dependent->target != NULL)
         {
-            // thenApply/thenRun: the dependent future fails with the source
+
+
             if (future->exceptional)
             {
                 LIBMATTI_JUC_CompletableFuture_CompleteExceptionally(dependent->target, future->result);
@@ -106,13 +108,14 @@ void *LIBMATTI_JUC_CompletableFuture_Join(const LIBMATTI_JUC_CompletableFuture *
 {
     if (!future->done)
     {
-        // Java would block here; the port has no scheduler to unblock it
+
+
         fprintf(stderr, "java.util.concurrent.CompletionException: future not completed (blocking unsupported)\n");
         abort();
     }
     if (future->exceptional)
     {
-        // Java: CompletionException wrapping the cause
+// Java: CompletionException wrapping the cause
         fprintf(stderr, "java.util.concurrent.CompletionException: future completed exceptionally\n");
         abort();
     }
@@ -133,7 +136,7 @@ static void add_dependent(LIBMATTI_JUC_CompletableFuture *future, Dependent depe
 {
     if (future->done)
     {
-        // Java: the dependent stage completes immediately through the direct executor
+// Java: the dependent stage completes immediately through the direct executor
         if (dependent.target != NULL)
         {
             if (future->exceptional)
@@ -204,7 +207,7 @@ LIBMATTI_JUC_CompletableFuture *LIBMATTI_JUC_CompletableFuture_AllOf(
     state->target = target;
     state->remaining = count;
 
-    // Java: an empty allOf completes immediately
+// Java: an empty allOf completes immediately
     if (count == 0)
     {
         free(state);

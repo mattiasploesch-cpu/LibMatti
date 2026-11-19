@@ -18,15 +18,15 @@ typedef struct
 struct LIBMATTI_JL_Class
 {
     char *name;
-    // Java: the defining ClassLoader
+// Java: the defining ClassLoader
     void *classLoader;
-    // Java: the package directory used by Class.getResource
+// Java: the package directory used by Class.getResource
     char *resourceDirectory;
-    // Java: Class.getSuperclass() (NULL for Object and interfaces)
+// Java: Class.getSuperclass() (NULL for Object and interfaces)
     LIBMATTI_JL_Class *superclass;
-    // Java: Class.getModifiers()
+// Java: Class.getModifiers()
     int modifiers;
-    // Java: Class.getInterfaces()
+// Java: Class.getInterfaces()
     LIBMATTI_JL_Class **interfaces;
     size_t interfaceCount;
     LIBMATTI_JL_Class_StaticMethod *staticMethods;
@@ -80,4 +80,4 @@ LIBMATTI_JL_Class *LIBMATTI_JL_Class_VoidType(void);
 // Java: String[].class
 LIBMATTI_JL_Class *LIBMATTI_JL_Class_StringArrayType(void);
 
-#endif //MATTICRAFT_JAVA_LANG_CLASS_H
+#endif

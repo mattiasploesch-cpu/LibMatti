@@ -94,7 +94,7 @@ LIBMATTI_FML_LanguageProviderLoader *LIBMATTI_FML_LanguageProviderLoader_New(
         const char *name = LIBMATTI_NEOFORGESPI_IModLanguageLoader_Name(lp);
         const char *version = LIBMATTI_NEOFORGESPI_IModLanguageLoader_Version(lp);
 
-        // Java: if (version == null || version.isBlank()) { error; throw new RuntimeException(...); }
+// Java: if (version == null || version.isBlank()) { error; throw new RuntimeException(...); }
         if (version == NULL || version[0] == '\0')
         {
             LIBMATTI_ML_Logger_Error(LOGGER(), &LIBMATTI_FML_MARKER_CORE, "Found unversioned language provider {}",
@@ -165,7 +165,7 @@ LIBMATTI_NEOFORGESPI_IModLanguageLoader *LIBMATTI_FML_LanguageProviderLoader_Fin
     LIBMATTI_FML_LanguageProviderLoader *loader, void *modFile, const char *modLoader,
     const LIBMATTI_NEOFORGESPI_VersionRange *modLoaderVersion)
 {
-    // Java: Remove this in 1.21.6 or beyond
+// Java: Remove this in 1.21.6 or beyond
     if (modLoader != NULL && strcmp(modLoader, "lowcodefml") == 0)
     {
         LIBMATTI_ML_Logger_Warn(LOGGER(), NULL,
@@ -176,7 +176,7 @@ LIBMATTI_NEOFORGESPI_IModLanguageLoader *LIBMATTI_FML_LanguageProviderLoader_Fin
         modLoaderVersion = NULL;
     }
 
-    // Java: We default to the java language loader now, since it also supports use-cases without any code
+// Java: We default to the java language loader now, since it also supports use-cases without any code
     if (modLoader == NULL)
     {
         modLoader = LIBMATTI_FML_FMLJavaModLanguageProvider_NAME;
@@ -198,7 +198,7 @@ LIBMATTI_NEOFORGESPI_IModLanguageLoader *LIBMATTI_FML_LanguageProviderLoader_Fin
                                  modLoader,
                                  LIBMATTI_NEOFORGESPI_IModFile_GetFileName(
                                      (LIBMATTI_NEOFORGESPI_IModFile *) modFile));
-        // Java: throw new ModLoadingException(ModLoadingIssue.error("fml.modloadingissue.language.missing", modLoader).withAffectedModFile(mf));
+// Java: throw new ModLoadingException(ModLoadingIssue.error("fml.modloadingissue.language.missing", modLoader).withAffectedModFile(mf));
         LIBMATTI_FML_ModLoadingIssue *issue = LIBMATTI_FML_ModLoadingIssue_Error(
             "fml.modloadingissue.language.missing", (const char *[]){modLoader}, 1);
         LIBMATTI_FML_ModLoadingIssue_WithAffectedModFile(issue, modFile, NULL);
@@ -237,7 +237,8 @@ void LIBMATTI_FML_LanguageProviderLoader_Free(LIBMATTI_FML_LanguageProviderLoade
     if (loader == NULL)
         return;
 
-    // Java's wrappers are collected with the loader; the port frees what the map owns.
+
+
     for (size_t i = 0; i < loader->languageProviderMapCount; i++)
     {
         free(loader->languageProviderMap[i].name);

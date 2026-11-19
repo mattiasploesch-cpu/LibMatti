@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.loading.MavenCoordinate.
+
+
 
 #ifndef MATTICRAFT_FML_LOADING_MAVENCOORDINATE_H
 #define MATTICRAFT_FML_LOADING_MAVENCOORDINATE_H
@@ -26,4 +27,4 @@ char *LIBMATTI_FML_MavenCoordinate_ToRelativeRepositoryPath(const LIBMATTI_FML_M
 // Java: @Override public String toString() - a new string
 char *LIBMATTI_FML_MavenCoordinate_ToString(const LIBMATTI_FML_MavenCoordinate *coordinate);
 
-#endif //MATTICRAFT_FML_LOADING_MAVENCOORDINATE_H
+#endif

@@ -1,4 +1,5 @@
-// Port of cpw.mods.modlauncher.InvalidLauncherSetupException.
+
+
 
 #ifndef MATTICRAFT_MODLAUNCHER_INVALIDLAUNCHERSETUPEXCEPTION_H
 #define MATTICRAFT_MODLAUNCHER_INVALIDLAUNCHERSETUPEXCEPTION_H
@@ -9,4 +10,4 @@ typedef struct
     char *message;
 } LIBMATTI_ML_InvalidLauncherSetupException;
 
-#endif //MATTICRAFT_MODLAUNCHER_INVALIDLAUNCHERSETUPEXCEPTION_H
+#endif

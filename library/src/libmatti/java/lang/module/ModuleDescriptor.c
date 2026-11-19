@@ -1,6 +1,7 @@
-//
-// Created by administrator on 09.09.26.
-//
+
+
+
+
 
 #include "ModuleDescriptor.h"
 
@@ -8,16 +9,17 @@
 #include <stdlib.h>
 #include <string.h>
 
-// ---------------------------------------------------------------------------
-// Version
-// ---------------------------------------------------------------------------
+
+
+
+
 
 LIBMATTI_JL_ModuleDescriptor_Version *LIBMATTI_JL_ModuleDescriptor_Version_Parse(const char *version)
 {
     LIBMATTI_JL_ModuleDescriptor_Version *result = calloc(1, sizeof(LIBMATTI_JL_ModuleDescriptor_Version));
     result->raw = strdup(version);
 
-    // Java: Version.parse - components separated by '.', '-' or '+'
+// Java: Version.parse - components separated by '.', '-' or '+'
     char *copy = strdup(version);
     char *token = strtok(copy, ".-+");
 
@@ -69,7 +71,7 @@ int LIBMATTI_JL_ModuleDescriptor_Version_Compare(const LIBMATTI_JL_ModuleDescrip
         }
         else if (aNumeric != bNumeric)
         {
-            // Java: numeric components are greater than string components
+// Java: numeric components are greater than string components
             return aNumeric ? 1 : -1;
         }
         else
@@ -88,9 +90,10 @@ const char *LIBMATTI_JL_ModuleDescriptor_Version_ToString(const LIBMATTI_JL_Modu
     return version->raw;
 }
 
-// ---------------------------------------------------------------------------
-// ModuleDescriptor
-// ---------------------------------------------------------------------------
+
+
+
+
 
 LIBMATTI_JL_ModuleDescriptor *LIBMATTI_JL_ModuleDescriptor_Create(const char *name, char **packages, size_t packageCount)
 {

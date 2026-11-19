@@ -1,4 +1,5 @@
-// Port of net.neoforged.neoforge.registries.RegisterEvent.
+
+
 
 #include "libmatti/net/neoforged/neoforge/registries/RegisterEvent.h"
 

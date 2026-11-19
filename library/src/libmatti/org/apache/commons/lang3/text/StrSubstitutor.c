@@ -1,4 +1,5 @@
-// Port of org.apache.commons.lang3.text.StrSubstitutor / ExtendedMessageFormat.
+
+
 
 #include "libmatti/org/apache/commons/lang3/text/StrSubstitutor.h"
 
@@ -17,7 +18,7 @@ char *LIBMATTI_CL3_StrSubstitutor_Replace(const char *source, LIBMATTI_CL3_StrLo
 
     for (size_t i = 0; source[i] != '\0';)
     {
-        // Java: the "${" prefix match
+// Java: the "${" prefix match
         if (source[i] == '$' && source[i + 1] == '{')
         {
             const char *end = strchr(source + i + 2, '}');
@@ -42,7 +43,7 @@ char *LIBMATTI_CL3_StrSubstitutor_Replace(const char *source, LIBMATTI_CL3_StrLo
                 }
                 else
                 {
-                    // Java: an unresolved variable stays as-is
+// Java: an unresolved variable stays as-is
                     if (outIndex + nameLength + 4 > capacity)
                     {
                         capacity = (outIndex + nameLength + 4) * 2;

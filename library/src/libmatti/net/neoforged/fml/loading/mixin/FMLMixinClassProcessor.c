@@ -1,8 +1,9 @@
-// Ports of net.neoforged.fml.loading.mixin.FMLMixinClassProcessor and
-// net.neoforged.fml.loading.mixin.FMLMixinGeneratingClassProcessor.
-// Java's processors drive the bytecode transformer; the port's native backend has no bytecode,
-// so handlesClass/processClass resolve over the hook table's registered targets - a class is
-// "handled" when a hook descriptor targets it, and "processed" when the chain runs.
+
+
+
+
+
+
 
 #include "libmatti/net/neoforged/fml/loading/mixin/FMLMixinClassProcessor.h"
 
@@ -23,7 +24,8 @@
 static const char *type_class_name(const LIBMATTI_ASM_Type *type)
 {
     char *name = LIBMATTI_ASM_Type_GetClassName((LIBMATTI_ASM_Type *) type);
-    // The port's Type keeps a stable name; a stack copy suffices for the lookup calls below.
+
+
     static char buffer[512];
     snprintf(buffer, sizeof(buffer), "%s", name);
     free(name);
@@ -96,16 +98,16 @@ static int mixin_processor_handles_class(LIBMATTI_NEOFORGESPI_ClassProcessor *se
     (void) self;
     if (context->type == NULL) return 0;
 
-    // Java: String name = context.type().getClassName();
+// Java: String name = context.type().getClassName();
     const char *name = type_class_name(context->type);
 
-    // Java: if (this.classTracker.isInvalidClass(name)) throw new NoClassDefFoundError(...);
+// Java: if (this.classTracker.isInvalidClass(name)) throw new NoClassDefFoundError(...);
     if (LIBMATTI_FML_FMLClassTracker_IsInvalidClass(name)) return 0;
 
-    // Java: if (!context.empty()) { if (processesClass(context.type())) return true; }
+// Java: if (!context.empty()) { if (processesClass(context.type())) return true; }
     if (!context->empty)
     {
-        // Java: processesClass -> transformer.couldTransformClass(environment, className)
+// Java: processesClass -> transformer.couldTransformClass(environment, className)
         return LIBMATTI_MIXIN_Lookup(LIBMATTI_MIXIN_HookTable_Default(), name) != NULL;
     }
 
@@ -120,14 +122,14 @@ static LIBMATTI_NEOFORGESPI_ClassProcessor_ComputeFlags mixin_processor_process_
     (void) self;
     if (context->type == NULL) return LIBMATTI_NEOFORGESPI_ClassProcessor_ComputeFlags_NO_REWRITE;
 
-    // Java: this.auditTrail.setConsumer(classType.getClassName(), context::audit);
+// Java: this.auditTrail.setConsumer(classType.getClassName(), context::audit);
     const char *className = type_class_name(context->type);
     LIBMATTI_SP_IMixinAuditTrail *auditTrail = LIBMATTI_FML_FMLAuditTrail_Instance();
     auditTrail->setConsumer(auditTrail->self, className,
                             (void (*)(const char *, const char **, size_t, void *)) context->auditTrail,
                             context->auditTrailUserdata);
 
-    // Java: transformer.transformClass(environment, className, classNode)
+// Java: transformer.transformClass(environment, className, classNode)
     // The native backend runs the hook chain for the target in the TransformingClassLoader's
     // transform step, so the processor marks the rewrite requirement Java's COMPUTE_FRAMES carries.
     return LIBMATTI_MIXIN_Lookup(LIBMATTI_MIXIN_HookTable_Default(), type_class_name(context->type)) != NULL
@@ -159,7 +161,8 @@ static int generating_processor_handles_class(
 {
     (void) self;
     (void) context;
-    // The port's synthetic class registry has no entries (the bytecode transformer is external)
+
+
     return 0;
 }
 
@@ -178,7 +181,7 @@ static void generating_processor_link(LIBMATTI_NEOFORGESPI_ClassProcessor *self,
                                       const LIBMATTI_NEOFORGESPI_ClassProcessor_LinkContext *context)
 {
     (void) self;
-    // Java: setBytecodeProvider(...) - the port's service keeps the provider for close()
+// Java: setBytecodeProvider(...) - the port's service keeps the provider for close()
     LIBMATTI_FML_FMLMixinService_SetBytecodeProvider(
         context != NULL ? (void *) context->bytecodeProvider : NULL);
 }
@@ -188,8 +191,8 @@ LIBMATTI_NEOFORGESPI_ClassProcessor *LIBMATTI_FML_FMLMixinClassProcessor_New(voi
 {
     LIBMATTI_NEOFORGESPI_ClassProcessor *processor = calloc(1, sizeof(*processor));
     processor->name = mixin_processor_name;
-    processor->runsBefore = NULL; // Java: default Set.of()
-    processor->runsAfter = NULL;  // Java: default Set.of()
+    processor->runsBefore = NULL;// Java: default Set.of()
+    processor->runsAfter = NULL;// Java: default Set.of()
     processor->generatesPackages = processor_generates_packages;
     processor->orderingHint = processor_ordering_hint;
     processor->handlesClass = mixin_processor_handles_class;
@@ -210,7 +213,7 @@ LIBMATTI_NEOFORGESPI_ClassProcessor *LIBMATTI_FML_FMLMixinGeneratingClassProcess
     processor->orderingHint = processor_ordering_hint;
     processor->handlesClass = generating_processor_handles_class;
     processor->processClass = generating_processor_process_class;
-    processor->afterProcessing = NULL; // Java: default no-op
+    processor->afterProcessing = NULL;// Java: default no-op
     processor->link = generating_processor_link;
     return processor;
 }

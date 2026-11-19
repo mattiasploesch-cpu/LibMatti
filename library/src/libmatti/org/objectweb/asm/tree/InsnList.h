@@ -1,4 +1,5 @@
-// Port of org.objectweb.asm.tree.InsnList.
+
+
 
 #ifndef MATTICRAFT_ASMT_INSNLIST_H
 #define MATTICRAFT_ASMT_INSNLIST_H
@@ -13,7 +14,7 @@ typedef struct LIBMATTI_ASMT_InsnList
     LIBMATTI_ASMT_AbstractInsnNode *first;
     LIBMATTI_ASMT_AbstractInsnNode *last;
     size_t size;
-    // Java: InsnList has no such flag; it marks that the parsed code must be
+// Java: InsnList has no such flag; it marks that the parsed code must be
     // re-serialized instead of reusing the original Code attribute bytes.
     int modified;
 } LIBMATTI_ASMT_InsnList;
@@ -41,4 +42,4 @@ LIBMATTI_ASMT_AbstractInsnNode **LIBMATTI_ASM_InsnList_ToArray(const LIBMATTI_AS
 
 void LIBMATTI_ASM_InsnList_Free(LIBMATTI_ASMT_InsnList *list);
 
-#endif //MATTICRAFT_ASMT_INSNLIST_H
+#endif

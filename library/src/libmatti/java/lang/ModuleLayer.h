@@ -1,10 +1,11 @@
-//
-// Port of java.lang.ModuleLayer.
-// Java creates layers from a java.lang.module.Configuration via
-// ModuleLayer.defineModules, which is JVM machinery (class loading into a
-// layer); the C port keeps the structure (name, configuration, parents) and the
-// module-to-classloader mapping.
-//
+
+
+
+
+
+
+
+
 
 #ifndef MATTICRAFT_MODULELAYER_H
 #define MATTICRAFT_MODULELAYER_H
@@ -33,8 +34,9 @@ LIBMATTI_JL_ModuleLayerController *LIBMATTI_JL_ModuleLayer_DefineModules(
 // Java: ModuleLayer.Controller.layer()
 LIBMATTI_JL_ModuleLayer *LIBMATTI_JL_ModuleLayerController_Layer(const LIBMATTI_JL_ModuleLayerController *controller);
 
-// Java has no teardown for layers; the C port releases what DefineModules allocated.
+
+
 void LIBMATTI_JL_ModuleLayer_Free(LIBMATTI_JL_ModuleLayer *layer);
 void LIBMATTI_JL_ModuleLayerController_Free(LIBMATTI_JL_ModuleLayerController *controller);
 
-#endif //MATTICRAFT_MODULELAYER_H
+#endif

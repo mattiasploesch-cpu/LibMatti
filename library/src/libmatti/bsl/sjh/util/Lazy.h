@@ -7,8 +7,9 @@
 typedef void *(*LIBMATTI_SJH_Lazy_Provider)(void *userData);
 typedef void (*LIBMATTI_SJH_Lazy_Consumer)(void *value, void *userData);
 
-// Port of cpw.mods.util.Lazy<T>.
-// T maps to void *; the provider fills the value on first get().
+
+
+
 typedef struct LIBMATTI_SJH_Lazy
 {
     void *value;

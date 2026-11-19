@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.loading.mixin.MixinFacade.
+
+
 
 #include "libmatti/net/neoforged/fml/loading/mixin/MixinFacade.h"
 
@@ -51,7 +52,7 @@ static void initConstants(void)
     LIBMATTI_FML_MixinFacade_HIGHEST_MIXIN_VERSION =
         LIBMATTI_NEOFORGESPI_MavenVersionAdapter_CreateFromVersion(LIBMATTI_FML_MixinFacade_MIXIN_VERSION);
 
-    // Java: int defaultMixinVersion = DEFAULT_BEHAVIOUR_VERSION;
+// Java: int defaultMixinVersion = DEFAULT_BEHAVIOUR_VERSION;
     //       int patch = defaultMixinVersion % 1000; defaultMixinVersion /= 1000;
     //       int minor = defaultMixinVersion % 1000; defaultMixinVersion /= 1000;
     //       int major = defaultMixinVersion;
@@ -73,25 +74,26 @@ LIBMATTI_FML_MixinFacade *LIBMATTI_FML_MixinFacade_New(void)
     LIBMATTI_FML_MixinFacade *facade = calloc(1, sizeof(*facade));
     initConstants();
 
-    // Java: if (FMLLoader.getCurrent().getDist() == null) throw new IllegalStateException(...)
+// Java: if (FMLLoader.getCurrent().getDist() == null) throw new IllegalStateException(...)
     // The port's Dist is a non-nullable enum filled in by FMLLoader.detectDist.
 
-    // Java: System.setProperty("mixin.service", FMLMixinService.class.getName());
+// Java: System.setProperty("mixin.service", FMLMixinService.class.getName());
     LIBMATTI_JL_System_SetProperty("mixin.service", "net.neoforged.fml.loading.mixin.FMLMixinService");
-    // Java: System.setProperty("mixin.bootstrapService", FMLMixinServiceBootstrap.class.getName());
+// Java: System.setProperty("mixin.bootstrapService", FMLMixinServiceBootstrap.class.getName());
     LIBMATTI_JL_System_SetProperty("mixin.bootstrapService", "net.neoforged.fml.loading.mixin.FMLMixinServiceBootstrap");
 
-    // Java: MixinBootstrap.init();
+// Java: MixinBootstrap.init();
     LIBMATTI_SP_MixinBootstrap_Init();
 
-    // Java: service = (FMLMixinService) MixinService.getService();
+// Java: service = (FMLMixinService) MixinService.getService();
     facade->service = LIBMATTI_FML_FMLMixinService_Instance();
 
-    // Java: this.classProcessor = new FMLMixinClassProcessor(service);
+// Java: this.classProcessor = new FMLMixinClassProcessor(service);
     facade->classProcessor = LIBMATTI_FML_FMLMixinClassProcessor_New();
-    // Java: this.generatingClassProcessor = new FMLMixinGeneratingClassProcessor(service);
+// Java: this.generatingClassProcessor = new FMLMixinGeneratingClassProcessor(service);
     facade->generatingClassProcessor = LIBMATTI_FML_FMLMixinGeneratingClassProcessor_New();
-    // The native mixin backend: the facade collects into the process-wide table.
+
+
     facade->hookTable = LIBMATTI_MIXIN_HookTable_Default();
     return facade;
 }
@@ -102,7 +104,8 @@ void *LIBMATTI_FML_MixinFacade_GetClassProcessor(const LIBMATTI_FML_MixinFacade 
     return facade->classProcessor;
 }
 
-// The native mixin backend
+
+
 struct LIBMATTI_MIXIN_HookTable *LIBMATTI_FML_MixinFacade_GetHookTable(const LIBMATTI_FML_MixinFacade *facade)
 {
     return facade->hookTable;
@@ -124,7 +127,8 @@ LIBMATTI_FML_MixinFacade_MixinConfig *LIBMATTI_FML_MixinFacade_GetConfig(const L
     return NULL;
 }
 
-// Java's record withers are garbage collected; the port frees the issue the with* call replaced.
+
+
 static void add_issue_with_mod_file(LIBMATTI_FML_ModLoadingIssue *issue, LIBMATTI_NEOFORGESPI_IModFile *file)
 {
     LIBMATTI_FML_ModLoader_AddLoadingIssue(LIBMATTI_FML_ModLoadingIssue_WithAffectedModFile(
@@ -151,7 +155,8 @@ static int areRequiredModsPresent(LIBMATTI_FML_ModFile *modFile,
     {
         if (LIBMATTI_FML_LoadingModList_GetModFileById(modList, mixinConfig->requiredMods[i]) == NULL)
         {
-            // Java logs the ModFile itself; the port's logger only substitutes strings.
+
+
             LIBMATTI_ML_Logger_Info(LOG(), NULL,
                                     "Mixin config {} from {} not applied as required mod '{}' is missing",
                                     mixinConfig->config,
@@ -169,7 +174,7 @@ static int validateMixinBehavior(LIBMATTI_FML_ModFile *modFile,
                                  const LIBMATTI_FML_ModFileParser_MixinConfig *mixinConfig)
 {
     const LIBMATTI_NEOFORGESPI_ArtifactVersion *behaviorVersion = mixinConfig->behaviorVersion;
-    // Java: if (behaviorVersion == null) return true;
+// Java: if (behaviorVersion == null) return true;
     if (behaviorVersion == NULL)
         return 1;
 
@@ -204,11 +209,11 @@ static int validateMixinBehavior(LIBMATTI_FML_ModFile *modFile,
 // Java: private static int calculateBehaviorVersion(@Nullable ArtifactVersion behaviorVersion)
 int LIBMATTI_FML_MixinFacade_CalculateBehaviorVersion(const LIBMATTI_NEOFORGESPI_ArtifactVersion *behaviorVersion)
 {
-    // Java: if (behaviorVersion == null) return DEFAULT_BEHAVIOUR_VERSION;
+// Java: if (behaviorVersion == null) return DEFAULT_BEHAVIOUR_VERSION;
     if (behaviorVersion == NULL)
         return LIBMATTI_FML_MixinFacade_DEFAULT_BEHAVIOUR_VERSION;
 
-    // Java: return behaviorVersion.getMajorVersion() * (1000 * 1000) + behaviorVersion.getMinorVersion() * 1000
+// Java: return behaviorVersion.getMajorVersion() * (1000 * 1000) + behaviorVersion.getMinorVersion() * 1000
     //             + behaviorVersion.getIncrementalVersion();
     return LIBMATTI_MAVEN_ArtifactVersion_GetMajorVersion(behaviorVersion) * (1000 * 1000) +
            LIBMATTI_MAVEN_ArtifactVersion_GetMinorVersion(behaviorVersion) * 1000 +
@@ -272,7 +277,7 @@ static void addMixins(LIBMATTI_FML_MixinFacade *facade, LIBMATTI_FML_LoadingModL
             }
             else
             {
-                // Java: configAnnotationInfo.putIfAbsent(mixinConfig.config(), currentInfo)
+// Java: configAnnotationInfo.putIfAbsent(mixinConfig.config(), currentInfo)
                 configAnnotationInfo = realloc(configAnnotationInfo, sizeof(*configAnnotationInfo) * (annotationInfoCount + 1));
                 configAnnotationInfo[annotationInfoCount].name = strdup(mixinConfig->config);
                 configAnnotationInfo[annotationInfoCount].modFile = current.modFile;
@@ -280,14 +285,14 @@ static void addMixins(LIBMATTI_FML_MixinFacade *facade, LIBMATTI_FML_LoadingModL
                 annotationInfoCount++;
             }
 
-            // Java: modFile.getContents().readFile(mixinConfig.config())
+// Java: modFile.getContents().readFile(mixinConfig.config())
             size_t contentLength = 0;
             unsigned char *content =
                 LIBMATTI_FML_JarContents_ReadFile(LIBMATTI_FML_ModFile_GetContents(modFile), mixinConfig->config,
                                                   &contentLength);
             if (content == NULL)
             {
-                // Java: NOTE: Archloom does not put common modules into the same MOD_CLASSES/modFolders group ...
+// Java: NOTE: Archloom does not put common modules into the same MOD_CLASSES/modFolders group ...
                 size_t otherCount = 0;
                 LIBMATTI_NEOFORGESPI_IModFile **otherFiles =
                     LIBMATTI_FML_LoadingModList_GetAllModFiles(modList, &otherCount);
@@ -316,12 +321,12 @@ static void addMixins(LIBMATTI_FML_MixinFacade *facade, LIBMATTI_FML_LoadingModL
                 continue;
             }
 
-            // Java: service.addMixinConfigContent(mixinConfig.config(), configContent);
+// Java: service.addMixinConfigContent(mixinConfig.config(), configContent);
             LIBMATTI_FML_FMLMixinService_AddMixinConfigContent(mixinConfig->config, content, contentLength);
-            // Java: Mixins.addConfiguration(mixinConfig.config());
+// Java: Mixins.addConfiguration(mixinConfig.config());
             LIBMATTI_SP_Mixins_AddConfiguration(mixinConfig->config);
 
-            // Java: the MixinConfig parse carried the content into the transformer's config view;
+// Java: the MixinConfig parse carried the content into the transformer's config view;
             // the facade's map (Mixins.getConfigs() keyed by Config::getName) keeps the same
             // two pieces for the diagnostics the harness reads.
             LIBMATTI_FML_MixinFacade_MixinConfig *registered =
@@ -345,7 +350,7 @@ static void addMixins(LIBMATTI_FML_MixinFacade *facade, LIBMATTI_FML_LoadingModL
         }
     }
 
-    // Java: for (var plugin : modList.getPlugins()) service.addMixinContainer(new FMLModFileContainerHandle(plugin.getFile()));
+// Java: for (var plugin : modList.getPlugins()) service.addMixinContainer(new FMLModFileContainerHandle(plugin.getFile()));
     size_t containerCount = 0;
     LIBMATTI_NEOFORGESPI_IModFileInfo **plugins = LIBMATTI_FML_LoadingModList_GetPlugins(modList, &containerCount);
     for (size_t i = 0; i < containerCount; i++)
@@ -355,7 +360,7 @@ static void addMixins(LIBMATTI_FML_MixinFacade *facade, LIBMATTI_FML_LoadingModL
         LIBMATTI_FML_FMLMixinService_AddMixinContainer(&handle->base);
     }
 
-    // Java: for (var gameLibrary : modList.getGameLibraries()) service.addMixinContainer(new FMLModFileContainerHandle(gameLibrary));
+// Java: for (var gameLibrary : modList.getGameLibraries()) service.addMixinContainer(new FMLModFileContainerHandle(gameLibrary));
     size_t gameLibraryCount = 0;
     LIBMATTI_NEOFORGESPI_IModFile **gameLibraries = LIBMATTI_FML_LoadingModList_GetGameLibraries(modList, &gameLibraryCount);
     for (size_t i = 0; i < gameLibraryCount; i++)
@@ -365,7 +370,7 @@ static void addMixins(LIBMATTI_FML_MixinFacade *facade, LIBMATTI_FML_LoadingModL
     }
     (void) gameLibraries;
 
-    // Java: var configMap = Mixins.getConfigs().stream().collect(toMap(Config::getName, Config::getConfig));
+// Java: var configMap = Mixins.getConfigs().stream().collect(toMap(Config::getName, Config::getConfig));
     //       for (var entry : configAnnotationInfo.entrySet()) { var config = configMap.get(name); ... }
     size_t configSetCount = 0;
     LIBMATTI_SP_Config **configSetItems = LIBMATTI_SP_Mixins_GetConfigs(&configSetCount);
@@ -390,13 +395,14 @@ static void addMixins(LIBMATTI_FML_MixinFacade *facade, LIBMATTI_FML_LoadingModL
             continue;
         }
 
-        // Java: config.decorate(FabricUtil.KEY_MOD_ID, modFile.getId());
+// Java: config.decorate(FabricUtil.KEY_MOD_ID, modFile.getId());
         LIBMATTI_SP_Config_DecorateModId(config, LIBMATTI_NEOFORGESPI_IModFile_GetId(configAnnotationInfo[i].modFile));
-        // Java: config.decorate(FabricUtil.KEY_COMPATIBILITY, annotationInfo.behaviorVersion());
+// Java: config.decorate(FabricUtil.KEY_COMPATIBILITY, annotationInfo.behaviorVersion());
         LIBMATTI_SP_Config_DecorateBehaviorVersion(config, configAnnotationInfo[i].behaviorVersion);
 
-        // The facade's view carries the same decorations (the harness reads them through
-        // LIBMATTI_FML_MixinFacade_GetConfig).
+
+
+
         LIBMATTI_FML_MixinFacade_MixinConfig *view =
             LIBMATTI_FML_MixinFacade_GetConfig(facade, configAnnotationInfo[i].name);
         if (view != NULL)
@@ -407,7 +413,8 @@ static void addMixins(LIBMATTI_FML_MixinFacade *facade, LIBMATTI_FML_LoadingModL
         }
     }
 
-    // Java's AnnotationInfo record is garbage collected; the port frees the copies it made.
+
+
     for (size_t i = 0; i < annotationInfoCount; i++) free(configAnnotationInfo[i].name);
     free(configAnnotationInfo);
 }
@@ -417,7 +424,7 @@ void LIBMATTI_FML_MixinFacade_FinishInitialization(LIBMATTI_FML_MixinFacade *fac
                                                    LIBMATTI_FML_LoadingModList *loadingModList,
                                                    LIBMATTI_FML_TransformingClassLoader *classLoader)
 {
-    // Java: if (Thread.currentThread().getContextClassLoader() != classLoader) throw new IllegalStateException(...)
+// Java: if (Thread.currentThread().getContextClassLoader() != classLoader) throw new IllegalStateException(...)
     if (LIBMATTI_JL_Thread_GetContextClassLoader(LIBMATTI_JL_Thread_CurrentThread()) !=
         (LIBMATTI_JL_ClassLoader *) classLoader)
     {
@@ -427,12 +434,13 @@ void LIBMATTI_FML_MixinFacade_FinishInitialization(LIBMATTI_FML_MixinFacade *fac
 
     addMixins(facade, loadingModList);
 
-    // The native backend (M4): collect the .matti_mixins descriptors of the game binary and of every
-    // mod file that was loaded as a shared object. Java collects the same way - through the mixin
-    // containers the service holds - just over class metadata instead of ELF sections.
+
+
+
+
     LIBMATTI_MIXIN_HookTable *hookTable = facade->hookTable;
 
-    // Java: the game's own targets come from the game module; the port reads the host image
+// Java: the game's own targets come from the game module; the port reads the host image
     // (dlopen(NULL) is the game binary itself, whether PIE or not).
     size_t gameTargets = LIBMATTI_MIXIN_HookTable_AddObject(hookTable, NULL, NULL);
 
@@ -450,18 +458,19 @@ void LIBMATTI_FML_MixinFacade_FinishInitialization(LIBMATTI_FML_MixinFacade *fac
         hookCount += LIBMATTI_MIXIN_HookTable_AddObject(hookTable, path, modId);
     }
 
-    // GetModFiles returns the list's own array (Java: an unmodifiable list); it must not be freed.
+// GetModFiles returns the list's own array (Java: an unmodifiable list); it must not be freed.
 
-    // The port's logger substitutes {} with strings only.
+
+
     char counts[128];
     snprintf(counts, sizeof(counts), "%zu game target(s), %zu mod hook(s)", gameTargets, hookCount);
     LIBMATTI_ML_Logger_Info(LOG(), NULL, "Mixin hook table: {}", counts);
 
-    // Java: We must transition to DEFAULT phase for normal Mixins to be applied at all
+// Java: We must transition to DEFAULT phase for normal Mixins to be applied at all
     gotoPhase(LIBMATTI_SP_MixinEnvironment_Phase_INIT());
     gotoPhase(LIBMATTI_SP_MixinEnvironment_Phase_DEFAULT());
 
-    // Java: MixinBootstrap.init(); MixinBootstrap.getPlatform().inject();
+// Java: MixinBootstrap.init(); MixinBootstrap.getPlatform().inject();
     LIBMATTI_SP_MixinBootstrap_Init();
     LIBMATTI_SP_MixinPlatformManager_Inject(LIBMATTI_SP_MixinBootstrap_GetPlatform());
 }
@@ -469,7 +478,7 @@ void LIBMATTI_FML_MixinFacade_FinishInitialization(LIBMATTI_FML_MixinFacade *fac
 // Java: public void close()
 void LIBMATTI_FML_MixinFacade_Close(LIBMATTI_FML_MixinFacade *facade)
 {
-    // Java: service.setBytecodeProvider(null) - the bytecode provider holds a static global strong
+// Java: service.setBytecodeProvider(null) - the bytecode provider holds a static global strong
     //       reference to the entire class-loader chain which will keep JAR files opened.
     LIBMATTI_FML_FMLMixinService_SetBytecodeProvider(NULL);
 }

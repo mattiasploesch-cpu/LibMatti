@@ -1,10 +1,11 @@
-// Port of net.minecraft.world.item.Items (the registry-data part).
-// Generated from the vendor Java sources (vendor/MCP-Reborn .../world/item/Items.java):
-// one row per public static final Item, in Java declaration order. The block column is
-// Java's BlockItem back-link (registerBlock / createBlockItemWithCustomItemName): the
-// Blocks constant whose block the item places; NULL means a plain Item. The props
-// column applies the per-item Item.Properties chain 1:1 (stacksTo, durability,
-// rarity, ..., the payload components stay commented game-port content).
+
+
+
+
+
+
+
+
 
 #include "libmatti/net/minecraft/server/bootstrap/VanillaItems.h"
 
@@ -1511,15 +1512,15 @@ enum
 
 typedef struct ItemEntry
 {
-    // Java: the static's name (Items.STONE)
+// Java: the static's name (Items.STONE)
     const char *name;
-    // Java: registerItem("<id>", ...) / registerBlock(Blocks.X) - the ResourceKey path
+// Java: registerItem("<id>", ...) / registerBlock(Blocks.X) - the ResourceKey path
     const char *id;
-    // Java: new BlockItem(Blocks.X, ...) - the Blocks constant, NULL for a plain Item
+// Java: new BlockItem(Blocks.X, ...) - the Blocks constant, NULL for a plain Item
     const char *block;
-    // Java: the Item.Properties chain, NULL for default properties
+// Java: the Item.Properties chain, NULL for default properties
     void (*props)(LIBMATTI_MC_ItemProperties *p);
-    // Java: the Item static itself
+// Java: the Item static itself
     LIBMATTI_MC_Item *item;
 } ItemEntry;
 
@@ -1547,7 +1548,7 @@ static void props_NETHERITE_BLOCK(LIBMATTI_MC_ItemProperties *p)
 // Java: DECORATED_POT - the Item.Properties chain
 static void props_DECORATED_POT(LIBMATTI_MC_ItemProperties *p)
 {
-    // Java: .component(DataComponents.POT_DECORATIONS, PotDecorations.EMPTY) - payload component (game-port content)
+// Java: .component(DataComponents.POT_DECORATIONS, PotDecorations.EMPTY) - payload component (game-port content)
 }
 
 // Java: DRAGON_EGG - the Item.Properties chain
@@ -1599,119 +1600,119 @@ static void props_STRUCTURE_VOID(LIBMATTI_MC_ItemProperties *p)
 static void props_SHULKER_BOX(LIBMATTI_MC_ItemProperties *p)
 {
     LIBMATTI_MC_ItemProperties_StacksTo(p, 1);
-    // Java: .component(DataComponents.CONTAINER, ItemContainerContents.EMPTY) - payload component (game-port content)
+// Java: .component(DataComponents.CONTAINER, ItemContainerContents.EMPTY) - payload component (game-port content)
 }
 
 // Java: WHITE_SHULKER_BOX - the Item.Properties chain
 static void props_WHITE_SHULKER_BOX(LIBMATTI_MC_ItemProperties *p)
 {
     LIBMATTI_MC_ItemProperties_StacksTo(p, 1);
-    // Java: .component(DataComponents.CONTAINER, ItemContainerContents.EMPTY) - payload component (game-port content)
+// Java: .component(DataComponents.CONTAINER, ItemContainerContents.EMPTY) - payload component (game-port content)
 }
 
 // Java: ORANGE_SHULKER_BOX - the Item.Properties chain
 static void props_ORANGE_SHULKER_BOX(LIBMATTI_MC_ItemProperties *p)
 {
     LIBMATTI_MC_ItemProperties_StacksTo(p, 1);
-    // Java: .component(DataComponents.CONTAINER, ItemContainerContents.EMPTY) - payload component (game-port content)
+// Java: .component(DataComponents.CONTAINER, ItemContainerContents.EMPTY) - payload component (game-port content)
 }
 
 // Java: MAGENTA_SHULKER_BOX - the Item.Properties chain
 static void props_MAGENTA_SHULKER_BOX(LIBMATTI_MC_ItemProperties *p)
 {
     LIBMATTI_MC_ItemProperties_StacksTo(p, 1);
-    // Java: .component(DataComponents.CONTAINER, ItemContainerContents.EMPTY) - payload component (game-port content)
+// Java: .component(DataComponents.CONTAINER, ItemContainerContents.EMPTY) - payload component (game-port content)
 }
 
 // Java: LIGHT_BLUE_SHULKER_BOX - the Item.Properties chain
 static void props_LIGHT_BLUE_SHULKER_BOX(LIBMATTI_MC_ItemProperties *p)
 {
     LIBMATTI_MC_ItemProperties_StacksTo(p, 1);
-    // Java: .component(DataComponents.CONTAINER, ItemContainerContents.EMPTY) - payload component (game-port content)
+// Java: .component(DataComponents.CONTAINER, ItemContainerContents.EMPTY) - payload component (game-port content)
 }
 
 // Java: YELLOW_SHULKER_BOX - the Item.Properties chain
 static void props_YELLOW_SHULKER_BOX(LIBMATTI_MC_ItemProperties *p)
 {
     LIBMATTI_MC_ItemProperties_StacksTo(p, 1);
-    // Java: .component(DataComponents.CONTAINER, ItemContainerContents.EMPTY) - payload component (game-port content)
+// Java: .component(DataComponents.CONTAINER, ItemContainerContents.EMPTY) - payload component (game-port content)
 }
 
 // Java: LIME_SHULKER_BOX - the Item.Properties chain
 static void props_LIME_SHULKER_BOX(LIBMATTI_MC_ItemProperties *p)
 {
     LIBMATTI_MC_ItemProperties_StacksTo(p, 1);
-    // Java: .component(DataComponents.CONTAINER, ItemContainerContents.EMPTY) - payload component (game-port content)
+// Java: .component(DataComponents.CONTAINER, ItemContainerContents.EMPTY) - payload component (game-port content)
 }
 
 // Java: PINK_SHULKER_BOX - the Item.Properties chain
 static void props_PINK_SHULKER_BOX(LIBMATTI_MC_ItemProperties *p)
 {
     LIBMATTI_MC_ItemProperties_StacksTo(p, 1);
-    // Java: .component(DataComponents.CONTAINER, ItemContainerContents.EMPTY) - payload component (game-port content)
+// Java: .component(DataComponents.CONTAINER, ItemContainerContents.EMPTY) - payload component (game-port content)
 }
 
 // Java: GRAY_SHULKER_BOX - the Item.Properties chain
 static void props_GRAY_SHULKER_BOX(LIBMATTI_MC_ItemProperties *p)
 {
     LIBMATTI_MC_ItemProperties_StacksTo(p, 1);
-    // Java: .component(DataComponents.CONTAINER, ItemContainerContents.EMPTY) - payload component (game-port content)
+// Java: .component(DataComponents.CONTAINER, ItemContainerContents.EMPTY) - payload component (game-port content)
 }
 
 // Java: LIGHT_GRAY_SHULKER_BOX - the Item.Properties chain
 static void props_LIGHT_GRAY_SHULKER_BOX(LIBMATTI_MC_ItemProperties *p)
 {
     LIBMATTI_MC_ItemProperties_StacksTo(p, 1);
-    // Java: .component(DataComponents.CONTAINER, ItemContainerContents.EMPTY) - payload component (game-port content)
+// Java: .component(DataComponents.CONTAINER, ItemContainerContents.EMPTY) - payload component (game-port content)
 }
 
 // Java: CYAN_SHULKER_BOX - the Item.Properties chain
 static void props_CYAN_SHULKER_BOX(LIBMATTI_MC_ItemProperties *p)
 {
     LIBMATTI_MC_ItemProperties_StacksTo(p, 1);
-    // Java: .component(DataComponents.CONTAINER, ItemContainerContents.EMPTY) - payload component (game-port content)
+// Java: .component(DataComponents.CONTAINER, ItemContainerContents.EMPTY) - payload component (game-port content)
 }
 
 // Java: PURPLE_SHULKER_BOX - the Item.Properties chain
 static void props_PURPLE_SHULKER_BOX(LIBMATTI_MC_ItemProperties *p)
 {
     LIBMATTI_MC_ItemProperties_StacksTo(p, 1);
-    // Java: .component(DataComponents.CONTAINER, ItemContainerContents.EMPTY) - payload component (game-port content)
+// Java: .component(DataComponents.CONTAINER, ItemContainerContents.EMPTY) - payload component (game-port content)
 }
 
 // Java: BLUE_SHULKER_BOX - the Item.Properties chain
 static void props_BLUE_SHULKER_BOX(LIBMATTI_MC_ItemProperties *p)
 {
     LIBMATTI_MC_ItemProperties_StacksTo(p, 1);
-    // Java: .component(DataComponents.CONTAINER, ItemContainerContents.EMPTY) - payload component (game-port content)
+// Java: .component(DataComponents.CONTAINER, ItemContainerContents.EMPTY) - payload component (game-port content)
 }
 
 // Java: BROWN_SHULKER_BOX - the Item.Properties chain
 static void props_BROWN_SHULKER_BOX(LIBMATTI_MC_ItemProperties *p)
 {
     LIBMATTI_MC_ItemProperties_StacksTo(p, 1);
-    // Java: .component(DataComponents.CONTAINER, ItemContainerContents.EMPTY) - payload component (game-port content)
+// Java: .component(DataComponents.CONTAINER, ItemContainerContents.EMPTY) - payload component (game-port content)
 }
 
 // Java: GREEN_SHULKER_BOX - the Item.Properties chain
 static void props_GREEN_SHULKER_BOX(LIBMATTI_MC_ItemProperties *p)
 {
     LIBMATTI_MC_ItemProperties_StacksTo(p, 1);
-    // Java: .component(DataComponents.CONTAINER, ItemContainerContents.EMPTY) - payload component (game-port content)
+// Java: .component(DataComponents.CONTAINER, ItemContainerContents.EMPTY) - payload component (game-port content)
 }
 
 // Java: RED_SHULKER_BOX - the Item.Properties chain
 static void props_RED_SHULKER_BOX(LIBMATTI_MC_ItemProperties *p)
 {
     LIBMATTI_MC_ItemProperties_StacksTo(p, 1);
-    // Java: .component(DataComponents.CONTAINER, ItemContainerContents.EMPTY) - payload component (game-port content)
+// Java: .component(DataComponents.CONTAINER, ItemContainerContents.EMPTY) - payload component (game-port content)
 }
 
 // Java: BLACK_SHULKER_BOX - the Item.Properties chain
 static void props_BLACK_SHULKER_BOX(LIBMATTI_MC_ItemProperties *p)
 {
     LIBMATTI_MC_ItemProperties_StacksTo(p, 1);
-    // Java: .component(DataComponents.CONTAINER, ItemContainerContents.EMPTY) - payload component (game-port content)
+// Java: .component(DataComponents.CONTAINER, ItemContainerContents.EMPTY) - payload component (game-port content)
 }
 
 // Java: CONDUIT - the Item.Properties chain
@@ -1723,126 +1724,126 @@ static void props_CONDUIT(LIBMATTI_MC_ItemProperties *p)
 // Java: REDSTONE - the Item.Properties chain
 static void props_REDSTONE(LIBMATTI_MC_ItemProperties *p)
 {
-    // Java: .trimMaterial(TrimMaterials.REDSTONE) - payload component (game-port content)
+// Java: .trimMaterial(TrimMaterials.REDSTONE) - payload component (game-port content)
 }
 
 // Java: SADDLE - the Item.Properties chain
 static void props_SADDLE(LIBMATTI_MC_ItemProperties *p)
 {
     LIBMATTI_MC_ItemProperties_StacksTo(p, 1);
-    // Java: .component(DataComponents.EQUIPPABLE, Equippable.saddle()) - payload component (game-port content)
+// Java: .component(DataComponents.EQUIPPABLE, Equippable.saddle()) - payload component (game-port content)
 }
 
 // Java: WHITE_HARNESS - the Item.Properties chain
 static void props_WHITE_HARNESS(LIBMATTI_MC_ItemProperties *p)
 {
     LIBMATTI_MC_ItemProperties_StacksTo(p, 1);
-    // Java: .component(DataComponents.EQUIPPABLE, Equippable.harness(DyeColor.WHITE)) - payload component (game-port content)
+// Java: .component(DataComponents.EQUIPPABLE, Equippable.harness(DyeColor.WHITE)) - payload component (game-port content)
 }
 
 // Java: ORANGE_HARNESS - the Item.Properties chain
 static void props_ORANGE_HARNESS(LIBMATTI_MC_ItemProperties *p)
 {
     LIBMATTI_MC_ItemProperties_StacksTo(p, 1);
-    // Java: .component(DataComponents.EQUIPPABLE, Equippable.harness(DyeColor.ORANGE)) - payload component (game-port content)
+// Java: .component(DataComponents.EQUIPPABLE, Equippable.harness(DyeColor.ORANGE)) - payload component (game-port content)
 }
 
 // Java: MAGENTA_HARNESS - the Item.Properties chain
 static void props_MAGENTA_HARNESS(LIBMATTI_MC_ItemProperties *p)
 {
     LIBMATTI_MC_ItemProperties_StacksTo(p, 1);
-    // Java: .component(DataComponents.EQUIPPABLE, Equippable.harness(DyeColor.MAGENTA)) - payload component (game-port content)
+// Java: .component(DataComponents.EQUIPPABLE, Equippable.harness(DyeColor.MAGENTA)) - payload component (game-port content)
 }
 
 // Java: LIGHT_BLUE_HARNESS - the Item.Properties chain
 static void props_LIGHT_BLUE_HARNESS(LIBMATTI_MC_ItemProperties *p)
 {
     LIBMATTI_MC_ItemProperties_StacksTo(p, 1);
-    // Java: .component(DataComponents.EQUIPPABLE, Equippable.harness(DyeColor.LIGHT_BLUE)) - payload component (game-port content)
+// Java: .component(DataComponents.EQUIPPABLE, Equippable.harness(DyeColor.LIGHT_BLUE)) - payload component (game-port content)
 }
 
 // Java: YELLOW_HARNESS - the Item.Properties chain
 static void props_YELLOW_HARNESS(LIBMATTI_MC_ItemProperties *p)
 {
     LIBMATTI_MC_ItemProperties_StacksTo(p, 1);
-    // Java: .component(DataComponents.EQUIPPABLE, Equippable.harness(DyeColor.YELLOW)) - payload component (game-port content)
+// Java: .component(DataComponents.EQUIPPABLE, Equippable.harness(DyeColor.YELLOW)) - payload component (game-port content)
 }
 
 // Java: LIME_HARNESS - the Item.Properties chain
 static void props_LIME_HARNESS(LIBMATTI_MC_ItemProperties *p)
 {
     LIBMATTI_MC_ItemProperties_StacksTo(p, 1);
-    // Java: .component(DataComponents.EQUIPPABLE, Equippable.harness(DyeColor.LIME)) - payload component (game-port content)
+// Java: .component(DataComponents.EQUIPPABLE, Equippable.harness(DyeColor.LIME)) - payload component (game-port content)
 }
 
 // Java: PINK_HARNESS - the Item.Properties chain
 static void props_PINK_HARNESS(LIBMATTI_MC_ItemProperties *p)
 {
     LIBMATTI_MC_ItemProperties_StacksTo(p, 1);
-    // Java: .component(DataComponents.EQUIPPABLE, Equippable.harness(DyeColor.PINK)) - payload component (game-port content)
+// Java: .component(DataComponents.EQUIPPABLE, Equippable.harness(DyeColor.PINK)) - payload component (game-port content)
 }
 
 // Java: GRAY_HARNESS - the Item.Properties chain
 static void props_GRAY_HARNESS(LIBMATTI_MC_ItemProperties *p)
 {
     LIBMATTI_MC_ItemProperties_StacksTo(p, 1);
-    // Java: .component(DataComponents.EQUIPPABLE, Equippable.harness(DyeColor.GRAY)) - payload component (game-port content)
+// Java: .component(DataComponents.EQUIPPABLE, Equippable.harness(DyeColor.GRAY)) - payload component (game-port content)
 }
 
 // Java: LIGHT_GRAY_HARNESS - the Item.Properties chain
 static void props_LIGHT_GRAY_HARNESS(LIBMATTI_MC_ItemProperties *p)
 {
     LIBMATTI_MC_ItemProperties_StacksTo(p, 1);
-    // Java: .component(DataComponents.EQUIPPABLE, Equippable.harness(DyeColor.LIGHT_GRAY)) - payload component (game-port content)
+// Java: .component(DataComponents.EQUIPPABLE, Equippable.harness(DyeColor.LIGHT_GRAY)) - payload component (game-port content)
 }
 
 // Java: CYAN_HARNESS - the Item.Properties chain
 static void props_CYAN_HARNESS(LIBMATTI_MC_ItemProperties *p)
 {
     LIBMATTI_MC_ItemProperties_StacksTo(p, 1);
-    // Java: .component(DataComponents.EQUIPPABLE, Equippable.harness(DyeColor.CYAN)) - payload component (game-port content)
+// Java: .component(DataComponents.EQUIPPABLE, Equippable.harness(DyeColor.CYAN)) - payload component (game-port content)
 }
 
 // Java: PURPLE_HARNESS - the Item.Properties chain
 static void props_PURPLE_HARNESS(LIBMATTI_MC_ItemProperties *p)
 {
     LIBMATTI_MC_ItemProperties_StacksTo(p, 1);
-    // Java: .component(DataComponents.EQUIPPABLE, Equippable.harness(DyeColor.PURPLE)) - payload component (game-port content)
+// Java: .component(DataComponents.EQUIPPABLE, Equippable.harness(DyeColor.PURPLE)) - payload component (game-port content)
 }
 
 // Java: BLUE_HARNESS - the Item.Properties chain
 static void props_BLUE_HARNESS(LIBMATTI_MC_ItemProperties *p)
 {
     LIBMATTI_MC_ItemProperties_StacksTo(p, 1);
-    // Java: .component(DataComponents.EQUIPPABLE, Equippable.harness(DyeColor.BLUE)) - payload component (game-port content)
+// Java: .component(DataComponents.EQUIPPABLE, Equippable.harness(DyeColor.BLUE)) - payload component (game-port content)
 }
 
 // Java: BROWN_HARNESS - the Item.Properties chain
 static void props_BROWN_HARNESS(LIBMATTI_MC_ItemProperties *p)
 {
     LIBMATTI_MC_ItemProperties_StacksTo(p, 1);
-    // Java: .component(DataComponents.EQUIPPABLE, Equippable.harness(DyeColor.BROWN)) - payload component (game-port content)
+// Java: .component(DataComponents.EQUIPPABLE, Equippable.harness(DyeColor.BROWN)) - payload component (game-port content)
 }
 
 // Java: GREEN_HARNESS - the Item.Properties chain
 static void props_GREEN_HARNESS(LIBMATTI_MC_ItemProperties *p)
 {
     LIBMATTI_MC_ItemProperties_StacksTo(p, 1);
-    // Java: .component(DataComponents.EQUIPPABLE, Equippable.harness(DyeColor.GREEN)) - payload component (game-port content)
+// Java: .component(DataComponents.EQUIPPABLE, Equippable.harness(DyeColor.GREEN)) - payload component (game-port content)
 }
 
 // Java: RED_HARNESS - the Item.Properties chain
 static void props_RED_HARNESS(LIBMATTI_MC_ItemProperties *p)
 {
     LIBMATTI_MC_ItemProperties_StacksTo(p, 1);
-    // Java: .component(DataComponents.EQUIPPABLE, Equippable.harness(DyeColor.RED)) - payload component (game-port content)
+// Java: .component(DataComponents.EQUIPPABLE, Equippable.harness(DyeColor.RED)) - payload component (game-port content)
 }
 
 // Java: BLACK_HARNESS - the Item.Properties chain
 static void props_BLACK_HARNESS(LIBMATTI_MC_ItemProperties *p)
 {
     LIBMATTI_MC_ItemProperties_StacksTo(p, 1);
-    // Java: .component(DataComponents.EQUIPPABLE, Equippable.harness(DyeColor.BLACK)) - payload component (game-port content)
+// Java: .component(DataComponents.EQUIPPABLE, Equippable.harness(DyeColor.BLACK)) - payload component (game-port content)
 }
 
 // Java: MINECART - the Item.Properties chain
@@ -2090,7 +2091,7 @@ static void props_FLINT_AND_STEEL(LIBMATTI_MC_ItemProperties *p)
 // Java: APPLE - the Item.Properties chain
 static void props_APPLE(LIBMATTI_MC_ItemProperties *p)
 {
-    // Java: .food(Foods.APPLE) - payload component (game-port content)
+// Java: .food(Foods.APPLE) - payload component (game-port content)
 }
 
 // Java: BOW - the Item.Properties chain
@@ -2104,56 +2105,56 @@ static void props_BOW(LIBMATTI_MC_ItemProperties *p)
 // Java: DIAMOND - the Item.Properties chain
 static void props_DIAMOND(LIBMATTI_MC_ItemProperties *p)
 {
-    // Java: .trimMaterial(TrimMaterials.DIAMOND) - payload component (game-port content)
+// Java: .trimMaterial(TrimMaterials.DIAMOND) - payload component (game-port content)
 }
 
 // Java: EMERALD - the Item.Properties chain
 static void props_EMERALD(LIBMATTI_MC_ItemProperties *p)
 {
-    // Java: .trimMaterial(TrimMaterials.EMERALD) - payload component (game-port content)
+// Java: .trimMaterial(TrimMaterials.EMERALD) - payload component (game-port content)
 }
 
 // Java: LAPIS_LAZULI - the Item.Properties chain
 static void props_LAPIS_LAZULI(LIBMATTI_MC_ItemProperties *p)
 {
-    // Java: .trimMaterial(TrimMaterials.LAPIS) - payload component (game-port content)
+// Java: .trimMaterial(TrimMaterials.LAPIS) - payload component (game-port content)
 }
 
 // Java: QUARTZ - the Item.Properties chain
 static void props_QUARTZ(LIBMATTI_MC_ItemProperties *p)
 {
-    // Java: .trimMaterial(TrimMaterials.QUARTZ) - payload component (game-port content)
+// Java: .trimMaterial(TrimMaterials.QUARTZ) - payload component (game-port content)
 }
 
 // Java: AMETHYST_SHARD - the Item.Properties chain
 static void props_AMETHYST_SHARD(LIBMATTI_MC_ItemProperties *p)
 {
-    // Java: .trimMaterial(TrimMaterials.AMETHYST) - payload component (game-port content)
+// Java: .trimMaterial(TrimMaterials.AMETHYST) - payload component (game-port content)
 }
 
 // Java: IRON_INGOT - the Item.Properties chain
 static void props_IRON_INGOT(LIBMATTI_MC_ItemProperties *p)
 {
-    // Java: .trimMaterial(TrimMaterials.IRON) - payload component (game-port content)
+// Java: .trimMaterial(TrimMaterials.IRON) - payload component (game-port content)
 }
 
 // Java: COPPER_INGOT - the Item.Properties chain
 static void props_COPPER_INGOT(LIBMATTI_MC_ItemProperties *p)
 {
-    // Java: .trimMaterial(TrimMaterials.COPPER) - payload component (game-port content)
+// Java: .trimMaterial(TrimMaterials.COPPER) - payload component (game-port content)
 }
 
 // Java: GOLD_INGOT - the Item.Properties chain
 static void props_GOLD_INGOT(LIBMATTI_MC_ItemProperties *p)
 {
-    // Java: .trimMaterial(TrimMaterials.GOLD) - payload component (game-port content)
+// Java: .trimMaterial(TrimMaterials.GOLD) - payload component (game-port content)
 }
 
 // Java: NETHERITE_INGOT - the Item.Properties chain
 static void props_NETHERITE_INGOT(LIBMATTI_MC_ItemProperties *p)
 {
     LIBMATTI_MC_ItemProperties_FireResistant(p);
-    // Java: .trimMaterial(TrimMaterials.NETHERITE) - payload component (game-port content)
+// Java: .trimMaterial(TrimMaterials.NETHERITE) - payload component (game-port content)
 }
 
 // Java: NETHERITE_SCRAP - the Item.Properties chain
@@ -2402,14 +2403,14 @@ static void props_NETHERITE_HOE(LIBMATTI_MC_ItemProperties *p)
 static void props_MUSHROOM_STEW(LIBMATTI_MC_ItemProperties *p)
 {
     LIBMATTI_MC_ItemProperties_StacksTo(p, 1);
-    // Java: .food(Foods.MUSHROOM_STEW) - payload component (game-port content)
+// Java: .food(Foods.MUSHROOM_STEW) - payload component (game-port content)
     // Java: .usingConvertsTo(BOWL) - payload component (game-port content)
 }
 
 // Java: BREAD - the Item.Properties chain
 static void props_BREAD(LIBMATTI_MC_ItemProperties *p)
 {
-    // Java: .food(Foods.BREAD) - payload component (game-port content)
+// Java: .food(Foods.BREAD) - payload component (game-port content)
 }
 
 // Java: LEATHER_HELMET - the Item.Properties chain
@@ -2591,26 +2592,26 @@ static void props_NETHERITE_BOOTS(LIBMATTI_MC_ItemProperties *p)
 // Java: PORKCHOP - the Item.Properties chain
 static void props_PORKCHOP(LIBMATTI_MC_ItemProperties *p)
 {
-    // Java: .food(Foods.PORKCHOP) - payload component (game-port content)
+// Java: .food(Foods.PORKCHOP) - payload component (game-port content)
 }
 
 // Java: COOKED_PORKCHOP - the Item.Properties chain
 static void props_COOKED_PORKCHOP(LIBMATTI_MC_ItemProperties *p)
 {
-    // Java: .food(Foods.COOKED_PORKCHOP) - payload component (game-port content)
+// Java: .food(Foods.COOKED_PORKCHOP) - payload component (game-port content)
 }
 
 // Java: GOLDEN_APPLE - the Item.Properties chain
 static void props_GOLDEN_APPLE(LIBMATTI_MC_ItemProperties *p)
 {
-    // Java: .food(Foods.GOLDEN_APPLE, Consumables.GOLDEN_APPLE) - payload component (game-port content)
+// Java: .food(Foods.GOLDEN_APPLE, Consumables.GOLDEN_APPLE) - payload component (game-port content)
 }
 
 // Java: ENCHANTED_GOLDEN_APPLE - the Item.Properties chain
 static void props_ENCHANTED_GOLDEN_APPLE(LIBMATTI_MC_ItemProperties *p)
 {
     LIBMATTI_MC_ItemProperties_Rarity(p, LIBMATTI_MC_Rarity_RARE);
-    // Java: .food(Foods.ENCHANTED_GOLDEN_APPLE, Consumables.ENCHANTED_GOLDEN_APPLE) - payload component (game-port content)
+// Java: .food(Foods.ENCHANTED_GOLDEN_APPLE, Consumables.ENCHANTED_GOLDEN_APPLE) - payload component (game-port content)
     // Java: .component(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true) - payload component (game-port content)
 }
 
@@ -2824,7 +2825,7 @@ static void props_SNOWBALL(LIBMATTI_MC_ItemProperties *p)
 static void props_MILK_BUCKET(LIBMATTI_MC_ItemProperties *p)
 {
     LIBMATTI_MC_ItemProperties_CraftRemainder(p, entries[996].item);
-    // Java: .component(DataComponents.CONSUMABLE, Consumables.MILK_BUCKET) - payload component (game-port content)
+// Java: .component(DataComponents.CONSUMABLE, Consumables.MILK_BUCKET) - payload component (game-port content)
     // Java: .usingConvertsTo(BUCKET) - payload component (game-port content)
     LIBMATTI_MC_ItemProperties_StacksTo(p, 1);
 }
@@ -2834,7 +2835,7 @@ static void props_PUFFERFISH_BUCKET(LIBMATTI_MC_ItemProperties *p)
 {
 // Java: p_359625_ -> new MobBucketItem - typed item class (game-port content)
     LIBMATTI_MC_ItemProperties_StacksTo(p, 1);
-    // Java: .component(DataComponents.BUCKET_ENTITY_DATA, CustomData.EMPTY) - payload component (game-port content)
+// Java: .component(DataComponents.BUCKET_ENTITY_DATA, CustomData.EMPTY) - payload component (game-port content)
     // Java: .component(DataComponents.FOOD, Foods.PUFFERFISH) - payload component (game-port content)
 }
 
@@ -2843,7 +2844,7 @@ static void props_SALMON_BUCKET(LIBMATTI_MC_ItemProperties *p)
 {
 // Java: p_359767_ -> new MobBucketItem - typed item class (game-port content)
     LIBMATTI_MC_ItemProperties_StacksTo(p, 1);
-    // Java: .component(DataComponents.BUCKET_ENTITY_DATA, CustomData.EMPTY) - payload component (game-port content)
+// Java: .component(DataComponents.BUCKET_ENTITY_DATA, CustomData.EMPTY) - payload component (game-port content)
     // Java: .component(DataComponents.FOOD, Foods.SALMON) - payload component (game-port content)
 }
 
@@ -2852,7 +2853,7 @@ static void props_COD_BUCKET(LIBMATTI_MC_ItemProperties *p)
 {
 // Java: p_359691_ -> new MobBucketItem - typed item class (game-port content)
     LIBMATTI_MC_ItemProperties_StacksTo(p, 1);
-    // Java: .component(DataComponents.BUCKET_ENTITY_DATA, CustomData.EMPTY) - payload component (game-port content)
+// Java: .component(DataComponents.BUCKET_ENTITY_DATA, CustomData.EMPTY) - payload component (game-port content)
     // Java: .component(DataComponents.FOOD, Foods.COD) - payload component (game-port content)
 }
 
@@ -2861,7 +2862,7 @@ static void props_TROPICAL_FISH_BUCKET(LIBMATTI_MC_ItemProperties *p)
 {
 // Java: p_359521_ -> new MobBucketItem - typed item class (game-port content)
     LIBMATTI_MC_ItemProperties_StacksTo(p, 1);
-    // Java: .component(DataComponents.BUCKET_ENTITY_DATA, CustomData.EMPTY) - payload component (game-port content)
+// Java: .component(DataComponents.BUCKET_ENTITY_DATA, CustomData.EMPTY) - payload component (game-port content)
     // Java: .component(DataComponents.FOOD, Foods.TROPICAL_FISH) - payload component (game-port content)
 }
 
@@ -2870,7 +2871,7 @@ static void props_AXOLOTL_BUCKET(LIBMATTI_MC_ItemProperties *p)
 {
 // Java: p_359602_ -> new MobBucketItem - typed item class (game-port content)
     LIBMATTI_MC_ItemProperties_StacksTo(p, 1);
-    // Java: .component(DataComponents.BUCKET_ENTITY_DATA, CustomData.EMPTY) - payload component (game-port content)
+// Java: .component(DataComponents.BUCKET_ENTITY_DATA, CustomData.EMPTY) - payload component (game-port content)
 }
 
 // Java: TADPOLE_BUCKET - the Item.Properties chain
@@ -2878,7 +2879,7 @@ static void props_TADPOLE_BUCKET(LIBMATTI_MC_ItemProperties *p)
 {
 // Java: p_359585_ -> new MobBucketItem - typed item class (game-port content)
     LIBMATTI_MC_ItemProperties_StacksTo(p, 1);
-    // Java: .component(DataComponents.BUCKET_ENTITY_DATA, CustomData.EMPTY) - payload component (game-port content)
+// Java: .component(DataComponents.BUCKET_ENTITY_DATA, CustomData.EMPTY) - payload component (game-port content)
 }
 
 // Java: BOOK - the Item.Properties chain
@@ -2892,7 +2893,7 @@ static void props_EGG(LIBMATTI_MC_ItemProperties *p)
 {
 // Java: EggItem::new - typed item class (game-port content)
     LIBMATTI_MC_ItemProperties_StacksTo(p, 16);
-    // Java: .component(DataComponents.CHICKEN_VARIANT, new EitherHolder<>(ChickenVariants.TEMPERATE)) - payload component (game-port content)
+// Java: .component(DataComponents.CHICKEN_VARIANT, new EitherHolder<>(ChickenVariants.TEMPERATE)) - payload component (game-port content)
 }
 
 // Java: BLUE_EGG - the Item.Properties chain
@@ -2900,7 +2901,7 @@ static void props_BLUE_EGG(LIBMATTI_MC_ItemProperties *p)
 {
 // Java: EggItem::new - typed item class (game-port content)
     LIBMATTI_MC_ItemProperties_StacksTo(p, 16);
-    // Java: .component(DataComponents.CHICKEN_VARIANT, new EitherHolder<>(ChickenVariants.COLD)) - payload component (game-port content)
+// Java: .component(DataComponents.CHICKEN_VARIANT, new EitherHolder<>(ChickenVariants.COLD)) - payload component (game-port content)
 }
 
 // Java: BROWN_EGG - the Item.Properties chain
@@ -2908,7 +2909,7 @@ static void props_BROWN_EGG(LIBMATTI_MC_ItemProperties *p)
 {
 // Java: EggItem::new - typed item class (game-port content)
     LIBMATTI_MC_ItemProperties_StacksTo(p, 16);
-    // Java: .component(DataComponents.CHICKEN_VARIANT, new EitherHolder<>(ChickenVariants.WARM)) - payload component (game-port content)
+// Java: .component(DataComponents.CHICKEN_VARIANT, new EitherHolder<>(ChickenVariants.WARM)) - payload component (game-port content)
 }
 
 // Java: RECOVERY_COMPASS - the Item.Properties chain
@@ -2922,7 +2923,7 @@ static void props_BUNDLE(LIBMATTI_MC_ItemProperties *p)
 {
 // Java: BundleItem::new - typed item class (game-port content)
     LIBMATTI_MC_ItemProperties_StacksTo(p, 1);
-    // Java: .component(DataComponents.BUNDLE_CONTENTS, BundleContents.EMPTY) - payload component (game-port content)
+// Java: .component(DataComponents.BUNDLE_CONTENTS, BundleContents.EMPTY) - payload component (game-port content)
 }
 
 // Java: WHITE_BUNDLE - the Item.Properties chain
@@ -2930,7 +2931,7 @@ static void props_WHITE_BUNDLE(LIBMATTI_MC_ItemProperties *p)
 {
 // Java: BundleItem::new - typed item class (game-port content)
     LIBMATTI_MC_ItemProperties_StacksTo(p, 1);
-    // Java: .component(DataComponents.BUNDLE_CONTENTS, BundleContents.EMPTY) - payload component (game-port content)
+// Java: .component(DataComponents.BUNDLE_CONTENTS, BundleContents.EMPTY) - payload component (game-port content)
 }
 
 // Java: ORANGE_BUNDLE - the Item.Properties chain
@@ -2938,7 +2939,7 @@ static void props_ORANGE_BUNDLE(LIBMATTI_MC_ItemProperties *p)
 {
 // Java: BundleItem::new - typed item class (game-port content)
     LIBMATTI_MC_ItemProperties_StacksTo(p, 1);
-    // Java: .component(DataComponents.BUNDLE_CONTENTS, BundleContents.EMPTY) - payload component (game-port content)
+// Java: .component(DataComponents.BUNDLE_CONTENTS, BundleContents.EMPTY) - payload component (game-port content)
 }
 
 // Java: MAGENTA_BUNDLE - the Item.Properties chain
@@ -2946,7 +2947,7 @@ static void props_MAGENTA_BUNDLE(LIBMATTI_MC_ItemProperties *p)
 {
 // Java: BundleItem::new - typed item class (game-port content)
     LIBMATTI_MC_ItemProperties_StacksTo(p, 1);
-    // Java: .component(DataComponents.BUNDLE_CONTENTS, BundleContents.EMPTY) - payload component (game-port content)
+// Java: .component(DataComponents.BUNDLE_CONTENTS, BundleContents.EMPTY) - payload component (game-port content)
 }
 
 // Java: LIGHT_BLUE_BUNDLE - the Item.Properties chain
@@ -2954,7 +2955,7 @@ static void props_LIGHT_BLUE_BUNDLE(LIBMATTI_MC_ItemProperties *p)
 {
 // Java: BundleItem::new - typed item class (game-port content)
     LIBMATTI_MC_ItemProperties_StacksTo(p, 1);
-    // Java: .component(DataComponents.BUNDLE_CONTENTS, BundleContents.EMPTY) - payload component (game-port content)
+// Java: .component(DataComponents.BUNDLE_CONTENTS, BundleContents.EMPTY) - payload component (game-port content)
 }
 
 // Java: YELLOW_BUNDLE - the Item.Properties chain
@@ -2962,7 +2963,7 @@ static void props_YELLOW_BUNDLE(LIBMATTI_MC_ItemProperties *p)
 {
 // Java: BundleItem::new - typed item class (game-port content)
     LIBMATTI_MC_ItemProperties_StacksTo(p, 1);
-    // Java: .component(DataComponents.BUNDLE_CONTENTS, BundleContents.EMPTY) - payload component (game-port content)
+// Java: .component(DataComponents.BUNDLE_CONTENTS, BundleContents.EMPTY) - payload component (game-port content)
 }
 
 // Java: LIME_BUNDLE - the Item.Properties chain
@@ -2970,7 +2971,7 @@ static void props_LIME_BUNDLE(LIBMATTI_MC_ItemProperties *p)
 {
 // Java: BundleItem::new - typed item class (game-port content)
     LIBMATTI_MC_ItemProperties_StacksTo(p, 1);
-    // Java: .component(DataComponents.BUNDLE_CONTENTS, BundleContents.EMPTY) - payload component (game-port content)
+// Java: .component(DataComponents.BUNDLE_CONTENTS, BundleContents.EMPTY) - payload component (game-port content)
 }
 
 // Java: PINK_BUNDLE - the Item.Properties chain
@@ -2978,7 +2979,7 @@ static void props_PINK_BUNDLE(LIBMATTI_MC_ItemProperties *p)
 {
 // Java: BundleItem::new - typed item class (game-port content)
     LIBMATTI_MC_ItemProperties_StacksTo(p, 1);
-    // Java: .component(DataComponents.BUNDLE_CONTENTS, BundleContents.EMPTY) - payload component (game-port content)
+// Java: .component(DataComponents.BUNDLE_CONTENTS, BundleContents.EMPTY) - payload component (game-port content)
 }
 
 // Java: GRAY_BUNDLE - the Item.Properties chain
@@ -2986,7 +2987,7 @@ static void props_GRAY_BUNDLE(LIBMATTI_MC_ItemProperties *p)
 {
 // Java: BundleItem::new - typed item class (game-port content)
     LIBMATTI_MC_ItemProperties_StacksTo(p, 1);
-    // Java: .component(DataComponents.BUNDLE_CONTENTS, BundleContents.EMPTY) - payload component (game-port content)
+// Java: .component(DataComponents.BUNDLE_CONTENTS, BundleContents.EMPTY) - payload component (game-port content)
 }
 
 // Java: LIGHT_GRAY_BUNDLE - the Item.Properties chain
@@ -2994,7 +2995,7 @@ static void props_LIGHT_GRAY_BUNDLE(LIBMATTI_MC_ItemProperties *p)
 {
 // Java: BundleItem::new - typed item class (game-port content)
     LIBMATTI_MC_ItemProperties_StacksTo(p, 1);
-    // Java: .component(DataComponents.BUNDLE_CONTENTS, BundleContents.EMPTY) - payload component (game-port content)
+// Java: .component(DataComponents.BUNDLE_CONTENTS, BundleContents.EMPTY) - payload component (game-port content)
 }
 
 // Java: CYAN_BUNDLE - the Item.Properties chain
@@ -3002,7 +3003,7 @@ static void props_CYAN_BUNDLE(LIBMATTI_MC_ItemProperties *p)
 {
 // Java: BundleItem::new - typed item class (game-port content)
     LIBMATTI_MC_ItemProperties_StacksTo(p, 1);
-    // Java: .component(DataComponents.BUNDLE_CONTENTS, BundleContents.EMPTY) - payload component (game-port content)
+// Java: .component(DataComponents.BUNDLE_CONTENTS, BundleContents.EMPTY) - payload component (game-port content)
 }
 
 // Java: PURPLE_BUNDLE - the Item.Properties chain
@@ -3010,7 +3011,7 @@ static void props_PURPLE_BUNDLE(LIBMATTI_MC_ItemProperties *p)
 {
 // Java: BundleItem::new - typed item class (game-port content)
     LIBMATTI_MC_ItemProperties_StacksTo(p, 1);
-    // Java: .component(DataComponents.BUNDLE_CONTENTS, BundleContents.EMPTY) - payload component (game-port content)
+// Java: .component(DataComponents.BUNDLE_CONTENTS, BundleContents.EMPTY) - payload component (game-port content)
 }
 
 // Java: BLUE_BUNDLE - the Item.Properties chain
@@ -3018,7 +3019,7 @@ static void props_BLUE_BUNDLE(LIBMATTI_MC_ItemProperties *p)
 {
 // Java: BundleItem::new - typed item class (game-port content)
     LIBMATTI_MC_ItemProperties_StacksTo(p, 1);
-    // Java: .component(DataComponents.BUNDLE_CONTENTS, BundleContents.EMPTY) - payload component (game-port content)
+// Java: .component(DataComponents.BUNDLE_CONTENTS, BundleContents.EMPTY) - payload component (game-port content)
 }
 
 // Java: BROWN_BUNDLE - the Item.Properties chain
@@ -3026,7 +3027,7 @@ static void props_BROWN_BUNDLE(LIBMATTI_MC_ItemProperties *p)
 {
 // Java: BundleItem::new - typed item class (game-port content)
     LIBMATTI_MC_ItemProperties_StacksTo(p, 1);
-    // Java: .component(DataComponents.BUNDLE_CONTENTS, BundleContents.EMPTY) - payload component (game-port content)
+// Java: .component(DataComponents.BUNDLE_CONTENTS, BundleContents.EMPTY) - payload component (game-port content)
 }
 
 // Java: GREEN_BUNDLE - the Item.Properties chain
@@ -3034,7 +3035,7 @@ static void props_GREEN_BUNDLE(LIBMATTI_MC_ItemProperties *p)
 {
 // Java: BundleItem::new - typed item class (game-port content)
     LIBMATTI_MC_ItemProperties_StacksTo(p, 1);
-    // Java: .component(DataComponents.BUNDLE_CONTENTS, BundleContents.EMPTY) - payload component (game-port content)
+// Java: .component(DataComponents.BUNDLE_CONTENTS, BundleContents.EMPTY) - payload component (game-port content)
 }
 
 // Java: RED_BUNDLE - the Item.Properties chain
@@ -3042,7 +3043,7 @@ static void props_RED_BUNDLE(LIBMATTI_MC_ItemProperties *p)
 {
 // Java: BundleItem::new - typed item class (game-port content)
     LIBMATTI_MC_ItemProperties_StacksTo(p, 1);
-    // Java: .component(DataComponents.BUNDLE_CONTENTS, BundleContents.EMPTY) - payload component (game-port content)
+// Java: .component(DataComponents.BUNDLE_CONTENTS, BundleContents.EMPTY) - payload component (game-port content)
 }
 
 // Java: BLACK_BUNDLE - the Item.Properties chain
@@ -3050,7 +3051,7 @@ static void props_BLACK_BUNDLE(LIBMATTI_MC_ItemProperties *p)
 {
 // Java: BundleItem::new - typed item class (game-port content)
     LIBMATTI_MC_ItemProperties_StacksTo(p, 1);
-    // Java: .component(DataComponents.BUNDLE_CONTENTS, BundleContents.EMPTY) - payload component (game-port content)
+// Java: .component(DataComponents.BUNDLE_CONTENTS, BundleContents.EMPTY) - payload component (game-port content)
 }
 
 // Java: FISHING_ROD - the Item.Properties chain
@@ -3071,37 +3072,37 @@ static void props_SPYGLASS(LIBMATTI_MC_ItemProperties *p)
 // Java: COD - the Item.Properties chain
 static void props_COD(LIBMATTI_MC_ItemProperties *p)
 {
-    // Java: .food(Foods.COD) - payload component (game-port content)
+// Java: .food(Foods.COD) - payload component (game-port content)
 }
 
 // Java: SALMON - the Item.Properties chain
 static void props_SALMON(LIBMATTI_MC_ItemProperties *p)
 {
-    // Java: .food(Foods.SALMON) - payload component (game-port content)
+// Java: .food(Foods.SALMON) - payload component (game-port content)
 }
 
 // Java: TROPICAL_FISH - the Item.Properties chain
 static void props_TROPICAL_FISH(LIBMATTI_MC_ItemProperties *p)
 {
-    // Java: .food(Foods.TROPICAL_FISH) - payload component (game-port content)
+// Java: .food(Foods.TROPICAL_FISH) - payload component (game-port content)
 }
 
 // Java: PUFFERFISH - the Item.Properties chain
 static void props_PUFFERFISH(LIBMATTI_MC_ItemProperties *p)
 {
-    // Java: .food(Foods.PUFFERFISH, Consumables.PUFFERFISH) - payload component (game-port content)
+// Java: .food(Foods.PUFFERFISH, Consumables.PUFFERFISH) - payload component (game-port content)
 }
 
 // Java: COOKED_COD - the Item.Properties chain
 static void props_COOKED_COD(LIBMATTI_MC_ItemProperties *p)
 {
-    // Java: .food(Foods.COOKED_COD) - payload component (game-port content)
+// Java: .food(Foods.COOKED_COD) - payload component (game-port content)
 }
 
 // Java: COOKED_SALMON - the Item.Properties chain
 static void props_COOKED_SALMON(LIBMATTI_MC_ItemProperties *p)
 {
-    // Java: .food(Foods.COOKED_SALMON) - payload component (game-port content)
+// Java: .food(Foods.COOKED_SALMON) - payload component (game-port content)
 }
 
 // Java: CAKE - the Item.Properties chain
@@ -3225,7 +3226,7 @@ static void props_BLACK_BED(LIBMATTI_MC_ItemProperties *p)
 // Java: COOKIE - the Item.Properties chain
 static void props_COOKIE(LIBMATTI_MC_ItemProperties *p)
 {
-    // Java: .food(Foods.COOKIE) - payload component (game-port content)
+// Java: .food(Foods.COOKIE) - payload component (game-port content)
 }
 
 // Java: FILLED_MAP - the Item.Properties chain
@@ -3241,49 +3242,49 @@ static void props_SHEARS(LIBMATTI_MC_ItemProperties *p)
 {
 // Java: ShearsItem::new - typed item class (game-port content)
     LIBMATTI_MC_ItemProperties_Durability(p, 238);
-    // Java: .component(DataComponents.TOOL, ShearsItem.createToolProperties()) - payload component (game-port content)
+// Java: .component(DataComponents.TOOL, ShearsItem.createToolProperties()) - payload component (game-port content)
 }
 
 // Java: MELON_SLICE - the Item.Properties chain
 static void props_MELON_SLICE(LIBMATTI_MC_ItemProperties *p)
 {
-    // Java: .food(Foods.MELON_SLICE) - payload component (game-port content)
+// Java: .food(Foods.MELON_SLICE) - payload component (game-port content)
 }
 
 // Java: DRIED_KELP - the Item.Properties chain
 static void props_DRIED_KELP(LIBMATTI_MC_ItemProperties *p)
 {
-    // Java: .food(Foods.DRIED_KELP, Consumables.DRIED_KELP) - payload component (game-port content)
+// Java: .food(Foods.DRIED_KELP, Consumables.DRIED_KELP) - payload component (game-port content)
 }
 
 // Java: BEEF - the Item.Properties chain
 static void props_BEEF(LIBMATTI_MC_ItemProperties *p)
 {
-    // Java: .food(Foods.BEEF) - payload component (game-port content)
+// Java: .food(Foods.BEEF) - payload component (game-port content)
 }
 
 // Java: COOKED_BEEF - the Item.Properties chain
 static void props_COOKED_BEEF(LIBMATTI_MC_ItemProperties *p)
 {
-    // Java: .food(Foods.COOKED_BEEF) - payload component (game-port content)
+// Java: .food(Foods.COOKED_BEEF) - payload component (game-port content)
 }
 
 // Java: CHICKEN - the Item.Properties chain
 static void props_CHICKEN(LIBMATTI_MC_ItemProperties *p)
 {
-    // Java: .food(Foods.CHICKEN, Consumables.CHICKEN) - payload component (game-port content)
+// Java: .food(Foods.CHICKEN, Consumables.CHICKEN) - payload component (game-port content)
 }
 
 // Java: COOKED_CHICKEN - the Item.Properties chain
 static void props_COOKED_CHICKEN(LIBMATTI_MC_ItemProperties *p)
 {
-    // Java: .food(Foods.COOKED_CHICKEN) - payload component (game-port content)
+// Java: .food(Foods.COOKED_CHICKEN) - payload component (game-port content)
 }
 
 // Java: ROTTEN_FLESH - the Item.Properties chain
 static void props_ROTTEN_FLESH(LIBMATTI_MC_ItemProperties *p)
 {
-    // Java: .food(Foods.ROTTEN_FLESH, Consumables.ROTTEN_FLESH) - payload component (game-port content)
+// Java: .food(Foods.ROTTEN_FLESH, Consumables.ROTTEN_FLESH) - payload component (game-port content)
 }
 
 // Java: ENDER_PEARL - the Item.Properties chain
@@ -3291,7 +3292,7 @@ static void props_ENDER_PEARL(LIBMATTI_MC_ItemProperties *p)
 {
 // Java: EnderpearlItem::new - typed item class (game-port content)
     LIBMATTI_MC_ItemProperties_StacksTo(p, 16);
-    // Java: .useCooldown(1.0F) - payload component (game-port content)
+// Java: .useCooldown(1.0F) - payload component (game-port content)
 }
 
 // Java: POTION - the Item.Properties chain
@@ -3304,7 +3305,7 @@ static void props_POTION(LIBMATTI_MC_ItemProperties *p)
 // Java: SPIDER_EYE - the Item.Properties chain
 static void props_SPIDER_EYE(LIBMATTI_MC_ItemProperties *p)
 {
-    // Java: .food(Foods.SPIDER_EYE, Consumables.SPIDER_EYE) - payload component (game-port content)
+// Java: .food(Foods.SPIDER_EYE, Consumables.SPIDER_EYE) - payload component (game-port content)
 }
 
 // Java: EXPERIENCE_BOTTLE - the Item.Properties chain
@@ -3312,7 +3313,7 @@ static void props_EXPERIENCE_BOTTLE(LIBMATTI_MC_ItemProperties *p)
 {
 // Java: ExperienceBottleItem::new - typed item class (game-port content)
     LIBMATTI_MC_ItemProperties_Rarity(p, LIBMATTI_MC_Rarity_UNCOMMON);
-    // Java: .component(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true) - payload component (game-port content)
+// Java: .component(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true) - payload component (game-port content)
 }
 
 // Java: WIND_CHARGE - the Item.Properties chain
@@ -3327,7 +3328,7 @@ static void props_WRITABLE_BOOK(LIBMATTI_MC_ItemProperties *p)
 {
 // Java: WritableBookItem::new - typed item class (game-port content)
     LIBMATTI_MC_ItemProperties_StacksTo(p, 1);
-    // Java: .component(DataComponents.WRITABLE_BOOK_CONTENT, WritableBookContent.EMPTY) - payload component (game-port content)
+// Java: .component(DataComponents.WRITABLE_BOOK_CONTENT, WritableBookContent.EMPTY) - payload component (game-port content)
 }
 
 // Java: WRITTEN_BOOK - the Item.Properties chain
@@ -3335,7 +3336,7 @@ static void props_WRITTEN_BOOK(LIBMATTI_MC_ItemProperties *p)
 {
 // Java: WrittenBookItem::new - typed item class (game-port content)
     LIBMATTI_MC_ItemProperties_StacksTo(p, 16);
-    // Java: .component(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true) - payload component (game-port content)
+// Java: .component(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true) - payload component (game-port content)
 }
 
 // Java: MACE - the Item.Properties chain
@@ -3348,31 +3349,31 @@ static void props_MACE(LIBMATTI_MC_ItemProperties *p)
 // Java: CARROT - the Item.Properties chain
 static void props_CARROT(LIBMATTI_MC_ItemProperties *p)
 {
-    // Java: .food(Foods.CARROT) - payload component (game-port content)
+// Java: .food(Foods.CARROT) - payload component (game-port content)
 }
 
 // Java: POTATO - the Item.Properties chain
 static void props_POTATO(LIBMATTI_MC_ItemProperties *p)
 {
-    // Java: .food(Foods.POTATO) - payload component (game-port content)
+// Java: .food(Foods.POTATO) - payload component (game-port content)
 }
 
 // Java: BAKED_POTATO - the Item.Properties chain
 static void props_BAKED_POTATO(LIBMATTI_MC_ItemProperties *p)
 {
-    // Java: .food(Foods.BAKED_POTATO) - payload component (game-port content)
+// Java: .food(Foods.BAKED_POTATO) - payload component (game-port content)
 }
 
 // Java: POISONOUS_POTATO - the Item.Properties chain
 static void props_POISONOUS_POTATO(LIBMATTI_MC_ItemProperties *p)
 {
-    // Java: .food(Foods.POISONOUS_POTATO, Consumables.POISONOUS_POTATO) - payload component (game-port content)
+// Java: .food(Foods.POISONOUS_POTATO, Consumables.POISONOUS_POTATO) - payload component (game-port content)
 }
 
 // Java: GOLDEN_CARROT - the Item.Properties chain
 static void props_GOLDEN_CARROT(LIBMATTI_MC_ItemProperties *p)
 {
-    // Java: .food(Foods.GOLDEN_CARROT) - payload component (game-port content)
+// Java: .food(Foods.GOLDEN_CARROT) - payload component (game-port content)
 }
 
 // Java: SKELETON_SKULL - the Item.Properties chain
@@ -3380,7 +3381,7 @@ static void props_SKELETON_SKULL(LIBMATTI_MC_ItemProperties *p)
 {
 // Java:  - typed item class (game-port content)
     LIBMATTI_MC_ItemProperties_Rarity(p, LIBMATTI_MC_Rarity_UNCOMMON);
-    // Java: .equippableUnswappable(EquipmentSlot.HEAD) - payload component (game-port content)
+// Java: .equippableUnswappable(EquipmentSlot.HEAD) - payload component (game-port content)
 }
 
 // Java: WITHER_SKELETON_SKULL - the Item.Properties chain
@@ -3388,7 +3389,7 @@ static void props_WITHER_SKELETON_SKULL(LIBMATTI_MC_ItemProperties *p)
 {
 // Java:  - typed item class (game-port content)
     LIBMATTI_MC_ItemProperties_Rarity(p, LIBMATTI_MC_Rarity_RARE);
-    // Java: .equippableUnswappable(EquipmentSlot.HEAD) - payload component (game-port content)
+// Java: .equippableUnswappable(EquipmentSlot.HEAD) - payload component (game-port content)
 }
 
 // Java: PLAYER_HEAD - the Item.Properties chain
@@ -3396,7 +3397,7 @@ static void props_PLAYER_HEAD(LIBMATTI_MC_ItemProperties *p)
 {
 // Java:  - typed item class (game-port content)
     LIBMATTI_MC_ItemProperties_Rarity(p, LIBMATTI_MC_Rarity_UNCOMMON);
-    // Java: .equippableUnswappable(EquipmentSlot.HEAD) - payload component (game-port content)
+// Java: .equippableUnswappable(EquipmentSlot.HEAD) - payload component (game-port content)
 }
 
 // Java: ZOMBIE_HEAD - the Item.Properties chain
@@ -3404,7 +3405,7 @@ static void props_ZOMBIE_HEAD(LIBMATTI_MC_ItemProperties *p)
 {
 // Java:  - typed item class (game-port content)
     LIBMATTI_MC_ItemProperties_Rarity(p, LIBMATTI_MC_Rarity_UNCOMMON);
-    // Java: .equippableUnswappable(EquipmentSlot.HEAD) - payload component (game-port content)
+// Java: .equippableUnswappable(EquipmentSlot.HEAD) - payload component (game-port content)
 }
 
 // Java: CREEPER_HEAD - the Item.Properties chain
@@ -3412,7 +3413,7 @@ static void props_CREEPER_HEAD(LIBMATTI_MC_ItemProperties *p)
 {
 // Java:  - typed item class (game-port content)
     LIBMATTI_MC_ItemProperties_Rarity(p, LIBMATTI_MC_Rarity_UNCOMMON);
-    // Java: .equippableUnswappable(EquipmentSlot.HEAD) - payload component (game-port content)
+// Java: .equippableUnswappable(EquipmentSlot.HEAD) - payload component (game-port content)
 }
 
 // Java: DRAGON_HEAD - the Item.Properties chain
@@ -3420,7 +3421,7 @@ static void props_DRAGON_HEAD(LIBMATTI_MC_ItemProperties *p)
 {
 // Java:  - typed item class (game-port content)
     LIBMATTI_MC_ItemProperties_Rarity(p, LIBMATTI_MC_Rarity_EPIC);
-    // Java: .equippableUnswappable(EquipmentSlot.HEAD) - payload component (game-port content)
+// Java: .equippableUnswappable(EquipmentSlot.HEAD) - payload component (game-port content)
 }
 
 // Java: PIGLIN_HEAD - the Item.Properties chain
@@ -3428,7 +3429,7 @@ static void props_PIGLIN_HEAD(LIBMATTI_MC_ItemProperties *p)
 {
 // Java:  - typed item class (game-port content)
     LIBMATTI_MC_ItemProperties_Rarity(p, LIBMATTI_MC_Rarity_UNCOMMON);
-    // Java: .equippableUnswappable(EquipmentSlot.HEAD) - payload component (game-port content)
+// Java: .equippableUnswappable(EquipmentSlot.HEAD) - payload component (game-port content)
 }
 
 // Java: NETHER_STAR - the Item.Properties chain
@@ -3440,7 +3441,7 @@ static void props_NETHER_STAR(LIBMATTI_MC_ItemProperties *p)
 // Java: PUMPKIN_PIE - the Item.Properties chain
 static void props_PUMPKIN_PIE(LIBMATTI_MC_ItemProperties *p)
 {
-    // Java: .food(Foods.PUMPKIN_PIE) - payload component (game-port content)
+// Java: .food(Foods.PUMPKIN_PIE) - payload component (game-port content)
 }
 
 // Java: FIREWORK_ROCKET - the Item.Properties chain
@@ -3459,26 +3460,26 @@ static void props_ENCHANTED_BOOK(LIBMATTI_MC_ItemProperties *p)
 // Java: RESIN_BRICK - the Item.Properties chain
 static void props_RESIN_BRICK(LIBMATTI_MC_ItemProperties *p)
 {
-    // Java: .trimMaterial(TrimMaterials.RESIN) - payload component (game-port content)
+// Java: .trimMaterial(TrimMaterials.RESIN) - payload component (game-port content)
 }
 
 // Java: RABBIT - the Item.Properties chain
 static void props_RABBIT(LIBMATTI_MC_ItemProperties *p)
 {
-    // Java: .food(Foods.RABBIT) - payload component (game-port content)
+// Java: .food(Foods.RABBIT) - payload component (game-port content)
 }
 
 // Java: COOKED_RABBIT - the Item.Properties chain
 static void props_COOKED_RABBIT(LIBMATTI_MC_ItemProperties *p)
 {
-    // Java: .food(Foods.COOKED_RABBIT) - payload component (game-port content)
+// Java: .food(Foods.COOKED_RABBIT) - payload component (game-port content)
 }
 
 // Java: RABBIT_STEW - the Item.Properties chain
 static void props_RABBIT_STEW(LIBMATTI_MC_ItemProperties *p)
 {
     LIBMATTI_MC_ItemProperties_StacksTo(p, 1);
-    // Java: .food(Foods.RABBIT_STEW) - payload component (game-port content)
+// Java: .food(Foods.RABBIT_STEW) - payload component (game-port content)
     // Java: .usingConvertsTo(BOWL) - payload component (game-port content)
 }
 
@@ -3492,38 +3493,38 @@ static void props_ARMOR_STAND(LIBMATTI_MC_ItemProperties *p)
 // Java: COPPER_HORSE_ARMOR - the Item.Properties chain
 static void props_COPPER_HORSE_ARMOR(LIBMATTI_MC_ItemProperties *p)
 {
-    // Java: .horseArmor(ArmorMaterials.COPPER) - attributes + EQUIPPABLE payload (game-port content)
+// Java: .horseArmor(ArmorMaterials.COPPER) - attributes + EQUIPPABLE payload (game-port content)
 }
 
 // Java: IRON_HORSE_ARMOR - the Item.Properties chain
 static void props_IRON_HORSE_ARMOR(LIBMATTI_MC_ItemProperties *p)
 {
-    // Java: .horseArmor(ArmorMaterials.IRON) - attributes + EQUIPPABLE payload (game-port content)
+// Java: .horseArmor(ArmorMaterials.IRON) - attributes + EQUIPPABLE payload (game-port content)
 }
 
 // Java: GOLDEN_HORSE_ARMOR - the Item.Properties chain
 static void props_GOLDEN_HORSE_ARMOR(LIBMATTI_MC_ItemProperties *p)
 {
-    // Java: .horseArmor(ArmorMaterials.GOLD) - attributes + EQUIPPABLE payload (game-port content)
+// Java: .horseArmor(ArmorMaterials.GOLD) - attributes + EQUIPPABLE payload (game-port content)
 }
 
 // Java: DIAMOND_HORSE_ARMOR - the Item.Properties chain
 static void props_DIAMOND_HORSE_ARMOR(LIBMATTI_MC_ItemProperties *p)
 {
-    // Java: .horseArmor(ArmorMaterials.DIAMOND) - attributes + EQUIPPABLE payload (game-port content)
+// Java: .horseArmor(ArmorMaterials.DIAMOND) - attributes + EQUIPPABLE payload (game-port content)
 }
 
 // Java: NETHERITE_HORSE_ARMOR - the Item.Properties chain
 static void props_NETHERITE_HORSE_ARMOR(LIBMATTI_MC_ItemProperties *p)
 {
-    // Java: .horseArmor(ArmorMaterials.NETHERITE) - attributes + EQUIPPABLE payload (game-port content)
+// Java: .horseArmor(ArmorMaterials.NETHERITE) - attributes + EQUIPPABLE payload (game-port content)
     LIBMATTI_MC_ItemProperties_FireResistant(p);
 }
 
 // Java: LEATHER_HORSE_ARMOR - the Item.Properties chain
 static void props_LEATHER_HORSE_ARMOR(LIBMATTI_MC_ItemProperties *p)
 {
-    // Java: .horseArmor(ArmorMaterials.LEATHER) - attributes + EQUIPPABLE payload (game-port content)
+// Java: .horseArmor(ArmorMaterials.LEATHER) - attributes + EQUIPPABLE payload (game-port content)
 }
 
 // Java: COMMAND_BLOCK_MINECART - the Item.Properties chain
@@ -3537,13 +3538,13 @@ static void props_COMMAND_BLOCK_MINECART(LIBMATTI_MC_ItemProperties *p)
 // Java: MUTTON - the Item.Properties chain
 static void props_MUTTON(LIBMATTI_MC_ItemProperties *p)
 {
-    // Java: .food(Foods.MUTTON) - payload component (game-port content)
+// Java: .food(Foods.MUTTON) - payload component (game-port content)
 }
 
 // Java: COOKED_MUTTON - the Item.Properties chain
 static void props_COOKED_MUTTON(LIBMATTI_MC_ItemProperties *p)
 {
-    // Java: .food(Foods.COOKED_MUTTON) - payload component (game-port content)
+// Java: .food(Foods.COOKED_MUTTON) - payload component (game-port content)
 }
 
 // Java: WHITE_BANNER - the Item.Properties chain
@@ -3551,7 +3552,7 @@ static void props_WHITE_BANNER(LIBMATTI_MC_ItemProperties *p)
 {
 // Java:  - typed item class (game-port content)
     LIBMATTI_MC_ItemProperties_StacksTo(p, 16);
-    // Java: .component(DataComponents.BANNER_PATTERNS, BannerPatternLayers.EMPTY) - payload component (game-port content)
+// Java: .component(DataComponents.BANNER_PATTERNS, BannerPatternLayers.EMPTY) - payload component (game-port content)
 }
 
 // Java: ORANGE_BANNER - the Item.Properties chain
@@ -3559,7 +3560,7 @@ static void props_ORANGE_BANNER(LIBMATTI_MC_ItemProperties *p)
 {
 // Java:  - typed item class (game-port content)
     LIBMATTI_MC_ItemProperties_StacksTo(p, 16);
-    // Java: .component(DataComponents.BANNER_PATTERNS, BannerPatternLayers.EMPTY) - payload component (game-port content)
+// Java: .component(DataComponents.BANNER_PATTERNS, BannerPatternLayers.EMPTY) - payload component (game-port content)
 }
 
 // Java: MAGENTA_BANNER - the Item.Properties chain
@@ -3567,7 +3568,7 @@ static void props_MAGENTA_BANNER(LIBMATTI_MC_ItemProperties *p)
 {
 // Java:  - typed item class (game-port content)
     LIBMATTI_MC_ItemProperties_StacksTo(p, 16);
-    // Java: .component(DataComponents.BANNER_PATTERNS, BannerPatternLayers.EMPTY) - payload component (game-port content)
+// Java: .component(DataComponents.BANNER_PATTERNS, BannerPatternLayers.EMPTY) - payload component (game-port content)
 }
 
 // Java: LIGHT_BLUE_BANNER - the Item.Properties chain
@@ -3575,7 +3576,7 @@ static void props_LIGHT_BLUE_BANNER(LIBMATTI_MC_ItemProperties *p)
 {
 // Java:  - typed item class (game-port content)
     LIBMATTI_MC_ItemProperties_StacksTo(p, 16);
-    // Java: .component(DataComponents.BANNER_PATTERNS, BannerPatternLayers.EMPTY) - payload component (game-port content)
+// Java: .component(DataComponents.BANNER_PATTERNS, BannerPatternLayers.EMPTY) - payload component (game-port content)
 }
 
 // Java: YELLOW_BANNER - the Item.Properties chain
@@ -3583,7 +3584,7 @@ static void props_YELLOW_BANNER(LIBMATTI_MC_ItemProperties *p)
 {
 // Java:  - typed item class (game-port content)
     LIBMATTI_MC_ItemProperties_StacksTo(p, 16);
-    // Java: .component(DataComponents.BANNER_PATTERNS, BannerPatternLayers.EMPTY) - payload component (game-port content)
+// Java: .component(DataComponents.BANNER_PATTERNS, BannerPatternLayers.EMPTY) - payload component (game-port content)
 }
 
 // Java: LIME_BANNER - the Item.Properties chain
@@ -3591,7 +3592,7 @@ static void props_LIME_BANNER(LIBMATTI_MC_ItemProperties *p)
 {
 // Java:  - typed item class (game-port content)
     LIBMATTI_MC_ItemProperties_StacksTo(p, 16);
-    // Java: .component(DataComponents.BANNER_PATTERNS, BannerPatternLayers.EMPTY) - payload component (game-port content)
+// Java: .component(DataComponents.BANNER_PATTERNS, BannerPatternLayers.EMPTY) - payload component (game-port content)
 }
 
 // Java: PINK_BANNER - the Item.Properties chain
@@ -3599,7 +3600,7 @@ static void props_PINK_BANNER(LIBMATTI_MC_ItemProperties *p)
 {
 // Java:  - typed item class (game-port content)
     LIBMATTI_MC_ItemProperties_StacksTo(p, 16);
-    // Java: .component(DataComponents.BANNER_PATTERNS, BannerPatternLayers.EMPTY) - payload component (game-port content)
+// Java: .component(DataComponents.BANNER_PATTERNS, BannerPatternLayers.EMPTY) - payload component (game-port content)
 }
 
 // Java: GRAY_BANNER - the Item.Properties chain
@@ -3607,7 +3608,7 @@ static void props_GRAY_BANNER(LIBMATTI_MC_ItemProperties *p)
 {
 // Java:  - typed item class (game-port content)
     LIBMATTI_MC_ItemProperties_StacksTo(p, 16);
-    // Java: .component(DataComponents.BANNER_PATTERNS, BannerPatternLayers.EMPTY) - payload component (game-port content)
+// Java: .component(DataComponents.BANNER_PATTERNS, BannerPatternLayers.EMPTY) - payload component (game-port content)
 }
 
 // Java: LIGHT_GRAY_BANNER - the Item.Properties chain
@@ -3615,7 +3616,7 @@ static void props_LIGHT_GRAY_BANNER(LIBMATTI_MC_ItemProperties *p)
 {
 // Java:  - typed item class (game-port content)
     LIBMATTI_MC_ItemProperties_StacksTo(p, 16);
-    // Java: .component(DataComponents.BANNER_PATTERNS, BannerPatternLayers.EMPTY) - payload component (game-port content)
+// Java: .component(DataComponents.BANNER_PATTERNS, BannerPatternLayers.EMPTY) - payload component (game-port content)
 }
 
 // Java: CYAN_BANNER - the Item.Properties chain
@@ -3623,7 +3624,7 @@ static void props_CYAN_BANNER(LIBMATTI_MC_ItemProperties *p)
 {
 // Java:  - typed item class (game-port content)
     LIBMATTI_MC_ItemProperties_StacksTo(p, 16);
-    // Java: .component(DataComponents.BANNER_PATTERNS, BannerPatternLayers.EMPTY) - payload component (game-port content)
+// Java: .component(DataComponents.BANNER_PATTERNS, BannerPatternLayers.EMPTY) - payload component (game-port content)
 }
 
 // Java: PURPLE_BANNER - the Item.Properties chain
@@ -3631,7 +3632,7 @@ static void props_PURPLE_BANNER(LIBMATTI_MC_ItemProperties *p)
 {
 // Java:  - typed item class (game-port content)
     LIBMATTI_MC_ItemProperties_StacksTo(p, 16);
-    // Java: .component(DataComponents.BANNER_PATTERNS, BannerPatternLayers.EMPTY) - payload component (game-port content)
+// Java: .component(DataComponents.BANNER_PATTERNS, BannerPatternLayers.EMPTY) - payload component (game-port content)
 }
 
 // Java: BLUE_BANNER - the Item.Properties chain
@@ -3639,7 +3640,7 @@ static void props_BLUE_BANNER(LIBMATTI_MC_ItemProperties *p)
 {
 // Java:  - typed item class (game-port content)
     LIBMATTI_MC_ItemProperties_StacksTo(p, 16);
-    // Java: .component(DataComponents.BANNER_PATTERNS, BannerPatternLayers.EMPTY) - payload component (game-port content)
+// Java: .component(DataComponents.BANNER_PATTERNS, BannerPatternLayers.EMPTY) - payload component (game-port content)
 }
 
 // Java: BROWN_BANNER - the Item.Properties chain
@@ -3647,7 +3648,7 @@ static void props_BROWN_BANNER(LIBMATTI_MC_ItemProperties *p)
 {
 // Java:  - typed item class (game-port content)
     LIBMATTI_MC_ItemProperties_StacksTo(p, 16);
-    // Java: .component(DataComponents.BANNER_PATTERNS, BannerPatternLayers.EMPTY) - payload component (game-port content)
+// Java: .component(DataComponents.BANNER_PATTERNS, BannerPatternLayers.EMPTY) - payload component (game-port content)
 }
 
 // Java: GREEN_BANNER - the Item.Properties chain
@@ -3655,7 +3656,7 @@ static void props_GREEN_BANNER(LIBMATTI_MC_ItemProperties *p)
 {
 // Java:  - typed item class (game-port content)
     LIBMATTI_MC_ItemProperties_StacksTo(p, 16);
-    // Java: .component(DataComponents.BANNER_PATTERNS, BannerPatternLayers.EMPTY) - payload component (game-port content)
+// Java: .component(DataComponents.BANNER_PATTERNS, BannerPatternLayers.EMPTY) - payload component (game-port content)
 }
 
 // Java: RED_BANNER - the Item.Properties chain
@@ -3663,7 +3664,7 @@ static void props_RED_BANNER(LIBMATTI_MC_ItemProperties *p)
 {
 // Java:  - typed item class (game-port content)
     LIBMATTI_MC_ItemProperties_StacksTo(p, 16);
-    // Java: .component(DataComponents.BANNER_PATTERNS, BannerPatternLayers.EMPTY) - payload component (game-port content)
+// Java: .component(DataComponents.BANNER_PATTERNS, BannerPatternLayers.EMPTY) - payload component (game-port content)
 }
 
 // Java: BLACK_BANNER - the Item.Properties chain
@@ -3671,7 +3672,7 @@ static void props_BLACK_BANNER(LIBMATTI_MC_ItemProperties *p)
 {
 // Java:  - typed item class (game-port content)
     LIBMATTI_MC_ItemProperties_StacksTo(p, 16);
-    // Java: .component(DataComponents.BANNER_PATTERNS, BannerPatternLayers.EMPTY) - payload component (game-port content)
+// Java: .component(DataComponents.BANNER_PATTERNS, BannerPatternLayers.EMPTY) - payload component (game-port content)
 }
 
 // Java: END_CRYSTAL - the Item.Properties chain
@@ -3684,21 +3685,21 @@ static void props_END_CRYSTAL(LIBMATTI_MC_ItemProperties *p)
 // Java: CHORUS_FRUIT - the Item.Properties chain
 static void props_CHORUS_FRUIT(LIBMATTI_MC_ItemProperties *p)
 {
-    // Java: .food(Foods.CHORUS_FRUIT, Consumables.CHORUS_FRUIT) - payload component (game-port content)
+// Java: .food(Foods.CHORUS_FRUIT, Consumables.CHORUS_FRUIT) - payload component (game-port content)
     // Java: .useCooldown(1.0F) - payload component (game-port content)
 }
 
 // Java: BEETROOT - the Item.Properties chain
 static void props_BEETROOT(LIBMATTI_MC_ItemProperties *p)
 {
-    // Java: .food(Foods.BEETROOT) - payload component (game-port content)
+// Java: .food(Foods.BEETROOT) - payload component (game-port content)
 }
 
 // Java: BEETROOT_SOUP - the Item.Properties chain
 static void props_BEETROOT_SOUP(LIBMATTI_MC_ItemProperties *p)
 {
     LIBMATTI_MC_ItemProperties_StacksTo(p, 1);
-    // Java: .food(Foods.BEETROOT_SOUP) - payload component (game-port content)
+// Java: .food(Foods.BEETROOT_SOUP) - payload component (game-port content)
     // Java: .usingConvertsTo(BOWL) - payload component (game-port content)
 }
 
@@ -3714,7 +3715,7 @@ static void props_SPLASH_POTION(LIBMATTI_MC_ItemProperties *p)
 {
 // Java: SplashPotionItem::new - typed item class (game-port content)
     LIBMATTI_MC_ItemProperties_StacksTo(p, 1);
-    // Java: .component(DataComponents.POTION_CONTENTS, PotionContents.EMPTY) - payload component (game-port content)
+// Java: .component(DataComponents.POTION_CONTENTS, PotionContents.EMPTY) - payload component (game-port content)
 }
 
 // Java: TIPPED_ARROW - the Item.Properties chain
@@ -3730,7 +3731,7 @@ static void props_LINGERING_POTION(LIBMATTI_MC_ItemProperties *p)
 {
 // Java: LingeringPotionItem::new - typed item class (game-port content)
     LIBMATTI_MC_ItemProperties_StacksTo(p, 1);
-    // Java: .component(DataComponents.POTION_CONTENTS, PotionContents.EMPTY) - payload component (game-port content)
+// Java: .component(DataComponents.POTION_CONTENTS, PotionContents.EMPTY) - payload component (game-port content)
     // Java: .component(DataComponents.POTION_DURATION_SCALE, 0.25F) - payload component (game-port content)
 }
 
@@ -3744,7 +3745,7 @@ static void props_SHIELD(LIBMATTI_MC_ItemProperties *p)
 // Java: WOODEN_SPEAR - the Item.Properties chain
 static void props_WOODEN_SPEAR(LIBMATTI_MC_ItemProperties *p)
 {
-    // Java: .spear(ToolMaterial.WOOD, 0.65F, 0.7F, 0.75F, 5.0F, 14.0F, 10.0F, 5.1F, 15.0F, 4.6F) - durability/enchantable below, the KINETIC_WEAPON payload is game-port content
+// Java: .spear(ToolMaterial.WOOD, 0.65F, 0.7F, 0.75F, 5.0F, 14.0F, 10.0F, 5.1F, 15.0F, 4.6F) - durability/enchantable below, the KINETIC_WEAPON payload is game-port content
     LIBMATTI_MC_ItemProperties_Durability(p, LIBMATTI_MC_ToolMaterial_WOOD()->durability);
     LIBMATTI_MC_ItemProperties_Enchantable(p, LIBMATTI_MC_ToolMaterial_WOOD()->enchantmentValue);
 }
@@ -3752,7 +3753,7 @@ static void props_WOODEN_SPEAR(LIBMATTI_MC_ItemProperties *p)
 // Java: STONE_SPEAR - the Item.Properties chain
 static void props_STONE_SPEAR(LIBMATTI_MC_ItemProperties *p)
 {
-    // Java: .spear(ToolMaterial.STONE, 0.75F, 0.82F, 0.7F, 4.5F, 10.0F, 9.0F, 5.1F, 13.75F, 4.6F) - durability/enchantable below, the KINETIC_WEAPON payload is game-port content
+// Java: .spear(ToolMaterial.STONE, 0.75F, 0.82F, 0.7F, 4.5F, 10.0F, 9.0F, 5.1F, 13.75F, 4.6F) - durability/enchantable below, the KINETIC_WEAPON payload is game-port content
     LIBMATTI_MC_ItemProperties_Durability(p, LIBMATTI_MC_ToolMaterial_STONE()->durability);
     LIBMATTI_MC_ItemProperties_Enchantable(p, LIBMATTI_MC_ToolMaterial_STONE()->enchantmentValue);
 }
@@ -3760,7 +3761,7 @@ static void props_STONE_SPEAR(LIBMATTI_MC_ItemProperties *p)
 // Java: COPPER_SPEAR - the Item.Properties chain
 static void props_COPPER_SPEAR(LIBMATTI_MC_ItemProperties *p)
 {
-    // Java: .spear(ToolMaterial.COPPER, 0.85F, 0.82F, 0.65F, 4.0F, 9.0F, 8.25F, 5.1F, 12.5F, 4.6F) - durability/enchantable below, the KINETIC_WEAPON payload is game-port content
+// Java: .spear(ToolMaterial.COPPER, 0.85F, 0.82F, 0.65F, 4.0F, 9.0F, 8.25F, 5.1F, 12.5F, 4.6F) - durability/enchantable below, the KINETIC_WEAPON payload is game-port content
     LIBMATTI_MC_ItemProperties_Durability(p, LIBMATTI_MC_ToolMaterial_COPPER()->durability);
     LIBMATTI_MC_ItemProperties_Enchantable(p, LIBMATTI_MC_ToolMaterial_COPPER()->enchantmentValue);
 }
@@ -3768,7 +3769,7 @@ static void props_COPPER_SPEAR(LIBMATTI_MC_ItemProperties *p)
 // Java: IRON_SPEAR - the Item.Properties chain
 static void props_IRON_SPEAR(LIBMATTI_MC_ItemProperties *p)
 {
-    // Java: .spear(ToolMaterial.IRON, 0.95F, 0.95F, 0.6F, 2.5F, 8.0F, 6.75F, 5.1F, 11.25F, 4.6F) - durability/enchantable below, the KINETIC_WEAPON payload is game-port content
+// Java: .spear(ToolMaterial.IRON, 0.95F, 0.95F, 0.6F, 2.5F, 8.0F, 6.75F, 5.1F, 11.25F, 4.6F) - durability/enchantable below, the KINETIC_WEAPON payload is game-port content
     LIBMATTI_MC_ItemProperties_Durability(p, LIBMATTI_MC_ToolMaterial_IRON()->durability);
     LIBMATTI_MC_ItemProperties_Enchantable(p, LIBMATTI_MC_ToolMaterial_IRON()->enchantmentValue);
 }
@@ -3776,7 +3777,7 @@ static void props_IRON_SPEAR(LIBMATTI_MC_ItemProperties *p)
 // Java: GOLDEN_SPEAR - the Item.Properties chain
 static void props_GOLDEN_SPEAR(LIBMATTI_MC_ItemProperties *p)
 {
-    // Java: .spear(ToolMaterial.GOLD, 0.95F, 0.7F, 0.7F, 3.5F, 10.0F, 8.5F, 5.1F, 13.75F, 4.6F) - durability/enchantable below, the KINETIC_WEAPON payload is game-port content
+// Java: .spear(ToolMaterial.GOLD, 0.95F, 0.7F, 0.7F, 3.5F, 10.0F, 8.5F, 5.1F, 13.75F, 4.6F) - durability/enchantable below, the KINETIC_WEAPON payload is game-port content
     LIBMATTI_MC_ItemProperties_Durability(p, LIBMATTI_MC_ToolMaterial_GOLD()->durability);
     LIBMATTI_MC_ItemProperties_Enchantable(p, LIBMATTI_MC_ToolMaterial_GOLD()->enchantmentValue);
 }
@@ -3784,7 +3785,7 @@ static void props_GOLDEN_SPEAR(LIBMATTI_MC_ItemProperties *p)
 // Java: DIAMOND_SPEAR - the Item.Properties chain
 static void props_DIAMOND_SPEAR(LIBMATTI_MC_ItemProperties *p)
 {
-    // Java: .spear(ToolMaterial.DIAMOND, 1.05F, 1.075F, 0.5F, 3.0F, 7.5F, 6.5F, 5.1F, 10.0F, 4.6F) - durability/enchantable below, the KINETIC_WEAPON payload is game-port content
+// Java: .spear(ToolMaterial.DIAMOND, 1.05F, 1.075F, 0.5F, 3.0F, 7.5F, 6.5F, 5.1F, 10.0F, 4.6F) - durability/enchantable below, the KINETIC_WEAPON payload is game-port content
     LIBMATTI_MC_ItemProperties_Durability(p, LIBMATTI_MC_ToolMaterial_DIAMOND()->durability);
     LIBMATTI_MC_ItemProperties_Enchantable(p, LIBMATTI_MC_ToolMaterial_DIAMOND()->enchantmentValue);
 }
@@ -3792,7 +3793,7 @@ static void props_DIAMOND_SPEAR(LIBMATTI_MC_ItemProperties *p)
 // Java: NETHERITE_SPEAR - the Item.Properties chain
 static void props_NETHERITE_SPEAR(LIBMATTI_MC_ItemProperties *p)
 {
-    // Java: .spear(ToolMaterial.NETHERITE, 1.15F, 1.2F, 0.4F, 2.5F, 7.0F, 5.5F, 5.1F, 8.75F, 4.6F) - durability/enchantable below, the KINETIC_WEAPON payload is game-port content
+// Java: .spear(ToolMaterial.NETHERITE, 1.15F, 1.2F, 0.4F, 2.5F, 7.0F, 5.5F, 5.1F, 8.75F, 4.6F) - durability/enchantable below, the KINETIC_WEAPON payload is game-port content
     LIBMATTI_MC_ItemProperties_Durability(p, LIBMATTI_MC_ToolMaterial_NETHERITE()->durability);
     LIBMATTI_MC_ItemProperties_Enchantable(p, LIBMATTI_MC_ToolMaterial_NETHERITE()->enchantmentValue);
     LIBMATTI_MC_ItemProperties_FireResistant(p);
@@ -3803,7 +3804,7 @@ static void props_TOTEM_OF_UNDYING(LIBMATTI_MC_ItemProperties *p)
 {
     LIBMATTI_MC_ItemProperties_StacksTo(p, 1);
     LIBMATTI_MC_ItemProperties_Rarity(p, LIBMATTI_MC_Rarity_UNCOMMON);
-    // Java: .component(DataComponents.DEATH_PROTECTION, DeathProtection.TOTEM_OF_UNDYING) - payload component (game-port content)
+// Java: .component(DataComponents.DEATH_PROTECTION, DeathProtection.TOTEM_OF_UNDYING) - payload component (game-port content)
 }
 
 // Java: KNOWLEDGE_BOOK - the Item.Properties chain
@@ -3812,7 +3813,7 @@ static void props_KNOWLEDGE_BOOK(LIBMATTI_MC_ItemProperties *p)
 // Java: KnowledgeBookItem::new - typed item class (game-port content)
     LIBMATTI_MC_ItemProperties_StacksTo(p, 1);
     LIBMATTI_MC_ItemProperties_Rarity(p, LIBMATTI_MC_Rarity_EPIC);
-    // Java: .component(DataComponents.RECIPES, List.of()) - payload component (game-port content)
+// Java: .component(DataComponents.RECIPES, List.of()) - payload component (game-port content)
 }
 
 // Java: DEBUG_STICK - the Item.Properties chain
@@ -3827,7 +3828,7 @@ static void props_MUSIC_DISC_13(LIBMATTI_MC_ItemProperties *p)
 {
     LIBMATTI_MC_ItemProperties_StacksTo(p, 1);
     LIBMATTI_MC_ItemProperties_Rarity(p, LIBMATTI_MC_Rarity_UNCOMMON);
-    // Java: .jukeboxPlayable(JukeboxSongs.THIRTEEN) - payload component (game-port content)
+// Java: .jukeboxPlayable(JukeboxSongs.THIRTEEN) - payload component (game-port content)
 }
 
 // Java: MUSIC_DISC_CAT - the Item.Properties chain
@@ -3835,7 +3836,7 @@ static void props_MUSIC_DISC_CAT(LIBMATTI_MC_ItemProperties *p)
 {
     LIBMATTI_MC_ItemProperties_StacksTo(p, 1);
     LIBMATTI_MC_ItemProperties_Rarity(p, LIBMATTI_MC_Rarity_UNCOMMON);
-    // Java: .jukeboxPlayable(JukeboxSongs.CAT) - payload component (game-port content)
+// Java: .jukeboxPlayable(JukeboxSongs.CAT) - payload component (game-port content)
 }
 
 // Java: MUSIC_DISC_BLOCKS - the Item.Properties chain
@@ -3843,7 +3844,7 @@ static void props_MUSIC_DISC_BLOCKS(LIBMATTI_MC_ItemProperties *p)
 {
     LIBMATTI_MC_ItemProperties_StacksTo(p, 1);
     LIBMATTI_MC_ItemProperties_Rarity(p, LIBMATTI_MC_Rarity_UNCOMMON);
-    // Java: .jukeboxPlayable(JukeboxSongs.BLOCKS) - payload component (game-port content)
+// Java: .jukeboxPlayable(JukeboxSongs.BLOCKS) - payload component (game-port content)
 }
 
 // Java: MUSIC_DISC_CHIRP - the Item.Properties chain
@@ -3851,7 +3852,7 @@ static void props_MUSIC_DISC_CHIRP(LIBMATTI_MC_ItemProperties *p)
 {
     LIBMATTI_MC_ItemProperties_StacksTo(p, 1);
     LIBMATTI_MC_ItemProperties_Rarity(p, LIBMATTI_MC_Rarity_UNCOMMON);
-    // Java: .jukeboxPlayable(JukeboxSongs.CHIRP) - payload component (game-port content)
+// Java: .jukeboxPlayable(JukeboxSongs.CHIRP) - payload component (game-port content)
 }
 
 // Java: MUSIC_DISC_CREATOR - the Item.Properties chain
@@ -3859,7 +3860,7 @@ static void props_MUSIC_DISC_CREATOR(LIBMATTI_MC_ItemProperties *p)
 {
     LIBMATTI_MC_ItemProperties_StacksTo(p, 1);
     LIBMATTI_MC_ItemProperties_Rarity(p, LIBMATTI_MC_Rarity_RARE);
-    // Java: .jukeboxPlayable(JukeboxSongs.CREATOR) - payload component (game-port content)
+// Java: .jukeboxPlayable(JukeboxSongs.CREATOR) - payload component (game-port content)
 }
 
 // Java: MUSIC_DISC_CREATOR_MUSIC_BOX - the Item.Properties chain
@@ -3867,7 +3868,7 @@ static void props_MUSIC_DISC_CREATOR_MUSIC_BOX(LIBMATTI_MC_ItemProperties *p)
 {
     LIBMATTI_MC_ItemProperties_StacksTo(p, 1);
     LIBMATTI_MC_ItemProperties_Rarity(p, LIBMATTI_MC_Rarity_UNCOMMON);
-    // Java: .jukeboxPlayable(JukeboxSongs.CREATOR_MUSIC_BOX) - payload component (game-port content)
+// Java: .jukeboxPlayable(JukeboxSongs.CREATOR_MUSIC_BOX) - payload component (game-port content)
 }
 
 // Java: MUSIC_DISC_FAR - the Item.Properties chain
@@ -3875,7 +3876,7 @@ static void props_MUSIC_DISC_FAR(LIBMATTI_MC_ItemProperties *p)
 {
     LIBMATTI_MC_ItemProperties_StacksTo(p, 1);
     LIBMATTI_MC_ItemProperties_Rarity(p, LIBMATTI_MC_Rarity_UNCOMMON);
-    // Java: .jukeboxPlayable(JukeboxSongs.FAR) - payload component (game-port content)
+// Java: .jukeboxPlayable(JukeboxSongs.FAR) - payload component (game-port content)
 }
 
 // Java: MUSIC_DISC_LAVA_CHICKEN - the Item.Properties chain
@@ -3883,7 +3884,7 @@ static void props_MUSIC_DISC_LAVA_CHICKEN(LIBMATTI_MC_ItemProperties *p)
 {
     LIBMATTI_MC_ItemProperties_StacksTo(p, 1);
     LIBMATTI_MC_ItemProperties_Rarity(p, LIBMATTI_MC_Rarity_RARE);
-    // Java: .jukeboxPlayable(JukeboxSongs.LAVA_CHICKEN) - payload component (game-port content)
+// Java: .jukeboxPlayable(JukeboxSongs.LAVA_CHICKEN) - payload component (game-port content)
 }
 
 // Java: MUSIC_DISC_MALL - the Item.Properties chain
@@ -3891,7 +3892,7 @@ static void props_MUSIC_DISC_MALL(LIBMATTI_MC_ItemProperties *p)
 {
     LIBMATTI_MC_ItemProperties_StacksTo(p, 1);
     LIBMATTI_MC_ItemProperties_Rarity(p, LIBMATTI_MC_Rarity_UNCOMMON);
-    // Java: .jukeboxPlayable(JukeboxSongs.MALL) - payload component (game-port content)
+// Java: .jukeboxPlayable(JukeboxSongs.MALL) - payload component (game-port content)
 }
 
 // Java: MUSIC_DISC_MELLOHI - the Item.Properties chain
@@ -3899,7 +3900,7 @@ static void props_MUSIC_DISC_MELLOHI(LIBMATTI_MC_ItemProperties *p)
 {
     LIBMATTI_MC_ItemProperties_StacksTo(p, 1);
     LIBMATTI_MC_ItemProperties_Rarity(p, LIBMATTI_MC_Rarity_UNCOMMON);
-    // Java: .jukeboxPlayable(JukeboxSongs.MELLOHI) - payload component (game-port content)
+// Java: .jukeboxPlayable(JukeboxSongs.MELLOHI) - payload component (game-port content)
 }
 
 // Java: MUSIC_DISC_STAL - the Item.Properties chain
@@ -3907,7 +3908,7 @@ static void props_MUSIC_DISC_STAL(LIBMATTI_MC_ItemProperties *p)
 {
     LIBMATTI_MC_ItemProperties_StacksTo(p, 1);
     LIBMATTI_MC_ItemProperties_Rarity(p, LIBMATTI_MC_Rarity_UNCOMMON);
-    // Java: .jukeboxPlayable(JukeboxSongs.STAL) - payload component (game-port content)
+// Java: .jukeboxPlayable(JukeboxSongs.STAL) - payload component (game-port content)
 }
 
 // Java: MUSIC_DISC_STRAD - the Item.Properties chain
@@ -3915,7 +3916,7 @@ static void props_MUSIC_DISC_STRAD(LIBMATTI_MC_ItemProperties *p)
 {
     LIBMATTI_MC_ItemProperties_StacksTo(p, 1);
     LIBMATTI_MC_ItemProperties_Rarity(p, LIBMATTI_MC_Rarity_UNCOMMON);
-    // Java: .jukeboxPlayable(JukeboxSongs.STRAD) - payload component (game-port content)
+// Java: .jukeboxPlayable(JukeboxSongs.STRAD) - payload component (game-port content)
 }
 
 // Java: MUSIC_DISC_WARD - the Item.Properties chain
@@ -3923,7 +3924,7 @@ static void props_MUSIC_DISC_WARD(LIBMATTI_MC_ItemProperties *p)
 {
     LIBMATTI_MC_ItemProperties_StacksTo(p, 1);
     LIBMATTI_MC_ItemProperties_Rarity(p, LIBMATTI_MC_Rarity_UNCOMMON);
-    // Java: .jukeboxPlayable(JukeboxSongs.WARD) - payload component (game-port content)
+// Java: .jukeboxPlayable(JukeboxSongs.WARD) - payload component (game-port content)
 }
 
 // Java: MUSIC_DISC_11 - the Item.Properties chain
@@ -3931,7 +3932,7 @@ static void props_MUSIC_DISC_11(LIBMATTI_MC_ItemProperties *p)
 {
     LIBMATTI_MC_ItemProperties_StacksTo(p, 1);
     LIBMATTI_MC_ItemProperties_Rarity(p, LIBMATTI_MC_Rarity_UNCOMMON);
-    // Java: .jukeboxPlayable(JukeboxSongs.ELEVEN) - payload component (game-port content)
+// Java: .jukeboxPlayable(JukeboxSongs.ELEVEN) - payload component (game-port content)
 }
 
 // Java: MUSIC_DISC_WAIT - the Item.Properties chain
@@ -3939,7 +3940,7 @@ static void props_MUSIC_DISC_WAIT(LIBMATTI_MC_ItemProperties *p)
 {
     LIBMATTI_MC_ItemProperties_StacksTo(p, 1);
     LIBMATTI_MC_ItemProperties_Rarity(p, LIBMATTI_MC_Rarity_UNCOMMON);
-    // Java: .jukeboxPlayable(JukeboxSongs.WAIT) - payload component (game-port content)
+// Java: .jukeboxPlayable(JukeboxSongs.WAIT) - payload component (game-port content)
 }
 
 // Java: MUSIC_DISC_OTHERSIDE - the Item.Properties chain
@@ -3947,7 +3948,7 @@ static void props_MUSIC_DISC_OTHERSIDE(LIBMATTI_MC_ItemProperties *p)
 {
     LIBMATTI_MC_ItemProperties_StacksTo(p, 1);
     LIBMATTI_MC_ItemProperties_Rarity(p, LIBMATTI_MC_Rarity_RARE);
-    // Java: .jukeboxPlayable(JukeboxSongs.OTHERSIDE) - payload component (game-port content)
+// Java: .jukeboxPlayable(JukeboxSongs.OTHERSIDE) - payload component (game-port content)
 }
 
 // Java: MUSIC_DISC_RELIC - the Item.Properties chain
@@ -3955,7 +3956,7 @@ static void props_MUSIC_DISC_RELIC(LIBMATTI_MC_ItemProperties *p)
 {
     LIBMATTI_MC_ItemProperties_StacksTo(p, 1);
     LIBMATTI_MC_ItemProperties_Rarity(p, LIBMATTI_MC_Rarity_UNCOMMON);
-    // Java: .jukeboxPlayable(JukeboxSongs.RELIC) - payload component (game-port content)
+// Java: .jukeboxPlayable(JukeboxSongs.RELIC) - payload component (game-port content)
 }
 
 // Java: MUSIC_DISC_5 - the Item.Properties chain
@@ -3963,7 +3964,7 @@ static void props_MUSIC_DISC_5(LIBMATTI_MC_ItemProperties *p)
 {
     LIBMATTI_MC_ItemProperties_StacksTo(p, 1);
     LIBMATTI_MC_ItemProperties_Rarity(p, LIBMATTI_MC_Rarity_UNCOMMON);
-    // Java: .jukeboxPlayable(JukeboxSongs.FIVE) - payload component (game-port content)
+// Java: .jukeboxPlayable(JukeboxSongs.FIVE) - payload component (game-port content)
 }
 
 // Java: MUSIC_DISC_PIGSTEP - the Item.Properties chain
@@ -3971,7 +3972,7 @@ static void props_MUSIC_DISC_PIGSTEP(LIBMATTI_MC_ItemProperties *p)
 {
     LIBMATTI_MC_ItemProperties_StacksTo(p, 1);
     LIBMATTI_MC_ItemProperties_Rarity(p, LIBMATTI_MC_Rarity_RARE);
-    // Java: .jukeboxPlayable(JukeboxSongs.PIGSTEP) - payload component (game-port content)
+// Java: .jukeboxPlayable(JukeboxSongs.PIGSTEP) - payload component (game-port content)
 }
 
 // Java: MUSIC_DISC_PRECIPICE - the Item.Properties chain
@@ -3979,7 +3980,7 @@ static void props_MUSIC_DISC_PRECIPICE(LIBMATTI_MC_ItemProperties *p)
 {
     LIBMATTI_MC_ItemProperties_StacksTo(p, 1);
     LIBMATTI_MC_ItemProperties_Rarity(p, LIBMATTI_MC_Rarity_UNCOMMON);
-    // Java: .jukeboxPlayable(JukeboxSongs.PRECIPICE) - payload component (game-port content)
+// Java: .jukeboxPlayable(JukeboxSongs.PRECIPICE) - payload component (game-port content)
 }
 
 // Java: MUSIC_DISC_TEARS - the Item.Properties chain
@@ -3987,7 +3988,7 @@ static void props_MUSIC_DISC_TEARS(LIBMATTI_MC_ItemProperties *p)
 {
     LIBMATTI_MC_ItemProperties_StacksTo(p, 1);
     LIBMATTI_MC_ItemProperties_Rarity(p, LIBMATTI_MC_Rarity_UNCOMMON);
-    // Java: .jukeboxPlayable(JukeboxSongs.TEARS) - payload component (game-port content)
+// Java: .jukeboxPlayable(JukeboxSongs.TEARS) - payload component (game-port content)
 }
 
 // Java: DISC_FRAGMENT_5 - the Item.Properties chain
@@ -4013,32 +4014,32 @@ static void props_NAUTILUS_SHELL(LIBMATTI_MC_ItemProperties *p)
 // Java: IRON_NAUTILUS_ARMOR - the Item.Properties chain
 static void props_IRON_NAUTILUS_ARMOR(LIBMATTI_MC_ItemProperties *p)
 {
-    // Java: .nautilusArmor(ArmorMaterials.IRON) - attributes + EQUIPPABLE payload (game-port content)
+// Java: .nautilusArmor(ArmorMaterials.IRON) - attributes + EQUIPPABLE payload (game-port content)
 }
 
 // Java: GOLDEN_NAUTILUS_ARMOR - the Item.Properties chain
 static void props_GOLDEN_NAUTILUS_ARMOR(LIBMATTI_MC_ItemProperties *p)
 {
-    // Java: .nautilusArmor(ArmorMaterials.GOLD) - attributes + EQUIPPABLE payload (game-port content)
+// Java: .nautilusArmor(ArmorMaterials.GOLD) - attributes + EQUIPPABLE payload (game-port content)
 }
 
 // Java: DIAMOND_NAUTILUS_ARMOR - the Item.Properties chain
 static void props_DIAMOND_NAUTILUS_ARMOR(LIBMATTI_MC_ItemProperties *p)
 {
-    // Java: .nautilusArmor(ArmorMaterials.DIAMOND) - attributes + EQUIPPABLE payload (game-port content)
+// Java: .nautilusArmor(ArmorMaterials.DIAMOND) - attributes + EQUIPPABLE payload (game-port content)
 }
 
 // Java: NETHERITE_NAUTILUS_ARMOR - the Item.Properties chain
 static void props_NETHERITE_NAUTILUS_ARMOR(LIBMATTI_MC_ItemProperties *p)
 {
-    // Java: .nautilusArmor(ArmorMaterials.NETHERITE) - attributes + EQUIPPABLE payload (game-port content)
+// Java: .nautilusArmor(ArmorMaterials.NETHERITE) - attributes + EQUIPPABLE payload (game-port content)
     LIBMATTI_MC_ItemProperties_FireResistant(p);
 }
 
 // Java: COPPER_NAUTILUS_ARMOR - the Item.Properties chain
 static void props_COPPER_NAUTILUS_ARMOR(LIBMATTI_MC_ItemProperties *p)
 {
-    // Java: .nautilusArmor(ArmorMaterials.COPPER) - attributes + EQUIPPABLE payload (game-port content)
+// Java: .nautilusArmor(ArmorMaterials.COPPER) - attributes + EQUIPPABLE payload (game-port content)
 }
 
 // Java: HEART_OF_THE_SEA - the Item.Properties chain
@@ -4053,7 +4054,7 @@ static void props_CROSSBOW(LIBMATTI_MC_ItemProperties *p)
 // Java: CrossbowItem::new - typed item class (game-port content)
     LIBMATTI_MC_ItemProperties_StacksTo(p, 1);
     LIBMATTI_MC_ItemProperties_Durability(p, 465);
-    // Java: .component(DataComponents.CHARGED_PROJECTILES, ChargedProjectiles.EMPTY) - payload component (game-port content)
+// Java: .component(DataComponents.CHARGED_PROJECTILES, ChargedProjectiles.EMPTY) - payload component (game-port content)
     LIBMATTI_MC_ItemProperties_Enchantable(p, 1);
 }
 
@@ -4061,7 +4062,7 @@ static void props_CROSSBOW(LIBMATTI_MC_ItemProperties *p)
 static void props_SUSPICIOUS_STEW(LIBMATTI_MC_ItemProperties *p)
 {
     LIBMATTI_MC_ItemProperties_StacksTo(p, 1);
-    // Java: .food(Foods.SUSPICIOUS_STEW) - payload component (game-port content)
+// Java: .food(Foods.SUSPICIOUS_STEW) - payload component (game-port content)
     // Java: .component(DataComponents.SUSPICIOUS_STEW_EFFECTS, SuspiciousStewEffects.EMPTY) - payload component (game-port content)
     // Java: .usingConvertsTo(BOWL) - payload component (game-port content)
 }
@@ -4070,7 +4071,7 @@ static void props_SUSPICIOUS_STEW(LIBMATTI_MC_ItemProperties *p)
 static void props_FLOWER_BANNER_PATTERN(LIBMATTI_MC_ItemProperties *p)
 {
     LIBMATTI_MC_ItemProperties_StacksTo(p, 1);
-    // Java: .component(DataComponents.PROVIDES_BANNER_PATTERNS, BannerPatternTags.PATTERN_ITEM_FLOWER) - payload component (game-port content)
+// Java: .component(DataComponents.PROVIDES_BANNER_PATTERNS, BannerPatternTags.PATTERN_ITEM_FLOWER) - payload component (game-port content)
 }
 
 // Java: CREEPER_BANNER_PATTERN - the Item.Properties chain
@@ -4078,7 +4079,7 @@ static void props_CREEPER_BANNER_PATTERN(LIBMATTI_MC_ItemProperties *p)
 {
     LIBMATTI_MC_ItemProperties_StacksTo(p, 1);
     LIBMATTI_MC_ItemProperties_Rarity(p, LIBMATTI_MC_Rarity_UNCOMMON);
-    // Java: .component(DataComponents.PROVIDES_BANNER_PATTERNS, BannerPatternTags.PATTERN_ITEM_CREEPER) - payload component (game-port content)
+// Java: .component(DataComponents.PROVIDES_BANNER_PATTERNS, BannerPatternTags.PATTERN_ITEM_CREEPER) - payload component (game-port content)
 }
 
 // Java: SKULL_BANNER_PATTERN - the Item.Properties chain
@@ -4086,7 +4087,7 @@ static void props_SKULL_BANNER_PATTERN(LIBMATTI_MC_ItemProperties *p)
 {
     LIBMATTI_MC_ItemProperties_StacksTo(p, 1);
     LIBMATTI_MC_ItemProperties_Rarity(p, LIBMATTI_MC_Rarity_RARE);
-    // Java: .component(DataComponents.PROVIDES_BANNER_PATTERNS, BannerPatternTags.PATTERN_ITEM_SKULL) - payload component (game-port content)
+// Java: .component(DataComponents.PROVIDES_BANNER_PATTERNS, BannerPatternTags.PATTERN_ITEM_SKULL) - payload component (game-port content)
 }
 
 // Java: MOJANG_BANNER_PATTERN - the Item.Properties chain
@@ -4094,14 +4095,14 @@ static void props_MOJANG_BANNER_PATTERN(LIBMATTI_MC_ItemProperties *p)
 {
     LIBMATTI_MC_ItemProperties_StacksTo(p, 1);
     LIBMATTI_MC_ItemProperties_Rarity(p, LIBMATTI_MC_Rarity_RARE);
-    // Java: .component(DataComponents.PROVIDES_BANNER_PATTERNS, BannerPatternTags.PATTERN_ITEM_MOJANG) - payload component (game-port content)
+// Java: .component(DataComponents.PROVIDES_BANNER_PATTERNS, BannerPatternTags.PATTERN_ITEM_MOJANG) - payload component (game-port content)
 }
 
 // Java: GLOBE_BANNER_PATTERN - the Item.Properties chain
 static void props_GLOBE_BANNER_PATTERN(LIBMATTI_MC_ItemProperties *p)
 {
     LIBMATTI_MC_ItemProperties_StacksTo(p, 1);
-    // Java: .component(DataComponents.PROVIDES_BANNER_PATTERNS, BannerPatternTags.PATTERN_ITEM_GLOBE) - payload component (game-port content)
+// Java: .component(DataComponents.PROVIDES_BANNER_PATTERNS, BannerPatternTags.PATTERN_ITEM_GLOBE) - payload component (game-port content)
 }
 
 // Java: PIGLIN_BANNER_PATTERN - the Item.Properties chain
@@ -4109,7 +4110,7 @@ static void props_PIGLIN_BANNER_PATTERN(LIBMATTI_MC_ItemProperties *p)
 {
     LIBMATTI_MC_ItemProperties_StacksTo(p, 1);
     LIBMATTI_MC_ItemProperties_Rarity(p, LIBMATTI_MC_Rarity_UNCOMMON);
-    // Java: .component(DataComponents.PROVIDES_BANNER_PATTERNS, BannerPatternTags.PATTERN_ITEM_PIGLIN) - payload component (game-port content)
+// Java: .component(DataComponents.PROVIDES_BANNER_PATTERNS, BannerPatternTags.PATTERN_ITEM_PIGLIN) - payload component (game-port content)
 }
 
 // Java: FLOW_BANNER_PATTERN - the Item.Properties chain
@@ -4117,7 +4118,7 @@ static void props_FLOW_BANNER_PATTERN(LIBMATTI_MC_ItemProperties *p)
 {
     LIBMATTI_MC_ItemProperties_StacksTo(p, 1);
     LIBMATTI_MC_ItemProperties_Rarity(p, LIBMATTI_MC_Rarity_RARE);
-    // Java: .component(DataComponents.PROVIDES_BANNER_PATTERNS, BannerPatternTags.PATTERN_ITEM_FLOW) - payload component (game-port content)
+// Java: .component(DataComponents.PROVIDES_BANNER_PATTERNS, BannerPatternTags.PATTERN_ITEM_FLOW) - payload component (game-port content)
 }
 
 // Java: GUSTER_BANNER_PATTERN - the Item.Properties chain
@@ -4125,21 +4126,21 @@ static void props_GUSTER_BANNER_PATTERN(LIBMATTI_MC_ItemProperties *p)
 {
     LIBMATTI_MC_ItemProperties_StacksTo(p, 1);
     LIBMATTI_MC_ItemProperties_Rarity(p, LIBMATTI_MC_Rarity_RARE);
-    // Java: .component(DataComponents.PROVIDES_BANNER_PATTERNS, BannerPatternTags.PATTERN_ITEM_GUSTER) - payload component (game-port content)
+// Java: .component(DataComponents.PROVIDES_BANNER_PATTERNS, BannerPatternTags.PATTERN_ITEM_GUSTER) - payload component (game-port content)
 }
 
 // Java: FIELD_MASONED_BANNER_PATTERN - the Item.Properties chain
 static void props_FIELD_MASONED_BANNER_PATTERN(LIBMATTI_MC_ItemProperties *p)
 {
     LIBMATTI_MC_ItemProperties_StacksTo(p, 1);
-    // Java: .component(DataComponents.PROVIDES_BANNER_PATTERNS, BannerPatternTags.PATTERN_ITEM_FIELD_MASONED) - payload component (game-port content)
+// Java: .component(DataComponents.PROVIDES_BANNER_PATTERNS, BannerPatternTags.PATTERN_ITEM_FIELD_MASONED) - payload component (game-port content)
 }
 
 // Java: BORDURE_INDENTED_BANNER_PATTERN - the Item.Properties chain
 static void props_BORDURE_INDENTED_BANNER_PATTERN(LIBMATTI_MC_ItemProperties *p)
 {
     LIBMATTI_MC_ItemProperties_StacksTo(p, 1);
-    // Java: .component(DataComponents.PROVIDES_BANNER_PATTERNS, BannerPatternTags.PATTERN_ITEM_BORDURE_INDENTED) - payload component (game-port content)
+// Java: .component(DataComponents.PROVIDES_BANNER_PATTERNS, BannerPatternTags.PATTERN_ITEM_BORDURE_INDENTED) - payload component (game-port content)
 }
 
 // Java: GOAT_HORN - the Item.Properties chain
@@ -4148,38 +4149,38 @@ static void props_GOAT_HORN(LIBMATTI_MC_ItemProperties *p)
 // Java: InstrumentItem::new - typed item class (game-port content)
     LIBMATTI_MC_ItemProperties_Rarity(p, LIBMATTI_MC_Rarity_UNCOMMON);
     LIBMATTI_MC_ItemProperties_StacksTo(p, 1);
-    // Java: .component(DataComponents.INSTRUMENT, new InstrumentComponent(Instruments.PONDER_GOAT_HORN)) - payload component (game-port content)
+// Java: .component(DataComponents.INSTRUMENT, new InstrumentComponent(Instruments.PONDER_GOAT_HORN)) - payload component (game-port content)
 }
 
 // Java: SWEET_BERRIES - the Item.Properties chain
 static void props_SWEET_BERRIES(LIBMATTI_MC_ItemProperties *p)
 {
-    // Java: .food(Foods.SWEET_BERRIES) - payload component (game-port content)
+// Java: .food(Foods.SWEET_BERRIES) - payload component (game-port content)
 }
 
 // Java: GLOW_BERRIES - the Item.Properties chain
 static void props_GLOW_BERRIES(LIBMATTI_MC_ItemProperties *p)
 {
-    // Java: .food(Foods.GLOW_BERRIES) - payload component (game-port content)
+// Java: .food(Foods.GLOW_BERRIES) - payload component (game-port content)
 }
 
 // Java: BEE_NEST - the Item.Properties chain
 static void props_BEE_NEST(LIBMATTI_MC_ItemProperties *p)
 {
-    // Java: .component(DataComponents.BEES, Bees.EMPTY) - payload component (game-port content)
+// Java: .component(DataComponents.BEES, Bees.EMPTY) - payload component (game-port content)
 }
 
 // Java: BEEHIVE - the Item.Properties chain
 static void props_BEEHIVE(LIBMATTI_MC_ItemProperties *p)
 {
-    // Java: .component(DataComponents.BEES, Bees.EMPTY) - payload component (game-port content)
+// Java: .component(DataComponents.BEES, Bees.EMPTY) - payload component (game-port content)
 }
 
 // Java: HONEY_BOTTLE - the Item.Properties chain
 static void props_HONEY_BOTTLE(LIBMATTI_MC_ItemProperties *p)
 {
     LIBMATTI_MC_ItemProperties_CraftRemainder(p, entries[1104].item);
-    // Java: .food(Foods.HONEY_BOTTLE, Consumables.HONEY_BOTTLE) - payload component (game-port content)
+// Java: .food(Foods.HONEY_BOTTLE, Consumables.HONEY_BOTTLE) - payload component (game-port content)
     // Java: .usingConvertsTo(GLASS_BOTTLE) - payload component (game-port content)
     LIBMATTI_MC_ItemProperties_StacksTo(p, 16);
 }
@@ -4471,49 +4472,49 @@ static void props_SNORT_POTTERY_SHERD(LIBMATTI_MC_ItemProperties *p)
 // Java: COPPER_GOLEM_STATUE - the Item.Properties chain
 static void props_COPPER_GOLEM_STATUE(LIBMATTI_MC_ItemProperties *p)
 {
-    // Java: .component( DataComponents.BLOCK_STATE, BlockItemStateProperties.EMPTY.with(CopperGolemStatueBlock.POSE, CopperGolemStatueBlock.Pose.STANDING) ) - payload component (game-port content)
+// Java: .component( DataComponents.BLOCK_STATE, BlockItemStateProperties.EMPTY.with(CopperGolemStatueBlock.POSE, CopperGolemStatueBlock.Pose.STANDING) ) - payload component (game-port content)
 }
 
 // Java: EXPOSED_COPPER_GOLEM_STATUE - the Item.Properties chain
 static void props_EXPOSED_COPPER_GOLEM_STATUE(LIBMATTI_MC_ItemProperties *p)
 {
-    // Java: .component( DataComponents.BLOCK_STATE, BlockItemStateProperties.EMPTY.with(CopperGolemStatueBlock.POSE, CopperGolemStatueBlock.Pose.STANDING) ) - payload component (game-port content)
+// Java: .component( DataComponents.BLOCK_STATE, BlockItemStateProperties.EMPTY.with(CopperGolemStatueBlock.POSE, CopperGolemStatueBlock.Pose.STANDING) ) - payload component (game-port content)
 }
 
 // Java: WEATHERED_COPPER_GOLEM_STATUE - the Item.Properties chain
 static void props_WEATHERED_COPPER_GOLEM_STATUE(LIBMATTI_MC_ItemProperties *p)
 {
-    // Java: .component( DataComponents.BLOCK_STATE, BlockItemStateProperties.EMPTY.with(CopperGolemStatueBlock.POSE, CopperGolemStatueBlock.Pose.STANDING) ) - payload component (game-port content)
+// Java: .component( DataComponents.BLOCK_STATE, BlockItemStateProperties.EMPTY.with(CopperGolemStatueBlock.POSE, CopperGolemStatueBlock.Pose.STANDING) ) - payload component (game-port content)
 }
 
 // Java: OXIDIZED_COPPER_GOLEM_STATUE - the Item.Properties chain
 static void props_OXIDIZED_COPPER_GOLEM_STATUE(LIBMATTI_MC_ItemProperties *p)
 {
-    // Java: .component( DataComponents.BLOCK_STATE, BlockItemStateProperties.EMPTY.with(CopperGolemStatueBlock.POSE, CopperGolemStatueBlock.Pose.STANDING) ) - payload component (game-port content)
+// Java: .component( DataComponents.BLOCK_STATE, BlockItemStateProperties.EMPTY.with(CopperGolemStatueBlock.POSE, CopperGolemStatueBlock.Pose.STANDING) ) - payload component (game-port content)
 }
 
 // Java: WAXED_COPPER_GOLEM_STATUE - the Item.Properties chain
 static void props_WAXED_COPPER_GOLEM_STATUE(LIBMATTI_MC_ItemProperties *p)
 {
-    // Java: .component( DataComponents.BLOCK_STATE, BlockItemStateProperties.EMPTY.with(CopperGolemStatueBlock.POSE, CopperGolemStatueBlock.Pose.STANDING) ) - payload component (game-port content)
+// Java: .component( DataComponents.BLOCK_STATE, BlockItemStateProperties.EMPTY.with(CopperGolemStatueBlock.POSE, CopperGolemStatueBlock.Pose.STANDING) ) - payload component (game-port content)
 }
 
 // Java: WAXED_EXPOSED_COPPER_GOLEM_STATUE - the Item.Properties chain
 static void props_WAXED_EXPOSED_COPPER_GOLEM_STATUE(LIBMATTI_MC_ItemProperties *p)
 {
-    // Java: .component( DataComponents.BLOCK_STATE, BlockItemStateProperties.EMPTY.with(CopperGolemStatueBlock.POSE, CopperGolemStatueBlock.Pose.STANDING) ) - payload component (game-port content)
+// Java: .component( DataComponents.BLOCK_STATE, BlockItemStateProperties.EMPTY.with(CopperGolemStatueBlock.POSE, CopperGolemStatueBlock.Pose.STANDING) ) - payload component (game-port content)
 }
 
 // Java: WAXED_WEATHERED_COPPER_GOLEM_STATUE - the Item.Properties chain
 static void props_WAXED_WEATHERED_COPPER_GOLEM_STATUE(LIBMATTI_MC_ItemProperties *p)
 {
-    // Java: .component( DataComponents.BLOCK_STATE, BlockItemStateProperties.EMPTY.with(CopperGolemStatueBlock.POSE, CopperGolemStatueBlock.Pose.STANDING) ) - payload component (game-port content)
+// Java: .component( DataComponents.BLOCK_STATE, BlockItemStateProperties.EMPTY.with(CopperGolemStatueBlock.POSE, CopperGolemStatueBlock.Pose.STANDING) ) - payload component (game-port content)
 }
 
 // Java: WAXED_OXIDIZED_COPPER_GOLEM_STATUE - the Item.Properties chain
 static void props_WAXED_OXIDIZED_COPPER_GOLEM_STATUE(LIBMATTI_MC_ItemProperties *p)
 {
-    // Java: .component( DataComponents.BLOCK_STATE, BlockItemStateProperties.EMPTY.with(CopperGolemStatueBlock.POSE, CopperGolemStatueBlock.Pose.STANDING) ) - payload component (game-port content)
+// Java: .component( DataComponents.BLOCK_STATE, BlockItemStateProperties.EMPTY.with(CopperGolemStatueBlock.POSE, CopperGolemStatueBlock.Pose.STANDING) ) - payload component (game-port content)
 }
 
 // Java: OMINOUS_BOTTLE - the Item.Properties chain
@@ -4528,7 +4529,7 @@ static void initialize(void)
         return;
     initialized = 1;
 
-    // Java: AirItem::new - typed item class (game-port content)
+// Java: AirItem::new - typed item class (game-port content)
     entries[AIR].name = "AIR";
     entries[AIR].id = "air";
     entries[AIR].block = "AIR";
@@ -5601,7 +5602,7 @@ static void initialize(void)
     entries[BIG_DRIPLEAF].id = "big_dripleaf";
     entries[BIG_DRIPLEAF].block = "BIG_DRIPLEAF";
     entries[BIG_DRIPLEAF].props = NULL;
-    // Java: DoubleHighBlockItem::new - typed item class (game-port content)
+// Java: DoubleHighBlockItem::new - typed item class (game-port content)
     entries[SMALL_DRIPLEAF].name = "SMALL_DRIPLEAF";
     entries[SMALL_DRIPLEAF].id = "small_dripleaf";
     entries[SMALL_DRIPLEAF].block = "SMALL_DRIPLEAF";
@@ -5818,7 +5819,7 @@ static void initialize(void)
     entries[OBSIDIAN].id = "obsidian";
     entries[OBSIDIAN].block = "OBSIDIAN";
     entries[OBSIDIAN].props = NULL;
-    // Java:  - typed item class (game-port content)
+// Java:  - typed item class (game-port content)
     entries[TORCH].name = "TORCH";
     entries[TORCH].id = "torch";
     entries[TORCH].block = "TORCH";
@@ -5991,12 +5992,12 @@ static void initialize(void)
     entries[SMOOTH_BASALT].id = "smooth_basalt";
     entries[SMOOTH_BASALT].block = "SMOOTH_BASALT";
     entries[SMOOTH_BASALT].props = NULL;
-    // Java:  - typed item class (game-port content)
+// Java:  - typed item class (game-port content)
     entries[SOUL_TORCH].name = "SOUL_TORCH";
     entries[SOUL_TORCH].id = "soul_torch";
     entries[SOUL_TORCH].block = "SOUL_TORCH";
     entries[SOUL_TORCH].props = NULL;
-    // Java:  - typed item class (game-port content)
+// Java:  - typed item class (game-port content)
     entries[COPPER_TORCH].name = "COPPER_TORCH";
     entries[COPPER_TORCH].id = "copper_torch";
     entries[COPPER_TORCH].block = "COPPER_TORCH";
@@ -6161,7 +6162,7 @@ static void initialize(void)
     entries[MYCELIUM].id = "mycelium";
     entries[MYCELIUM].block = "MYCELIUM";
     entries[MYCELIUM].props = NULL;
-    // Java: PlaceOnWaterBlockItem::new - typed item class (game-port content)
+// Java: PlaceOnWaterBlockItem::new - typed item class (game-port content)
     entries[LILY_PAD].name = "LILY_PAD";
     entries[LILY_PAD].id = "lily_pad";
     entries[LILY_PAD].block = "LILY_PAD";
@@ -6286,7 +6287,7 @@ static void initialize(void)
     entries[WARPED_STAIRS].id = "warped_stairs";
     entries[WARPED_STAIRS].block = "WARPED_STAIRS";
     entries[WARPED_STAIRS].props = NULL;
-    // Java: GameMasterBlockItem::new - typed item class (game-port content)
+// Java: GameMasterBlockItem::new - typed item class (game-port content)
     entries[COMMAND_BLOCK].name = "COMMAND_BLOCK";
     entries[COMMAND_BLOCK].id = "command_block";
     entries[COMMAND_BLOCK].block = "COMMAND_BLOCK";
@@ -6567,32 +6568,32 @@ static void initialize(void)
     entries[DIRT_PATH].id = "dirt_path";
     entries[DIRT_PATH].block = "DIRT_PATH";
     entries[DIRT_PATH].props = NULL;
-    // Java: DoubleHighBlockItem::new - typed item class (game-port content)
+// Java: DoubleHighBlockItem::new - typed item class (game-port content)
     entries[SUNFLOWER].name = "SUNFLOWER";
     entries[SUNFLOWER].id = "sunflower";
     entries[SUNFLOWER].block = "SUNFLOWER";
     entries[SUNFLOWER].props = NULL;
-    // Java: DoubleHighBlockItem::new - typed item class (game-port content)
+// Java: DoubleHighBlockItem::new - typed item class (game-port content)
     entries[LILAC].name = "LILAC";
     entries[LILAC].id = "lilac";
     entries[LILAC].block = "LILAC";
     entries[LILAC].props = NULL;
-    // Java: DoubleHighBlockItem::new - typed item class (game-port content)
+// Java: DoubleHighBlockItem::new - typed item class (game-port content)
     entries[ROSE_BUSH].name = "ROSE_BUSH";
     entries[ROSE_BUSH].id = "rose_bush";
     entries[ROSE_BUSH].block = "ROSE_BUSH";
     entries[ROSE_BUSH].props = NULL;
-    // Java: DoubleHighBlockItem::new - typed item class (game-port content)
+// Java: DoubleHighBlockItem::new - typed item class (game-port content)
     entries[PEONY].name = "PEONY";
     entries[PEONY].id = "peony";
     entries[PEONY].block = "PEONY";
     entries[PEONY].props = NULL;
-    // Java: DoubleHighBlockItem::new - typed item class (game-port content)
+// Java: DoubleHighBlockItem::new - typed item class (game-port content)
     entries[TALL_GRASS].name = "TALL_GRASS";
     entries[TALL_GRASS].id = "tall_grass";
     entries[TALL_GRASS].block = "TALL_GRASS";
     entries[TALL_GRASS].props = NULL;
-    // Java: DoubleHighBlockItem::new - typed item class (game-port content)
+// Java: DoubleHighBlockItem::new - typed item class (game-port content)
     entries[LARGE_FERN].name = "LARGE_FERN";
     entries[LARGE_FERN].id = "large_fern";
     entries[LARGE_FERN].block = "LARGE_FERN";
@@ -6769,12 +6770,12 @@ static void initialize(void)
     entries[RED_SANDSTONE_STAIRS].id = "red_sandstone_stairs";
     entries[RED_SANDSTONE_STAIRS].block = "RED_SANDSTONE_STAIRS";
     entries[RED_SANDSTONE_STAIRS].props = NULL;
-    // Java: GameMasterBlockItem::new - typed item class (game-port content)
+// Java: GameMasterBlockItem::new - typed item class (game-port content)
     entries[REPEATING_COMMAND_BLOCK].name = "REPEATING_COMMAND_BLOCK";
     entries[REPEATING_COMMAND_BLOCK].id = "repeating_command_block";
     entries[REPEATING_COMMAND_BLOCK].block = "REPEATING_COMMAND_BLOCK";
     entries[REPEATING_COMMAND_BLOCK].props = props_REPEATING_COMMAND_BLOCK;
-    // Java: GameMasterBlockItem::new - typed item class (game-port content)
+// Java: GameMasterBlockItem::new - typed item class (game-port content)
     entries[CHAIN_COMMAND_BLOCK].name = "CHAIN_COMMAND_BLOCK";
     entries[CHAIN_COMMAND_BLOCK].id = "chain_command_block";
     entries[CHAIN_COMMAND_BLOCK].block = "CHAIN_COMMAND_BLOCK";
@@ -7155,52 +7156,52 @@ static void initialize(void)
     entries[DEAD_TUBE_CORAL].id = "dead_tube_coral";
     entries[DEAD_TUBE_CORAL].block = "DEAD_TUBE_CORAL";
     entries[DEAD_TUBE_CORAL].props = NULL;
-    // Java:  - typed item class (game-port content)
+// Java:  - typed item class (game-port content)
     entries[TUBE_CORAL_FAN].name = "TUBE_CORAL_FAN";
     entries[TUBE_CORAL_FAN].id = "tube_coral_fan";
     entries[TUBE_CORAL_FAN].block = "TUBE_CORAL_FAN";
     entries[TUBE_CORAL_FAN].props = NULL;
-    // Java:  - typed item class (game-port content)
+// Java:  - typed item class (game-port content)
     entries[BRAIN_CORAL_FAN].name = "BRAIN_CORAL_FAN";
     entries[BRAIN_CORAL_FAN].id = "brain_coral_fan";
     entries[BRAIN_CORAL_FAN].block = "BRAIN_CORAL_FAN";
     entries[BRAIN_CORAL_FAN].props = NULL;
-    // Java:  - typed item class (game-port content)
+// Java:  - typed item class (game-port content)
     entries[BUBBLE_CORAL_FAN].name = "BUBBLE_CORAL_FAN";
     entries[BUBBLE_CORAL_FAN].id = "bubble_coral_fan";
     entries[BUBBLE_CORAL_FAN].block = "BUBBLE_CORAL_FAN";
     entries[BUBBLE_CORAL_FAN].props = NULL;
-    // Java:  - typed item class (game-port content)
+// Java:  - typed item class (game-port content)
     entries[FIRE_CORAL_FAN].name = "FIRE_CORAL_FAN";
     entries[FIRE_CORAL_FAN].id = "fire_coral_fan";
     entries[FIRE_CORAL_FAN].block = "FIRE_CORAL_FAN";
     entries[FIRE_CORAL_FAN].props = NULL;
-    // Java:  - typed item class (game-port content)
+// Java:  - typed item class (game-port content)
     entries[HORN_CORAL_FAN].name = "HORN_CORAL_FAN";
     entries[HORN_CORAL_FAN].id = "horn_coral_fan";
     entries[HORN_CORAL_FAN].block = "HORN_CORAL_FAN";
     entries[HORN_CORAL_FAN].props = NULL;
-    // Java:  - typed item class (game-port content)
+// Java:  - typed item class (game-port content)
     entries[DEAD_TUBE_CORAL_FAN].name = "DEAD_TUBE_CORAL_FAN";
     entries[DEAD_TUBE_CORAL_FAN].id = "dead_tube_coral_fan";
     entries[DEAD_TUBE_CORAL_FAN].block = "DEAD_TUBE_CORAL_FAN";
     entries[DEAD_TUBE_CORAL_FAN].props = NULL;
-    // Java:  - typed item class (game-port content)
+// Java:  - typed item class (game-port content)
     entries[DEAD_BRAIN_CORAL_FAN].name = "DEAD_BRAIN_CORAL_FAN";
     entries[DEAD_BRAIN_CORAL_FAN].id = "dead_brain_coral_fan";
     entries[DEAD_BRAIN_CORAL_FAN].block = "DEAD_BRAIN_CORAL_FAN";
     entries[DEAD_BRAIN_CORAL_FAN].props = NULL;
-    // Java:  - typed item class (game-port content)
+// Java:  - typed item class (game-port content)
     entries[DEAD_BUBBLE_CORAL_FAN].name = "DEAD_BUBBLE_CORAL_FAN";
     entries[DEAD_BUBBLE_CORAL_FAN].id = "dead_bubble_coral_fan";
     entries[DEAD_BUBBLE_CORAL_FAN].block = "DEAD_BUBBLE_CORAL_FAN";
     entries[DEAD_BUBBLE_CORAL_FAN].props = NULL;
-    // Java:  - typed item class (game-port content)
+// Java:  - typed item class (game-port content)
     entries[DEAD_FIRE_CORAL_FAN].name = "DEAD_FIRE_CORAL_FAN";
     entries[DEAD_FIRE_CORAL_FAN].id = "dead_fire_coral_fan";
     entries[DEAD_FIRE_CORAL_FAN].block = "DEAD_FIRE_CORAL_FAN";
     entries[DEAD_FIRE_CORAL_FAN].props = NULL;
-    // Java:  - typed item class (game-port content)
+// Java:  - typed item class (game-port content)
     entries[DEAD_HORN_CORAL_FAN].name = "DEAD_HORN_CORAL_FAN";
     entries[DEAD_HORN_CORAL_FAN].id = "dead_horn_coral_fan";
     entries[DEAD_HORN_CORAL_FAN].block = "DEAD_HORN_CORAL_FAN";
@@ -7353,7 +7354,7 @@ static void initialize(void)
     entries[DEEPSLATE_TILE_SLAB].id = "deepslate_tile_slab";
     entries[DEEPSLATE_TILE_SLAB].block = "DEEPSLATE_TILE_SLAB";
     entries[DEEPSLATE_TILE_SLAB].props = NULL;
-    // Java: ScaffoldingBlockItem::new - typed item class (game-port content)
+// Java: ScaffoldingBlockItem::new - typed item class (game-port content)
     entries[SCAFFOLDING].name = "SCAFFOLDING";
     entries[SCAFFOLDING].id = "scaffolding";
     entries[SCAFFOLDING].block = "SCAFFOLDING";
@@ -7362,7 +7363,7 @@ static void initialize(void)
     entries[REDSTONE].id = "redstone";
     entries[REDSTONE].block = "REDSTONE_WIRE";
     entries[REDSTONE].props = props_REDSTONE;
-    // Java:  - typed item class (game-port content)
+// Java:  - typed item class (game-port content)
     entries[REDSTONE_TORCH].name = "REDSTONE_TORCH";
     entries[REDSTONE_TORCH].id = "redstone_torch";
     entries[REDSTONE_TORCH].block = "REDSTONE_TORCH";
@@ -7607,107 +7608,107 @@ static void initialize(void)
     entries[WARPED_PRESSURE_PLATE].id = "warped_pressure_plate";
     entries[WARPED_PRESSURE_PLATE].block = "WARPED_PRESSURE_PLATE";
     entries[WARPED_PRESSURE_PLATE].props = NULL;
-    // Java: DoubleHighBlockItem::new - typed item class (game-port content)
+// Java: DoubleHighBlockItem::new - typed item class (game-port content)
     entries[IRON_DOOR].name = "IRON_DOOR";
     entries[IRON_DOOR].id = "iron_door";
     entries[IRON_DOOR].block = "IRON_DOOR";
     entries[IRON_DOOR].props = NULL;
-    // Java: DoubleHighBlockItem::new - typed item class (game-port content)
+// Java: DoubleHighBlockItem::new - typed item class (game-port content)
     entries[OAK_DOOR].name = "OAK_DOOR";
     entries[OAK_DOOR].id = "oak_door";
     entries[OAK_DOOR].block = "OAK_DOOR";
     entries[OAK_DOOR].props = NULL;
-    // Java: DoubleHighBlockItem::new - typed item class (game-port content)
+// Java: DoubleHighBlockItem::new - typed item class (game-port content)
     entries[SPRUCE_DOOR].name = "SPRUCE_DOOR";
     entries[SPRUCE_DOOR].id = "spruce_door";
     entries[SPRUCE_DOOR].block = "SPRUCE_DOOR";
     entries[SPRUCE_DOOR].props = NULL;
-    // Java: DoubleHighBlockItem::new - typed item class (game-port content)
+// Java: DoubleHighBlockItem::new - typed item class (game-port content)
     entries[BIRCH_DOOR].name = "BIRCH_DOOR";
     entries[BIRCH_DOOR].id = "birch_door";
     entries[BIRCH_DOOR].block = "BIRCH_DOOR";
     entries[BIRCH_DOOR].props = NULL;
-    // Java: DoubleHighBlockItem::new - typed item class (game-port content)
+// Java: DoubleHighBlockItem::new - typed item class (game-port content)
     entries[JUNGLE_DOOR].name = "JUNGLE_DOOR";
     entries[JUNGLE_DOOR].id = "jungle_door";
     entries[JUNGLE_DOOR].block = "JUNGLE_DOOR";
     entries[JUNGLE_DOOR].props = NULL;
-    // Java: DoubleHighBlockItem::new - typed item class (game-port content)
+// Java: DoubleHighBlockItem::new - typed item class (game-port content)
     entries[ACACIA_DOOR].name = "ACACIA_DOOR";
     entries[ACACIA_DOOR].id = "acacia_door";
     entries[ACACIA_DOOR].block = "ACACIA_DOOR";
     entries[ACACIA_DOOR].props = NULL;
-    // Java: DoubleHighBlockItem::new - typed item class (game-port content)
+// Java: DoubleHighBlockItem::new - typed item class (game-port content)
     entries[CHERRY_DOOR].name = "CHERRY_DOOR";
     entries[CHERRY_DOOR].id = "cherry_door";
     entries[CHERRY_DOOR].block = "CHERRY_DOOR";
     entries[CHERRY_DOOR].props = NULL;
-    // Java: DoubleHighBlockItem::new - typed item class (game-port content)
+// Java: DoubleHighBlockItem::new - typed item class (game-port content)
     entries[DARK_OAK_DOOR].name = "DARK_OAK_DOOR";
     entries[DARK_OAK_DOOR].id = "dark_oak_door";
     entries[DARK_OAK_DOOR].block = "DARK_OAK_DOOR";
     entries[DARK_OAK_DOOR].props = NULL;
-    // Java: DoubleHighBlockItem::new - typed item class (game-port content)
+// Java: DoubleHighBlockItem::new - typed item class (game-port content)
     entries[PALE_OAK_DOOR].name = "PALE_OAK_DOOR";
     entries[PALE_OAK_DOOR].id = "pale_oak_door";
     entries[PALE_OAK_DOOR].block = "PALE_OAK_DOOR";
     entries[PALE_OAK_DOOR].props = NULL;
-    // Java: DoubleHighBlockItem::new - typed item class (game-port content)
+// Java: DoubleHighBlockItem::new - typed item class (game-port content)
     entries[MANGROVE_DOOR].name = "MANGROVE_DOOR";
     entries[MANGROVE_DOOR].id = "mangrove_door";
     entries[MANGROVE_DOOR].block = "MANGROVE_DOOR";
     entries[MANGROVE_DOOR].props = NULL;
-    // Java: DoubleHighBlockItem::new - typed item class (game-port content)
+// Java: DoubleHighBlockItem::new - typed item class (game-port content)
     entries[BAMBOO_DOOR].name = "BAMBOO_DOOR";
     entries[BAMBOO_DOOR].id = "bamboo_door";
     entries[BAMBOO_DOOR].block = "BAMBOO_DOOR";
     entries[BAMBOO_DOOR].props = NULL;
-    // Java: DoubleHighBlockItem::new - typed item class (game-port content)
+// Java: DoubleHighBlockItem::new - typed item class (game-port content)
     entries[CRIMSON_DOOR].name = "CRIMSON_DOOR";
     entries[CRIMSON_DOOR].id = "crimson_door";
     entries[CRIMSON_DOOR].block = "CRIMSON_DOOR";
     entries[CRIMSON_DOOR].props = NULL;
-    // Java: DoubleHighBlockItem::new - typed item class (game-port content)
+// Java: DoubleHighBlockItem::new - typed item class (game-port content)
     entries[WARPED_DOOR].name = "WARPED_DOOR";
     entries[WARPED_DOOR].id = "warped_door";
     entries[WARPED_DOOR].block = "WARPED_DOOR";
     entries[WARPED_DOOR].props = NULL;
-    // Java: DoubleHighBlockItem::new - typed item class (game-port content)
+// Java: DoubleHighBlockItem::new - typed item class (game-port content)
     entries[COPPER_DOOR].name = "COPPER_DOOR";
     entries[COPPER_DOOR].id = "copper_door";
     entries[COPPER_DOOR].block = "COPPER_DOOR";
     entries[COPPER_DOOR].props = NULL;
-    // Java: DoubleHighBlockItem::new - typed item class (game-port content)
+// Java: DoubleHighBlockItem::new - typed item class (game-port content)
     entries[EXPOSED_COPPER_DOOR].name = "EXPOSED_COPPER_DOOR";
     entries[EXPOSED_COPPER_DOOR].id = "exposed_copper_door";
     entries[EXPOSED_COPPER_DOOR].block = "EXPOSED_COPPER_DOOR";
     entries[EXPOSED_COPPER_DOOR].props = NULL;
-    // Java: DoubleHighBlockItem::new - typed item class (game-port content)
+// Java: DoubleHighBlockItem::new - typed item class (game-port content)
     entries[WEATHERED_COPPER_DOOR].name = "WEATHERED_COPPER_DOOR";
     entries[WEATHERED_COPPER_DOOR].id = "weathered_copper_door";
     entries[WEATHERED_COPPER_DOOR].block = "WEATHERED_COPPER_DOOR";
     entries[WEATHERED_COPPER_DOOR].props = NULL;
-    // Java: DoubleHighBlockItem::new - typed item class (game-port content)
+// Java: DoubleHighBlockItem::new - typed item class (game-port content)
     entries[OXIDIZED_COPPER_DOOR].name = "OXIDIZED_COPPER_DOOR";
     entries[OXIDIZED_COPPER_DOOR].id = "oxidized_copper_door";
     entries[OXIDIZED_COPPER_DOOR].block = "OXIDIZED_COPPER_DOOR";
     entries[OXIDIZED_COPPER_DOOR].props = NULL;
-    // Java: DoubleHighBlockItem::new - typed item class (game-port content)
+// Java: DoubleHighBlockItem::new - typed item class (game-port content)
     entries[WAXED_COPPER_DOOR].name = "WAXED_COPPER_DOOR";
     entries[WAXED_COPPER_DOOR].id = "waxed_copper_door";
     entries[WAXED_COPPER_DOOR].block = "WAXED_COPPER_DOOR";
     entries[WAXED_COPPER_DOOR].props = NULL;
-    // Java: DoubleHighBlockItem::new - typed item class (game-port content)
+// Java: DoubleHighBlockItem::new - typed item class (game-port content)
     entries[WAXED_EXPOSED_COPPER_DOOR].name = "WAXED_EXPOSED_COPPER_DOOR";
     entries[WAXED_EXPOSED_COPPER_DOOR].id = "waxed_exposed_copper_door";
     entries[WAXED_EXPOSED_COPPER_DOOR].block = "WAXED_EXPOSED_COPPER_DOOR";
     entries[WAXED_EXPOSED_COPPER_DOOR].props = NULL;
-    // Java: DoubleHighBlockItem::new - typed item class (game-port content)
+// Java: DoubleHighBlockItem::new - typed item class (game-port content)
     entries[WAXED_WEATHERED_COPPER_DOOR].name = "WAXED_WEATHERED_COPPER_DOOR";
     entries[WAXED_WEATHERED_COPPER_DOOR].id = "waxed_weathered_copper_door";
     entries[WAXED_WEATHERED_COPPER_DOOR].block = "WAXED_WEATHERED_COPPER_DOOR";
     entries[WAXED_WEATHERED_COPPER_DOOR].props = NULL;
-    // Java: DoubleHighBlockItem::new - typed item class (game-port content)
+// Java: DoubleHighBlockItem::new - typed item class (game-port content)
     entries[WAXED_OXIDIZED_COPPER_DOOR].name = "WAXED_OXIDIZED_COPPER_DOOR";
     entries[WAXED_OXIDIZED_COPPER_DOOR].id = "waxed_oxidized_copper_door";
     entries[WAXED_OXIDIZED_COPPER_DOOR].block = "WAXED_OXIDIZED_COPPER_DOOR";
@@ -7928,37 +7929,37 @@ static void initialize(void)
     entries[BLACK_HARNESS].id = "black_harness";
     entries[BLACK_HARNESS].block = NULL;
     entries[BLACK_HARNESS].props = props_BLACK_HARNESS;
-    // Java: p_359425_ -> new MinecartItem - typed item class (game-port content)
+// Java: p_359425_ -> new MinecartItem - typed item class (game-port content)
     entries[MINECART].name = "MINECART";
     entries[MINECART].id = "minecart";
     entries[MINECART].block = NULL;
     entries[MINECART].props = props_MINECART;
-    // Java: p_359510_ -> new MinecartItem - typed item class (game-port content)
+// Java: p_359510_ -> new MinecartItem - typed item class (game-port content)
     entries[CHEST_MINECART].name = "CHEST_MINECART";
     entries[CHEST_MINECART].id = "chest_minecart";
     entries[CHEST_MINECART].block = NULL;
     entries[CHEST_MINECART].props = props_CHEST_MINECART;
-    // Java: p_359744_ -> new MinecartItem - typed item class (game-port content)
+// Java: p_359744_ -> new MinecartItem - typed item class (game-port content)
     entries[FURNACE_MINECART].name = "FURNACE_MINECART";
     entries[FURNACE_MINECART].id = "furnace_minecart";
     entries[FURNACE_MINECART].block = NULL;
     entries[FURNACE_MINECART].props = props_FURNACE_MINECART;
-    // Java: p_359728_ -> new MinecartItem - typed item class (game-port content)
+// Java: p_359728_ -> new MinecartItem - typed item class (game-port content)
     entries[TNT_MINECART].name = "TNT_MINECART";
     entries[TNT_MINECART].id = "tnt_minecart";
     entries[TNT_MINECART].block = NULL;
     entries[TNT_MINECART].props = props_TNT_MINECART;
-    // Java: p_359554_ -> new MinecartItem - typed item class (game-port content)
+// Java: p_359554_ -> new MinecartItem - typed item class (game-port content)
     entries[HOPPER_MINECART].name = "HOPPER_MINECART";
     entries[HOPPER_MINECART].id = "hopper_minecart";
     entries[HOPPER_MINECART].block = NULL;
     entries[HOPPER_MINECART].props = props_HOPPER_MINECART;
-    // Java: p_359780_ -> new FoodOnAStickItem<> - typed item class (game-port content)
+// Java: p_359780_ -> new FoodOnAStickItem<> - typed item class (game-port content)
     entries[CARROT_ON_A_STICK].name = "CARROT_ON_A_STICK";
     entries[CARROT_ON_A_STICK].id = "carrot_on_a_stick";
     entries[CARROT_ON_A_STICK].block = NULL;
     entries[CARROT_ON_A_STICK].props = props_CARROT_ON_A_STICK;
-    // Java: p_359490_ -> new FoodOnAStickItem<> - typed item class (game-port content)
+// Java: p_359490_ -> new FoodOnAStickItem<> - typed item class (game-port content)
     entries[WARPED_FUNGUS_ON_A_STICK].name = "WARPED_FUNGUS_ON_A_STICK";
     entries[WARPED_FUNGUS_ON_A_STICK].id = "warped_fungus_on_a_stick";
     entries[WARPED_FUNGUS_ON_A_STICK].block = NULL;
@@ -7971,122 +7972,122 @@ static void initialize(void)
     entries[ELYTRA].id = "elytra";
     entries[ELYTRA].block = NULL;
     entries[ELYTRA].props = props_ELYTRA;
-    // Java: p_359441_ -> new BoatItem - typed item class (game-port content)
+// Java: p_359441_ -> new BoatItem - typed item class (game-port content)
     entries[OAK_BOAT].name = "OAK_BOAT";
     entries[OAK_BOAT].id = "oak_boat";
     entries[OAK_BOAT].block = NULL;
     entries[OAK_BOAT].props = props_OAK_BOAT;
-    // Java: p_359731_ -> new BoatItem - typed item class (game-port content)
+// Java: p_359731_ -> new BoatItem - typed item class (game-port content)
     entries[OAK_CHEST_BOAT].name = "OAK_CHEST_BOAT";
     entries[OAK_CHEST_BOAT].id = "oak_chest_boat";
     entries[OAK_CHEST_BOAT].block = NULL;
     entries[OAK_CHEST_BOAT].props = props_OAK_CHEST_BOAT;
-    // Java: p_359555_ -> new BoatItem - typed item class (game-port content)
+// Java: p_359555_ -> new BoatItem - typed item class (game-port content)
     entries[SPRUCE_BOAT].name = "SPRUCE_BOAT";
     entries[SPRUCE_BOAT].id = "spruce_boat";
     entries[SPRUCE_BOAT].block = NULL;
     entries[SPRUCE_BOAT].props = props_SPRUCE_BOAT;
-    // Java: p_359434_ -> new BoatItem - typed item class (game-port content)
+// Java: p_359434_ -> new BoatItem - typed item class (game-port content)
     entries[SPRUCE_CHEST_BOAT].name = "SPRUCE_CHEST_BOAT";
     entries[SPRUCE_CHEST_BOAT].id = "spruce_chest_boat";
     entries[SPRUCE_CHEST_BOAT].block = NULL;
     entries[SPRUCE_CHEST_BOAT].props = props_SPRUCE_CHEST_BOAT;
-    // Java: p_359621_ -> new BoatItem - typed item class (game-port content)
+// Java: p_359621_ -> new BoatItem - typed item class (game-port content)
     entries[BIRCH_BOAT].name = "BIRCH_BOAT";
     entries[BIRCH_BOAT].id = "birch_boat";
     entries[BIRCH_BOAT].block = NULL;
     entries[BIRCH_BOAT].props = props_BIRCH_BOAT;
-    // Java: p_359499_ -> new BoatItem - typed item class (game-port content)
+// Java: p_359499_ -> new BoatItem - typed item class (game-port content)
     entries[BIRCH_CHEST_BOAT].name = "BIRCH_CHEST_BOAT";
     entries[BIRCH_CHEST_BOAT].id = "birch_chest_boat";
     entries[BIRCH_CHEST_BOAT].block = NULL;
     entries[BIRCH_CHEST_BOAT].props = props_BIRCH_CHEST_BOAT;
-    // Java: p_359735_ -> new BoatItem - typed item class (game-port content)
+// Java: p_359735_ -> new BoatItem - typed item class (game-port content)
     entries[JUNGLE_BOAT].name = "JUNGLE_BOAT";
     entries[JUNGLE_BOAT].id = "jungle_boat";
     entries[JUNGLE_BOAT].block = NULL;
     entries[JUNGLE_BOAT].props = props_JUNGLE_BOAT;
-    // Java: p_359699_ -> new BoatItem - typed item class (game-port content)
+// Java: p_359699_ -> new BoatItem - typed item class (game-port content)
     entries[JUNGLE_CHEST_BOAT].name = "JUNGLE_CHEST_BOAT";
     entries[JUNGLE_CHEST_BOAT].id = "jungle_chest_boat";
     entries[JUNGLE_CHEST_BOAT].block = NULL;
     entries[JUNGLE_CHEST_BOAT].props = props_JUNGLE_CHEST_BOAT;
-    // Java: p_359556_ -> new BoatItem - typed item class (game-port content)
+// Java: p_359556_ -> new BoatItem - typed item class (game-port content)
     entries[ACACIA_BOAT].name = "ACACIA_BOAT";
     entries[ACACIA_BOAT].id = "acacia_boat";
     entries[ACACIA_BOAT].block = NULL;
     entries[ACACIA_BOAT].props = props_ACACIA_BOAT;
-    // Java: p_359543_ -> new BoatItem - typed item class (game-port content)
+// Java: p_359543_ -> new BoatItem - typed item class (game-port content)
     entries[ACACIA_CHEST_BOAT].name = "ACACIA_CHEST_BOAT";
     entries[ACACIA_CHEST_BOAT].id = "acacia_chest_boat";
     entries[ACACIA_CHEST_BOAT].block = NULL;
     entries[ACACIA_CHEST_BOAT].props = props_ACACIA_CHEST_BOAT;
-    // Java: p_359742_ -> new BoatItem - typed item class (game-port content)
+// Java: p_359742_ -> new BoatItem - typed item class (game-port content)
     entries[CHERRY_BOAT].name = "CHERRY_BOAT";
     entries[CHERRY_BOAT].id = "cherry_boat";
     entries[CHERRY_BOAT].block = NULL;
     entries[CHERRY_BOAT].props = props_CHERRY_BOAT;
-    // Java: p_359417_ -> new BoatItem - typed item class (game-port content)
+// Java: p_359417_ -> new BoatItem - typed item class (game-port content)
     entries[CHERRY_CHEST_BOAT].name = "CHERRY_CHEST_BOAT";
     entries[CHERRY_CHEST_BOAT].id = "cherry_chest_boat";
     entries[CHERRY_CHEST_BOAT].block = NULL;
     entries[CHERRY_CHEST_BOAT].props = props_CHERRY_CHEST_BOAT;
-    // Java: p_359778_ -> new BoatItem - typed item class (game-port content)
+// Java: p_359778_ -> new BoatItem - typed item class (game-port content)
     entries[DARK_OAK_BOAT].name = "DARK_OAK_BOAT";
     entries[DARK_OAK_BOAT].id = "dark_oak_boat";
     entries[DARK_OAK_BOAT].block = NULL;
     entries[DARK_OAK_BOAT].props = props_DARK_OAK_BOAT;
-    // Java: p_359770_ -> new BoatItem - typed item class (game-port content)
+// Java: p_359770_ -> new BoatItem - typed item class (game-port content)
     entries[DARK_OAK_CHEST_BOAT].name = "DARK_OAK_CHEST_BOAT";
     entries[DARK_OAK_CHEST_BOAT].id = "dark_oak_chest_boat";
     entries[DARK_OAK_CHEST_BOAT].block = NULL;
     entries[DARK_OAK_CHEST_BOAT].props = props_DARK_OAK_CHEST_BOAT;
-    // Java: p_359496_ -> new BoatItem - typed item class (game-port content)
+// Java: p_359496_ -> new BoatItem - typed item class (game-port content)
     entries[PALE_OAK_BOAT].name = "PALE_OAK_BOAT";
     entries[PALE_OAK_BOAT].id = "pale_oak_boat";
     entries[PALE_OAK_BOAT].block = NULL;
     entries[PALE_OAK_BOAT].props = props_PALE_OAK_BOAT;
-    // Java: p_359772_ -> new BoatItem - typed item class (game-port content)
+// Java: p_359772_ -> new BoatItem - typed item class (game-port content)
     entries[PALE_OAK_CHEST_BOAT].name = "PALE_OAK_CHEST_BOAT";
     entries[PALE_OAK_CHEST_BOAT].id = "pale_oak_chest_boat";
     entries[PALE_OAK_CHEST_BOAT].block = NULL;
     entries[PALE_OAK_CHEST_BOAT].props = props_PALE_OAK_CHEST_BOAT;
-    // Java: p_359528_ -> new BoatItem - typed item class (game-port content)
+// Java: p_359528_ -> new BoatItem - typed item class (game-port content)
     entries[MANGROVE_BOAT].name = "MANGROVE_BOAT";
     entries[MANGROVE_BOAT].id = "mangrove_boat";
     entries[MANGROVE_BOAT].block = NULL;
     entries[MANGROVE_BOAT].props = props_MANGROVE_BOAT;
-    // Java: p_359443_ -> new BoatItem - typed item class (game-port content)
+// Java: p_359443_ -> new BoatItem - typed item class (game-port content)
     entries[MANGROVE_CHEST_BOAT].name = "MANGROVE_CHEST_BOAT";
     entries[MANGROVE_CHEST_BOAT].id = "mangrove_chest_boat";
     entries[MANGROVE_CHEST_BOAT].block = NULL;
     entries[MANGROVE_CHEST_BOAT].props = props_MANGROVE_CHEST_BOAT;
-    // Java: p_359438_ -> new BoatItem - typed item class (game-port content)
+// Java: p_359438_ -> new BoatItem - typed item class (game-port content)
     entries[BAMBOO_RAFT].name = "BAMBOO_RAFT";
     entries[BAMBOO_RAFT].id = "bamboo_raft";
     entries[BAMBOO_RAFT].block = NULL;
     entries[BAMBOO_RAFT].props = props_BAMBOO_RAFT;
-    // Java: p_359564_ -> new BoatItem - typed item class (game-port content)
+// Java: p_359564_ -> new BoatItem - typed item class (game-port content)
     entries[BAMBOO_CHEST_RAFT].name = "BAMBOO_CHEST_RAFT";
     entries[BAMBOO_CHEST_RAFT].id = "bamboo_chest_raft";
     entries[BAMBOO_CHEST_RAFT].block = NULL;
     entries[BAMBOO_CHEST_RAFT].props = props_BAMBOO_CHEST_RAFT;
-    // Java: GameMasterBlockItem::new - typed item class (game-port content)
+// Java: GameMasterBlockItem::new - typed item class (game-port content)
     entries[STRUCTURE_BLOCK].name = "STRUCTURE_BLOCK";
     entries[STRUCTURE_BLOCK].id = "structure_block";
     entries[STRUCTURE_BLOCK].block = "STRUCTURE_BLOCK";
     entries[STRUCTURE_BLOCK].props = props_STRUCTURE_BLOCK;
-    // Java: GameMasterBlockItem::new - typed item class (game-port content)
+// Java: GameMasterBlockItem::new - typed item class (game-port content)
     entries[JIGSAW].name = "JIGSAW";
     entries[JIGSAW].id = "jigsaw";
     entries[JIGSAW].block = "JIGSAW";
     entries[JIGSAW].props = props_JIGSAW;
-    // Java: GameMasterBlockItem::new - typed item class (game-port content)
+// Java: GameMasterBlockItem::new - typed item class (game-port content)
     entries[TEST_BLOCK].name = "TEST_BLOCK";
     entries[TEST_BLOCK].id = "test_block";
     entries[TEST_BLOCK].block = "TEST_BLOCK";
     entries[TEST_BLOCK].props = props_TEST_BLOCK;
-    // Java: GameMasterBlockItem::new - typed item class (game-port content)
+// Java: GameMasterBlockItem::new - typed item class (game-port content)
     entries[TEST_INSTANCE_BLOCK].name = "TEST_INSTANCE_BLOCK";
     entries[TEST_INSTANCE_BLOCK].id = "test_instance_block";
     entries[TEST_INSTANCE_BLOCK].block = "TEST_INSTANCE_BLOCK";
@@ -8107,7 +8108,7 @@ static void initialize(void)
     entries[WOLF_ARMOR].id = "wolf_armor";
     entries[WOLF_ARMOR].block = NULL;
     entries[WOLF_ARMOR].props = props_WOLF_ARMOR;
-    // Java: FlintAndSteelItem::new - typed item class (game-port content)
+// Java: FlintAndSteelItem::new - typed item class (game-port content)
     entries[FLINT_AND_STEEL].name = "FLINT_AND_STEEL";
     entries[FLINT_AND_STEEL].id = "flint_and_steel";
     entries[FLINT_AND_STEEL].block = NULL;
@@ -8120,12 +8121,12 @@ static void initialize(void)
     entries[APPLE].id = "apple";
     entries[APPLE].block = NULL;
     entries[APPLE].props = props_APPLE;
-    // Java: BowItem::new - typed item class (game-port content)
+// Java: BowItem::new - typed item class (game-port content)
     entries[BOW].name = "BOW";
     entries[BOW].id = "bow";
     entries[BOW].block = NULL;
     entries[BOW].props = props_BOW;
-    // Java: ArrowItem::new - typed item class (game-port content)
+// Java: ArrowItem::new - typed item class (game-port content)
     entries[ARROW].name = "ARROW";
     entries[ARROW].id = "arrow";
     entries[ARROW].block = NULL;
@@ -8194,7 +8195,7 @@ static void initialize(void)
     entries[WOODEN_SWORD].id = "wooden_sword";
     entries[WOODEN_SWORD].block = NULL;
     entries[WOODEN_SWORD].props = props_WOODEN_SWORD;
-    // Java: p_359493_ -> new ShovelItem - typed item class (game-port content)
+// Java: p_359493_ -> new ShovelItem - typed item class (game-port content)
     entries[WOODEN_SHOVEL].name = "WOODEN_SHOVEL";
     entries[WOODEN_SHOVEL].id = "wooden_shovel";
     entries[WOODEN_SHOVEL].block = NULL;
@@ -8203,12 +8204,12 @@ static void initialize(void)
     entries[WOODEN_PICKAXE].id = "wooden_pickaxe";
     entries[WOODEN_PICKAXE].block = NULL;
     entries[WOODEN_PICKAXE].props = props_WOODEN_PICKAXE;
-    // Java: p_359736_ -> new AxeItem - typed item class (game-port content)
+// Java: p_359736_ -> new AxeItem - typed item class (game-port content)
     entries[WOODEN_AXE].name = "WOODEN_AXE";
     entries[WOODEN_AXE].id = "wooden_axe";
     entries[WOODEN_AXE].block = NULL;
     entries[WOODEN_AXE].props = props_WOODEN_AXE;
-    // Java: p_359709_ -> new HoeItem - typed item class (game-port content)
+// Java: p_359709_ -> new HoeItem - typed item class (game-port content)
     entries[WOODEN_HOE].name = "WOODEN_HOE";
     entries[WOODEN_HOE].id = "wooden_hoe";
     entries[WOODEN_HOE].block = NULL;
@@ -8217,7 +8218,7 @@ static void initialize(void)
     entries[COPPER_SWORD].id = "copper_sword";
     entries[COPPER_SWORD].block = NULL;
     entries[COPPER_SWORD].props = props_COPPER_SWORD;
-    // Java: p_421978_ -> new ShovelItem - typed item class (game-port content)
+// Java: p_421978_ -> new ShovelItem - typed item class (game-port content)
     entries[COPPER_SHOVEL].name = "COPPER_SHOVEL";
     entries[COPPER_SHOVEL].id = "copper_shovel";
     entries[COPPER_SHOVEL].block = NULL;
@@ -8226,12 +8227,12 @@ static void initialize(void)
     entries[COPPER_PICKAXE].id = "copper_pickaxe";
     entries[COPPER_PICKAXE].block = NULL;
     entries[COPPER_PICKAXE].props = props_COPPER_PICKAXE;
-    // Java: p_421967_ -> new AxeItem - typed item class (game-port content)
+// Java: p_421967_ -> new AxeItem - typed item class (game-port content)
     entries[COPPER_AXE].name = "COPPER_AXE";
     entries[COPPER_AXE].id = "copper_axe";
     entries[COPPER_AXE].block = NULL;
     entries[COPPER_AXE].props = props_COPPER_AXE;
-    // Java: p_421976_ -> new HoeItem - typed item class (game-port content)
+// Java: p_421976_ -> new HoeItem - typed item class (game-port content)
     entries[COPPER_HOE].name = "COPPER_HOE";
     entries[COPPER_HOE].id = "copper_hoe";
     entries[COPPER_HOE].block = NULL;
@@ -8240,7 +8241,7 @@ static void initialize(void)
     entries[STONE_SWORD].id = "stone_sword";
     entries[STONE_SWORD].block = NULL;
     entries[STONE_SWORD].props = props_STONE_SWORD;
-    // Java: p_359652_ -> new ShovelItem - typed item class (game-port content)
+// Java: p_359652_ -> new ShovelItem - typed item class (game-port content)
     entries[STONE_SHOVEL].name = "STONE_SHOVEL";
     entries[STONE_SHOVEL].id = "stone_shovel";
     entries[STONE_SHOVEL].block = NULL;
@@ -8249,12 +8250,12 @@ static void initialize(void)
     entries[STONE_PICKAXE].id = "stone_pickaxe";
     entries[STONE_PICKAXE].block = NULL;
     entries[STONE_PICKAXE].props = props_STONE_PICKAXE;
-    // Java: p_359654_ -> new AxeItem - typed item class (game-port content)
+// Java: p_359654_ -> new AxeItem - typed item class (game-port content)
     entries[STONE_AXE].name = "STONE_AXE";
     entries[STONE_AXE].id = "stone_axe";
     entries[STONE_AXE].block = NULL;
     entries[STONE_AXE].props = props_STONE_AXE;
-    // Java: p_359477_ -> new HoeItem - typed item class (game-port content)
+// Java: p_359477_ -> new HoeItem - typed item class (game-port content)
     entries[STONE_HOE].name = "STONE_HOE";
     entries[STONE_HOE].id = "stone_hoe";
     entries[STONE_HOE].block = NULL;
@@ -8263,7 +8264,7 @@ static void initialize(void)
     entries[GOLDEN_SWORD].id = "golden_sword";
     entries[GOLDEN_SWORD].block = NULL;
     entries[GOLDEN_SWORD].props = props_GOLDEN_SWORD;
-    // Java: p_359718_ -> new ShovelItem - typed item class (game-port content)
+// Java: p_359718_ -> new ShovelItem - typed item class (game-port content)
     entries[GOLDEN_SHOVEL].name = "GOLDEN_SHOVEL";
     entries[GOLDEN_SHOVEL].id = "golden_shovel";
     entries[GOLDEN_SHOVEL].block = NULL;
@@ -8272,12 +8273,12 @@ static void initialize(void)
     entries[GOLDEN_PICKAXE].id = "golden_pickaxe";
     entries[GOLDEN_PICKAXE].block = NULL;
     entries[GOLDEN_PICKAXE].props = props_GOLDEN_PICKAXE;
-    // Java: p_359783_ -> new AxeItem - typed item class (game-port content)
+// Java: p_359783_ -> new AxeItem - typed item class (game-port content)
     entries[GOLDEN_AXE].name = "GOLDEN_AXE";
     entries[GOLDEN_AXE].id = "golden_axe";
     entries[GOLDEN_AXE].block = NULL;
     entries[GOLDEN_AXE].props = props_GOLDEN_AXE;
-    // Java: p_359669_ -> new HoeItem - typed item class (game-port content)
+// Java: p_359669_ -> new HoeItem - typed item class (game-port content)
     entries[GOLDEN_HOE].name = "GOLDEN_HOE";
     entries[GOLDEN_HOE].id = "golden_hoe";
     entries[GOLDEN_HOE].block = NULL;
@@ -8286,7 +8287,7 @@ static void initialize(void)
     entries[IRON_SWORD].id = "iron_sword";
     entries[IRON_SWORD].block = NULL;
     entries[IRON_SWORD].props = props_IRON_SWORD;
-    // Java: p_359754_ -> new ShovelItem - typed item class (game-port content)
+// Java: p_359754_ -> new ShovelItem - typed item class (game-port content)
     entries[IRON_SHOVEL].name = "IRON_SHOVEL";
     entries[IRON_SHOVEL].id = "iron_shovel";
     entries[IRON_SHOVEL].block = NULL;
@@ -8295,12 +8296,12 @@ static void initialize(void)
     entries[IRON_PICKAXE].id = "iron_pickaxe";
     entries[IRON_PICKAXE].block = NULL;
     entries[IRON_PICKAXE].props = props_IRON_PICKAXE;
-    // Java: p_359663_ -> new AxeItem - typed item class (game-port content)
+// Java: p_359663_ -> new AxeItem - typed item class (game-port content)
     entries[IRON_AXE].name = "IRON_AXE";
     entries[IRON_AXE].id = "iron_axe";
     entries[IRON_AXE].block = NULL;
     entries[IRON_AXE].props = props_IRON_AXE;
-    // Java: p_359444_ -> new HoeItem - typed item class (game-port content)
+// Java: p_359444_ -> new HoeItem - typed item class (game-port content)
     entries[IRON_HOE].name = "IRON_HOE";
     entries[IRON_HOE].id = "iron_hoe";
     entries[IRON_HOE].block = NULL;
@@ -8309,7 +8310,7 @@ static void initialize(void)
     entries[DIAMOND_SWORD].id = "diamond_sword";
     entries[DIAMOND_SWORD].block = NULL;
     entries[DIAMOND_SWORD].props = props_DIAMOND_SWORD;
-    // Java: p_359687_ -> new ShovelItem - typed item class (game-port content)
+// Java: p_359687_ -> new ShovelItem - typed item class (game-port content)
     entries[DIAMOND_SHOVEL].name = "DIAMOND_SHOVEL";
     entries[DIAMOND_SHOVEL].id = "diamond_shovel";
     entries[DIAMOND_SHOVEL].block = NULL;
@@ -8318,12 +8319,12 @@ static void initialize(void)
     entries[DIAMOND_PICKAXE].id = "diamond_pickaxe";
     entries[DIAMOND_PICKAXE].block = NULL;
     entries[DIAMOND_PICKAXE].props = props_DIAMOND_PICKAXE;
-    // Java: p_359516_ -> new AxeItem - typed item class (game-port content)
+// Java: p_359516_ -> new AxeItem - typed item class (game-port content)
     entries[DIAMOND_AXE].name = "DIAMOND_AXE";
     entries[DIAMOND_AXE].id = "diamond_axe";
     entries[DIAMOND_AXE].block = NULL;
     entries[DIAMOND_AXE].props = props_DIAMOND_AXE;
-    // Java: p_359473_ -> new HoeItem - typed item class (game-port content)
+// Java: p_359473_ -> new HoeItem - typed item class (game-port content)
     entries[DIAMOND_HOE].name = "DIAMOND_HOE";
     entries[DIAMOND_HOE].id = "diamond_hoe";
     entries[DIAMOND_HOE].block = NULL;
@@ -8332,7 +8333,7 @@ static void initialize(void)
     entries[NETHERITE_SWORD].id = "netherite_sword";
     entries[NETHERITE_SWORD].block = NULL;
     entries[NETHERITE_SWORD].props = props_NETHERITE_SWORD;
-    // Java: p_359558_ -> new ShovelItem - typed item class (game-port content)
+// Java: p_359558_ -> new ShovelItem - typed item class (game-port content)
     entries[NETHERITE_SHOVEL].name = "NETHERITE_SHOVEL";
     entries[NETHERITE_SHOVEL].id = "netherite_shovel";
     entries[NETHERITE_SHOVEL].block = NULL;
@@ -8341,12 +8342,12 @@ static void initialize(void)
     entries[NETHERITE_PICKAXE].id = "netherite_pickaxe";
     entries[NETHERITE_PICKAXE].block = NULL;
     entries[NETHERITE_PICKAXE].props = props_NETHERITE_PICKAXE;
-    // Java: p_359729_ -> new AxeItem - typed item class (game-port content)
+// Java: p_359729_ -> new AxeItem - typed item class (game-port content)
     entries[NETHERITE_AXE].name = "NETHERITE_AXE";
     entries[NETHERITE_AXE].id = "netherite_axe";
     entries[NETHERITE_AXE].block = NULL;
     entries[NETHERITE_AXE].props = props_NETHERITE_AXE;
-    // Java: p_359549_ -> new HoeItem - typed item class (game-port content)
+// Java: p_359549_ -> new HoeItem - typed item class (game-port content)
     entries[NETHERITE_HOE].name = "NETHERITE_HOE";
     entries[NETHERITE_HOE].id = "netherite_hoe";
     entries[NETHERITE_HOE].block = NULL;
@@ -8507,7 +8508,7 @@ static void initialize(void)
     entries[COOKED_PORKCHOP].id = "cooked_porkchop";
     entries[COOKED_PORKCHOP].block = NULL;
     entries[COOKED_PORKCHOP].props = props_COOKED_PORKCHOP;
-    // Java: p_359532_ -> new HangingEntityItem - typed item class (game-port content)
+// Java: p_359532_ -> new HangingEntityItem - typed item class (game-port content)
     entries[PAINTING].name = "PAINTING";
     entries[PAINTING].id = "painting";
     entries[PAINTING].block = NULL;
@@ -8520,147 +8521,147 @@ static void initialize(void)
     entries[ENCHANTED_GOLDEN_APPLE].id = "enchanted_golden_apple";
     entries[ENCHANTED_GOLDEN_APPLE].block = NULL;
     entries[ENCHANTED_GOLDEN_APPLE].props = props_ENCHANTED_GOLDEN_APPLE;
-    // Java:  - typed item class (game-port content)
+// Java:  - typed item class (game-port content)
     entries[OAK_SIGN].name = "OAK_SIGN";
     entries[OAK_SIGN].id = "oak_sign";
     entries[OAK_SIGN].block = "OAK_SIGN";
     entries[OAK_SIGN].props = props_OAK_SIGN;
-    // Java:  - typed item class (game-port content)
+// Java:  - typed item class (game-port content)
     entries[SPRUCE_SIGN].name = "SPRUCE_SIGN";
     entries[SPRUCE_SIGN].id = "spruce_sign";
     entries[SPRUCE_SIGN].block = "SPRUCE_SIGN";
     entries[SPRUCE_SIGN].props = props_SPRUCE_SIGN;
-    // Java:  - typed item class (game-port content)
+// Java:  - typed item class (game-port content)
     entries[BIRCH_SIGN].name = "BIRCH_SIGN";
     entries[BIRCH_SIGN].id = "birch_sign";
     entries[BIRCH_SIGN].block = "BIRCH_SIGN";
     entries[BIRCH_SIGN].props = props_BIRCH_SIGN;
-    // Java:  - typed item class (game-port content)
+// Java:  - typed item class (game-port content)
     entries[JUNGLE_SIGN].name = "JUNGLE_SIGN";
     entries[JUNGLE_SIGN].id = "jungle_sign";
     entries[JUNGLE_SIGN].block = "JUNGLE_SIGN";
     entries[JUNGLE_SIGN].props = props_JUNGLE_SIGN;
-    // Java:  - typed item class (game-port content)
+// Java:  - typed item class (game-port content)
     entries[ACACIA_SIGN].name = "ACACIA_SIGN";
     entries[ACACIA_SIGN].id = "acacia_sign";
     entries[ACACIA_SIGN].block = "ACACIA_SIGN";
     entries[ACACIA_SIGN].props = props_ACACIA_SIGN;
-    // Java:  - typed item class (game-port content)
+// Java:  - typed item class (game-port content)
     entries[CHERRY_SIGN].name = "CHERRY_SIGN";
     entries[CHERRY_SIGN].id = "cherry_sign";
     entries[CHERRY_SIGN].block = "CHERRY_SIGN";
     entries[CHERRY_SIGN].props = props_CHERRY_SIGN;
-    // Java:  - typed item class (game-port content)
+// Java:  - typed item class (game-port content)
     entries[DARK_OAK_SIGN].name = "DARK_OAK_SIGN";
     entries[DARK_OAK_SIGN].id = "dark_oak_sign";
     entries[DARK_OAK_SIGN].block = "DARK_OAK_SIGN";
     entries[DARK_OAK_SIGN].props = props_DARK_OAK_SIGN;
-    // Java:  - typed item class (game-port content)
+// Java:  - typed item class (game-port content)
     entries[PALE_OAK_SIGN].name = "PALE_OAK_SIGN";
     entries[PALE_OAK_SIGN].id = "pale_oak_sign";
     entries[PALE_OAK_SIGN].block = "PALE_OAK_SIGN";
     entries[PALE_OAK_SIGN].props = props_PALE_OAK_SIGN;
-    // Java:  - typed item class (game-port content)
+// Java:  - typed item class (game-port content)
     entries[MANGROVE_SIGN].name = "MANGROVE_SIGN";
     entries[MANGROVE_SIGN].id = "mangrove_sign";
     entries[MANGROVE_SIGN].block = "MANGROVE_SIGN";
     entries[MANGROVE_SIGN].props = props_MANGROVE_SIGN;
-    // Java:  - typed item class (game-port content)
+// Java:  - typed item class (game-port content)
     entries[BAMBOO_SIGN].name = "BAMBOO_SIGN";
     entries[BAMBOO_SIGN].id = "bamboo_sign";
     entries[BAMBOO_SIGN].block = "BAMBOO_SIGN";
     entries[BAMBOO_SIGN].props = props_BAMBOO_SIGN;
-    // Java:  - typed item class (game-port content)
+// Java:  - typed item class (game-port content)
     entries[CRIMSON_SIGN].name = "CRIMSON_SIGN";
     entries[CRIMSON_SIGN].id = "crimson_sign";
     entries[CRIMSON_SIGN].block = "CRIMSON_SIGN";
     entries[CRIMSON_SIGN].props = props_CRIMSON_SIGN;
-    // Java:  - typed item class (game-port content)
+// Java:  - typed item class (game-port content)
     entries[WARPED_SIGN].name = "WARPED_SIGN";
     entries[WARPED_SIGN].id = "warped_sign";
     entries[WARPED_SIGN].block = "WARPED_SIGN";
     entries[WARPED_SIGN].props = props_WARPED_SIGN;
-    // Java:  - typed item class (game-port content)
+// Java:  - typed item class (game-port content)
     entries[OAK_HANGING_SIGN].name = "OAK_HANGING_SIGN";
     entries[OAK_HANGING_SIGN].id = "oak_hanging_sign";
     entries[OAK_HANGING_SIGN].block = "OAK_HANGING_SIGN";
     entries[OAK_HANGING_SIGN].props = props_OAK_HANGING_SIGN;
-    // Java:  - typed item class (game-port content)
+// Java:  - typed item class (game-port content)
     entries[SPRUCE_HANGING_SIGN].name = "SPRUCE_HANGING_SIGN";
     entries[SPRUCE_HANGING_SIGN].id = "spruce_hanging_sign";
     entries[SPRUCE_HANGING_SIGN].block = "SPRUCE_HANGING_SIGN";
     entries[SPRUCE_HANGING_SIGN].props = props_SPRUCE_HANGING_SIGN;
-    // Java:  - typed item class (game-port content)
+// Java:  - typed item class (game-port content)
     entries[BIRCH_HANGING_SIGN].name = "BIRCH_HANGING_SIGN";
     entries[BIRCH_HANGING_SIGN].id = "birch_hanging_sign";
     entries[BIRCH_HANGING_SIGN].block = "BIRCH_HANGING_SIGN";
     entries[BIRCH_HANGING_SIGN].props = props_BIRCH_HANGING_SIGN;
-    // Java:  - typed item class (game-port content)
+// Java:  - typed item class (game-port content)
     entries[JUNGLE_HANGING_SIGN].name = "JUNGLE_HANGING_SIGN";
     entries[JUNGLE_HANGING_SIGN].id = "jungle_hanging_sign";
     entries[JUNGLE_HANGING_SIGN].block = "JUNGLE_HANGING_SIGN";
     entries[JUNGLE_HANGING_SIGN].props = props_JUNGLE_HANGING_SIGN;
-    // Java:  - typed item class (game-port content)
+// Java:  - typed item class (game-port content)
     entries[ACACIA_HANGING_SIGN].name = "ACACIA_HANGING_SIGN";
     entries[ACACIA_HANGING_SIGN].id = "acacia_hanging_sign";
     entries[ACACIA_HANGING_SIGN].block = "ACACIA_HANGING_SIGN";
     entries[ACACIA_HANGING_SIGN].props = props_ACACIA_HANGING_SIGN;
-    // Java:  - typed item class (game-port content)
+// Java:  - typed item class (game-port content)
     entries[CHERRY_HANGING_SIGN].name = "CHERRY_HANGING_SIGN";
     entries[CHERRY_HANGING_SIGN].id = "cherry_hanging_sign";
     entries[CHERRY_HANGING_SIGN].block = "CHERRY_HANGING_SIGN";
     entries[CHERRY_HANGING_SIGN].props = props_CHERRY_HANGING_SIGN;
-    // Java:  - typed item class (game-port content)
+// Java:  - typed item class (game-port content)
     entries[DARK_OAK_HANGING_SIGN].name = "DARK_OAK_HANGING_SIGN";
     entries[DARK_OAK_HANGING_SIGN].id = "dark_oak_hanging_sign";
     entries[DARK_OAK_HANGING_SIGN].block = "DARK_OAK_HANGING_SIGN";
     entries[DARK_OAK_HANGING_SIGN].props = props_DARK_OAK_HANGING_SIGN;
-    // Java:  - typed item class (game-port content)
+// Java:  - typed item class (game-port content)
     entries[PALE_OAK_HANGING_SIGN].name = "PALE_OAK_HANGING_SIGN";
     entries[PALE_OAK_HANGING_SIGN].id = "pale_oak_hanging_sign";
     entries[PALE_OAK_HANGING_SIGN].block = "PALE_OAK_HANGING_SIGN";
     entries[PALE_OAK_HANGING_SIGN].props = props_PALE_OAK_HANGING_SIGN;
-    // Java:  - typed item class (game-port content)
+// Java:  - typed item class (game-port content)
     entries[MANGROVE_HANGING_SIGN].name = "MANGROVE_HANGING_SIGN";
     entries[MANGROVE_HANGING_SIGN].id = "mangrove_hanging_sign";
     entries[MANGROVE_HANGING_SIGN].block = "MANGROVE_HANGING_SIGN";
     entries[MANGROVE_HANGING_SIGN].props = props_MANGROVE_HANGING_SIGN;
-    // Java:  - typed item class (game-port content)
+// Java:  - typed item class (game-port content)
     entries[BAMBOO_HANGING_SIGN].name = "BAMBOO_HANGING_SIGN";
     entries[BAMBOO_HANGING_SIGN].id = "bamboo_hanging_sign";
     entries[BAMBOO_HANGING_SIGN].block = "BAMBOO_HANGING_SIGN";
     entries[BAMBOO_HANGING_SIGN].props = props_BAMBOO_HANGING_SIGN;
-    // Java:  - typed item class (game-port content)
+// Java:  - typed item class (game-port content)
     entries[CRIMSON_HANGING_SIGN].name = "CRIMSON_HANGING_SIGN";
     entries[CRIMSON_HANGING_SIGN].id = "crimson_hanging_sign";
     entries[CRIMSON_HANGING_SIGN].block = "CRIMSON_HANGING_SIGN";
     entries[CRIMSON_HANGING_SIGN].props = props_CRIMSON_HANGING_SIGN;
-    // Java:  - typed item class (game-port content)
+// Java:  - typed item class (game-port content)
     entries[WARPED_HANGING_SIGN].name = "WARPED_HANGING_SIGN";
     entries[WARPED_HANGING_SIGN].id = "warped_hanging_sign";
     entries[WARPED_HANGING_SIGN].block = "WARPED_HANGING_SIGN";
     entries[WARPED_HANGING_SIGN].props = props_WARPED_HANGING_SIGN;
-    // Java: p_359515_ -> new BucketItem - typed item class (game-port content)
+// Java: p_359515_ -> new BucketItem - typed item class (game-port content)
     entries[BUCKET].name = "BUCKET";
     entries[BUCKET].id = "bucket";
     entries[BUCKET].block = NULL;
     entries[BUCKET].props = props_BUCKET;
-    // Java: p_359595_ -> new BucketItem - typed item class (game-port content)
+// Java: p_359595_ -> new BucketItem - typed item class (game-port content)
     entries[WATER_BUCKET].name = "WATER_BUCKET";
     entries[WATER_BUCKET].id = "water_bucket";
     entries[WATER_BUCKET].block = NULL;
     entries[WATER_BUCKET].props = props_WATER_BUCKET;
-    // Java: p_359702_ -> new BucketItem - typed item class (game-port content)
+// Java: p_359702_ -> new BucketItem - typed item class (game-port content)
     entries[LAVA_BUCKET].name = "LAVA_BUCKET";
     entries[LAVA_BUCKET].id = "lava_bucket";
     entries[LAVA_BUCKET].block = NULL;
     entries[LAVA_BUCKET].props = props_LAVA_BUCKET;
-    // Java: p_359449_ -> new SolidBucketItem - typed item class (game-port content)
+// Java: p_359449_ -> new SolidBucketItem - typed item class (game-port content)
     entries[POWDER_SNOW_BUCKET].name = "POWDER_SNOW_BUCKET";
     entries[POWDER_SNOW_BUCKET].id = "powder_snow_bucket";
     entries[POWDER_SNOW_BUCKET].block = NULL;
     entries[POWDER_SNOW_BUCKET].props = props_POWDER_SNOW_BUCKET;
-    // Java: SnowballItem::new - typed item class (game-port content)
+// Java: SnowballItem::new - typed item class (game-port content)
     entries[SNOWBALL].name = "SNOWBALL";
     entries[SNOWBALL].id = "snowball";
     entries[SNOWBALL].block = NULL;
@@ -8673,32 +8674,32 @@ static void initialize(void)
     entries[MILK_BUCKET].id = "milk_bucket";
     entries[MILK_BUCKET].block = NULL;
     entries[MILK_BUCKET].props = props_MILK_BUCKET;
-    // Java: p_359625_ -> new MobBucketItem - typed item class (game-port content)
+// Java: p_359625_ -> new MobBucketItem - typed item class (game-port content)
     entries[PUFFERFISH_BUCKET].name = "PUFFERFISH_BUCKET";
     entries[PUFFERFISH_BUCKET].id = "pufferfish_bucket";
     entries[PUFFERFISH_BUCKET].block = NULL;
     entries[PUFFERFISH_BUCKET].props = props_PUFFERFISH_BUCKET;
-    // Java: p_359767_ -> new MobBucketItem - typed item class (game-port content)
+// Java: p_359767_ -> new MobBucketItem - typed item class (game-port content)
     entries[SALMON_BUCKET].name = "SALMON_BUCKET";
     entries[SALMON_BUCKET].id = "salmon_bucket";
     entries[SALMON_BUCKET].block = NULL;
     entries[SALMON_BUCKET].props = props_SALMON_BUCKET;
-    // Java: p_359691_ -> new MobBucketItem - typed item class (game-port content)
+// Java: p_359691_ -> new MobBucketItem - typed item class (game-port content)
     entries[COD_BUCKET].name = "COD_BUCKET";
     entries[COD_BUCKET].id = "cod_bucket";
     entries[COD_BUCKET].block = NULL;
     entries[COD_BUCKET].props = props_COD_BUCKET;
-    // Java: p_359521_ -> new MobBucketItem - typed item class (game-port content)
+// Java: p_359521_ -> new MobBucketItem - typed item class (game-port content)
     entries[TROPICAL_FISH_BUCKET].name = "TROPICAL_FISH_BUCKET";
     entries[TROPICAL_FISH_BUCKET].id = "tropical_fish_bucket";
     entries[TROPICAL_FISH_BUCKET].block = NULL;
     entries[TROPICAL_FISH_BUCKET].props = props_TROPICAL_FISH_BUCKET;
-    // Java: p_359602_ -> new MobBucketItem - typed item class (game-port content)
+// Java: p_359602_ -> new MobBucketItem - typed item class (game-port content)
     entries[AXOLOTL_BUCKET].name = "AXOLOTL_BUCKET";
     entries[AXOLOTL_BUCKET].id = "axolotl_bucket";
     entries[AXOLOTL_BUCKET].block = NULL;
     entries[AXOLOTL_BUCKET].props = props_AXOLOTL_BUCKET;
-    // Java: p_359585_ -> new MobBucketItem - typed item class (game-port content)
+// Java: p_359585_ -> new MobBucketItem - typed item class (game-port content)
     entries[TADPOLE_BUCKET].name = "TADPOLE_BUCKET";
     entries[TADPOLE_BUCKET].id = "tadpole_bucket";
     entries[TADPOLE_BUCKET].block = NULL;
@@ -8727,22 +8728,22 @@ static void initialize(void)
     entries[SLIME_BALL].id = "slime_ball";
     entries[SLIME_BALL].block = NULL;
     entries[SLIME_BALL].props = NULL;
-    // Java: EggItem::new - typed item class (game-port content)
+// Java: EggItem::new - typed item class (game-port content)
     entries[EGG].name = "EGG";
     entries[EGG].id = "egg";
     entries[EGG].block = NULL;
     entries[EGG].props = props_EGG;
-    // Java: EggItem::new - typed item class (game-port content)
+// Java: EggItem::new - typed item class (game-port content)
     entries[BLUE_EGG].name = "BLUE_EGG";
     entries[BLUE_EGG].id = "blue_egg";
     entries[BLUE_EGG].block = NULL;
     entries[BLUE_EGG].props = props_BLUE_EGG;
-    // Java: EggItem::new - typed item class (game-port content)
+// Java: EggItem::new - typed item class (game-port content)
     entries[BROWN_EGG].name = "BROWN_EGG";
     entries[BROWN_EGG].id = "brown_egg";
     entries[BROWN_EGG].block = NULL;
     entries[BROWN_EGG].props = props_BROWN_EGG;
-    // Java: CompassItem::new - typed item class (game-port content)
+// Java: CompassItem::new - typed item class (game-port content)
     entries[COMPASS].name = "COMPASS";
     entries[COMPASS].id = "compass";
     entries[COMPASS].block = NULL;
@@ -8751,92 +8752,92 @@ static void initialize(void)
     entries[RECOVERY_COMPASS].id = "recovery_compass";
     entries[RECOVERY_COMPASS].block = NULL;
     entries[RECOVERY_COMPASS].props = props_RECOVERY_COMPASS;
-    // Java: BundleItem::new - typed item class (game-port content)
+// Java: BundleItem::new - typed item class (game-port content)
     entries[BUNDLE].name = "BUNDLE";
     entries[BUNDLE].id = "bundle";
     entries[BUNDLE].block = NULL;
     entries[BUNDLE].props = props_BUNDLE;
-    // Java: BundleItem::new - typed item class (game-port content)
+// Java: BundleItem::new - typed item class (game-port content)
     entries[WHITE_BUNDLE].name = "WHITE_BUNDLE";
     entries[WHITE_BUNDLE].id = "white_bundle";
     entries[WHITE_BUNDLE].block = NULL;
     entries[WHITE_BUNDLE].props = props_WHITE_BUNDLE;
-    // Java: BundleItem::new - typed item class (game-port content)
+// Java: BundleItem::new - typed item class (game-port content)
     entries[ORANGE_BUNDLE].name = "ORANGE_BUNDLE";
     entries[ORANGE_BUNDLE].id = "orange_bundle";
     entries[ORANGE_BUNDLE].block = NULL;
     entries[ORANGE_BUNDLE].props = props_ORANGE_BUNDLE;
-    // Java: BundleItem::new - typed item class (game-port content)
+// Java: BundleItem::new - typed item class (game-port content)
     entries[MAGENTA_BUNDLE].name = "MAGENTA_BUNDLE";
     entries[MAGENTA_BUNDLE].id = "magenta_bundle";
     entries[MAGENTA_BUNDLE].block = NULL;
     entries[MAGENTA_BUNDLE].props = props_MAGENTA_BUNDLE;
-    // Java: BundleItem::new - typed item class (game-port content)
+// Java: BundleItem::new - typed item class (game-port content)
     entries[LIGHT_BLUE_BUNDLE].name = "LIGHT_BLUE_BUNDLE";
     entries[LIGHT_BLUE_BUNDLE].id = "light_blue_bundle";
     entries[LIGHT_BLUE_BUNDLE].block = NULL;
     entries[LIGHT_BLUE_BUNDLE].props = props_LIGHT_BLUE_BUNDLE;
-    // Java: BundleItem::new - typed item class (game-port content)
+// Java: BundleItem::new - typed item class (game-port content)
     entries[YELLOW_BUNDLE].name = "YELLOW_BUNDLE";
     entries[YELLOW_BUNDLE].id = "yellow_bundle";
     entries[YELLOW_BUNDLE].block = NULL;
     entries[YELLOW_BUNDLE].props = props_YELLOW_BUNDLE;
-    // Java: BundleItem::new - typed item class (game-port content)
+// Java: BundleItem::new - typed item class (game-port content)
     entries[LIME_BUNDLE].name = "LIME_BUNDLE";
     entries[LIME_BUNDLE].id = "lime_bundle";
     entries[LIME_BUNDLE].block = NULL;
     entries[LIME_BUNDLE].props = props_LIME_BUNDLE;
-    // Java: BundleItem::new - typed item class (game-port content)
+// Java: BundleItem::new - typed item class (game-port content)
     entries[PINK_BUNDLE].name = "PINK_BUNDLE";
     entries[PINK_BUNDLE].id = "pink_bundle";
     entries[PINK_BUNDLE].block = NULL;
     entries[PINK_BUNDLE].props = props_PINK_BUNDLE;
-    // Java: BundleItem::new - typed item class (game-port content)
+// Java: BundleItem::new - typed item class (game-port content)
     entries[GRAY_BUNDLE].name = "GRAY_BUNDLE";
     entries[GRAY_BUNDLE].id = "gray_bundle";
     entries[GRAY_BUNDLE].block = NULL;
     entries[GRAY_BUNDLE].props = props_GRAY_BUNDLE;
-    // Java: BundleItem::new - typed item class (game-port content)
+// Java: BundleItem::new - typed item class (game-port content)
     entries[LIGHT_GRAY_BUNDLE].name = "LIGHT_GRAY_BUNDLE";
     entries[LIGHT_GRAY_BUNDLE].id = "light_gray_bundle";
     entries[LIGHT_GRAY_BUNDLE].block = NULL;
     entries[LIGHT_GRAY_BUNDLE].props = props_LIGHT_GRAY_BUNDLE;
-    // Java: BundleItem::new - typed item class (game-port content)
+// Java: BundleItem::new - typed item class (game-port content)
     entries[CYAN_BUNDLE].name = "CYAN_BUNDLE";
     entries[CYAN_BUNDLE].id = "cyan_bundle";
     entries[CYAN_BUNDLE].block = NULL;
     entries[CYAN_BUNDLE].props = props_CYAN_BUNDLE;
-    // Java: BundleItem::new - typed item class (game-port content)
+// Java: BundleItem::new - typed item class (game-port content)
     entries[PURPLE_BUNDLE].name = "PURPLE_BUNDLE";
     entries[PURPLE_BUNDLE].id = "purple_bundle";
     entries[PURPLE_BUNDLE].block = NULL;
     entries[PURPLE_BUNDLE].props = props_PURPLE_BUNDLE;
-    // Java: BundleItem::new - typed item class (game-port content)
+// Java: BundleItem::new - typed item class (game-port content)
     entries[BLUE_BUNDLE].name = "BLUE_BUNDLE";
     entries[BLUE_BUNDLE].id = "blue_bundle";
     entries[BLUE_BUNDLE].block = NULL;
     entries[BLUE_BUNDLE].props = props_BLUE_BUNDLE;
-    // Java: BundleItem::new - typed item class (game-port content)
+// Java: BundleItem::new - typed item class (game-port content)
     entries[BROWN_BUNDLE].name = "BROWN_BUNDLE";
     entries[BROWN_BUNDLE].id = "brown_bundle";
     entries[BROWN_BUNDLE].block = NULL;
     entries[BROWN_BUNDLE].props = props_BROWN_BUNDLE;
-    // Java: BundleItem::new - typed item class (game-port content)
+// Java: BundleItem::new - typed item class (game-port content)
     entries[GREEN_BUNDLE].name = "GREEN_BUNDLE";
     entries[GREEN_BUNDLE].id = "green_bundle";
     entries[GREEN_BUNDLE].block = NULL;
     entries[GREEN_BUNDLE].props = props_GREEN_BUNDLE;
-    // Java: BundleItem::new - typed item class (game-port content)
+// Java: BundleItem::new - typed item class (game-port content)
     entries[RED_BUNDLE].name = "RED_BUNDLE";
     entries[RED_BUNDLE].id = "red_bundle";
     entries[RED_BUNDLE].block = NULL;
     entries[RED_BUNDLE].props = props_RED_BUNDLE;
-    // Java: BundleItem::new - typed item class (game-port content)
+// Java: BundleItem::new - typed item class (game-port content)
     entries[BLACK_BUNDLE].name = "BLACK_BUNDLE";
     entries[BLACK_BUNDLE].id = "black_bundle";
     entries[BLACK_BUNDLE].block = NULL;
     entries[BLACK_BUNDLE].props = props_BLACK_BUNDLE;
-    // Java: FishingRodItem::new - typed item class (game-port content)
+// Java: FishingRodItem::new - typed item class (game-port content)
     entries[FISHING_ROD].name = "FISHING_ROD";
     entries[FISHING_ROD].id = "fishing_rod";
     entries[FISHING_ROD].block = NULL;
@@ -8845,7 +8846,7 @@ static void initialize(void)
     entries[CLOCK].id = "clock";
     entries[CLOCK].block = NULL;
     entries[CLOCK].props = NULL;
-    // Java: SpyglassItem::new - typed item class (game-port content)
+// Java: SpyglassItem::new - typed item class (game-port content)
     entries[SPYGLASS].name = "SPYGLASS";
     entries[SPYGLASS].id = "spyglass";
     entries[SPYGLASS].block = NULL;
@@ -8878,12 +8879,12 @@ static void initialize(void)
     entries[COOKED_SALMON].id = "cooked_salmon";
     entries[COOKED_SALMON].block = NULL;
     entries[COOKED_SALMON].props = props_COOKED_SALMON;
-    // Java: InkSacItem::new - typed item class (game-port content)
+// Java: InkSacItem::new - typed item class (game-port content)
     entries[INK_SAC].name = "INK_SAC";
     entries[INK_SAC].id = "ink_sac";
     entries[INK_SAC].block = NULL;
     entries[INK_SAC].props = NULL;
-    // Java: GlowInkSacItem::new - typed item class (game-port content)
+// Java: GlowInkSacItem::new - typed item class (game-port content)
     entries[GLOW_INK_SAC].name = "GLOW_INK_SAC";
     entries[GLOW_INK_SAC].id = "glow_ink_sac";
     entries[GLOW_INK_SAC].block = NULL;
@@ -8892,87 +8893,87 @@ static void initialize(void)
     entries[COCOA_BEANS].id = "cocoa_beans";
     entries[COCOA_BEANS].block = "COCOA";
     entries[COCOA_BEANS].props = NULL;
-    // Java: p_359758_ -> new DyeItem - typed item class (game-port content)
+// Java: p_359758_ -> new DyeItem - typed item class (game-port content)
     entries[WHITE_DYE].name = "WHITE_DYE";
     entries[WHITE_DYE].id = "white_dye";
     entries[WHITE_DYE].block = NULL;
     entries[WHITE_DYE].props = NULL;
-    // Java: p_359462_ -> new DyeItem - typed item class (game-port content)
+// Java: p_359462_ -> new DyeItem - typed item class (game-port content)
     entries[ORANGE_DYE].name = "ORANGE_DYE";
     entries[ORANGE_DYE].id = "orange_dye";
     entries[ORANGE_DYE].block = NULL;
     entries[ORANGE_DYE].props = NULL;
-    // Java: p_359442_ -> new DyeItem - typed item class (game-port content)
+// Java: p_359442_ -> new DyeItem - typed item class (game-port content)
     entries[MAGENTA_DYE].name = "MAGENTA_DYE";
     entries[MAGENTA_DYE].id = "magenta_dye";
     entries[MAGENTA_DYE].block = NULL;
     entries[MAGENTA_DYE].props = NULL;
-    // Java: p_359512_ -> new DyeItem - typed item class (game-port content)
+// Java: p_359512_ -> new DyeItem - typed item class (game-port content)
     entries[LIGHT_BLUE_DYE].name = "LIGHT_BLUE_DYE";
     entries[LIGHT_BLUE_DYE].id = "light_blue_dye";
     entries[LIGHT_BLUE_DYE].block = NULL;
     entries[LIGHT_BLUE_DYE].props = NULL;
-    // Java: p_359607_ -> new DyeItem - typed item class (game-port content)
+// Java: p_359607_ -> new DyeItem - typed item class (game-port content)
     entries[YELLOW_DYE].name = "YELLOW_DYE";
     entries[YELLOW_DYE].id = "yellow_dye";
     entries[YELLOW_DYE].block = NULL;
     entries[YELLOW_DYE].props = NULL;
-    // Java: p_359486_ -> new DyeItem - typed item class (game-port content)
+// Java: p_359486_ -> new DyeItem - typed item class (game-port content)
     entries[LIME_DYE].name = "LIME_DYE";
     entries[LIME_DYE].id = "lime_dye";
     entries[LIME_DYE].block = NULL;
     entries[LIME_DYE].props = NULL;
-    // Java: p_359436_ -> new DyeItem - typed item class (game-port content)
+// Java: p_359436_ -> new DyeItem - typed item class (game-port content)
     entries[PINK_DYE].name = "PINK_DYE";
     entries[PINK_DYE].id = "pink_dye";
     entries[PINK_DYE].block = NULL;
     entries[PINK_DYE].props = NULL;
-    // Java: p_359433_ -> new DyeItem - typed item class (game-port content)
+// Java: p_359433_ -> new DyeItem - typed item class (game-port content)
     entries[GRAY_DYE].name = "GRAY_DYE";
     entries[GRAY_DYE].id = "gray_dye";
     entries[GRAY_DYE].block = NULL;
     entries[GRAY_DYE].props = NULL;
-    // Java: p_359509_ -> new DyeItem - typed item class (game-port content)
+// Java: p_359509_ -> new DyeItem - typed item class (game-port content)
     entries[LIGHT_GRAY_DYE].name = "LIGHT_GRAY_DYE";
     entries[LIGHT_GRAY_DYE].id = "light_gray_dye";
     entries[LIGHT_GRAY_DYE].block = NULL;
     entries[LIGHT_GRAY_DYE].props = NULL;
-    // Java: p_359635_ -> new DyeItem - typed item class (game-port content)
+// Java: p_359635_ -> new DyeItem - typed item class (game-port content)
     entries[CYAN_DYE].name = "CYAN_DYE";
     entries[CYAN_DYE].id = "cyan_dye";
     entries[CYAN_DYE].block = NULL;
     entries[CYAN_DYE].props = NULL;
-    // Java: p_359544_ -> new DyeItem - typed item class (game-port content)
+// Java: p_359544_ -> new DyeItem - typed item class (game-port content)
     entries[PURPLE_DYE].name = "PURPLE_DYE";
     entries[PURPLE_DYE].id = "purple_dye";
     entries[PURPLE_DYE].block = NULL;
     entries[PURPLE_DYE].props = NULL;
-    // Java: p_359427_ -> new DyeItem - typed item class (game-port content)
+// Java: p_359427_ -> new DyeItem - typed item class (game-port content)
     entries[BLUE_DYE].name = "BLUE_DYE";
     entries[BLUE_DYE].id = "blue_dye";
     entries[BLUE_DYE].block = NULL;
     entries[BLUE_DYE].props = NULL;
-    // Java: p_359703_ -> new DyeItem - typed item class (game-port content)
+// Java: p_359703_ -> new DyeItem - typed item class (game-port content)
     entries[BROWN_DYE].name = "BROWN_DYE";
     entries[BROWN_DYE].id = "brown_dye";
     entries[BROWN_DYE].block = NULL;
     entries[BROWN_DYE].props = NULL;
-    // Java: p_359503_ -> new DyeItem - typed item class (game-port content)
+// Java: p_359503_ -> new DyeItem - typed item class (game-port content)
     entries[GREEN_DYE].name = "GREEN_DYE";
     entries[GREEN_DYE].id = "green_dye";
     entries[GREEN_DYE].block = NULL;
     entries[GREEN_DYE].props = NULL;
-    // Java: p_359690_ -> new DyeItem - typed item class (game-port content)
+// Java: p_359690_ -> new DyeItem - typed item class (game-port content)
     entries[RED_DYE].name = "RED_DYE";
     entries[RED_DYE].id = "red_dye";
     entries[RED_DYE].block = NULL;
     entries[RED_DYE].props = NULL;
-    // Java: p_359688_ -> new DyeItem - typed item class (game-port content)
+// Java: p_359688_ -> new DyeItem - typed item class (game-port content)
     entries[BLACK_DYE].name = "BLACK_DYE";
     entries[BLACK_DYE].id = "black_dye";
     entries[BLACK_DYE].block = NULL;
     entries[BLACK_DYE].props = NULL;
-    // Java: BoneMealItem::new - typed item class (game-port content)
+// Java: BoneMealItem::new - typed item class (game-port content)
     entries[BONE_MEAL].name = "BONE_MEAL";
     entries[BONE_MEAL].id = "bone_meal";
     entries[BONE_MEAL].block = NULL;
@@ -8989,82 +8990,82 @@ static void initialize(void)
     entries[CAKE].id = "cake";
     entries[CAKE].block = "CAKE";
     entries[CAKE].props = props_CAKE;
-    // Java: BedItem::new - typed item class (game-port content)
+// Java: BedItem::new - typed item class (game-port content)
     entries[WHITE_BED].name = "WHITE_BED";
     entries[WHITE_BED].id = "white_bed";
     entries[WHITE_BED].block = "WHITE_BED";
     entries[WHITE_BED].props = props_WHITE_BED;
-    // Java: BedItem::new - typed item class (game-port content)
+// Java: BedItem::new - typed item class (game-port content)
     entries[ORANGE_BED].name = "ORANGE_BED";
     entries[ORANGE_BED].id = "orange_bed";
     entries[ORANGE_BED].block = "ORANGE_BED";
     entries[ORANGE_BED].props = props_ORANGE_BED;
-    // Java: BedItem::new - typed item class (game-port content)
+// Java: BedItem::new - typed item class (game-port content)
     entries[MAGENTA_BED].name = "MAGENTA_BED";
     entries[MAGENTA_BED].id = "magenta_bed";
     entries[MAGENTA_BED].block = "MAGENTA_BED";
     entries[MAGENTA_BED].props = props_MAGENTA_BED;
-    // Java: BedItem::new - typed item class (game-port content)
+// Java: BedItem::new - typed item class (game-port content)
     entries[LIGHT_BLUE_BED].name = "LIGHT_BLUE_BED";
     entries[LIGHT_BLUE_BED].id = "light_blue_bed";
     entries[LIGHT_BLUE_BED].block = "LIGHT_BLUE_BED";
     entries[LIGHT_BLUE_BED].props = props_LIGHT_BLUE_BED;
-    // Java: BedItem::new - typed item class (game-port content)
+// Java: BedItem::new - typed item class (game-port content)
     entries[YELLOW_BED].name = "YELLOW_BED";
     entries[YELLOW_BED].id = "yellow_bed";
     entries[YELLOW_BED].block = "YELLOW_BED";
     entries[YELLOW_BED].props = props_YELLOW_BED;
-    // Java: BedItem::new - typed item class (game-port content)
+// Java: BedItem::new - typed item class (game-port content)
     entries[LIME_BED].name = "LIME_BED";
     entries[LIME_BED].id = "lime_bed";
     entries[LIME_BED].block = "LIME_BED";
     entries[LIME_BED].props = props_LIME_BED;
-    // Java: BedItem::new - typed item class (game-port content)
+// Java: BedItem::new - typed item class (game-port content)
     entries[PINK_BED].name = "PINK_BED";
     entries[PINK_BED].id = "pink_bed";
     entries[PINK_BED].block = "PINK_BED";
     entries[PINK_BED].props = props_PINK_BED;
-    // Java: BedItem::new - typed item class (game-port content)
+// Java: BedItem::new - typed item class (game-port content)
     entries[GRAY_BED].name = "GRAY_BED";
     entries[GRAY_BED].id = "gray_bed";
     entries[GRAY_BED].block = "GRAY_BED";
     entries[GRAY_BED].props = props_GRAY_BED;
-    // Java: BedItem::new - typed item class (game-port content)
+// Java: BedItem::new - typed item class (game-port content)
     entries[LIGHT_GRAY_BED].name = "LIGHT_GRAY_BED";
     entries[LIGHT_GRAY_BED].id = "light_gray_bed";
     entries[LIGHT_GRAY_BED].block = "LIGHT_GRAY_BED";
     entries[LIGHT_GRAY_BED].props = props_LIGHT_GRAY_BED;
-    // Java: BedItem::new - typed item class (game-port content)
+// Java: BedItem::new - typed item class (game-port content)
     entries[CYAN_BED].name = "CYAN_BED";
     entries[CYAN_BED].id = "cyan_bed";
     entries[CYAN_BED].block = "CYAN_BED";
     entries[CYAN_BED].props = props_CYAN_BED;
-    // Java: BedItem::new - typed item class (game-port content)
+// Java: BedItem::new - typed item class (game-port content)
     entries[PURPLE_BED].name = "PURPLE_BED";
     entries[PURPLE_BED].id = "purple_bed";
     entries[PURPLE_BED].block = "PURPLE_BED";
     entries[PURPLE_BED].props = props_PURPLE_BED;
-    // Java: BedItem::new - typed item class (game-port content)
+// Java: BedItem::new - typed item class (game-port content)
     entries[BLUE_BED].name = "BLUE_BED";
     entries[BLUE_BED].id = "blue_bed";
     entries[BLUE_BED].block = "BLUE_BED";
     entries[BLUE_BED].props = props_BLUE_BED;
-    // Java: BedItem::new - typed item class (game-port content)
+// Java: BedItem::new - typed item class (game-port content)
     entries[BROWN_BED].name = "BROWN_BED";
     entries[BROWN_BED].id = "brown_bed";
     entries[BROWN_BED].block = "BROWN_BED";
     entries[BROWN_BED].props = props_BROWN_BED;
-    // Java: BedItem::new - typed item class (game-port content)
+// Java: BedItem::new - typed item class (game-port content)
     entries[GREEN_BED].name = "GREEN_BED";
     entries[GREEN_BED].id = "green_bed";
     entries[GREEN_BED].block = "GREEN_BED";
     entries[GREEN_BED].props = props_GREEN_BED;
-    // Java: BedItem::new - typed item class (game-port content)
+// Java: BedItem::new - typed item class (game-port content)
     entries[RED_BED].name = "RED_BED";
     entries[RED_BED].id = "red_bed";
     entries[RED_BED].block = "RED_BED";
     entries[RED_BED].props = props_RED_BED;
-    // Java: BedItem::new - typed item class (game-port content)
+// Java: BedItem::new - typed item class (game-port content)
     entries[BLACK_BED].name = "BLACK_BED";
     entries[BLACK_BED].id = "black_bed";
     entries[BLACK_BED].block = "BLACK_BED";
@@ -9077,12 +9078,12 @@ static void initialize(void)
     entries[CRAFTER].id = "crafter";
     entries[CRAFTER].block = "CRAFTER";
     entries[CRAFTER].props = NULL;
-    // Java: MapItem::new - typed item class (game-port content)
+// Java: MapItem::new - typed item class (game-port content)
     entries[FILLED_MAP].name = "FILLED_MAP";
     entries[FILLED_MAP].id = "filled_map";
     entries[FILLED_MAP].block = NULL;
     entries[FILLED_MAP].props = props_FILLED_MAP;
-    // Java: ShearsItem::new - typed item class (game-port content)
+// Java: ShearsItem::new - typed item class (game-port content)
     entries[SHEARS].name = "SHEARS";
     entries[SHEARS].id = "shears";
     entries[SHEARS].block = NULL;
@@ -9123,7 +9124,7 @@ static void initialize(void)
     entries[ROTTEN_FLESH].id = "rotten_flesh";
     entries[ROTTEN_FLESH].block = NULL;
     entries[ROTTEN_FLESH].props = props_ROTTEN_FLESH;
-    // Java: EnderpearlItem::new - typed item class (game-port content)
+// Java: EnderpearlItem::new - typed item class (game-port content)
     entries[ENDER_PEARL].name = "ENDER_PEARL";
     entries[ENDER_PEARL].id = "ender_pearl";
     entries[ENDER_PEARL].block = NULL;
@@ -9144,12 +9145,12 @@ static void initialize(void)
     entries[NETHER_WART].id = "nether_wart";
     entries[NETHER_WART].block = "NETHER_WART";
     entries[NETHER_WART].props = NULL;
-    // Java: BottleItem::new - typed item class (game-port content)
+// Java: BottleItem::new - typed item class (game-port content)
     entries[GLASS_BOTTLE].name = "GLASS_BOTTLE";
     entries[GLASS_BOTTLE].id = "glass_bottle";
     entries[GLASS_BOTTLE].block = NULL;
     entries[GLASS_BOTTLE].props = NULL;
-    // Java: PotionItem::new - typed item class (game-port content)
+// Java: PotionItem::new - typed item class (game-port content)
     entries[POTION].name = "POTION";
     entries[POTION].id = "potion";
     entries[POTION].block = NULL;
@@ -9178,7 +9179,7 @@ static void initialize(void)
     entries[CAULDRON].id = "cauldron";
     entries[CAULDRON].block = "CAULDRON";
     entries[CAULDRON].props = NULL;
-    // Java: EnderEyeItem::new - typed item class (game-port content)
+// Java: EnderEyeItem::new - typed item class (game-port content)
     entries[ENDER_EYE].name = "ENDER_EYE";
     entries[ENDER_EYE].id = "ender_eye";
     entries[ENDER_EYE].block = NULL;
@@ -9187,462 +9188,462 @@ static void initialize(void)
     entries[GLISTERING_MELON_SLICE].id = "glistering_melon_slice";
     entries[GLISTERING_MELON_SLICE].block = NULL;
     entries[GLISTERING_MELON_SLICE].props = NULL;
-    // Java: .spawnEgg(EntityType.CHICKEN) - payload component ENTITY_DATA (game-port content)
+// Java: .spawnEgg(EntityType.CHICKEN) - payload component ENTITY_DATA (game-port content)
     entries[CHICKEN_SPAWN_EGG].name = "CHICKEN_SPAWN_EGG";
     entries[CHICKEN_SPAWN_EGG].id = "chicken_spawn_egg";
     entries[CHICKEN_SPAWN_EGG].block = NULL;
     entries[CHICKEN_SPAWN_EGG].props = NULL;
-    // Java: .spawnEgg(EntityType.COW) - payload component ENTITY_DATA (game-port content)
+// Java: .spawnEgg(EntityType.COW) - payload component ENTITY_DATA (game-port content)
     entries[COW_SPAWN_EGG].name = "COW_SPAWN_EGG";
     entries[COW_SPAWN_EGG].id = "cow_spawn_egg";
     entries[COW_SPAWN_EGG].block = NULL;
     entries[COW_SPAWN_EGG].props = NULL;
-    // Java: .spawnEgg(EntityType.PIG) - payload component ENTITY_DATA (game-port content)
+// Java: .spawnEgg(EntityType.PIG) - payload component ENTITY_DATA (game-port content)
     entries[PIG_SPAWN_EGG].name = "PIG_SPAWN_EGG";
     entries[PIG_SPAWN_EGG].id = "pig_spawn_egg";
     entries[PIG_SPAWN_EGG].block = NULL;
     entries[PIG_SPAWN_EGG].props = NULL;
-    // Java: .spawnEgg(EntityType.SHEEP) - payload component ENTITY_DATA (game-port content)
+// Java: .spawnEgg(EntityType.SHEEP) - payload component ENTITY_DATA (game-port content)
     entries[SHEEP_SPAWN_EGG].name = "SHEEP_SPAWN_EGG";
     entries[SHEEP_SPAWN_EGG].id = "sheep_spawn_egg";
     entries[SHEEP_SPAWN_EGG].block = NULL;
     entries[SHEEP_SPAWN_EGG].props = NULL;
-    // Java: .spawnEgg(EntityType.CAMEL) - payload component ENTITY_DATA (game-port content)
+// Java: .spawnEgg(EntityType.CAMEL) - payload component ENTITY_DATA (game-port content)
     entries[CAMEL_SPAWN_EGG].name = "CAMEL_SPAWN_EGG";
     entries[CAMEL_SPAWN_EGG].id = "camel_spawn_egg";
     entries[CAMEL_SPAWN_EGG].block = NULL;
     entries[CAMEL_SPAWN_EGG].props = NULL;
-    // Java: .spawnEgg(EntityType.DONKEY) - payload component ENTITY_DATA (game-port content)
+// Java: .spawnEgg(EntityType.DONKEY) - payload component ENTITY_DATA (game-port content)
     entries[DONKEY_SPAWN_EGG].name = "DONKEY_SPAWN_EGG";
     entries[DONKEY_SPAWN_EGG].id = "donkey_spawn_egg";
     entries[DONKEY_SPAWN_EGG].block = NULL;
     entries[DONKEY_SPAWN_EGG].props = NULL;
-    // Java: .spawnEgg(EntityType.HORSE) - payload component ENTITY_DATA (game-port content)
+// Java: .spawnEgg(EntityType.HORSE) - payload component ENTITY_DATA (game-port content)
     entries[HORSE_SPAWN_EGG].name = "HORSE_SPAWN_EGG";
     entries[HORSE_SPAWN_EGG].id = "horse_spawn_egg";
     entries[HORSE_SPAWN_EGG].block = NULL;
     entries[HORSE_SPAWN_EGG].props = NULL;
-    // Java: .spawnEgg(EntityType.MULE) - payload component ENTITY_DATA (game-port content)
+// Java: .spawnEgg(EntityType.MULE) - payload component ENTITY_DATA (game-port content)
     entries[MULE_SPAWN_EGG].name = "MULE_SPAWN_EGG";
     entries[MULE_SPAWN_EGG].id = "mule_spawn_egg";
     entries[MULE_SPAWN_EGG].block = NULL;
     entries[MULE_SPAWN_EGG].props = NULL;
-    // Java: .spawnEgg(EntityType.CAT) - payload component ENTITY_DATA (game-port content)
+// Java: .spawnEgg(EntityType.CAT) - payload component ENTITY_DATA (game-port content)
     entries[CAT_SPAWN_EGG].name = "CAT_SPAWN_EGG";
     entries[CAT_SPAWN_EGG].id = "cat_spawn_egg";
     entries[CAT_SPAWN_EGG].block = NULL;
     entries[CAT_SPAWN_EGG].props = NULL;
-    // Java: .spawnEgg(EntityType.PARROT) - payload component ENTITY_DATA (game-port content)
+// Java: .spawnEgg(EntityType.PARROT) - payload component ENTITY_DATA (game-port content)
     entries[PARROT_SPAWN_EGG].name = "PARROT_SPAWN_EGG";
     entries[PARROT_SPAWN_EGG].id = "parrot_spawn_egg";
     entries[PARROT_SPAWN_EGG].block = NULL;
     entries[PARROT_SPAWN_EGG].props = NULL;
-    // Java: .spawnEgg(EntityType.WOLF) - payload component ENTITY_DATA (game-port content)
+// Java: .spawnEgg(EntityType.WOLF) - payload component ENTITY_DATA (game-port content)
     entries[WOLF_SPAWN_EGG].name = "WOLF_SPAWN_EGG";
     entries[WOLF_SPAWN_EGG].id = "wolf_spawn_egg";
     entries[WOLF_SPAWN_EGG].block = NULL;
     entries[WOLF_SPAWN_EGG].props = NULL;
-    // Java: .spawnEgg(EntityType.ARMADILLO) - payload component ENTITY_DATA (game-port content)
+// Java: .spawnEgg(EntityType.ARMADILLO) - payload component ENTITY_DATA (game-port content)
     entries[ARMADILLO_SPAWN_EGG].name = "ARMADILLO_SPAWN_EGG";
     entries[ARMADILLO_SPAWN_EGG].id = "armadillo_spawn_egg";
     entries[ARMADILLO_SPAWN_EGG].block = NULL;
     entries[ARMADILLO_SPAWN_EGG].props = NULL;
-    // Java: .spawnEgg(EntityType.BAT) - payload component ENTITY_DATA (game-port content)
+// Java: .spawnEgg(EntityType.BAT) - payload component ENTITY_DATA (game-port content)
     entries[BAT_SPAWN_EGG].name = "BAT_SPAWN_EGG";
     entries[BAT_SPAWN_EGG].id = "bat_spawn_egg";
     entries[BAT_SPAWN_EGG].block = NULL;
     entries[BAT_SPAWN_EGG].props = NULL;
-    // Java: .spawnEgg(EntityType.BEE) - payload component ENTITY_DATA (game-port content)
+// Java: .spawnEgg(EntityType.BEE) - payload component ENTITY_DATA (game-port content)
     entries[BEE_SPAWN_EGG].name = "BEE_SPAWN_EGG";
     entries[BEE_SPAWN_EGG].id = "bee_spawn_egg";
     entries[BEE_SPAWN_EGG].block = NULL;
     entries[BEE_SPAWN_EGG].props = NULL;
-    // Java: .spawnEgg(EntityType.FOX) - payload component ENTITY_DATA (game-port content)
+// Java: .spawnEgg(EntityType.FOX) - payload component ENTITY_DATA (game-port content)
     entries[FOX_SPAWN_EGG].name = "FOX_SPAWN_EGG";
     entries[FOX_SPAWN_EGG].id = "fox_spawn_egg";
     entries[FOX_SPAWN_EGG].block = NULL;
     entries[FOX_SPAWN_EGG].props = NULL;
-    // Java: .spawnEgg(EntityType.GOAT) - payload component ENTITY_DATA (game-port content)
+// Java: .spawnEgg(EntityType.GOAT) - payload component ENTITY_DATA (game-port content)
     entries[GOAT_SPAWN_EGG].name = "GOAT_SPAWN_EGG";
     entries[GOAT_SPAWN_EGG].id = "goat_spawn_egg";
     entries[GOAT_SPAWN_EGG].block = NULL;
     entries[GOAT_SPAWN_EGG].props = NULL;
-    // Java: .spawnEgg(EntityType.LLAMA) - payload component ENTITY_DATA (game-port content)
+// Java: .spawnEgg(EntityType.LLAMA) - payload component ENTITY_DATA (game-port content)
     entries[LLAMA_SPAWN_EGG].name = "LLAMA_SPAWN_EGG";
     entries[LLAMA_SPAWN_EGG].id = "llama_spawn_egg";
     entries[LLAMA_SPAWN_EGG].block = NULL;
     entries[LLAMA_SPAWN_EGG].props = NULL;
-    // Java: .spawnEgg(EntityType.OCELOT) - payload component ENTITY_DATA (game-port content)
+// Java: .spawnEgg(EntityType.OCELOT) - payload component ENTITY_DATA (game-port content)
     entries[OCELOT_SPAWN_EGG].name = "OCELOT_SPAWN_EGG";
     entries[OCELOT_SPAWN_EGG].id = "ocelot_spawn_egg";
     entries[OCELOT_SPAWN_EGG].block = NULL;
     entries[OCELOT_SPAWN_EGG].props = NULL;
-    // Java: .spawnEgg(EntityType.PANDA) - payload component ENTITY_DATA (game-port content)
+// Java: .spawnEgg(EntityType.PANDA) - payload component ENTITY_DATA (game-port content)
     entries[PANDA_SPAWN_EGG].name = "PANDA_SPAWN_EGG";
     entries[PANDA_SPAWN_EGG].id = "panda_spawn_egg";
     entries[PANDA_SPAWN_EGG].block = NULL;
     entries[PANDA_SPAWN_EGG].props = NULL;
-    // Java: .spawnEgg(EntityType.POLAR_BEAR) - payload component ENTITY_DATA (game-port content)
+// Java: .spawnEgg(EntityType.POLAR_BEAR) - payload component ENTITY_DATA (game-port content)
     entries[POLAR_BEAR_SPAWN_EGG].name = "POLAR_BEAR_SPAWN_EGG";
     entries[POLAR_BEAR_SPAWN_EGG].id = "polar_bear_spawn_egg";
     entries[POLAR_BEAR_SPAWN_EGG].block = NULL;
     entries[POLAR_BEAR_SPAWN_EGG].props = NULL;
-    // Java: .spawnEgg(EntityType.RABBIT) - payload component ENTITY_DATA (game-port content)
+// Java: .spawnEgg(EntityType.RABBIT) - payload component ENTITY_DATA (game-port content)
     entries[RABBIT_SPAWN_EGG].name = "RABBIT_SPAWN_EGG";
     entries[RABBIT_SPAWN_EGG].id = "rabbit_spawn_egg";
     entries[RABBIT_SPAWN_EGG].block = NULL;
     entries[RABBIT_SPAWN_EGG].props = NULL;
-    // Java: .spawnEgg(EntityType.AXOLOTL) - payload component ENTITY_DATA (game-port content)
+// Java: .spawnEgg(EntityType.AXOLOTL) - payload component ENTITY_DATA (game-port content)
     entries[AXOLOTL_SPAWN_EGG].name = "AXOLOTL_SPAWN_EGG";
     entries[AXOLOTL_SPAWN_EGG].id = "axolotl_spawn_egg";
     entries[AXOLOTL_SPAWN_EGG].block = NULL;
     entries[AXOLOTL_SPAWN_EGG].props = NULL;
-    // Java: .spawnEgg(EntityType.COD) - payload component ENTITY_DATA (game-port content)
+// Java: .spawnEgg(EntityType.COD) - payload component ENTITY_DATA (game-port content)
     entries[COD_SPAWN_EGG].name = "COD_SPAWN_EGG";
     entries[COD_SPAWN_EGG].id = "cod_spawn_egg";
     entries[COD_SPAWN_EGG].block = NULL;
     entries[COD_SPAWN_EGG].props = NULL;
-    // Java: .spawnEgg(EntityType.DOLPHIN) - payload component ENTITY_DATA (game-port content)
+// Java: .spawnEgg(EntityType.DOLPHIN) - payload component ENTITY_DATA (game-port content)
     entries[DOLPHIN_SPAWN_EGG].name = "DOLPHIN_SPAWN_EGG";
     entries[DOLPHIN_SPAWN_EGG].id = "dolphin_spawn_egg";
     entries[DOLPHIN_SPAWN_EGG].block = NULL;
     entries[DOLPHIN_SPAWN_EGG].props = NULL;
-    // Java: .spawnEgg(EntityType.FROG) - payload component ENTITY_DATA (game-port content)
+// Java: .spawnEgg(EntityType.FROG) - payload component ENTITY_DATA (game-port content)
     entries[FROG_SPAWN_EGG].name = "FROG_SPAWN_EGG";
     entries[FROG_SPAWN_EGG].id = "frog_spawn_egg";
     entries[FROG_SPAWN_EGG].block = NULL;
     entries[FROG_SPAWN_EGG].props = NULL;
-    // Java: .spawnEgg(EntityType.GLOW_SQUID) - payload component ENTITY_DATA (game-port content)
+// Java: .spawnEgg(EntityType.GLOW_SQUID) - payload component ENTITY_DATA (game-port content)
     entries[GLOW_SQUID_SPAWN_EGG].name = "GLOW_SQUID_SPAWN_EGG";
     entries[GLOW_SQUID_SPAWN_EGG].id = "glow_squid_spawn_egg";
     entries[GLOW_SQUID_SPAWN_EGG].block = NULL;
     entries[GLOW_SQUID_SPAWN_EGG].props = NULL;
-    // Java: .spawnEgg(EntityType.NAUTILUS) - payload component ENTITY_DATA (game-port content)
+// Java: .spawnEgg(EntityType.NAUTILUS) - payload component ENTITY_DATA (game-port content)
     entries[NAUTILUS_SPAWN_EGG].name = "NAUTILUS_SPAWN_EGG";
     entries[NAUTILUS_SPAWN_EGG].id = "nautilus_spawn_egg";
     entries[NAUTILUS_SPAWN_EGG].block = NULL;
     entries[NAUTILUS_SPAWN_EGG].props = NULL;
-    // Java: .spawnEgg(EntityType.PUFFERFISH) - payload component ENTITY_DATA (game-port content)
+// Java: .spawnEgg(EntityType.PUFFERFISH) - payload component ENTITY_DATA (game-port content)
     entries[PUFFERFISH_SPAWN_EGG].name = "PUFFERFISH_SPAWN_EGG";
     entries[PUFFERFISH_SPAWN_EGG].id = "pufferfish_spawn_egg";
     entries[PUFFERFISH_SPAWN_EGG].block = NULL;
     entries[PUFFERFISH_SPAWN_EGG].props = NULL;
-    // Java: .spawnEgg(EntityType.SALMON) - payload component ENTITY_DATA (game-port content)
+// Java: .spawnEgg(EntityType.SALMON) - payload component ENTITY_DATA (game-port content)
     entries[SALMON_SPAWN_EGG].name = "SALMON_SPAWN_EGG";
     entries[SALMON_SPAWN_EGG].id = "salmon_spawn_egg";
     entries[SALMON_SPAWN_EGG].block = NULL;
     entries[SALMON_SPAWN_EGG].props = NULL;
-    // Java: .spawnEgg(EntityType.SQUID) - payload component ENTITY_DATA (game-port content)
+// Java: .spawnEgg(EntityType.SQUID) - payload component ENTITY_DATA (game-port content)
     entries[SQUID_SPAWN_EGG].name = "SQUID_SPAWN_EGG";
     entries[SQUID_SPAWN_EGG].id = "squid_spawn_egg";
     entries[SQUID_SPAWN_EGG].block = NULL;
     entries[SQUID_SPAWN_EGG].props = NULL;
-    // Java: .spawnEgg(EntityType.TADPOLE) - payload component ENTITY_DATA (game-port content)
+// Java: .spawnEgg(EntityType.TADPOLE) - payload component ENTITY_DATA (game-port content)
     entries[TADPOLE_SPAWN_EGG].name = "TADPOLE_SPAWN_EGG";
     entries[TADPOLE_SPAWN_EGG].id = "tadpole_spawn_egg";
     entries[TADPOLE_SPAWN_EGG].block = NULL;
     entries[TADPOLE_SPAWN_EGG].props = NULL;
-    // Java: .spawnEgg(EntityType.TROPICAL_FISH) - payload component ENTITY_DATA (game-port content)
+// Java: .spawnEgg(EntityType.TROPICAL_FISH) - payload component ENTITY_DATA (game-port content)
     entries[TROPICAL_FISH_SPAWN_EGG].name = "TROPICAL_FISH_SPAWN_EGG";
     entries[TROPICAL_FISH_SPAWN_EGG].id = "tropical_fish_spawn_egg";
     entries[TROPICAL_FISH_SPAWN_EGG].block = NULL;
     entries[TROPICAL_FISH_SPAWN_EGG].props = NULL;
-    // Java: .spawnEgg(EntityType.TURTLE) - payload component ENTITY_DATA (game-port content)
+// Java: .spawnEgg(EntityType.TURTLE) - payload component ENTITY_DATA (game-port content)
     entries[TURTLE_SPAWN_EGG].name = "TURTLE_SPAWN_EGG";
     entries[TURTLE_SPAWN_EGG].id = "turtle_spawn_egg";
     entries[TURTLE_SPAWN_EGG].block = NULL;
     entries[TURTLE_SPAWN_EGG].props = NULL;
-    // Java: .spawnEgg(EntityType.ALLAY) - payload component ENTITY_DATA (game-port content)
+// Java: .spawnEgg(EntityType.ALLAY) - payload component ENTITY_DATA (game-port content)
     entries[ALLAY_SPAWN_EGG].name = "ALLAY_SPAWN_EGG";
     entries[ALLAY_SPAWN_EGG].id = "allay_spawn_egg";
     entries[ALLAY_SPAWN_EGG].block = NULL;
     entries[ALLAY_SPAWN_EGG].props = NULL;
-    // Java: .spawnEgg(EntityType.MOOSHROOM) - payload component ENTITY_DATA (game-port content)
+// Java: .spawnEgg(EntityType.MOOSHROOM) - payload component ENTITY_DATA (game-port content)
     entries[MOOSHROOM_SPAWN_EGG].name = "MOOSHROOM_SPAWN_EGG";
     entries[MOOSHROOM_SPAWN_EGG].id = "mooshroom_spawn_egg";
     entries[MOOSHROOM_SPAWN_EGG].block = NULL;
     entries[MOOSHROOM_SPAWN_EGG].props = NULL;
-    // Java: .spawnEgg(EntityType.SNIFFER) - payload component ENTITY_DATA (game-port content)
+// Java: .spawnEgg(EntityType.SNIFFER) - payload component ENTITY_DATA (game-port content)
     entries[SNIFFER_SPAWN_EGG].name = "SNIFFER_SPAWN_EGG";
     entries[SNIFFER_SPAWN_EGG].id = "sniffer_spawn_egg";
     entries[SNIFFER_SPAWN_EGG].block = NULL;
     entries[SNIFFER_SPAWN_EGG].props = NULL;
-    // Java: .spawnEgg(EntityType.COPPER_GOLEM) - payload component ENTITY_DATA (game-port content)
+// Java: .spawnEgg(EntityType.COPPER_GOLEM) - payload component ENTITY_DATA (game-port content)
     entries[COPPER_GOLEM_SPAWN_EGG].name = "COPPER_GOLEM_SPAWN_EGG";
     entries[COPPER_GOLEM_SPAWN_EGG].id = "copper_golem_spawn_egg";
     entries[COPPER_GOLEM_SPAWN_EGG].block = NULL;
     entries[COPPER_GOLEM_SPAWN_EGG].props = NULL;
-    // Java: .spawnEgg(EntityType.IRON_GOLEM) - payload component ENTITY_DATA (game-port content)
+// Java: .spawnEgg(EntityType.IRON_GOLEM) - payload component ENTITY_DATA (game-port content)
     entries[IRON_GOLEM_SPAWN_EGG].name = "IRON_GOLEM_SPAWN_EGG";
     entries[IRON_GOLEM_SPAWN_EGG].id = "iron_golem_spawn_egg";
     entries[IRON_GOLEM_SPAWN_EGG].block = NULL;
     entries[IRON_GOLEM_SPAWN_EGG].props = NULL;
-    // Java: .spawnEgg(EntityType.SNOW_GOLEM) - payload component ENTITY_DATA (game-port content)
+// Java: .spawnEgg(EntityType.SNOW_GOLEM) - payload component ENTITY_DATA (game-port content)
     entries[SNOW_GOLEM_SPAWN_EGG].name = "SNOW_GOLEM_SPAWN_EGG";
     entries[SNOW_GOLEM_SPAWN_EGG].id = "snow_golem_spawn_egg";
     entries[SNOW_GOLEM_SPAWN_EGG].block = NULL;
     entries[SNOW_GOLEM_SPAWN_EGG].props = NULL;
-    // Java: .spawnEgg(EntityType.TRADER_LLAMA) - payload component ENTITY_DATA (game-port content)
+// Java: .spawnEgg(EntityType.TRADER_LLAMA) - payload component ENTITY_DATA (game-port content)
     entries[TRADER_LLAMA_SPAWN_EGG].name = "TRADER_LLAMA_SPAWN_EGG";
     entries[TRADER_LLAMA_SPAWN_EGG].id = "trader_llama_spawn_egg";
     entries[TRADER_LLAMA_SPAWN_EGG].block = NULL;
     entries[TRADER_LLAMA_SPAWN_EGG].props = NULL;
-    // Java: .spawnEgg(EntityType.VILLAGER) - payload component ENTITY_DATA (game-port content)
+// Java: .spawnEgg(EntityType.VILLAGER) - payload component ENTITY_DATA (game-port content)
     entries[VILLAGER_SPAWN_EGG].name = "VILLAGER_SPAWN_EGG";
     entries[VILLAGER_SPAWN_EGG].id = "villager_spawn_egg";
     entries[VILLAGER_SPAWN_EGG].block = NULL;
     entries[VILLAGER_SPAWN_EGG].props = NULL;
-    // Java: .spawnEgg(EntityType.WANDERING_TRADER) - payload component ENTITY_DATA (game-port content)
+// Java: .spawnEgg(EntityType.WANDERING_TRADER) - payload component ENTITY_DATA (game-port content)
     entries[WANDERING_TRADER_SPAWN_EGG].name = "WANDERING_TRADER_SPAWN_EGG";
     entries[WANDERING_TRADER_SPAWN_EGG].id = "wandering_trader_spawn_egg";
     entries[WANDERING_TRADER_SPAWN_EGG].block = NULL;
     entries[WANDERING_TRADER_SPAWN_EGG].props = NULL;
-    // Java: .spawnEgg(EntityType.BOGGED) - payload component ENTITY_DATA (game-port content)
+// Java: .spawnEgg(EntityType.BOGGED) - payload component ENTITY_DATA (game-port content)
     entries[BOGGED_SPAWN_EGG].name = "BOGGED_SPAWN_EGG";
     entries[BOGGED_SPAWN_EGG].id = "bogged_spawn_egg";
     entries[BOGGED_SPAWN_EGG].block = NULL;
     entries[BOGGED_SPAWN_EGG].props = NULL;
-    // Java: .spawnEgg(EntityType.CAMEL_HUSK) - payload component ENTITY_DATA (game-port content)
+// Java: .spawnEgg(EntityType.CAMEL_HUSK) - payload component ENTITY_DATA (game-port content)
     entries[CAMEL_HUSK_SPAWN_EGG].name = "CAMEL_HUSK_SPAWN_EGG";
     entries[CAMEL_HUSK_SPAWN_EGG].id = "camel_husk_spawn_egg";
     entries[CAMEL_HUSK_SPAWN_EGG].block = NULL;
     entries[CAMEL_HUSK_SPAWN_EGG].props = NULL;
-    // Java: .spawnEgg(EntityType.DROWNED) - payload component ENTITY_DATA (game-port content)
+// Java: .spawnEgg(EntityType.DROWNED) - payload component ENTITY_DATA (game-port content)
     entries[DROWNED_SPAWN_EGG].name = "DROWNED_SPAWN_EGG";
     entries[DROWNED_SPAWN_EGG].id = "drowned_spawn_egg";
     entries[DROWNED_SPAWN_EGG].block = NULL;
     entries[DROWNED_SPAWN_EGG].props = NULL;
-    // Java: .spawnEgg(EntityType.HUSK) - payload component ENTITY_DATA (game-port content)
+// Java: .spawnEgg(EntityType.HUSK) - payload component ENTITY_DATA (game-port content)
     entries[HUSK_SPAWN_EGG].name = "HUSK_SPAWN_EGG";
     entries[HUSK_SPAWN_EGG].id = "husk_spawn_egg";
     entries[HUSK_SPAWN_EGG].block = NULL;
     entries[HUSK_SPAWN_EGG].props = NULL;
-    // Java: .spawnEgg(EntityType.PARCHED) - payload component ENTITY_DATA (game-port content)
+// Java: .spawnEgg(EntityType.PARCHED) - payload component ENTITY_DATA (game-port content)
     entries[PARCHED_SPAWN_EGG].name = "PARCHED_SPAWN_EGG";
     entries[PARCHED_SPAWN_EGG].id = "parched_spawn_egg";
     entries[PARCHED_SPAWN_EGG].block = NULL;
     entries[PARCHED_SPAWN_EGG].props = NULL;
-    // Java: .spawnEgg(EntityType.SKELETON) - payload component ENTITY_DATA (game-port content)
+// Java: .spawnEgg(EntityType.SKELETON) - payload component ENTITY_DATA (game-port content)
     entries[SKELETON_SPAWN_EGG].name = "SKELETON_SPAWN_EGG";
     entries[SKELETON_SPAWN_EGG].id = "skeleton_spawn_egg";
     entries[SKELETON_SPAWN_EGG].block = NULL;
     entries[SKELETON_SPAWN_EGG].props = NULL;
-    // Java: .spawnEgg(EntityType.SKELETON_HORSE) - payload component ENTITY_DATA (game-port content)
+// Java: .spawnEgg(EntityType.SKELETON_HORSE) - payload component ENTITY_DATA (game-port content)
     entries[SKELETON_HORSE_SPAWN_EGG].name = "SKELETON_HORSE_SPAWN_EGG";
     entries[SKELETON_HORSE_SPAWN_EGG].id = "skeleton_horse_spawn_egg";
     entries[SKELETON_HORSE_SPAWN_EGG].block = NULL;
     entries[SKELETON_HORSE_SPAWN_EGG].props = NULL;
-    // Java: .spawnEgg(EntityType.STRAY) - payload component ENTITY_DATA (game-port content)
+// Java: .spawnEgg(EntityType.STRAY) - payload component ENTITY_DATA (game-port content)
     entries[STRAY_SPAWN_EGG].name = "STRAY_SPAWN_EGG";
     entries[STRAY_SPAWN_EGG].id = "stray_spawn_egg";
     entries[STRAY_SPAWN_EGG].block = NULL;
     entries[STRAY_SPAWN_EGG].props = NULL;
-    // Java: .spawnEgg(EntityType.WITHER) - payload component ENTITY_DATA (game-port content)
+// Java: .spawnEgg(EntityType.WITHER) - payload component ENTITY_DATA (game-port content)
     entries[WITHER_SPAWN_EGG].name = "WITHER_SPAWN_EGG";
     entries[WITHER_SPAWN_EGG].id = "wither_spawn_egg";
     entries[WITHER_SPAWN_EGG].block = NULL;
     entries[WITHER_SPAWN_EGG].props = NULL;
-    // Java: .spawnEgg(EntityType.WITHER_SKELETON) - payload component ENTITY_DATA (game-port content)
+// Java: .spawnEgg(EntityType.WITHER_SKELETON) - payload component ENTITY_DATA (game-port content)
     entries[WITHER_SKELETON_SPAWN_EGG].name = "WITHER_SKELETON_SPAWN_EGG";
     entries[WITHER_SKELETON_SPAWN_EGG].id = "wither_skeleton_spawn_egg";
     entries[WITHER_SKELETON_SPAWN_EGG].block = NULL;
     entries[WITHER_SKELETON_SPAWN_EGG].props = NULL;
-    // Java: .spawnEgg(EntityType.ZOMBIE) - payload component ENTITY_DATA (game-port content)
+// Java: .spawnEgg(EntityType.ZOMBIE) - payload component ENTITY_DATA (game-port content)
     entries[ZOMBIE_SPAWN_EGG].name = "ZOMBIE_SPAWN_EGG";
     entries[ZOMBIE_SPAWN_EGG].id = "zombie_spawn_egg";
     entries[ZOMBIE_SPAWN_EGG].block = NULL;
     entries[ZOMBIE_SPAWN_EGG].props = NULL;
-    // Java: .spawnEgg(EntityType.ZOMBIE_HORSE) - payload component ENTITY_DATA (game-port content)
+// Java: .spawnEgg(EntityType.ZOMBIE_HORSE) - payload component ENTITY_DATA (game-port content)
     entries[ZOMBIE_HORSE_SPAWN_EGG].name = "ZOMBIE_HORSE_SPAWN_EGG";
     entries[ZOMBIE_HORSE_SPAWN_EGG].id = "zombie_horse_spawn_egg";
     entries[ZOMBIE_HORSE_SPAWN_EGG].block = NULL;
     entries[ZOMBIE_HORSE_SPAWN_EGG].props = NULL;
-    // Java: .spawnEgg(EntityType.ZOMBIE_NAUTILUS) - payload component ENTITY_DATA (game-port content)
+// Java: .spawnEgg(EntityType.ZOMBIE_NAUTILUS) - payload component ENTITY_DATA (game-port content)
     entries[ZOMBIE_NAUTILUS_SPAWN_EGG].name = "ZOMBIE_NAUTILUS_SPAWN_EGG";
     entries[ZOMBIE_NAUTILUS_SPAWN_EGG].id = "zombie_nautilus_spawn_egg";
     entries[ZOMBIE_NAUTILUS_SPAWN_EGG].block = NULL;
     entries[ZOMBIE_NAUTILUS_SPAWN_EGG].props = NULL;
-    // Java: .spawnEgg(EntityType.ZOMBIE_VILLAGER) - payload component ENTITY_DATA (game-port content)
+// Java: .spawnEgg(EntityType.ZOMBIE_VILLAGER) - payload component ENTITY_DATA (game-port content)
     entries[ZOMBIE_VILLAGER_SPAWN_EGG].name = "ZOMBIE_VILLAGER_SPAWN_EGG";
     entries[ZOMBIE_VILLAGER_SPAWN_EGG].id = "zombie_villager_spawn_egg";
     entries[ZOMBIE_VILLAGER_SPAWN_EGG].block = NULL;
     entries[ZOMBIE_VILLAGER_SPAWN_EGG].props = NULL;
-    // Java: .spawnEgg(EntityType.CAVE_SPIDER) - payload component ENTITY_DATA (game-port content)
+// Java: .spawnEgg(EntityType.CAVE_SPIDER) - payload component ENTITY_DATA (game-port content)
     entries[CAVE_SPIDER_SPAWN_EGG].name = "CAVE_SPIDER_SPAWN_EGG";
     entries[CAVE_SPIDER_SPAWN_EGG].id = "cave_spider_spawn_egg";
     entries[CAVE_SPIDER_SPAWN_EGG].block = NULL;
     entries[CAVE_SPIDER_SPAWN_EGG].props = NULL;
-    // Java: .spawnEgg(EntityType.SPIDER) - payload component ENTITY_DATA (game-port content)
+// Java: .spawnEgg(EntityType.SPIDER) - payload component ENTITY_DATA (game-port content)
     entries[SPIDER_SPAWN_EGG].name = "SPIDER_SPAWN_EGG";
     entries[SPIDER_SPAWN_EGG].id = "spider_spawn_egg";
     entries[SPIDER_SPAWN_EGG].block = NULL;
     entries[SPIDER_SPAWN_EGG].props = NULL;
-    // Java: .spawnEgg(EntityType.BREEZE) - payload component ENTITY_DATA (game-port content)
+// Java: .spawnEgg(EntityType.BREEZE) - payload component ENTITY_DATA (game-port content)
     entries[BREEZE_SPAWN_EGG].name = "BREEZE_SPAWN_EGG";
     entries[BREEZE_SPAWN_EGG].id = "breeze_spawn_egg";
     entries[BREEZE_SPAWN_EGG].block = NULL;
     entries[BREEZE_SPAWN_EGG].props = NULL;
-    // Java: .spawnEgg(EntityType.CREAKING) - payload component ENTITY_DATA (game-port content)
+// Java: .spawnEgg(EntityType.CREAKING) - payload component ENTITY_DATA (game-port content)
     entries[CREAKING_SPAWN_EGG].name = "CREAKING_SPAWN_EGG";
     entries[CREAKING_SPAWN_EGG].id = "creaking_spawn_egg";
     entries[CREAKING_SPAWN_EGG].block = NULL;
     entries[CREAKING_SPAWN_EGG].props = NULL;
-    // Java: .spawnEgg(EntityType.CREEPER) - payload component ENTITY_DATA (game-port content)
+// Java: .spawnEgg(EntityType.CREEPER) - payload component ENTITY_DATA (game-port content)
     entries[CREEPER_SPAWN_EGG].name = "CREEPER_SPAWN_EGG";
     entries[CREEPER_SPAWN_EGG].id = "creeper_spawn_egg";
     entries[CREEPER_SPAWN_EGG].block = NULL;
     entries[CREEPER_SPAWN_EGG].props = NULL;
-    // Java: .spawnEgg(EntityType.ELDER_GUARDIAN) - payload component ENTITY_DATA (game-port content)
+// Java: .spawnEgg(EntityType.ELDER_GUARDIAN) - payload component ENTITY_DATA (game-port content)
     entries[ELDER_GUARDIAN_SPAWN_EGG].name = "ELDER_GUARDIAN_SPAWN_EGG";
     entries[ELDER_GUARDIAN_SPAWN_EGG].id = "elder_guardian_spawn_egg";
     entries[ELDER_GUARDIAN_SPAWN_EGG].block = NULL;
     entries[ELDER_GUARDIAN_SPAWN_EGG].props = NULL;
-    // Java: .spawnEgg(EntityType.GUARDIAN) - payload component ENTITY_DATA (game-port content)
+// Java: .spawnEgg(EntityType.GUARDIAN) - payload component ENTITY_DATA (game-port content)
     entries[GUARDIAN_SPAWN_EGG].name = "GUARDIAN_SPAWN_EGG";
     entries[GUARDIAN_SPAWN_EGG].id = "guardian_spawn_egg";
     entries[GUARDIAN_SPAWN_EGG].block = NULL;
     entries[GUARDIAN_SPAWN_EGG].props = NULL;
-    // Java: .spawnEgg(EntityType.PHANTOM) - payload component ENTITY_DATA (game-port content)
+// Java: .spawnEgg(EntityType.PHANTOM) - payload component ENTITY_DATA (game-port content)
     entries[PHANTOM_SPAWN_EGG].name = "PHANTOM_SPAWN_EGG";
     entries[PHANTOM_SPAWN_EGG].id = "phantom_spawn_egg";
     entries[PHANTOM_SPAWN_EGG].block = NULL;
     entries[PHANTOM_SPAWN_EGG].props = NULL;
-    // Java: .spawnEgg(EntityType.SILVERFISH) - payload component ENTITY_DATA (game-port content)
+// Java: .spawnEgg(EntityType.SILVERFISH) - payload component ENTITY_DATA (game-port content)
     entries[SILVERFISH_SPAWN_EGG].name = "SILVERFISH_SPAWN_EGG";
     entries[SILVERFISH_SPAWN_EGG].id = "silverfish_spawn_egg";
     entries[SILVERFISH_SPAWN_EGG].block = NULL;
     entries[SILVERFISH_SPAWN_EGG].props = NULL;
-    // Java: .spawnEgg(EntityType.SLIME) - payload component ENTITY_DATA (game-port content)
+// Java: .spawnEgg(EntityType.SLIME) - payload component ENTITY_DATA (game-port content)
     entries[SLIME_SPAWN_EGG].name = "SLIME_SPAWN_EGG";
     entries[SLIME_SPAWN_EGG].id = "slime_spawn_egg";
     entries[SLIME_SPAWN_EGG].block = NULL;
     entries[SLIME_SPAWN_EGG].props = NULL;
-    // Java: .spawnEgg(EntityType.WARDEN) - payload component ENTITY_DATA (game-port content)
+// Java: .spawnEgg(EntityType.WARDEN) - payload component ENTITY_DATA (game-port content)
     entries[WARDEN_SPAWN_EGG].name = "WARDEN_SPAWN_EGG";
     entries[WARDEN_SPAWN_EGG].id = "warden_spawn_egg";
     entries[WARDEN_SPAWN_EGG].block = NULL;
     entries[WARDEN_SPAWN_EGG].props = NULL;
-    // Java: .spawnEgg(EntityType.WITCH) - payload component ENTITY_DATA (game-port content)
+// Java: .spawnEgg(EntityType.WITCH) - payload component ENTITY_DATA (game-port content)
     entries[WITCH_SPAWN_EGG].name = "WITCH_SPAWN_EGG";
     entries[WITCH_SPAWN_EGG].id = "witch_spawn_egg";
     entries[WITCH_SPAWN_EGG].block = NULL;
     entries[WITCH_SPAWN_EGG].props = NULL;
-    // Java: .spawnEgg(EntityType.EVOKER) - payload component ENTITY_DATA (game-port content)
+// Java: .spawnEgg(EntityType.EVOKER) - payload component ENTITY_DATA (game-port content)
     entries[EVOKER_SPAWN_EGG].name = "EVOKER_SPAWN_EGG";
     entries[EVOKER_SPAWN_EGG].id = "evoker_spawn_egg";
     entries[EVOKER_SPAWN_EGG].block = NULL;
     entries[EVOKER_SPAWN_EGG].props = NULL;
-    // Java: .spawnEgg(EntityType.PILLAGER) - payload component ENTITY_DATA (game-port content)
+// Java: .spawnEgg(EntityType.PILLAGER) - payload component ENTITY_DATA (game-port content)
     entries[PILLAGER_SPAWN_EGG].name = "PILLAGER_SPAWN_EGG";
     entries[PILLAGER_SPAWN_EGG].id = "pillager_spawn_egg";
     entries[PILLAGER_SPAWN_EGG].block = NULL;
     entries[PILLAGER_SPAWN_EGG].props = NULL;
-    // Java: .spawnEgg(EntityType.RAVAGER) - payload component ENTITY_DATA (game-port content)
+// Java: .spawnEgg(EntityType.RAVAGER) - payload component ENTITY_DATA (game-port content)
     entries[RAVAGER_SPAWN_EGG].name = "RAVAGER_SPAWN_EGG";
     entries[RAVAGER_SPAWN_EGG].id = "ravager_spawn_egg";
     entries[RAVAGER_SPAWN_EGG].block = NULL;
     entries[RAVAGER_SPAWN_EGG].props = NULL;
-    // Java: .spawnEgg(EntityType.VINDICATOR) - payload component ENTITY_DATA (game-port content)
+// Java: .spawnEgg(EntityType.VINDICATOR) - payload component ENTITY_DATA (game-port content)
     entries[VINDICATOR_SPAWN_EGG].name = "VINDICATOR_SPAWN_EGG";
     entries[VINDICATOR_SPAWN_EGG].id = "vindicator_spawn_egg";
     entries[VINDICATOR_SPAWN_EGG].block = NULL;
     entries[VINDICATOR_SPAWN_EGG].props = NULL;
-    // Java: .spawnEgg(EntityType.VEX) - payload component ENTITY_DATA (game-port content)
+// Java: .spawnEgg(EntityType.VEX) - payload component ENTITY_DATA (game-port content)
     entries[VEX_SPAWN_EGG].name = "VEX_SPAWN_EGG";
     entries[VEX_SPAWN_EGG].id = "vex_spawn_egg";
     entries[VEX_SPAWN_EGG].block = NULL;
     entries[VEX_SPAWN_EGG].props = NULL;
-    // Java: .spawnEgg(EntityType.BLAZE) - payload component ENTITY_DATA (game-port content)
+// Java: .spawnEgg(EntityType.BLAZE) - payload component ENTITY_DATA (game-port content)
     entries[BLAZE_SPAWN_EGG].name = "BLAZE_SPAWN_EGG";
     entries[BLAZE_SPAWN_EGG].id = "blaze_spawn_egg";
     entries[BLAZE_SPAWN_EGG].block = NULL;
     entries[BLAZE_SPAWN_EGG].props = NULL;
-    // Java: .spawnEgg(EntityType.GHAST) - payload component ENTITY_DATA (game-port content)
+// Java: .spawnEgg(EntityType.GHAST) - payload component ENTITY_DATA (game-port content)
     entries[GHAST_SPAWN_EGG].name = "GHAST_SPAWN_EGG";
     entries[GHAST_SPAWN_EGG].id = "ghast_spawn_egg";
     entries[GHAST_SPAWN_EGG].block = NULL;
     entries[GHAST_SPAWN_EGG].props = NULL;
-    // Java: .spawnEgg(EntityType.HAPPY_GHAST) - payload component ENTITY_DATA (game-port content)
+// Java: .spawnEgg(EntityType.HAPPY_GHAST) - payload component ENTITY_DATA (game-port content)
     entries[HAPPY_GHAST_SPAWN_EGG].name = "HAPPY_GHAST_SPAWN_EGG";
     entries[HAPPY_GHAST_SPAWN_EGG].id = "happy_ghast_spawn_egg";
     entries[HAPPY_GHAST_SPAWN_EGG].block = NULL;
     entries[HAPPY_GHAST_SPAWN_EGG].props = NULL;
-    // Java: .spawnEgg(EntityType.HOGLIN) - payload component ENTITY_DATA (game-port content)
+// Java: .spawnEgg(EntityType.HOGLIN) - payload component ENTITY_DATA (game-port content)
     entries[HOGLIN_SPAWN_EGG].name = "HOGLIN_SPAWN_EGG";
     entries[HOGLIN_SPAWN_EGG].id = "hoglin_spawn_egg";
     entries[HOGLIN_SPAWN_EGG].block = NULL;
     entries[HOGLIN_SPAWN_EGG].props = NULL;
-    // Java: .spawnEgg(EntityType.MAGMA_CUBE) - payload component ENTITY_DATA (game-port content)
+// Java: .spawnEgg(EntityType.MAGMA_CUBE) - payload component ENTITY_DATA (game-port content)
     entries[MAGMA_CUBE_SPAWN_EGG].name = "MAGMA_CUBE_SPAWN_EGG";
     entries[MAGMA_CUBE_SPAWN_EGG].id = "magma_cube_spawn_egg";
     entries[MAGMA_CUBE_SPAWN_EGG].block = NULL;
     entries[MAGMA_CUBE_SPAWN_EGG].props = NULL;
-    // Java: .spawnEgg(EntityType.PIGLIN) - payload component ENTITY_DATA (game-port content)
+// Java: .spawnEgg(EntityType.PIGLIN) - payload component ENTITY_DATA (game-port content)
     entries[PIGLIN_SPAWN_EGG].name = "PIGLIN_SPAWN_EGG";
     entries[PIGLIN_SPAWN_EGG].id = "piglin_spawn_egg";
     entries[PIGLIN_SPAWN_EGG].block = NULL;
     entries[PIGLIN_SPAWN_EGG].props = NULL;
-    // Java: .spawnEgg(EntityType.PIGLIN_BRUTE) - payload component ENTITY_DATA (game-port content)
+// Java: .spawnEgg(EntityType.PIGLIN_BRUTE) - payload component ENTITY_DATA (game-port content)
     entries[PIGLIN_BRUTE_SPAWN_EGG].name = "PIGLIN_BRUTE_SPAWN_EGG";
     entries[PIGLIN_BRUTE_SPAWN_EGG].id = "piglin_brute_spawn_egg";
     entries[PIGLIN_BRUTE_SPAWN_EGG].block = NULL;
     entries[PIGLIN_BRUTE_SPAWN_EGG].props = NULL;
-    // Java: .spawnEgg(EntityType.STRIDER) - payload component ENTITY_DATA (game-port content)
+// Java: .spawnEgg(EntityType.STRIDER) - payload component ENTITY_DATA (game-port content)
     entries[STRIDER_SPAWN_EGG].name = "STRIDER_SPAWN_EGG";
     entries[STRIDER_SPAWN_EGG].id = "strider_spawn_egg";
     entries[STRIDER_SPAWN_EGG].block = NULL;
     entries[STRIDER_SPAWN_EGG].props = NULL;
-    // Java: .spawnEgg(EntityType.ZOGLIN) - payload component ENTITY_DATA (game-port content)
+// Java: .spawnEgg(EntityType.ZOGLIN) - payload component ENTITY_DATA (game-port content)
     entries[ZOGLIN_SPAWN_EGG].name = "ZOGLIN_SPAWN_EGG";
     entries[ZOGLIN_SPAWN_EGG].id = "zoglin_spawn_egg";
     entries[ZOGLIN_SPAWN_EGG].block = NULL;
     entries[ZOGLIN_SPAWN_EGG].props = NULL;
-    // Java: .spawnEgg(EntityType.ZOMBIFIED_PIGLIN) - payload component ENTITY_DATA (game-port content)
+// Java: .spawnEgg(EntityType.ZOMBIFIED_PIGLIN) - payload component ENTITY_DATA (game-port content)
     entries[ZOMBIFIED_PIGLIN_SPAWN_EGG].name = "ZOMBIFIED_PIGLIN_SPAWN_EGG";
     entries[ZOMBIFIED_PIGLIN_SPAWN_EGG].id = "zombified_piglin_spawn_egg";
     entries[ZOMBIFIED_PIGLIN_SPAWN_EGG].block = NULL;
     entries[ZOMBIFIED_PIGLIN_SPAWN_EGG].props = NULL;
-    // Java: .spawnEgg(EntityType.ENDER_DRAGON) - payload component ENTITY_DATA (game-port content)
+// Java: .spawnEgg(EntityType.ENDER_DRAGON) - payload component ENTITY_DATA (game-port content)
     entries[ENDER_DRAGON_SPAWN_EGG].name = "ENDER_DRAGON_SPAWN_EGG";
     entries[ENDER_DRAGON_SPAWN_EGG].id = "ender_dragon_spawn_egg";
     entries[ENDER_DRAGON_SPAWN_EGG].block = NULL;
     entries[ENDER_DRAGON_SPAWN_EGG].props = NULL;
-    // Java: .spawnEgg(EntityType.ENDERMAN) - payload component ENTITY_DATA (game-port content)
+// Java: .spawnEgg(EntityType.ENDERMAN) - payload component ENTITY_DATA (game-port content)
     entries[ENDERMAN_SPAWN_EGG].name = "ENDERMAN_SPAWN_EGG";
     entries[ENDERMAN_SPAWN_EGG].id = "enderman_spawn_egg";
     entries[ENDERMAN_SPAWN_EGG].block = NULL;
     entries[ENDERMAN_SPAWN_EGG].props = NULL;
-    // Java: .spawnEgg(EntityType.ENDERMITE) - payload component ENTITY_DATA (game-port content)
+// Java: .spawnEgg(EntityType.ENDERMITE) - payload component ENTITY_DATA (game-port content)
     entries[ENDERMITE_SPAWN_EGG].name = "ENDERMITE_SPAWN_EGG";
     entries[ENDERMITE_SPAWN_EGG].id = "endermite_spawn_egg";
     entries[ENDERMITE_SPAWN_EGG].block = NULL;
     entries[ENDERMITE_SPAWN_EGG].props = NULL;
-    // Java: .spawnEgg(EntityType.SHULKER) - payload component ENTITY_DATA (game-port content)
+// Java: .spawnEgg(EntityType.SHULKER) - payload component ENTITY_DATA (game-port content)
     entries[SHULKER_SPAWN_EGG].name = "SHULKER_SPAWN_EGG";
     entries[SHULKER_SPAWN_EGG].id = "shulker_spawn_egg";
     entries[SHULKER_SPAWN_EGG].block = NULL;
     entries[SHULKER_SPAWN_EGG].props = NULL;
-    // Java: ExperienceBottleItem::new - typed item class (game-port content)
+// Java: ExperienceBottleItem::new - typed item class (game-port content)
     entries[EXPERIENCE_BOTTLE].name = "EXPERIENCE_BOTTLE";
     entries[EXPERIENCE_BOTTLE].id = "experience_bottle";
     entries[EXPERIENCE_BOTTLE].block = NULL;
     entries[EXPERIENCE_BOTTLE].props = props_EXPERIENCE_BOTTLE;
-    // Java: FireChargeItem::new - typed item class (game-port content)
+// Java: FireChargeItem::new - typed item class (game-port content)
     entries[FIRE_CHARGE].name = "FIRE_CHARGE";
     entries[FIRE_CHARGE].id = "fire_charge";
     entries[FIRE_CHARGE].block = NULL;
     entries[FIRE_CHARGE].props = NULL;
-    // Java: WindChargeItem::new - typed item class (game-port content)
+// Java: WindChargeItem::new - typed item class (game-port content)
     entries[WIND_CHARGE].name = "WIND_CHARGE";
     entries[WIND_CHARGE].id = "wind_charge";
     entries[WIND_CHARGE].block = NULL;
     entries[WIND_CHARGE].props = props_WIND_CHARGE;
-    // Java: WritableBookItem::new - typed item class (game-port content)
+// Java: WritableBookItem::new - typed item class (game-port content)
     entries[WRITABLE_BOOK].name = "WRITABLE_BOOK";
     entries[WRITABLE_BOOK].id = "writable_book";
     entries[WRITABLE_BOOK].block = NULL;
     entries[WRITABLE_BOOK].props = props_WRITABLE_BOOK;
-    // Java: WrittenBookItem::new - typed item class (game-port content)
+// Java: WrittenBookItem::new - typed item class (game-port content)
     entries[WRITTEN_BOOK].name = "WRITTEN_BOOK";
     entries[WRITTEN_BOOK].id = "written_book";
     entries[WRITTEN_BOOK].block = NULL;
@@ -9651,17 +9652,17 @@ static void initialize(void)
     entries[BREEZE_ROD].id = "breeze_rod";
     entries[BREEZE_ROD].block = NULL;
     entries[BREEZE_ROD].props = NULL;
-    // Java: MaceItem::new - typed item class (game-port content)
+// Java: MaceItem::new - typed item class (game-port content)
     entries[MACE].name = "MACE";
     entries[MACE].id = "mace";
     entries[MACE].block = NULL;
     entries[MACE].props = props_MACE;
-    // Java: p_359578_ -> new ItemFrameItem - typed item class (game-port content)
+// Java: p_359578_ -> new ItemFrameItem - typed item class (game-port content)
     entries[ITEM_FRAME].name = "ITEM_FRAME";
     entries[ITEM_FRAME].id = "item_frame";
     entries[ITEM_FRAME].block = NULL;
     entries[ITEM_FRAME].props = NULL;
-    // Java: p_359650_ -> new ItemFrameItem - typed item class (game-port content)
+// Java: p_359650_ -> new ItemFrameItem - typed item class (game-port content)
     entries[GLOW_ITEM_FRAME].name = "GLOW_ITEM_FRAME";
     entries[GLOW_ITEM_FRAME].id = "glow_item_frame";
     entries[GLOW_ITEM_FRAME].block = NULL;
@@ -9686,7 +9687,7 @@ static void initialize(void)
     entries[POISONOUS_POTATO].id = "poisonous_potato";
     entries[POISONOUS_POTATO].block = NULL;
     entries[POISONOUS_POTATO].props = props_POISONOUS_POTATO;
-    // Java: EmptyMapItem::new - typed item class (game-port content)
+// Java: EmptyMapItem::new - typed item class (game-port content)
     entries[MAP].name = "MAP";
     entries[MAP].id = "map";
     entries[MAP].block = NULL;
@@ -9695,37 +9696,37 @@ static void initialize(void)
     entries[GOLDEN_CARROT].id = "golden_carrot";
     entries[GOLDEN_CARROT].block = NULL;
     entries[GOLDEN_CARROT].props = props_GOLDEN_CARROT;
-    // Java:  - typed item class (game-port content)
+// Java:  - typed item class (game-port content)
     entries[SKELETON_SKULL].name = "SKELETON_SKULL";
     entries[SKELETON_SKULL].id = "skeleton_skull";
     entries[SKELETON_SKULL].block = "SKELETON_SKULL";
     entries[SKELETON_SKULL].props = props_SKELETON_SKULL;
-    // Java:  - typed item class (game-port content)
+// Java:  - typed item class (game-port content)
     entries[WITHER_SKELETON_SKULL].name = "WITHER_SKELETON_SKULL";
     entries[WITHER_SKELETON_SKULL].id = "wither_skeleton_skull";
     entries[WITHER_SKELETON_SKULL].block = "WITHER_SKELETON_SKULL";
     entries[WITHER_SKELETON_SKULL].props = props_WITHER_SKELETON_SKULL;
-    // Java:  - typed item class (game-port content)
+// Java:  - typed item class (game-port content)
     entries[PLAYER_HEAD].name = "PLAYER_HEAD";
     entries[PLAYER_HEAD].id = "player_head";
     entries[PLAYER_HEAD].block = "PLAYER_HEAD";
     entries[PLAYER_HEAD].props = props_PLAYER_HEAD;
-    // Java:  - typed item class (game-port content)
+// Java:  - typed item class (game-port content)
     entries[ZOMBIE_HEAD].name = "ZOMBIE_HEAD";
     entries[ZOMBIE_HEAD].id = "zombie_head";
     entries[ZOMBIE_HEAD].block = "ZOMBIE_HEAD";
     entries[ZOMBIE_HEAD].props = props_ZOMBIE_HEAD;
-    // Java:  - typed item class (game-port content)
+// Java:  - typed item class (game-port content)
     entries[CREEPER_HEAD].name = "CREEPER_HEAD";
     entries[CREEPER_HEAD].id = "creeper_head";
     entries[CREEPER_HEAD].block = "CREEPER_HEAD";
     entries[CREEPER_HEAD].props = props_CREEPER_HEAD;
-    // Java:  - typed item class (game-port content)
+// Java:  - typed item class (game-port content)
     entries[DRAGON_HEAD].name = "DRAGON_HEAD";
     entries[DRAGON_HEAD].id = "dragon_head";
     entries[DRAGON_HEAD].block = "DRAGON_HEAD";
     entries[DRAGON_HEAD].props = props_DRAGON_HEAD;
-    // Java:  - typed item class (game-port content)
+// Java:  - typed item class (game-port content)
     entries[PIGLIN_HEAD].name = "PIGLIN_HEAD";
     entries[PIGLIN_HEAD].id = "piglin_head";
     entries[PIGLIN_HEAD].block = "PIGLIN_HEAD";
@@ -9738,7 +9739,7 @@ static void initialize(void)
     entries[PUMPKIN_PIE].id = "pumpkin_pie";
     entries[PUMPKIN_PIE].block = NULL;
     entries[PUMPKIN_PIE].props = props_PUMPKIN_PIE;
-    // Java: FireworkRocketItem::new - typed item class (game-port content)
+// Java: FireworkRocketItem::new - typed item class (game-port content)
     entries[FIREWORK_ROCKET].name = "FIREWORK_ROCKET";
     entries[FIREWORK_ROCKET].id = "firework_rocket";
     entries[FIREWORK_ROCKET].block = NULL;
@@ -9787,7 +9788,7 @@ static void initialize(void)
     entries[RABBIT_HIDE].id = "rabbit_hide";
     entries[RABBIT_HIDE].block = NULL;
     entries[RABBIT_HIDE].props = NULL;
-    // Java: ArmorStandItem::new - typed item class (game-port content)
+// Java: ArmorStandItem::new - typed item class (game-port content)
     entries[ARMOR_STAND].name = "ARMOR_STAND";
     entries[ARMOR_STAND].id = "armor_stand";
     entries[ARMOR_STAND].block = NULL;
@@ -9816,17 +9817,17 @@ static void initialize(void)
     entries[LEATHER_HORSE_ARMOR].id = "leather_horse_armor";
     entries[LEATHER_HORSE_ARMOR].block = NULL;
     entries[LEATHER_HORSE_ARMOR].props = props_LEATHER_HORSE_ARMOR;
-    // Java: LeadItem::new - typed item class (game-port content)
+// Java: LeadItem::new - typed item class (game-port content)
     entries[LEAD].name = "LEAD";
     entries[LEAD].id = "lead";
     entries[LEAD].block = NULL;
     entries[LEAD].props = NULL;
-    // Java: NameTagItem::new - typed item class (game-port content)
+// Java: NameTagItem::new - typed item class (game-port content)
     entries[NAME_TAG].name = "NAME_TAG";
     entries[NAME_TAG].id = "name_tag";
     entries[NAME_TAG].block = NULL;
     entries[NAME_TAG].props = NULL;
-    // Java: p_359446_ -> new MinecartItem - typed item class (game-port content)
+// Java: p_359446_ -> new MinecartItem - typed item class (game-port content)
     entries[COMMAND_BLOCK_MINECART].name = "COMMAND_BLOCK_MINECART";
     entries[COMMAND_BLOCK_MINECART].id = "command_block_minecart";
     entries[COMMAND_BLOCK_MINECART].block = NULL;
@@ -9839,87 +9840,87 @@ static void initialize(void)
     entries[COOKED_MUTTON].id = "cooked_mutton";
     entries[COOKED_MUTTON].block = NULL;
     entries[COOKED_MUTTON].props = props_COOKED_MUTTON;
-    // Java:  - typed item class (game-port content)
+// Java:  - typed item class (game-port content)
     entries[WHITE_BANNER].name = "WHITE_BANNER";
     entries[WHITE_BANNER].id = "white_banner";
     entries[WHITE_BANNER].block = "WHITE_BANNER";
     entries[WHITE_BANNER].props = props_WHITE_BANNER;
-    // Java:  - typed item class (game-port content)
+// Java:  - typed item class (game-port content)
     entries[ORANGE_BANNER].name = "ORANGE_BANNER";
     entries[ORANGE_BANNER].id = "orange_banner";
     entries[ORANGE_BANNER].block = "ORANGE_BANNER";
     entries[ORANGE_BANNER].props = props_ORANGE_BANNER;
-    // Java:  - typed item class (game-port content)
+// Java:  - typed item class (game-port content)
     entries[MAGENTA_BANNER].name = "MAGENTA_BANNER";
     entries[MAGENTA_BANNER].id = "magenta_banner";
     entries[MAGENTA_BANNER].block = "MAGENTA_BANNER";
     entries[MAGENTA_BANNER].props = props_MAGENTA_BANNER;
-    // Java:  - typed item class (game-port content)
+// Java:  - typed item class (game-port content)
     entries[LIGHT_BLUE_BANNER].name = "LIGHT_BLUE_BANNER";
     entries[LIGHT_BLUE_BANNER].id = "light_blue_banner";
     entries[LIGHT_BLUE_BANNER].block = "LIGHT_BLUE_BANNER";
     entries[LIGHT_BLUE_BANNER].props = props_LIGHT_BLUE_BANNER;
-    // Java:  - typed item class (game-port content)
+// Java:  - typed item class (game-port content)
     entries[YELLOW_BANNER].name = "YELLOW_BANNER";
     entries[YELLOW_BANNER].id = "yellow_banner";
     entries[YELLOW_BANNER].block = "YELLOW_BANNER";
     entries[YELLOW_BANNER].props = props_YELLOW_BANNER;
-    // Java:  - typed item class (game-port content)
+// Java:  - typed item class (game-port content)
     entries[LIME_BANNER].name = "LIME_BANNER";
     entries[LIME_BANNER].id = "lime_banner";
     entries[LIME_BANNER].block = "LIME_BANNER";
     entries[LIME_BANNER].props = props_LIME_BANNER;
-    // Java:  - typed item class (game-port content)
+// Java:  - typed item class (game-port content)
     entries[PINK_BANNER].name = "PINK_BANNER";
     entries[PINK_BANNER].id = "pink_banner";
     entries[PINK_BANNER].block = "PINK_BANNER";
     entries[PINK_BANNER].props = props_PINK_BANNER;
-    // Java:  - typed item class (game-port content)
+// Java:  - typed item class (game-port content)
     entries[GRAY_BANNER].name = "GRAY_BANNER";
     entries[GRAY_BANNER].id = "gray_banner";
     entries[GRAY_BANNER].block = "GRAY_BANNER";
     entries[GRAY_BANNER].props = props_GRAY_BANNER;
-    // Java:  - typed item class (game-port content)
+// Java:  - typed item class (game-port content)
     entries[LIGHT_GRAY_BANNER].name = "LIGHT_GRAY_BANNER";
     entries[LIGHT_GRAY_BANNER].id = "light_gray_banner";
     entries[LIGHT_GRAY_BANNER].block = "LIGHT_GRAY_BANNER";
     entries[LIGHT_GRAY_BANNER].props = props_LIGHT_GRAY_BANNER;
-    // Java:  - typed item class (game-port content)
+// Java:  - typed item class (game-port content)
     entries[CYAN_BANNER].name = "CYAN_BANNER";
     entries[CYAN_BANNER].id = "cyan_banner";
     entries[CYAN_BANNER].block = "CYAN_BANNER";
     entries[CYAN_BANNER].props = props_CYAN_BANNER;
-    // Java:  - typed item class (game-port content)
+// Java:  - typed item class (game-port content)
     entries[PURPLE_BANNER].name = "PURPLE_BANNER";
     entries[PURPLE_BANNER].id = "purple_banner";
     entries[PURPLE_BANNER].block = "PURPLE_BANNER";
     entries[PURPLE_BANNER].props = props_PURPLE_BANNER;
-    // Java:  - typed item class (game-port content)
+// Java:  - typed item class (game-port content)
     entries[BLUE_BANNER].name = "BLUE_BANNER";
     entries[BLUE_BANNER].id = "blue_banner";
     entries[BLUE_BANNER].block = "BLUE_BANNER";
     entries[BLUE_BANNER].props = props_BLUE_BANNER;
-    // Java:  - typed item class (game-port content)
+// Java:  - typed item class (game-port content)
     entries[BROWN_BANNER].name = "BROWN_BANNER";
     entries[BROWN_BANNER].id = "brown_banner";
     entries[BROWN_BANNER].block = "BROWN_BANNER";
     entries[BROWN_BANNER].props = props_BROWN_BANNER;
-    // Java:  - typed item class (game-port content)
+// Java:  - typed item class (game-port content)
     entries[GREEN_BANNER].name = "GREEN_BANNER";
     entries[GREEN_BANNER].id = "green_banner";
     entries[GREEN_BANNER].block = "GREEN_BANNER";
     entries[GREEN_BANNER].props = props_GREEN_BANNER;
-    // Java:  - typed item class (game-port content)
+// Java:  - typed item class (game-port content)
     entries[RED_BANNER].name = "RED_BANNER";
     entries[RED_BANNER].id = "red_banner";
     entries[RED_BANNER].block = "RED_BANNER";
     entries[RED_BANNER].props = props_RED_BANNER;
-    // Java:  - typed item class (game-port content)
+// Java:  - typed item class (game-port content)
     entries[BLACK_BANNER].name = "BLACK_BANNER";
     entries[BLACK_BANNER].id = "black_banner";
     entries[BLACK_BANNER].block = "BLACK_BANNER";
     entries[BLACK_BANNER].props = props_BLACK_BANNER;
-    // Java: EndCrystalItem::new - typed item class (game-port content)
+// Java: EndCrystalItem::new - typed item class (game-port content)
     entries[END_CRYSTAL].name = "END_CRYSTAL";
     entries[END_CRYSTAL].id = "end_crystal";
     entries[END_CRYSTAL].block = NULL;
@@ -9956,27 +9957,27 @@ static void initialize(void)
     entries[DRAGON_BREATH].id = "dragon_breath";
     entries[DRAGON_BREATH].block = NULL;
     entries[DRAGON_BREATH].props = props_DRAGON_BREATH;
-    // Java: SplashPotionItem::new - typed item class (game-port content)
+// Java: SplashPotionItem::new - typed item class (game-port content)
     entries[SPLASH_POTION].name = "SPLASH_POTION";
     entries[SPLASH_POTION].id = "splash_potion";
     entries[SPLASH_POTION].block = NULL;
     entries[SPLASH_POTION].props = props_SPLASH_POTION;
-    // Java: SpectralArrowItem::new - typed item class (game-port content)
+// Java: SpectralArrowItem::new - typed item class (game-port content)
     entries[SPECTRAL_ARROW].name = "SPECTRAL_ARROW";
     entries[SPECTRAL_ARROW].id = "spectral_arrow";
     entries[SPECTRAL_ARROW].block = NULL;
     entries[SPECTRAL_ARROW].props = NULL;
-    // Java: TippedArrowItem::new - typed item class (game-port content)
+// Java: TippedArrowItem::new - typed item class (game-port content)
     entries[TIPPED_ARROW].name = "TIPPED_ARROW";
     entries[TIPPED_ARROW].id = "tipped_arrow";
     entries[TIPPED_ARROW].block = NULL;
     entries[TIPPED_ARROW].props = props_TIPPED_ARROW;
-    // Java: LingeringPotionItem::new - typed item class (game-port content)
+// Java: LingeringPotionItem::new - typed item class (game-port content)
     entries[LINGERING_POTION].name = "LINGERING_POTION";
     entries[LINGERING_POTION].id = "lingering_potion";
     entries[LINGERING_POTION].block = NULL;
     entries[LINGERING_POTION].props = props_LINGERING_POTION;
-    // Java: ShieldItem::new - typed item class (game-port content)
+// Java: ShieldItem::new - typed item class (game-port content)
     entries[SHIELD].name = "SHIELD";
     entries[SHIELD].id = "shield";
     entries[SHIELD].block = NULL;
@@ -10025,12 +10026,12 @@ static void initialize(void)
     entries[COPPER_NUGGET].id = "copper_nugget";
     entries[COPPER_NUGGET].block = NULL;
     entries[COPPER_NUGGET].props = NULL;
-    // Java: KnowledgeBookItem::new - typed item class (game-port content)
+// Java: KnowledgeBookItem::new - typed item class (game-port content)
     entries[KNOWLEDGE_BOOK].name = "KNOWLEDGE_BOOK";
     entries[KNOWLEDGE_BOOK].id = "knowledge_book";
     entries[KNOWLEDGE_BOOK].block = NULL;
     entries[KNOWLEDGE_BOOK].props = props_KNOWLEDGE_BOOK;
-    // Java: DebugStickItem::new - typed item class (game-port content)
+// Java: DebugStickItem::new - typed item class (game-port content)
     entries[DEBUG_STICK].name = "DEBUG_STICK";
     entries[DEBUG_STICK].id = "debug_stick";
     entries[DEBUG_STICK].block = NULL;
@@ -10119,12 +10120,12 @@ static void initialize(void)
     entries[MUSIC_DISC_TEARS].id = "music_disc_tears";
     entries[MUSIC_DISC_TEARS].block = NULL;
     entries[MUSIC_DISC_TEARS].props = props_MUSIC_DISC_TEARS;
-    // Java: DiscFragmentItem::new - typed item class (game-port content)
+// Java: DiscFragmentItem::new - typed item class (game-port content)
     entries[DISC_FRAGMENT_5].name = "DISC_FRAGMENT_5";
     entries[DISC_FRAGMENT_5].id = "disc_fragment_5";
     entries[DISC_FRAGMENT_5].block = NULL;
     entries[DISC_FRAGMENT_5].props = props_DISC_FRAGMENT_5;
-    // Java: TridentItem::new - typed item class (game-port content)
+// Java: TridentItem::new - typed item class (game-port content)
     entries[TRIDENT].name = "TRIDENT";
     entries[TRIDENT].id = "trident";
     entries[TRIDENT].block = NULL;
@@ -10157,7 +10158,7 @@ static void initialize(void)
     entries[HEART_OF_THE_SEA].id = "heart_of_the_sea";
     entries[HEART_OF_THE_SEA].block = NULL;
     entries[HEART_OF_THE_SEA].props = props_HEART_OF_THE_SEA;
-    // Java: CrossbowItem::new - typed item class (game-port content)
+// Java: CrossbowItem::new - typed item class (game-port content)
     entries[CROSSBOW].name = "CROSSBOW";
     entries[CROSSBOW].id = "crossbow";
     entries[CROSSBOW].block = NULL;
@@ -10210,7 +10211,7 @@ static void initialize(void)
     entries[BORDURE_INDENTED_BANNER_PATTERN].id = "bordure_indented_banner_pattern";
     entries[BORDURE_INDENTED_BANNER_PATTERN].block = NULL;
     entries[BORDURE_INDENTED_BANNER_PATTERN].props = props_BORDURE_INDENTED_BANNER_PATTERN;
-    // Java: InstrumentItem::new - typed item class (game-port content)
+// Java: InstrumentItem::new - typed item class (game-port content)
     entries[GOAT_HORN].name = "GOAT_HORN";
     entries[GOAT_HORN].id = "goat_horn";
     entries[GOAT_HORN].block = NULL;
@@ -10283,7 +10284,7 @@ static void initialize(void)
     entries[SHROOMLIGHT].id = "shroomlight";
     entries[SHROOMLIGHT].block = "SHROOMLIGHT";
     entries[SHROOMLIGHT].props = NULL;
-    // Java: HoneycombItem::new - typed item class (game-port content)
+// Java: HoneycombItem::new - typed item class (game-port content)
     entries[HONEYCOMB].name = "HONEYCOMB";
     entries[HONEYCOMB].id = "honeycomb";
     entries[HONEYCOMB].block = NULL;
@@ -10464,7 +10465,7 @@ static void initialize(void)
     entries[PEARLESCENT_FROGLIGHT].id = "pearlescent_froglight";
     entries[PEARLESCENT_FROGLIGHT].block = "PEARLESCENT_FROGLIGHT";
     entries[PEARLESCENT_FROGLIGHT].props = NULL;
-    // Java: PlaceOnWaterBlockItem::new - typed item class (game-port content)
+// Java: PlaceOnWaterBlockItem::new - typed item class (game-port content)
     entries[FROGSPAWN].name = "FROGSPAWN";
     entries[FROGSPAWN].id = "frogspawn";
     entries[FROGSPAWN].block = "FROGSPAWN";
@@ -10473,102 +10474,102 @@ static void initialize(void)
     entries[ECHO_SHARD].id = "echo_shard";
     entries[ECHO_SHARD].block = NULL;
     entries[ECHO_SHARD].props = props_ECHO_SHARD;
-    // Java: BrushItem::new - typed item class (game-port content)
+// Java: BrushItem::new - typed item class (game-port content)
     entries[BRUSH].name = "BRUSH";
     entries[BRUSH].id = "brush";
     entries[BRUSH].block = NULL;
     entries[BRUSH].props = props_BRUSH;
-    // Java: SmithingTemplateItem::createNetheriteUpgradeTemplate - typed item class (game-port content)
+// Java: SmithingTemplateItem::createNetheriteUpgradeTemplate - typed item class (game-port content)
     entries[NETHERITE_UPGRADE_SMITHING_TEMPLATE].name = "NETHERITE_UPGRADE_SMITHING_TEMPLATE";
     entries[NETHERITE_UPGRADE_SMITHING_TEMPLATE].id = "netherite_upgrade_smithing_template";
     entries[NETHERITE_UPGRADE_SMITHING_TEMPLATE].block = NULL;
     entries[NETHERITE_UPGRADE_SMITHING_TEMPLATE].props = props_NETHERITE_UPGRADE_SMITHING_TEMPLATE;
-    // Java: SmithingTemplateItem::createArmorTrimTemplate - typed item class (game-port content)
+// Java: SmithingTemplateItem::createArmorTrimTemplate - typed item class (game-port content)
     entries[SENTRY_ARMOR_TRIM_SMITHING_TEMPLATE].name = "SENTRY_ARMOR_TRIM_SMITHING_TEMPLATE";
     entries[SENTRY_ARMOR_TRIM_SMITHING_TEMPLATE].id = "sentry_armor_trim_smithing_template";
     entries[SENTRY_ARMOR_TRIM_SMITHING_TEMPLATE].block = NULL;
     entries[SENTRY_ARMOR_TRIM_SMITHING_TEMPLATE].props = props_SENTRY_ARMOR_TRIM_SMITHING_TEMPLATE;
-    // Java: SmithingTemplateItem::createArmorTrimTemplate - typed item class (game-port content)
+// Java: SmithingTemplateItem::createArmorTrimTemplate - typed item class (game-port content)
     entries[DUNE_ARMOR_TRIM_SMITHING_TEMPLATE].name = "DUNE_ARMOR_TRIM_SMITHING_TEMPLATE";
     entries[DUNE_ARMOR_TRIM_SMITHING_TEMPLATE].id = "dune_armor_trim_smithing_template";
     entries[DUNE_ARMOR_TRIM_SMITHING_TEMPLATE].block = NULL;
     entries[DUNE_ARMOR_TRIM_SMITHING_TEMPLATE].props = props_DUNE_ARMOR_TRIM_SMITHING_TEMPLATE;
-    // Java: SmithingTemplateItem::createArmorTrimTemplate - typed item class (game-port content)
+// Java: SmithingTemplateItem::createArmorTrimTemplate - typed item class (game-port content)
     entries[COAST_ARMOR_TRIM_SMITHING_TEMPLATE].name = "COAST_ARMOR_TRIM_SMITHING_TEMPLATE";
     entries[COAST_ARMOR_TRIM_SMITHING_TEMPLATE].id = "coast_armor_trim_smithing_template";
     entries[COAST_ARMOR_TRIM_SMITHING_TEMPLATE].block = NULL;
     entries[COAST_ARMOR_TRIM_SMITHING_TEMPLATE].props = props_COAST_ARMOR_TRIM_SMITHING_TEMPLATE;
-    // Java: SmithingTemplateItem::createArmorTrimTemplate - typed item class (game-port content)
+// Java: SmithingTemplateItem::createArmorTrimTemplate - typed item class (game-port content)
     entries[WILD_ARMOR_TRIM_SMITHING_TEMPLATE].name = "WILD_ARMOR_TRIM_SMITHING_TEMPLATE";
     entries[WILD_ARMOR_TRIM_SMITHING_TEMPLATE].id = "wild_armor_trim_smithing_template";
     entries[WILD_ARMOR_TRIM_SMITHING_TEMPLATE].block = NULL;
     entries[WILD_ARMOR_TRIM_SMITHING_TEMPLATE].props = props_WILD_ARMOR_TRIM_SMITHING_TEMPLATE;
-    // Java: SmithingTemplateItem::createArmorTrimTemplate - typed item class (game-port content)
+// Java: SmithingTemplateItem::createArmorTrimTemplate - typed item class (game-port content)
     entries[WARD_ARMOR_TRIM_SMITHING_TEMPLATE].name = "WARD_ARMOR_TRIM_SMITHING_TEMPLATE";
     entries[WARD_ARMOR_TRIM_SMITHING_TEMPLATE].id = "ward_armor_trim_smithing_template";
     entries[WARD_ARMOR_TRIM_SMITHING_TEMPLATE].block = NULL;
     entries[WARD_ARMOR_TRIM_SMITHING_TEMPLATE].props = props_WARD_ARMOR_TRIM_SMITHING_TEMPLATE;
-    // Java: SmithingTemplateItem::createArmorTrimTemplate - typed item class (game-port content)
+// Java: SmithingTemplateItem::createArmorTrimTemplate - typed item class (game-port content)
     entries[EYE_ARMOR_TRIM_SMITHING_TEMPLATE].name = "EYE_ARMOR_TRIM_SMITHING_TEMPLATE";
     entries[EYE_ARMOR_TRIM_SMITHING_TEMPLATE].id = "eye_armor_trim_smithing_template";
     entries[EYE_ARMOR_TRIM_SMITHING_TEMPLATE].block = NULL;
     entries[EYE_ARMOR_TRIM_SMITHING_TEMPLATE].props = props_EYE_ARMOR_TRIM_SMITHING_TEMPLATE;
-    // Java: SmithingTemplateItem::createArmorTrimTemplate - typed item class (game-port content)
+// Java: SmithingTemplateItem::createArmorTrimTemplate - typed item class (game-port content)
     entries[VEX_ARMOR_TRIM_SMITHING_TEMPLATE].name = "VEX_ARMOR_TRIM_SMITHING_TEMPLATE";
     entries[VEX_ARMOR_TRIM_SMITHING_TEMPLATE].id = "vex_armor_trim_smithing_template";
     entries[VEX_ARMOR_TRIM_SMITHING_TEMPLATE].block = NULL;
     entries[VEX_ARMOR_TRIM_SMITHING_TEMPLATE].props = props_VEX_ARMOR_TRIM_SMITHING_TEMPLATE;
-    // Java: SmithingTemplateItem::createArmorTrimTemplate - typed item class (game-port content)
+// Java: SmithingTemplateItem::createArmorTrimTemplate - typed item class (game-port content)
     entries[TIDE_ARMOR_TRIM_SMITHING_TEMPLATE].name = "TIDE_ARMOR_TRIM_SMITHING_TEMPLATE";
     entries[TIDE_ARMOR_TRIM_SMITHING_TEMPLATE].id = "tide_armor_trim_smithing_template";
     entries[TIDE_ARMOR_TRIM_SMITHING_TEMPLATE].block = NULL;
     entries[TIDE_ARMOR_TRIM_SMITHING_TEMPLATE].props = props_TIDE_ARMOR_TRIM_SMITHING_TEMPLATE;
-    // Java: SmithingTemplateItem::createArmorTrimTemplate - typed item class (game-port content)
+// Java: SmithingTemplateItem::createArmorTrimTemplate - typed item class (game-port content)
     entries[SNOUT_ARMOR_TRIM_SMITHING_TEMPLATE].name = "SNOUT_ARMOR_TRIM_SMITHING_TEMPLATE";
     entries[SNOUT_ARMOR_TRIM_SMITHING_TEMPLATE].id = "snout_armor_trim_smithing_template";
     entries[SNOUT_ARMOR_TRIM_SMITHING_TEMPLATE].block = NULL;
     entries[SNOUT_ARMOR_TRIM_SMITHING_TEMPLATE].props = props_SNOUT_ARMOR_TRIM_SMITHING_TEMPLATE;
-    // Java: SmithingTemplateItem::createArmorTrimTemplate - typed item class (game-port content)
+// Java: SmithingTemplateItem::createArmorTrimTemplate - typed item class (game-port content)
     entries[RIB_ARMOR_TRIM_SMITHING_TEMPLATE].name = "RIB_ARMOR_TRIM_SMITHING_TEMPLATE";
     entries[RIB_ARMOR_TRIM_SMITHING_TEMPLATE].id = "rib_armor_trim_smithing_template";
     entries[RIB_ARMOR_TRIM_SMITHING_TEMPLATE].block = NULL;
     entries[RIB_ARMOR_TRIM_SMITHING_TEMPLATE].props = props_RIB_ARMOR_TRIM_SMITHING_TEMPLATE;
-    // Java: SmithingTemplateItem::createArmorTrimTemplate - typed item class (game-port content)
+// Java: SmithingTemplateItem::createArmorTrimTemplate - typed item class (game-port content)
     entries[SPIRE_ARMOR_TRIM_SMITHING_TEMPLATE].name = "SPIRE_ARMOR_TRIM_SMITHING_TEMPLATE";
     entries[SPIRE_ARMOR_TRIM_SMITHING_TEMPLATE].id = "spire_armor_trim_smithing_template";
     entries[SPIRE_ARMOR_TRIM_SMITHING_TEMPLATE].block = NULL;
     entries[SPIRE_ARMOR_TRIM_SMITHING_TEMPLATE].props = props_SPIRE_ARMOR_TRIM_SMITHING_TEMPLATE;
-    // Java: SmithingTemplateItem::createArmorTrimTemplate - typed item class (game-port content)
+// Java: SmithingTemplateItem::createArmorTrimTemplate - typed item class (game-port content)
     entries[WAYFINDER_ARMOR_TRIM_SMITHING_TEMPLATE].name = "WAYFINDER_ARMOR_TRIM_SMITHING_TEMPLATE";
     entries[WAYFINDER_ARMOR_TRIM_SMITHING_TEMPLATE].id = "wayfinder_armor_trim_smithing_template";
     entries[WAYFINDER_ARMOR_TRIM_SMITHING_TEMPLATE].block = NULL;
     entries[WAYFINDER_ARMOR_TRIM_SMITHING_TEMPLATE].props = props_WAYFINDER_ARMOR_TRIM_SMITHING_TEMPLATE;
-    // Java: SmithingTemplateItem::createArmorTrimTemplate - typed item class (game-port content)
+// Java: SmithingTemplateItem::createArmorTrimTemplate - typed item class (game-port content)
     entries[SHAPER_ARMOR_TRIM_SMITHING_TEMPLATE].name = "SHAPER_ARMOR_TRIM_SMITHING_TEMPLATE";
     entries[SHAPER_ARMOR_TRIM_SMITHING_TEMPLATE].id = "shaper_armor_trim_smithing_template";
     entries[SHAPER_ARMOR_TRIM_SMITHING_TEMPLATE].block = NULL;
     entries[SHAPER_ARMOR_TRIM_SMITHING_TEMPLATE].props = props_SHAPER_ARMOR_TRIM_SMITHING_TEMPLATE;
-    // Java: SmithingTemplateItem::createArmorTrimTemplate - typed item class (game-port content)
+// Java: SmithingTemplateItem::createArmorTrimTemplate - typed item class (game-port content)
     entries[SILENCE_ARMOR_TRIM_SMITHING_TEMPLATE].name = "SILENCE_ARMOR_TRIM_SMITHING_TEMPLATE";
     entries[SILENCE_ARMOR_TRIM_SMITHING_TEMPLATE].id = "silence_armor_trim_smithing_template";
     entries[SILENCE_ARMOR_TRIM_SMITHING_TEMPLATE].block = NULL;
     entries[SILENCE_ARMOR_TRIM_SMITHING_TEMPLATE].props = props_SILENCE_ARMOR_TRIM_SMITHING_TEMPLATE;
-    // Java: SmithingTemplateItem::createArmorTrimTemplate - typed item class (game-port content)
+// Java: SmithingTemplateItem::createArmorTrimTemplate - typed item class (game-port content)
     entries[RAISER_ARMOR_TRIM_SMITHING_TEMPLATE].name = "RAISER_ARMOR_TRIM_SMITHING_TEMPLATE";
     entries[RAISER_ARMOR_TRIM_SMITHING_TEMPLATE].id = "raiser_armor_trim_smithing_template";
     entries[RAISER_ARMOR_TRIM_SMITHING_TEMPLATE].block = NULL;
     entries[RAISER_ARMOR_TRIM_SMITHING_TEMPLATE].props = props_RAISER_ARMOR_TRIM_SMITHING_TEMPLATE;
-    // Java: SmithingTemplateItem::createArmorTrimTemplate - typed item class (game-port content)
+// Java: SmithingTemplateItem::createArmorTrimTemplate - typed item class (game-port content)
     entries[HOST_ARMOR_TRIM_SMITHING_TEMPLATE].name = "HOST_ARMOR_TRIM_SMITHING_TEMPLATE";
     entries[HOST_ARMOR_TRIM_SMITHING_TEMPLATE].id = "host_armor_trim_smithing_template";
     entries[HOST_ARMOR_TRIM_SMITHING_TEMPLATE].block = NULL;
     entries[HOST_ARMOR_TRIM_SMITHING_TEMPLATE].props = props_HOST_ARMOR_TRIM_SMITHING_TEMPLATE;
-    // Java: SmithingTemplateItem::createArmorTrimTemplate - typed item class (game-port content)
+// Java: SmithingTemplateItem::createArmorTrimTemplate - typed item class (game-port content)
     entries[FLOW_ARMOR_TRIM_SMITHING_TEMPLATE].name = "FLOW_ARMOR_TRIM_SMITHING_TEMPLATE";
     entries[FLOW_ARMOR_TRIM_SMITHING_TEMPLATE].id = "flow_armor_trim_smithing_template";
     entries[FLOW_ARMOR_TRIM_SMITHING_TEMPLATE].block = NULL;
     entries[FLOW_ARMOR_TRIM_SMITHING_TEMPLATE].props = props_FLOW_ARMOR_TRIM_SMITHING_TEMPLATE;
-    // Java: SmithingTemplateItem::createArmorTrimTemplate - typed item class (game-port content)
+// Java: SmithingTemplateItem::createArmorTrimTemplate - typed item class (game-port content)
     entries[BOLT_ARMOR_TRIM_SMITHING_TEMPLATE].name = "BOLT_ARMOR_TRIM_SMITHING_TEMPLATE";
     entries[BOLT_ARMOR_TRIM_SMITHING_TEMPLATE].id = "bolt_armor_trim_smithing_template";
     entries[BOLT_ARMOR_TRIM_SMITHING_TEMPLATE].block = NULL;
@@ -10813,7 +10814,7 @@ static void initialize(void)
     entries[OMINOUS_BOTTLE].id = "ominous_bottle";
     entries[OMINOUS_BOTTLE].block = NULL;
     entries[OMINOUS_BOTTLE].props = props_OMINOUS_BOTTLE;
-    // Java: new Item(Properties) / new BlockItem(Blocks.X, Properties) - the back-links
+// Java: new Item(Properties) / new BlockItem(Blocks.X, Properties) - the back-links
     // resolve now; every item gets the prototype map with its id so the description id
     // (item.<ns>.<path>) resolves at construction, exactly like Java's register()
     for (int i = 0; i < 1481; i++)
@@ -10890,7 +10891,3 @@ LIBMATTI_MC_Item *LIBMATTI_MC_VanillaItems_AIR(void)
     initialize();
     return entries[AIR].item;
 }
-
-
-
-

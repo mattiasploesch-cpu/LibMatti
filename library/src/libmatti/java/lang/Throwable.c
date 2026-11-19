@@ -213,7 +213,7 @@ static void print_enclosed_stack_trace(const LIBMATTI_JL_Throwable *throwable,
 {
     if (deja_vu_contains(dejaVu, throwable))
     {
-        // Java: s.println(prefix + caption + "[CIRCULAR REFERENCE: " + this + "]")
+// Java: s.println(prefix + caption + "[CIRCULAR REFERENCE: " + this + "]")
         char *text = throwable_to_string(throwable);
         println_parts(writer, prefix, caption, "[CIRCULAR REFERENCE: ", text);
         LIBMATTI_JI_PrintWriter_Println(writer, "]");

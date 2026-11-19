@@ -29,7 +29,7 @@ LIBMATTI_SJH_Lazy *LIBMATTI_SJH_Lazy_OfProvider(LIBMATTI_SJH_Lazy_Provider provi
 
 void *LIBMATTI_SJH_Lazy_Get(LIBMATTI_SJH_Lazy *lazy)
 {
-    // Java: synchronized (lock) { if (!initialized && provider != null) { initialized = true; value = provider.get(); } return value; }
+// Java: synchronized (lock) { if (!initialized && provider != null) { initialized = true; value = provider.get(); } return value; }
     if (!lazy->initialized && lazy->provider != NULL)
     {
         lazy->initialized = true;

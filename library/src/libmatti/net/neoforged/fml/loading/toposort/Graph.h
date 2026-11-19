@@ -1,5 +1,6 @@
-// Stands in for com.google.common.graph.GraphBuilder / MutableGraph / Graph, which are external.
-// Nodes are identified by pointer, which is what the sorter needs (Java compares them by identity too).
+
+
+
 
 #ifndef MATTICRAFT_FML_LOADING_TOPOSORT_GRAPH_H
 #define MATTICRAFT_FML_LOADING_TOPOSORT_GRAPH_H
@@ -12,10 +13,11 @@ struct LIBMATTI_FML_Graph
 {
     void **nodes;
     size_t nodeCount;
-    void ***successors; // per node: the successors in edge insertion order
+    void ***successors;
+
     size_t *successorCounts;
-    int directed; // Java: graph.isDirected()
-    int allowsSelfLoops; // Java: graph.allowsSelfLoops()
+    int directed;// Java: graph.isDirected()
+    int allowsSelfLoops;// Java: graph.allowsSelfLoops()
 };
 
 // Java: GraphBuilder.directed().build()
@@ -46,4 +48,4 @@ size_t LIBMATTI_FML_Graph_NodeCount(const LIBMATTI_FML_Graph *graph);
 // Caller frees the array.
 void **LIBMATTI_FML_Graph_ReachableNodes(const LIBMATTI_FML_Graph *graph, const void *node, size_t *count);
 
-#endif //MATTICRAFT_FML_LOADING_TOPOSORT_GRAPH_H
+#endif

@@ -1,4 +1,5 @@
-// Port of cpw.mods.modlauncher.BootstrapLaunchConsumer.
+
+
 
 #ifndef MATTICRAFT_MODLAUNCHER_BOOTSTRAPLAUNCHCONSUMER_H
 #define MATTICRAFT_MODLAUNCHER_BOOTSTRAPLAUNCHCONSUMER_H
@@ -22,4 +23,4 @@ int LIBMATTI_ML_BootstrapLaunchConsumer_GetLauncherStatus(void);
 //       so registering the consumer with the bootstrap launcher seam is this step.
 void LIBMATTI_ML_BootstrapLaunchConsumer_Register(void);
 
-#endif //MATTICRAFT_MODLAUNCHER_BOOTSTRAPLAUNCHCONSUMER_H
+#endif

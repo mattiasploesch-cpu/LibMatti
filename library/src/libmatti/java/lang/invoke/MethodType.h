@@ -18,4 +18,4 @@ LIBMATTI_JLI_MethodType *LIBMATTI_JLI_MethodType_MethodType(LIBMATTI_JL_Class *r
                                                             LIBMATTI_JL_Class **parameterTypes, size_t parameterCount);
 void LIBMATTI_JLI_MethodType_Free(LIBMATTI_JLI_MethodType *type);
 
-#endif //MATTICRAFT_JAVA_LANG_INVOKE_METHODTYPE_H
+#endif

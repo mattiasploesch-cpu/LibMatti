@@ -14,4 +14,4 @@
 // Java: int value() - the element name of the annotation
 #define LIBMATTI_FML_INDEXEDENUM_VALUE "value"
 
-#endif //MATTICRAFT_FML_COMMON_ASM_ENUMEXTENSION_INDEXEDENUM_H
+#endif

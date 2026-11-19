@@ -1,6 +1,7 @@
-// Implementation of the texture/animation metadata section parsers. Java runs
-// the DataResult codecs; the port walks the parsed Gson JSON object with the
-// same field names and defaults.
+
+
+
+
 
 #include "libmatti/net/minecraft/client/resources/metadata/TextureMetadataSections.h"
 
@@ -9,9 +10,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-// ---------------------------------------------------------------------------
-// MipmapStrategy
-// ---------------------------------------------------------------------------
+
+
+
+
 
 static const char *const MIPMAP_STRATEGY_NAMES[] = {
     "auto", "mean", "cutout", "strict_cutout", "dark_cutout",
@@ -38,9 +40,10 @@ const char *LIBMATTI_MC_MipmapStrategy_ToName(int strategy)
     return MIPMAP_STRATEGY_NAMES[strategy];
 }
 
-// ---------------------------------------------------------------------------
-// TextureMetadataSection
-// ---------------------------------------------------------------------------
+
+
+
+
 
 LIBMATTI_MC_TextureMetadataSection *LIBMATTI_MC_TextureMetadataSection_Parse(const void *jsonObject, char **outError)
 {
@@ -49,7 +52,7 @@ LIBMATTI_MC_TextureMetadataSection *LIBMATTI_MC_TextureMetadataSection_Parse(con
         return NULL;
 
     LIBMATTI_MC_TextureMetadataSection *section = calloc(1, sizeof(LIBMATTI_MC_TextureMetadataSection));
-    // Java: optionalFieldOf defaults
+// Java: optionalFieldOf defaults
     section->blur = 0;
     section->clamp = 0;
     section->mipmapStrategy = 0;
@@ -90,14 +93,15 @@ void LIBMATTI_MC_TextureMetadataSection_Free(LIBMATTI_MC_TextureMetadataSection 
     free(section);
 }
 
-// ---------------------------------------------------------------------------
-// AnimationMetadataSection
-// ---------------------------------------------------------------------------
+
+
+
+
 
 LIBMATTI_MC_FrameSize LIBMATTI_MC_AnimationMetadataSection_CalculateFrameSize(
     const LIBMATTI_MC_AnimationMetadataSection *section, int imageWidth, int imageHeight)
 {
-    // Java: public FrameSize calculateFrameSize(int, int)
+// Java: public FrameSize calculateFrameSize(int, int)
     LIBMATTI_MC_FrameSize frameSize;
     if (section->hasFrameWidth)
     {
@@ -140,7 +144,7 @@ static void parse_frames(const LIBMATTI_GSON_JsonElement *array, LIBMATTI_MC_Ani
         LIBMATTI_GSON_JsonElement *element = LIBMATTI_GSON_JsonElement_ElementAt(array, i);
         if (LIBMATTI_GSON_JsonElement_IsJsonObject(element))
         {
-            // Java: AnimationFrame.MapCodec - index is required, frametime defaults
+// Java: AnimationFrame.MapCodec - index is required, frametime defaults
             LIBMATTI_GSON_JsonElement *index = LIBMATTI_GSON_JsonElement_GetMember(element, "index");
             LIBMATTI_GSON_JsonElement *time = LIBMATTI_GSON_JsonElement_GetMember(element, "frametime");
             section->frames[i].index = index != NULL ? LIBMATTI_GSON_JsonElement_GetAsInt(index) : (int) i;
@@ -148,9 +152,10 @@ static void parse_frames(const LIBMATTI_GSON_JsonElement *array, LIBMATTI_MC_Ani
         }
         else
         {
-            // Java: ExtraCodecs.POSITIVE_INT - the plain index form
+// Java: ExtraCodecs.POSITIVE_INT - the plain index form
             section->frames[i].index = LIBMATTI_GSON_JsonElement_GetAsInt(element);
-            section->frames[i].time = -1; // resolved to the default later
+            section->frames[i].time = -1;
+
         }
     }
 }
@@ -162,7 +167,7 @@ LIBMATTI_MC_AnimationMetadataSection *LIBMATTI_MC_AnimationMetadataSection_Parse
         return NULL;
 
     LIBMATTI_MC_AnimationMetadataSection *section = calloc(1, sizeof(LIBMATTI_MC_AnimationMetadataSection));
-    // Java: the codec defaults - frametime 1, interpolate false
+// Java: the codec defaults - frametime 1, interpolate false
     section->defaultFrameTime = 1;
     section->interpolatedFrames = 0;
 

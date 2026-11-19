@@ -1,4 +1,5 @@
-// Port of cpw.mods.modlauncher.TransformationServicesHandler.
+
+
 
 #include "libmatti/cpw/modlauncher/TransformationServicesHandler.h"
 
@@ -73,7 +74,7 @@ static void validate_transformation_services(LIBMATTI_ML_TransformationServicesH
 
     LIBMATTI_ML_Logger_Error(LIBMATTI_ML_LogManager_GetLogger(), &LIBMATTI_ML_MARKER_MODLAUNCHER,
                              "Found {} services that failed to load : [{}]", "");
-    // Java: throw new InvalidLauncherSetupException("Invalid Services found " + names)
+// Java: throw new InvalidLauncherSetupException("Invalid Services found " + names)
 }
 
 // Java: private void computeArgumentsForServices(OptionParser parser)
@@ -101,7 +102,7 @@ static void compute_arguments_for_services(LIBMATTI_JOPT_OptionParser *parser, v
 {
     LIBMATTI_ML_TransformationServicesHandler *handler = userdata;
 
-    // Java: serviceLookup.values().stream().map(TransformationServiceDecorator::getService)
+// Java: serviceLookup.values().stream().map(TransformationServiceDecorator::getService)
     //           .forEach(service -> service.arguments((a, b) -> parser.accepts(service.name() + "." + a, b)))
     for (size_t i = 0; i < handler->count; i++)
     {
@@ -175,7 +176,7 @@ static LIBMATTI_MLA_ITransformationService_Resource *run_scanning_transformation
             result = realloc(result, sizeof(*result) * (resultCount + 1));
             result[resultCount++] = resources[r];
         }
-        // the resource list belongs to the service (Java: the returned List)
+// the resource list belongs to the service (Java: the returned List)
     }
 
     *count = resultCount;
@@ -227,12 +228,12 @@ LIBMATTI_ML_TransformingClassLoader *LIBMATTI_ML_TransformationServicesHandler_B
     LIBMATTI_ML_TransformationServicesHandler *handler, LIBMATTI_ML_LaunchPluginHandler *pluginHandler,
     LIBMATTI_ML_Environment *environment, LIBMATTI_ML_ModuleLayerHandler *layerHandler)
 {
-    // Java: final var layerInfo = layerHandler.buildLayer(Layer.GAME, (cf, parents) -> new TransformingClassLoader(...))
+// Java: final var layerInfo = layerHandler.buildLayer(Layer.GAME, (cf, parents) -> new TransformingClassLoader(...))
     TransformingClassLoaderContext context = {handler->transformStore, pluginHandler, environment};
     LIBMATTI_ML_ModuleLayerHandler_LayerInfo layerInfo = LIBMATTI_ML_ModuleLayerHandler_BuildLayerWith(
         layerHandler, LIBMATTI_MLA_LAYER_GAME, transforming_class_loader_supplier, &context);
 
-    // Java: layerHandler.updateLayer(Layer.PLUGIN, li -> li.cl().setFallbackClassLoader(layerInfo.cl()))
+// Java: layerHandler.updateLayer(Layer.PLUGIN, li -> li.cl().setFallbackClassLoader(layerInfo.cl()))
     FallbackSetterContext fallback = {layerInfo.cl};
     LIBMATTI_ML_ModuleLayerHandler_UpdateLayer(layerHandler, LIBMATTI_MLA_LAYER_PLUGIN, set_fallback_class_loader,
                                                &fallback);
@@ -246,7 +247,7 @@ void LIBMATTI_ML_TransformationServicesHandler_InitialiseServiceTransformers(
     LIBMATTI_ML_Logger_Debug(LIBMATTI_ML_LogManager_GetLogger(), &LIBMATTI_ML_MARKER_MODLAUNCHER,
                              "Transformation services loading transformers");
 
-    // Java: serviceLookup.values().forEach(s -> s.gatherTransformers(transformStore))
+// Java: serviceLookup.values().forEach(s -> s.gatherTransformers(transformStore))
     for (size_t i = 0; i < handler->count; i++)
         LIBMATTI_ML_TransformationServiceDecorator_GatherTransformers(handler->services[i], handler->transformStore);
 }
@@ -257,7 +258,7 @@ void LIBMATTI_ML_TransformationServicesHandler_DiscoverServices(
     LIBMATTI_ML_Logger_Debug(LIBMATTI_ML_LogManager_GetLogger(), &LIBMATTI_ML_MARKER_MODLAUNCHER,
                              "Discovering transformation services");
 
-    // Java: var bootLayer = layerHandler.getLayer(IModuleLayerManager.Layer.BOOT).orElseThrow()
+// Java: var bootLayer = layerHandler.getLayer(IModuleLayerManager.Layer.BOOT).orElseThrow()
     LIBMATTI_JL_ModuleLayer *bootLayer = LIBMATTI_ML_ModuleLayerHandler_GetLayer(handler->layerHandler,
                                                                                  LIBMATTI_MLA_LAYER_BOOT);
     if (bootLayer == NULL)
@@ -267,14 +268,14 @@ void LIBMATTI_ML_TransformationServicesHandler_DiscoverServices(
         return;
     }
 
-    // Java: var earlyDiscoveryServices = ServiceLoaderUtils.streamServiceLoader(
+// Java: var earlyDiscoveryServices = ServiceLoaderUtils.streamServiceLoader(
     //       () -> ServiceLoader.load(bootLayer, ITransformerDiscoveryService.class), ...).toList()
     size_t discoveryCount = 0;
     void **discoveryServices = LIBMATTI_MLU_ServiceLoaderUtils_StreamServiceLoader(
         bootLayer, "cpw.mods.modlauncher.serviceapi.ITransformerDiscoveryService", log_service_error, NULL,
         &discoveryCount);
 
-    // Java: additionalPaths = earlyDiscoveryServices.stream()
+// Java: additionalPaths = earlyDiscoveryServices.stream()
     //           .map(s -> s.candidates(gameDir, launchTarget)).<NamedPath>mapMulti(Iterable::forEach).toList()
     LIBMATTI_MLA_NamedPath *additionalPaths = NULL;
     size_t additionalPathCount = 0;
@@ -296,16 +297,16 @@ void LIBMATTI_ML_TransformationServicesHandler_DiscoverServices(
     LIBMATTI_ML_Logger_Debug(LIBMATTI_ML_LogManager_GetLogger(), &LIBMATTI_ML_MARKER_MODLAUNCHER,
                              "Found additional transformation services from discovery services: {}", "");
 
-    // Java: additionalPaths.forEach(np -> layerHandler.addToLayer(Layer.SERVICE, np))
+// Java: additionalPaths.forEach(np -> layerHandler.addToLayer(Layer.SERVICE, np))
     for (size_t i = 0; i < additionalPathCount; i++)
         LIBMATTI_ML_ModuleLayerHandler_AddNamedPathToLayer(handler->layerHandler, LIBMATTI_MLA_LAYER_SERVICE,
                                                            &additionalPaths[i]);
 
-    // Java: var serviceLayer = layerHandler.buildLayer(Layer.SERVICE)
+// Java: var serviceLayer = layerHandler.buildLayer(Layer.SERVICE)
     LIBMATTI_ML_ModuleLayerHandler_LayerInfo serviceLayer = LIBMATTI_ML_ModuleLayerHandler_BuildLayer(
         handler->layerHandler, LIBMATTI_MLA_LAYER_SERVICE);
 
-    // Java: earlyDiscoveryServices.forEach(s -> s.earlyInitialization(launchTarget, arguments))
+// Java: earlyDiscoveryServices.forEach(s -> s.earlyInitialization(launchTarget, arguments))
     for (size_t i = 0; i < discoveryCount; i++)
         LIBMATTI_MLS_ITransformerDiscoveryService_EarlyInitialization(discoveryServices[i],
                                                                       discoveryData.launchTarget,
@@ -313,7 +314,7 @@ void LIBMATTI_ML_TransformationServicesHandler_DiscoverServices(
                                                                       discoveryData.arguments);
     free(discoveryServices);
 
-    // Java: serviceLookup = ServiceLoaderUtils.streamServiceLoader(
+// Java: serviceLookup = ServiceLoaderUtils.streamServiceLoader(
     //       () -> ServiceLoader.load(serviceLayer.layer(), ITransformationService.class), ...)
     //       .collect(Collectors.toMap(ITransformationService::name, TransformationServiceDecorator::new))
     size_t serviceCount = 0;
@@ -332,7 +333,7 @@ void LIBMATTI_ML_TransformationServicesHandler_DiscoverServices(
     }
     free(services);
 
-    // Java: var modlist = serviceLookup.entrySet().stream().map(e -> Map.of("name", ..., "type", "TRANSFORMATIONSERVICE",
+// Java: var modlist = serviceLookup.entrySet().stream().map(e -> Map.of("name", ..., "type", "TRANSFORMATIONSERVICE",
     //              "file", ServiceLoaderUtils.fileNameFor(e.getValue().getClass()))).toList()
     //       Launcher.INSTANCE.environment().getProperty(MODLIST).ifPresent(ml -> ml.addAll(modlist))
     if (LIBMATTI_ML_Launcher_INSTANCE != NULL)
@@ -352,7 +353,7 @@ void LIBMATTI_ML_TransformationServicesHandler_DiscoverServices(
         }
     }
 
-    // Java: () -> String.join(",", serviceLookup.keySet())
+// Java: () -> String.join(",", serviceLookup.keySet())
     size_t namesLength = 1;
     for (size_t i = 0; i < handler->count; i++) namesLength += strlen(handler->names[i]) + 1;
     char *names = malloc(namesLength);
@@ -372,7 +373,7 @@ LIBMATTI_MLA_ITransformationService_Resource *LIBMATTI_ML_TransformationServices
     LIBMATTI_ML_TransformationServicesHandler *handler, LIBMATTI_MLA_IModuleLayerManager *moduleLayerManager,
     size_t *count)
 {
-    // Java: serviceLookup.values().stream().map(tsd -> tsd.onCompleteScan(moduleLayerManager))
+// Java: serviceLookup.values().stream().map(tsd -> tsd.onCompleteScan(moduleLayerManager))
     //           .<Resource>mapMulti(Iterable::forEach).toList()
     LIBMATTI_MLA_ITransformationService_Resource *result = NULL;
     size_t resultCount = 0;
@@ -389,7 +390,7 @@ LIBMATTI_MLA_ITransformationService_Resource *LIBMATTI_ML_TransformationServices
             result = realloc(result, sizeof(*result) * (resultCount + 1));
             result[resultCount++] = resources[r];
         }
-        // the resource list belongs to the service (Java: the returned List)
+// the resource list belongs to the service (Java: the returned List)
     }
 
     *count = resultCount;

@@ -61,7 +61,7 @@ float LIBMATTI_JOML_Vector2f_LengthSquared(const LIBMATTI_JOML_Vector2f *v)
 
 LIBMATTI_JOML_Vector2f *LIBMATTI_JOML_Vector2f_Normalize(LIBMATTI_JOML_Vector2f *v)
 {
-    // Java: float invLength = Math.invsqrt(lengthSquared())
+// Java: float invLength = Math.invsqrt(lengthSquared())
     float length = LIBMATTI_JOML_Vector2f_Length(v);
     if (length != 0.0f)
     {

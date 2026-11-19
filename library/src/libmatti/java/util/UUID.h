@@ -1,7 +1,8 @@
-// Port of java.util.UUID. Java models the UUID as a 128-bit immutable value
-// (mostSigBits/leastSigBits) with the version/variant bit layout; the C port
-// keeps the same two words plus the canonical 8-4-4-4-12 string form used by
-// the game protocol and the save format.
+
+
+
+
+
 
 #ifndef MATTICRAFT_JAVA_UTIL_UUID_H
 #define MATTICRAFT_JAVA_UTIL_UUID_H
@@ -17,7 +18,7 @@ extern "C" {
 // Java: public final class UUID
 typedef struct LIBMATTI_JU_UUID
 {
-    // Java: private final long mostSigBits / leastSigBits
+// Java: private final long mostSigBits / leastSigBits
     uint64_t mostSigBits;
     uint64_t leastSigBits;
 } LIBMATTI_JU_UUID;
@@ -31,7 +32,8 @@ LIBMATTI_JU_UUID LIBMATTI_JU_UUID_NameUUIDFromBytes(const uint8_t *bytes, size_t
 // Java: public static UUID randomUUID() - SecureRandom in Java; the port uses
 // the java/util Random port seeded from the time so callers stay deterministic.
 LIBMATTI_JU_UUID LIBMATTI_JU_UUID_RandomUUID(void);
-// The version-0 zero UUID (Java models it through the all-zero bit pattern).
+
+
 LIBMATTI_JU_UUID LIBMATTI_JU_UUID_Zero(void);
 
 // Java: public int version() - the 4-bit version field (bits 15..12 of mostSigBits)
@@ -60,4 +62,4 @@ bool LIBMATTI_JU_UUID_Equals(const LIBMATTI_JU_UUID *a, const LIBMATTI_JU_UUID *
 }
 #endif
 
-#endif //MATTICRAFT_JAVA_UTIL_UUID_H
+#endif

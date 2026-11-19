@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.loading.BackgroundWaiter.
+
+
 
 #include "libmatti/net/neoforged/fml/loading/BackgroundWaiter.h"
 
@@ -43,7 +44,7 @@ void LIBMATTI_FML_BackgroundWaiter_RunAndTick(LIBMATTI_FML_BackgroundWaiter_Task
     pthread_t handle;
     if (pthread_create(&handle, NULL, work_main, work) != 0)
     {
-        // Java: the executor could not accept the work
+// Java: the executor could not accept the work
         LIBMATTI_ML_Logger_Error(LOGGER(), NULL, "Failed to submit the background work");
         free(work);
         return;
@@ -56,7 +57,7 @@ void LIBMATTI_FML_BackgroundWaiter_RunAndTick(LIBMATTI_FML_BackgroundWaiter_Task
     }
     while (!atomic_load(&work->done));
 
-    // Java: runner.shutdown(); work.get();
+// Java: runner.shutdown(); work.get();
     pthread_join(handle, NULL);
     free(work);
 }

@@ -1,7 +1,8 @@
-// Port of net.neoforged.fml.util.ServiceLoaderUtil.
-// Java uses generics and reflection (Class<T>, Predicate<Class<? extends T>>,
-// protection domains). The C port keeps the same flow and takes those reflective
-// pieces as hooks the caller supplies.
+
+
+
+
+
 
 #ifndef MATTICRAFT_FML_UTIL_SERVICELOADERUTIL_H
 #define MATTICRAFT_FML_UTIL_SERVICELOADERUTIL_H
@@ -16,7 +17,7 @@ typedef struct
 {
     void *service;
     const char *serviceClassName;
-    // Java: additionalServices.contains(service)
+// Java: additionalServices.contains(service)
     int builtIn;
 } LIBMATTI_FML_Service;
 
@@ -26,16 +27,17 @@ typedef struct
     size_t count;
 } LIBMATTI_FML_ServiceList;
 
-// The reflective pieces of the Java implementation.
+
+
 typedef struct
 {
-    // Java: Predicate<Class<? extends T>> filter
+// Java: Predicate<Class<? extends T>> filter
     int (*filter)(const char *providerClassName);
-    // Java: IOrderedProvider.class.isAssignableFrom(serviceClass)
+// Java: IOrderedProvider.class.isAssignableFrom(serviceClass)
     int applyPriority;
-    // Java: ((IOrderedProvider) service).getPriority()
+// Java: ((IOrderedProvider) service).getPriority()
     int (*getPriority)(void *service);
-    // Java: p.get()
+// Java: p.get()
     void *(*instantiate)(const LIBMATTI_JU_ServiceLoader_Provider *provider);
 } LIBMATTI_FML_ServiceLoaderUtil_Hooks;
 
@@ -62,4 +64,4 @@ char *LIBMATTI_FML_ServiceLoaderUtil_IdentifySourcePath(const char *className, c
 
 void LIBMATTI_FML_ServiceLoaderUtil_FreeServiceList(LIBMATTI_FML_ServiceList *list);
 
-#endif //MATTICRAFT_FML_UTIL_SERVICELOADERUTIL_H
+#endif

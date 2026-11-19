@@ -1,4 +1,5 @@
-// Port of org.apache.maven.artifact.versioning.VersionRange.
+
+
 
 #include "libmatti/org/apache/maven/artifact/versioning/VersionRange.h"
 
@@ -16,7 +17,8 @@ static LIBMATTI_ML_Logger *LOGGER(void)
 // Java: throw new InvalidVersionSpecificationException(message)
 static void invalid_version_specification(const char *message, const char *spec)
 {
-    // the port aborts like the uncaught exception it would be
+
+
     LIBMATTI_ML_Logger_Error(LOGGER(), NULL, "InvalidVersionSpecificationException: {} ({})", message, spec);
     abort();
 }
@@ -195,7 +197,7 @@ LIBMATTI_MAVEN_VersionRange *LIBMATTI_MAVEN_VersionRange_CreateFromVersionSpec(c
         }
 
         version = LIBMATTI_MAVEN_ArtifactVersion_New(process);
-        // Java: restrictions.add(Restriction.EVERYTHING)
+// Java: restrictions.add(Restriction.EVERYTHING)
         restrictions_add(&restrictions, &restrictionCount,
                          (LIBMATTI_MAVEN_Restriction *)LIBMATTI_MAVEN_Restriction_Everything());
     }
@@ -213,11 +215,11 @@ LIBMATTI_MAVEN_VersionRange *LIBMATTI_MAVEN_VersionRange_CreateFromVersionSpec(c
 // Java: public static VersionRange createFromVersion(String version)
 LIBMATTI_MAVEN_VersionRange *LIBMATTI_MAVEN_VersionRange_CreateFromVersion(const char *version)
 {
-    // Java: if (DefaultArtifact.empty(version)) return null
+// Java: if (DefaultArtifact.empty(version)) return null
     if (version == NULL || version[0] == '\0') return NULL;
 
     LIBMATTI_MAVEN_VersionRange *range = calloc(1, sizeof(LIBMATTI_MAVEN_VersionRange));
-    // Java: Collections.emptyList()
+// Java: Collections.emptyList()
     range->restrictions = NULL;
     range->restrictionCount = 0;
     range->recommendedVersion = LIBMATTI_MAVEN_ArtifactVersion_New(version);
@@ -259,7 +261,7 @@ int LIBMATTI_MAVEN_VersionRange_HasRestrictions(const LIBMATTI_MAVEN_VersionRang
 // Java: public VersionRange cloneOf()
 LIBMATTI_MAVEN_VersionRange *LIBMATTI_MAVEN_VersionRange_CloneOf(const LIBMATTI_MAVEN_VersionRange *range)
 {
-    // Java: copies the list shell, the Restriction instances stay shared (VersionRange is immutable)
+// Java: copies the list shell, the Restriction instances stay shared (VersionRange is immutable)
     LIBMATTI_MAVEN_VersionRange *clone = calloc(1, sizeof(LIBMATTI_MAVEN_VersionRange));
     clone->recommendedVersion = range->recommendedVersion;
     clone->restrictionCount = range->restrictionCount;
@@ -281,7 +283,8 @@ LIBMATTI_MAVEN_ArtifactVersion *LIBMATTI_MAVEN_VersionRange_MatchVersion(
     for (size_t i = 0; i < versionCount; i++)
     {
         if (!LIBMATTI_MAVEN_VersionRange_ContainsVersion(range, versions[i])) continue;
-        // valid - check if it is greater than the currently matched version
+
+
         if (matched == NULL || LIBMATTI_MAVEN_ArtifactVersion_Compare(versions[i], matched) > 0)
             matched = versions[i];
     }
@@ -294,7 +297,7 @@ LIBMATTI_MAVEN_ArtifactVersion *LIBMATTI_MAVEN_VersionRange_GetSelectedVersion(
 {
     if (range->recommendedVersion != NULL) return range->recommendedVersion;
 
-    // Java: if (restrictions.isEmpty()) throw new OverConstrainedVersionException(...)
+// Java: if (restrictions.isEmpty()) throw new OverConstrainedVersionException(...)
     if (range->restrictionCount == 0)
     {
         LIBMATTI_ML_Logger_Error(LOGGER(), NULL, "OverConstrainedVersionException: The artifact has no valid ranges");
@@ -324,7 +327,7 @@ LIBMATTI_MAVEN_Restriction **LIBMATTI_MAVEN_VersionRange_Intersection(
     LIBMATTI_MAVEN_Restriction **restrictions = NULL;
     size_t count = 0;
 
-    // Java: both iterators are advanced before the loop (i1.next() / i2.next()); empty inputs end it
+// Java: both iterators are advanced before the loop (i1.next() / i2.next()); empty inputs end it
     if (r1Count == 0 || r2Count == 0)
     {
         *outCount = 0;
@@ -350,7 +353,8 @@ LIBMATTI_MAVEN_Restriction **LIBMATTI_MAVEN_VersionRange_Intersection(
                 int lowerInclusive;
                 int upperInclusive;
 
-                // overlaps
+
+
                 if (res1->lowerBound == NULL)
                 {
                     lower = res2->lowerBound;
@@ -411,7 +415,8 @@ LIBMATTI_MAVEN_Restriction **LIBMATTI_MAVEN_VersionRange_Intersection(
                     }
                 }
 
-                // don't add if they are equal and one is not inclusive
+
+
                 if (lower == NULL || upper == NULL ||
                     LIBMATTI_MAVEN_ArtifactVersion_Compare(lower, upper) != 0)
                 {
@@ -426,10 +431,11 @@ LIBMATTI_MAVEN_Restriction **LIBMATTI_MAVEN_VersionRange_Intersection(
                         (LIBMATTI_MAVEN_ArtifactVersion *) upper, upperInclusive));
                 }
 
-                // Java: if (upper == res2.getUpperBound()) - advance res2, else advance res1
+// Java: if (upper == res2.getUpperBound()) - advance res2, else advance res1
                 if (upper == res2->upperBound)
                 {
-                    // advance res2
+
+
                     if (i2 < r2Count)
                         res2 = r2[i2++];
                     else
@@ -437,7 +443,8 @@ LIBMATTI_MAVEN_Restriction **LIBMATTI_MAVEN_VersionRange_Intersection(
                 }
                 else
                 {
-                    // advance res1
+
+
                     if (i1 < r1Count)
                         res1 = r1[i1++];
                     else
@@ -446,7 +453,8 @@ LIBMATTI_MAVEN_Restriction **LIBMATTI_MAVEN_VersionRange_Intersection(
             }
             else
             {
-                // move on to next in r1
+
+
                 if (i1 < r1Count)
                     res1 = r1[i1++];
                 else
@@ -455,7 +463,8 @@ LIBMATTI_MAVEN_Restriction **LIBMATTI_MAVEN_VersionRange_Intersection(
         }
         else
         {
-            // move on to next in r2
+
+
             if (i2 < r2Count)
                 res2 = r2[i2++];
             else
@@ -478,13 +487,13 @@ LIBMATTI_MAVEN_VersionRange *LIBMATTI_MAVEN_VersionRange_Restrict(const LIBMATTI
 
     if (range->restrictionCount == 0 || restriction->restrictionCount == 0)
     {
-        // Java: Collections.emptyList()
+// Java: Collections.emptyList()
         restrictions = NULL;
         restrictionCount = 0;
     }
     else
     {
-        // Java: Collections.unmodifiableList(intersection(r1, r2))
+// Java: Collections.unmodifiableList(intersection(r1, r2))
         restrictions = LIBMATTI_MAVEN_VersionRange_Intersection(r1, range->restrictionCount, r2,
                                                                restriction->restrictionCount,
                                                                &restrictionCount);
@@ -499,28 +508,33 @@ LIBMATTI_MAVEN_VersionRange *LIBMATTI_MAVEN_VersionRange_Restrict(const LIBMATTI
             if (range->recommendedVersion != NULL &&
                 LIBMATTI_MAVEN_Restriction_ContainsVersion(r, range->recommendedVersion))
             {
-                // if we find the original, use that
+
+
                 version = range->recommendedVersion;
                 break;
             }
             else if (version == NULL && restriction->recommendedVersion != NULL &&
                      LIBMATTI_MAVEN_Restriction_ContainsVersion(r, restriction->recommendedVersion))
             {
-                // use this if we can, but prefer the original if possible
+
+
                 version = restriction->recommendedVersion;
             }
         }
     }
-    // Either the original or the specified version ranges have no restrictions
+
+
     else if (range->recommendedVersion != NULL)
     {
-        // Use the original recommended version since it exists
+
+
         version = range->recommendedVersion;
     }
     else if (restriction->recommendedVersion != NULL)
     {
-        // Use the recommended version from the specified VersionRange since there is no
-        // original recommended version
+
+
+
         version = restriction->recommendedVersion;
     }
 
@@ -558,7 +572,7 @@ int LIBMATTI_MAVEN_VersionRange_HashCode(const LIBMATTI_MAVEN_VersionRange *rang
 {
     int hash = 7;
     hash = 31 * hash + (range->recommendedVersion == NULL ? 0 : LIBMATTI_MAVEN_ArtifactVersion_HashCode(range->recommendedVersion));
-    // Java: restrictions.hashCode() - List hash over the elements
+// Java: restrictions.hashCode() - List hash over the elements
     hash = 31 * hash;
     for (size_t i = 0; i < range->restrictionCount; i++)
         hash = 31 * hash + LIBMATTI_MAVEN_Restriction_HashCode(range->restrictions[i]);
@@ -601,10 +615,10 @@ void LIBMATTI_MAVEN_VersionRange_Free(LIBMATTI_MAVEN_VersionRange *range)
     {
         LIBMATTI_MAVEN_Restriction *restriction = range->restrictions[i];
 
-        // Java: EVERYTHING is a shared constant and its bounds are null
+// Java: EVERYTHING is a shared constant and its bounds are null
         if (restriction != LIBMATTI_MAVEN_Restriction_Everything())
         {
-            // Java: a single version uses one ArtifactVersion for both bounds
+// Java: a single version uses one ArtifactVersion for both bounds
             if (restriction->lowerBound != restriction->upperBound)
                 LIBMATTI_MAVEN_ArtifactVersion_Free(restriction->upperBound);
             LIBMATTI_MAVEN_ArtifactVersion_Free(restriction->lowerBound);

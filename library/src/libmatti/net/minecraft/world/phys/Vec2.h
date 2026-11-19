@@ -1,6 +1,7 @@
-// Port of net.minecraft.world.phys.Vec2 (the 2-float vector KeyboardInput's
-// moveVector and the HUD math use). Java's immutability becomes value
-// semantics - the constructors return the struct by value.
+
+
+
+
 
 #ifndef MATTICRAFT_MC_WORLD_PHYS_VEC2_H
 #define MATTICRAFT_MC_WORLD_PHYS_VEC2_H
@@ -44,4 +45,4 @@ LIBMATTI_MC_Vec2 LIBMATTI_MC_Vec2_Negated(LIBMATTI_MC_Vec2 v);
 }
 #endif
 
-#endif //MATTICRAFT_MC_WORLD_PHYS_VEC2_H
+#endif

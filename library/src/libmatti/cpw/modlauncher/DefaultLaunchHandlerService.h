@@ -1,4 +1,5 @@
-// Port of cpw.mods.modlauncher.DefaultLaunchHandlerService.
+
+
 
 #ifndef MATTICRAFT_MODLAUNCHER_DEFAULTLAUNCHHANDLERSERVICE_H
 #define MATTICRAFT_MODLAUNCHER_DEFAULTLAUNCHHANDLERSERVICE_H
@@ -8,7 +9,7 @@
 // Java: public class DefaultLaunchHandlerService implements ILaunchHandlerService
 typedef struct
 {
-    // Java: implements ILaunchHandlerService
+// Java: implements ILaunchHandlerService
     LIBMATTI_MLA_ILaunchHandlerService base;
 } LIBMATTI_ML_DefaultLaunchHandlerService;
 
@@ -19,4 +20,4 @@ typedef struct
 LIBMATTI_ML_DefaultLaunchHandlerService *LIBMATTI_ML_DefaultLaunchHandlerService_New(void);
 void LIBMATTI_ML_DefaultLaunchHandlerService_Free(LIBMATTI_ML_DefaultLaunchHandlerService *service);
 
-#endif //MATTICRAFT_MODLAUNCHER_DEFAULTLAUNCHHANDLERSERVICE_H
+#endif

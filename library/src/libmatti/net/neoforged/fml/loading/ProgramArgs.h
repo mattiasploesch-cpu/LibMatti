@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.loading.ProgramArgs.
+
+
 
 #ifndef MATTICRAFT_FML_PROGRAMARGS_H
 #define MATTICRAFT_FML_PROGRAMARGS_H
@@ -33,4 +34,4 @@ void LIBMATTI_FML_ProgramArgs_PutLazy(LIBMATTI_FML_ProgramArgs *programArgs, con
 // Java: public String remove(String key) - the returned value is a new string the caller frees
 char *LIBMATTI_FML_ProgramArgs_Remove(LIBMATTI_FML_ProgramArgs *programArgs, const char *key);
 
-#endif //MATTICRAFT_FML_PROGRAMARGS_H
+#endif

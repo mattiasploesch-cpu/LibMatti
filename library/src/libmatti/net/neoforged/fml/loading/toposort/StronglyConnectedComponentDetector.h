@@ -1,5 +1,6 @@
-// Port of net.neoforged.fml.loading.toposort.StronglyConnectedComponentDetector.
-// Splits the graph into strongly connected components lazily with Tarjan's algorithm.
+
+
+
 
 #ifndef MATTICRAFT_FML_LOADING_TOPOSORT_STRONGLYCONNECTEDCOMPONENTDETECTOR_H
 #define MATTICRAFT_FML_LOADING_TOPOSORT_STRONGLYCONNECTEDCOMPONENTDETECTOR_H
@@ -13,7 +14,7 @@ typedef struct LIBMATTI_FML_StronglyConnectedComponentDetector LIBMATTI_FML_Stro
 struct LIBMATTI_FML_StronglyConnectedComponentDetector
 {
     LIBMATTI_FML_Graph *graph;
-    // Java: private Set<Set<T>> components - NULL until calculate() ran
+// Java: private Set<Set<T>> components - NULL until calculate() ran
     void ***components;
     size_t *componentSizes;
     size_t componentCount;
@@ -29,4 +30,4 @@ void ***LIBMATTI_FML_StronglyConnectedComponentDetector_GetComponents(
 
 void LIBMATTI_FML_StronglyConnectedComponentDetector_Free(LIBMATTI_FML_StronglyConnectedComponentDetector *detector);
 
-#endif //MATTICRAFT_FML_LOADING_TOPOSORT_STRONGLYCONNECTEDCOMPONENTDETECTOR_H
+#endif

@@ -2,8 +2,9 @@
 
 #include "libmatti/com/mojang/blaze3d/vertex/VertexFormatElement.h"
 
-// Java builds every format through VertexFormat.builder(); the port mirrors
-// each builder chain 1:1 and caches the singleton.
+
+
+
 #define DEFINE_FORMAT(name)                                                          \
     static LIBMATTI_B3D_VertexFormat *name##_instance = NULL;                        \
     const LIBMATTI_B3D_VertexFormat *LIBMATTI_B3D_DefaultVertexFormat_##name(void)   \

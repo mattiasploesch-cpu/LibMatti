@@ -1,10 +1,11 @@
-// Port of com.electronwill.nightconfig.core.file.FileWatcher.
-//
-// Java's implementation runs a WatchService thread per filesystem and a debounce
-// thread per watched file; the change handler fires after a calm period (any
-// modification resets the countdown). The port reproduces the observable behaviour
-// on one thread: an inotify watch per file, a poll loop with the service poll
-// timeout (200ms) and a per-file debounce countdown (500ms by default).
+
+
+
+
+
+
+
+
 
 #include "libmatti/com/electronwill/nightconfig/core/file/FileWatcher.h"
 
@@ -30,18 +31,18 @@ typedef struct WatchedFile
 {
     char *path;
     int watchDescriptor;
-    // Java: the handler runnable
+// Java: the handler runnable
     void (*changeHandler)(void *self, void *userdata);
     void *handlerSelf;
     void *handlerUserdata;
-    // Java: the debounce countdown; 0 = no pending event
+// Java: the debounce countdown; 0 = no pending event
     long long debounceRemainingMillis;
     struct WatchedFile *next;
 } WatchedFile;
 
 struct LIBMATTI_NC_FileWatcher
 {
-    // Java: private volatile boolean running = true
+// Java: private volatile boolean running = true
     int running;
     long long debounceMillis;
     int inotifyFd;
@@ -73,7 +74,7 @@ LIBMATTI_NC_FileWatcher_WatchingException *LIBMATTI_NC_FileWatcher_AddWatch(
 {
     if (watcher == NULL || !watcher->running) return NULL;
 
-    // Java: the file's parent directory must exist (WatchingException otherwise)
+// Java: the file's parent directory must exist (WatchingException otherwise)
     char *directory = strdup(file);
     char *slash = strrchr(directory, '/');
     if (slash != NULL)
@@ -93,7 +94,7 @@ LIBMATTI_NC_FileWatcher_WatchingException *LIBMATTI_NC_FileWatcher_AddWatch(
 
     pthread_mutex_lock(&watcher->lock);
 
-    // Java: Watches a file, if not already watched by this FileWatcher
+// Java: Watches a file, if not already watched by this FileWatcher
     WatchedFile *existing = find_file(watcher, file);
     if (existing != NULL)
     {
@@ -104,7 +105,7 @@ LIBMATTI_NC_FileWatcher_WatchingException *LIBMATTI_NC_FileWatcher_AddWatch(
         return NULL;
     }
 
-    // Java: WatchService.register(path) - the inotify watch on the file itself
+// Java: WatchService.register(path) - the inotify watch on the file itself
     int watchDescriptor = inotify_add_watch(watcher->inotifyFd, file, IN_MODIFY | IN_CREATE | IN_DELETE | IN_ATTRIB);
     if (watchDescriptor < 0)
     {
@@ -161,7 +162,7 @@ static void *watcher_thread(void *userdata)
     long long lastPoll = now_millis();
     while (watcher->running)
     {
-        // Java: WatchService.poll(servicePollTimeout) - the control channel timeout
+// Java: WatchService.poll(servicePollTimeout) - the control channel timeout
         struct pollfd fds = {.fd = watcher->inotifyFd, .events = POLLIN};
         int ready = poll(&fds, 1, SERVICE_POLL_TIMEOUT_MILLIS);
         long long now = now_millis();
@@ -177,14 +178,14 @@ static void *watcher_thread(void *userdata)
                 struct inotify_event *event = (struct inotify_event *) (buffer + offset);
                 offset += (ssize_t) (sizeof(struct inotify_event) + event->len);
 
-                // Java: any modification resets the countdown of the watched file
+// Java: any modification resets the countdown of the watched file
                 for (WatchedFile *file = watcher->files; file != NULL; file = file->next)
                     if (file->watchDescriptor == event->wd)
                         file->debounceRemainingMillis = watcher->debounceMillis;
             }
         }
 
-        // Java: the debounce thread fires the handler once the calm period expired
+// Java: the debounce thread fires the handler once the calm period expired
         for (WatchedFile *file = watcher->files; file != NULL; file = file->next)
         {
             if (file->debounceRemainingMillis <= 0) continue;
@@ -192,7 +193,7 @@ static void *watcher_thread(void *userdata)
             if (file->debounceRemainingMillis <= 0)
             {
                 file->debounceRemainingMillis = 0;
-                // Java: the handler runs on the watcher thread
+// Java: the handler runs on the watcher thread
                 if (file->changeHandler != NULL)
                     file->changeHandler(file->handlerSelf, file->handlerUserdata);
             }
@@ -216,7 +217,7 @@ LIBMATTI_NC_FileWatcher *LIBMATTI_NC_FileWatcher_NewWithDebounce(long long debou
     watcher->inotifyFd = inotify_init1(IN_NONBLOCK | IN_CLOEXEC);
     pthread_mutex_init(&watcher->lock, NULL);
 
-    // Java: the watcher thread starts with the instance (the thread group "watchers-<id>")
+// Java: the watcher thread starts with the instance (the thread group "watchers-<id>")
     if (watcher->inotifyFd >= 0)
         watcher->threadStarted = pthread_create(&watcher->thread, NULL, watcher_thread, watcher) == 0;
     return watcher;

@@ -1,5 +1,6 @@
-// Port of java.util.concurrent.locks.ReentrantLock (the fair=false case the
-// loader uses) built on pthread_mutex.
+
+
+
 
 #ifndef MATTICRAFT_JAVA_UTIL_CONCURRENT_REENTRANTLOCK_H
 #define MATTICRAFT_JAVA_UTIL_CONCURRENT_REENTRANTLOCK_H
@@ -9,9 +10,10 @@
 typedef struct LIBMATTI_JUC_ReentrantLock
 {
     pthread_mutex_t mutex;
-    pthread_t owner;   // Java: the exclusive owner thread
-    int locked;        // 0/1, guards reading owner
-    int holdCount;     // Java: the reentrancy count
+    pthread_t owner;// Java: the exclusive owner thread
+    int locked;
+
+    int holdCount;// Java: the reentrancy count
 } LIBMATTI_JUC_ReentrantLock;
 
 // Java: public ReentrantLock()
@@ -29,4 +31,4 @@ int LIBMATTI_JUC_ReentrantLock_GetHoldCount(const LIBMATTI_JUC_ReentrantLock *lo
 // Java: public boolean isHeldByCurrentThread()
 int LIBMATTI_JUC_ReentrantLock_IsHeldByCurrentThread(const LIBMATTI_JUC_ReentrantLock *lock);
 
-#endif //MATTICRAFT_JAVA_UTIL_CONCURRENT_REENTRANTLOCK_H
+#endif

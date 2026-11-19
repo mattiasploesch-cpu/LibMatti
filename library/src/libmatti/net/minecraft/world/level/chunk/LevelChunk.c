@@ -1,4 +1,5 @@
-// Port of net.minecraft.world.level.chunk.LevelChunk.
+
+
 
 #include "libmatti/net/minecraft/world/level/chunk/LevelChunk.h"
 
@@ -15,7 +16,7 @@
 LIBMATTI_MC_LevelChunk *LIBMATTI_MC_LevelChunk_New(struct LIBMATTI_MC_Level *level, const LIBMATTI_MC_ChunkPos *pos)
 {
     LIBMATTI_MC_LevelChunk *chunk = calloc(1, sizeof(LIBMATTI_MC_LevelChunk));
-    // Java: the ChunkAccess super constructor receives the level's height accessor
+// Java: the ChunkAccess super constructor receives the level's height accessor
     LIBMATTI_MC_LevelHeightAccessor heightAccessor = LIBMATTI_MC_Level_GetHeightAccessor(level);
     LIBMATTI_MC_ChunkAccess_Init(&chunk->base, pos, &heightAccessor, 0);
     chunk->level = level;
@@ -44,7 +45,7 @@ int LIBMATTI_MC_LevelChunk_GetMinY(const LIBMATTI_MC_LevelChunk *chunk)
 
 LIBMATTI_MC_BlockState *LIBMATTI_MC_LevelChunk_GetBlockState(const LIBMATTI_MC_LevelChunk *chunk, const LIBMATTI_MC_BlockPos *pos)
 {
-    // Java: the isDebug branch (barrier/debug layer) is game-port content
+// Java: the isDebug branch (barrier/debug layer) is game-port content
     int x = LIBMATTI_MC_Vec3i_GetX(&pos->base);
     int y = LIBMATTI_MC_Vec3i_GetY(&pos->base);
     int z = LIBMATTI_MC_Vec3i_GetZ(&pos->base);
@@ -54,7 +55,7 @@ LIBMATTI_MC_BlockState *LIBMATTI_MC_LevelChunk_GetBlockState(const LIBMATTI_MC_L
 LIBMATTI_MC_BlockState *LIBMATTI_MC_LevelChunk_SetBlockState(LIBMATTI_MC_LevelChunk *chunk, const LIBMATTI_MC_BlockPos *pos, LIBMATTI_MC_BlockState *state, int flags)
 {
     (void) flags;
-    // Java: LevelChunk.setBlockState - the section lookup, the section write, then
+// Java: LevelChunk.setBlockState - the section lookup, the section write, then
     // the heightmap updates over the four live heightmaps (the WG pair belongs to
     // worldgen only)
     int x = LIBMATTI_MC_Vec3i_GetX(&pos->base);
@@ -66,14 +67,14 @@ LIBMATTI_MC_BlockState *LIBMATTI_MC_LevelChunk_SetBlockState(LIBMATTI_MC_LevelCh
         return NULL;
 
     LIBMATTI_MC_LevelChunkSection *section = chunk->base.sections[index];
-    // Java: flag = section.hasOnlyAir(); if (flag && state.isAir()) return null;
+// Java: flag = section.hasOnlyAir(); if (flag && state.isAir()) return null;
     bool wasOnlyAir = LIBMATTI_MC_LevelChunkSection_HasOnlyAir(section);
     if (wasOnlyAir && state == LIBMATTI_MC_Block_DefaultBlockState(LIBMATTI_MC_VanillaBlocks_AIR()))
         return NULL;
 
     LIBMATTI_MC_BlockState *oldState = LIBMATTI_MC_LevelChunkSection_SetBlockState(section, x & 15, y & 15, z & 15, state);
 
-    // Java: the four heightmap updates (MOTION_BLOCKING, MOTION_BLOCKING_NO_LEAVES,
+// Java: the four heightmap updates (MOTION_BLOCKING, MOTION_BLOCKING_NO_LEAVES,
     // OCEAN_FLOOR, WORLD_SURFACE) - each runs even when not yet primed, exactly like
     // Java's heightmaps.get(...) after getOrCreateHeightmapUnprimed priming on demand
     static const LIBMATTI_MC_HeightmapTypes LIVE_TYPES[] = {
@@ -111,7 +112,7 @@ static bool state_has_block_entity(LIBMATTI_MC_BlockState *state)
 
 static LIBMATTI_MC_BlockEntity *create_block_entity(LIBMATTI_MC_LevelChunk *chunk, const LIBMATTI_MC_BlockPos *pos)
 {
-    // Java: private createBlockEntity - the state's EntityBlock.newBlockEntity
+// Java: private createBlockEntity - the state's EntityBlock.newBlockEntity
     LIBMATTI_MC_BlockState *state = LIBMATTI_MC_LevelChunk_GetBlockState(chunk, pos);
     if (state_has_block_entity(state))
     {
@@ -120,7 +121,8 @@ static LIBMATTI_MC_BlockEntity *create_block_entity(LIBMATTI_MC_LevelChunk *chun
         if (entity != NULL)
             return entity;
     }
-    // the vanilla fallback: the type whose validBlocks contain this block
+
+
     for (int i = 0; i < 49; i++)
     {
         const LIBMATTI_MC_BlockEntityType *type = LIBMATTI_MC_BlockEntityType_AccessIndex(i);
@@ -150,7 +152,7 @@ static LIBMATTI_MC_ChunkBlockEntityEntry *find_block_entity(LIBMATTI_MC_ChunkAcc
 LIBMATTI_MC_BlockEntity *LIBMATTI_MC_LevelChunk_GetBlockEntityWithCreation(LIBMATTI_MC_LevelChunk *chunk, const LIBMATTI_MC_BlockPos *pos,
                                                                            LIBMATTI_MC_LevelChunkEntityCreationType creationType)
 {
-    // Java: 1:1 - the live map, then the pending promote, then the immediate create
+// Java: 1:1 - the live map, then the pending promote, then the immediate create
     LIBMATTI_MC_ChunkAccess *base = &chunk->base;
     LIBMATTI_MC_ChunkBlockEntityEntry *entry = find_block_entity(base, pos);
     LIBMATTI_MC_BlockEntity *blockEntity = entry != NULL ? entry->blockEntity : NULL;
@@ -182,7 +184,7 @@ LIBMATTI_MC_BlockEntity *LIBMATTI_MC_LevelChunk_GetBlockEntityWithCreation(LIBMA
     }
     else if (LIBMATTI_MC_BlockEntity_IsRemoved(blockEntity))
     {
-        // Java: remove + null
+// Java: remove + null
         int64_t packed = LIBMATTI_MC_BlockPos_AsLong(pos);
         for (int i = 0; i < base->blockEntityCount; i++)
         {
@@ -201,7 +203,7 @@ LIBMATTI_MC_BlockEntity *LIBMATTI_MC_LevelChunk_GetBlockEntityWithCreation(LIBMA
 
 void LIBMATTI_MC_LevelChunk_SetBlockEntity(LIBMATTI_MC_LevelChunk *chunk, LIBMATTI_MC_BlockEntity *blockEntity)
 {
-    // Java: setBlockEntity - the hasBlockEntity check, the level wiring, the map put
+// Java: setBlockEntity - the hasBlockEntity check, the level wiring, the map put
     const LIBMATTI_MC_BlockPos *blockPos = LIBMATTI_MC_BlockEntity_GetBlockPos(blockEntity);
     LIBMATTI_MC_BlockState *state = LIBMATTI_MC_LevelChunk_GetBlockState(chunk, blockPos);
     if (!state_has_block_entity(state))
@@ -223,7 +225,7 @@ void LIBMATTI_MC_LevelChunk_SetBlockEntity(LIBMATTI_MC_LevelChunk *chunk, LIBMAT
     {
         if (base->blockEntities[i].packedPos == packed)
         {
-            // Java: the previous entry setRemoved when replaced
+// Java: the previous entry setRemoved when replaced
             if (base->blockEntities[i].blockEntity != blockEntity)
                 LIBMATTI_MC_BlockEntity_SetRemoved(base->blockEntities[i].blockEntity);
             base->blockEntities[i].blockEntity = blockEntity;
@@ -243,7 +245,7 @@ void LIBMATTI_MC_LevelChunk_SetBlockEntity(LIBMATTI_MC_LevelChunk *chunk, LIBMAT
 
 LIBMATTI_MC_BlockEntity *LIBMATTI_MC_LevelChunk_PromotePendingBlockEntity(LIBMATTI_MC_LevelChunk *chunk, const LIBMATTI_MC_BlockPos *pos, void *tag)
 {
-    // Java: promotePendingBlockEntity decodes the tag (type by id, loadWithComponents)
+// Java: promotePendingBlockEntity decodes the tag (type by id, loadWithComponents)
     // and registers the entity. The tag decode is game-port content; the port moves
     // the pending slot and creates the base entity for the position's state.
     LIBMATTI_MC_ChunkAccess *base = &chunk->base;
@@ -258,7 +260,7 @@ LIBMATTI_MC_BlockEntity *LIBMATTI_MC_LevelChunk_PromotePendingBlockEntity(LIBMAT
         return NULL;
 
     LIBMATTI_MC_LevelChunk_SetBlockEntity(chunk, blockEntity);
-    // Java: pendingBlockEntities.remove(pos)
+// Java: pendingBlockEntities.remove(pos)
     for (int i = 0; i < base->pendingBlockEntityCount; i++)
     {
         if (base->pendingBlockEntities[i].packedPos == packed)
@@ -285,7 +287,7 @@ void LIBMATTI_MC_LevelChunk_RemoveBlockEntity(LIBMATTI_MC_LevelChunk *chunk, con
             return;
         }
     }
-    // Java: removeBlockEntity also clears a pending entry
+// Java: removeBlockEntity also clears a pending entry
     for (int i = 0; i < base->pendingBlockEntityCount; i++)
     {
         if (base->pendingBlockEntities[i].packedPos == packed)
@@ -299,7 +301,7 @@ void LIBMATTI_MC_LevelChunk_RemoveBlockEntity(LIBMATTI_MC_LevelChunk *chunk, con
 
 bool LIBMATTI_MC_LevelChunk_IsInLevel(const LIBMATTI_MC_LevelChunk *chunk)
 {
-    // Java: this.loaded || this.level.isClientSide()
+// Java: this.loaded || this.level.isClientSide()
     return chunk->loaded || LIBMATTI_MC_Level_IsClientSide(chunk->level);
 }
 

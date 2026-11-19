@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.javafmlmod.FMLModContainer.
+
+
 
 #include "libmatti/net/neoforged/fml/javafmlmod/FMLModContainer.h"
 
@@ -45,13 +46,15 @@ static void fml_mod_container_on_event_failed(void *self, LIBMATTI_BUS_IEventBus
 // Java: throw new ModLoadingException(issue)
 static void throw_mod_loading_exception(LIBMATTI_FML_ModLoadingIssue *issue)
 {
-    // Java throws out of the caller and the load fails at the next throwIfErrors; the port records the
-    // issue instead, which is what ModLoader.throwIfErrors then finds.
+
+
+
     LIBMATTI_FML_ModLoader_AddLoadingIssue(issue);
 
     LIBMATTI_FML_ModLoadingException *exception = LIBMATTI_FML_ModLoadingException_New(issue);
     char *message = LIBMATTI_FML_ModLoadingException_GetMessage(exception);
-    // Java throws out of constructMod; the port records the issue and keeps the message for the log.
+
+
     LIBMATTI_ML_Logger_Error(LOGGER(), NULL, "{}", message);
     free(message);
     LIBMATTI_FML_ModLoadingException_Free(exception);
@@ -85,7 +88,8 @@ static const char *arg_name(LIBMATTI_FML_FMLModContainer_Arg arg)
 // Java: the entrypoints list in "Creating FMLModContainer instance for {} with entrypoints {}"
 static char *join_entrypoints(const char **entrypoints, size_t count)
 {
-    size_t length = 3; // "[ ]"
+    size_t length = 3;
+
     for (size_t i = 0; i < count; i++)
         length += strlen(entrypoints[i]) + 2;
 
@@ -127,14 +131,14 @@ LIBMATTI_FML_FMLModContainer *LIBMATTI_FML_FMLModContainer_New(
 
     container->base.constructMod = fml_mod_container_construct_mod;
     container->base.getEventBus = fml_mod_container_get_event_bus;
-    // Java: the subclass adds no fields ModContainer does not already release
+// Java: the subclass adds no fields ModContainer does not already release
     container->base.free = NULL;
 
     container->scanResults = modFileScanResults;
     container->eventBus = create_event_bus(container);
     container->layer = strdup(gameLayer != NULL ? gameLayer : "");
 
-    // Java: Class.forName(layer, entrypoint) - the port keeps the entrypoint names; the mod registers
+// Java: Class.forName(layer, entrypoint) - the port keeps the entrypoint names; the mod registers
     // its constructor with RegisterModClass
     container->entrypoints = calloc(entrypointCount > 0 ? entrypointCount : 1, sizeof(char *));
     container->entrypointCount = entrypointCount;
@@ -147,7 +151,7 @@ LIBMATTI_FML_FMLModContainer *LIBMATTI_FML_FMLModContainer_New(
                              LIBMATTI_NEOFORGESPI_IModInfo_GetModId(info), joined);
     free(joined);
 
-    // Java: Class.forName(layer, entrypoint) defines the mod's classes here; the port's mod code is the
+// Java: Class.forName(layer, entrypoint) defines the mod's classes here; the port's mod code is the
     // shared object of the mod file, so it is loaded here and its entry point is run by constructMod.
     LIBMATTI_NEOFORGESPI_IModFileInfo *owningFile = LIBMATTI_NEOFORGESPI_IModInfo_GetOwningFile(info);
     LIBMATTI_NEOFORGESPI_IModFile *modFile =
@@ -217,7 +221,7 @@ static void fml_mod_container_construct_mod(void *self)
 {
     LIBMATTI_FML_FMLModContainer *container = self;
 
-    // Java: Map<Class<?>, Object> allowedConstructorArgs
+// Java: Map<Class<?>, Object> allowedConstructorArgs
     LIBMATTI_FML_FMLModContainer_ConstructorArgs args = {
         .eventBus = container->eventBus,
         .modContainer = &container->base,
@@ -230,7 +234,7 @@ static void fml_mod_container_construct_mod(void *self)
         const char *entrypoint = container->entrypoints[i];
         LIBMATTI_FML_FMLModContainer_ModClass *modClass = find_mod_class(container, entrypoint);
 
-        // Java: Class.forName(layer, entrypoint) throws ClassNotFoundException
+// Java: Class.forName(layer, entrypoint) throws ClassNotFoundException
         if (modClass == NULL)
         {
             throw_mod_loading_exception(with_affected_mod(
@@ -239,7 +243,7 @@ static void fml_mod_container_construct_mod(void *self)
             continue;
         }
 
-        // Java: every parameter type must be one of the allowed arguments and occur once
+// Java: every parameter type must be one of the allowed arguments and occur once
         int invalid = 0;
         for (size_t j = 0; j < modClass->argCount; j++)
         {
@@ -274,14 +278,14 @@ static void fml_mod_container_construct_mod(void *self)
             continue;
         }
 
-        // Java: constructor.newInstance(constructorArgs)
+// Java: constructor.newInstance(constructorArgs)
         if (modClass->construct != NULL) modClass->construct(modClass->self, container, &args);
 
         LIBMATTI_ML_Logger_Trace(LOGGER(), &LIBMATTI_FML_Logging_LOADING, "Loaded mod instance {} of type {}",
                                  container->base.modId, modClass->className);
     }
 
-    // Java: constructor.newInstance(constructorArgs) - the port's mod instance is created by the mod
+// Java: constructor.newInstance(constructorArgs) - the port's mod instance is created by the mod
     // file's entry point.
     if (LIBMATTI_FML_ModLibrary_HasEntrypoint(container->library))
     {
@@ -291,7 +295,7 @@ static void fml_mod_container_construct_mod(void *self)
                                  LIBMATTI_FML_ModLibrary_EntrypointName(container->library));
     }
 
-    // Java: AutomaticEventSubscriber.inject(this, this.scanResults, layer)
+// Java: AutomaticEventSubscriber.inject(this, this.scanResults, layer)
     LIBMATTI_ML_Logger_Trace(LOGGER(), &LIBMATTI_FML_Logging_LOADING,
                              "Injecting Automatic event subscribers for {}", container->base.modId);
     LIBMATTI_FML_AutomaticEventSubscriber_Inject(&container->base, container->scanResults, container->layer);

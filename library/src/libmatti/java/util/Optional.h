@@ -1,5 +1,6 @@
-// Port of java.util.Optional<T>.
-// In the C port T is void* and "empty" means the value pointer is NULL.
+
+
+
 
 #ifndef MATTICRAFT_JAVA_UTIL_OPTIONAL_H
 #define MATTICRAFT_JAVA_UTIL_OPTIONAL_H
@@ -8,7 +9,8 @@
 
 typedef struct
 {
-    void *value; // NULL = empty
+    void *value;
+
 } LIBMATTI_JU_Optional;
 
 // Java: public static <T> Optional<T> empty()
@@ -29,4 +31,4 @@ void *LIBMATTI_JU_Optional_OrElse(const LIBMATTI_JU_Optional *optional, void *ot
 // Java: public T orElseGet(Supplier<? extends T> supplier)
 void *LIBMATTI_JU_Optional_OrElseGet(const LIBMATTI_JU_Optional *optional, void *(*supplier)(void *self), void *self);
 
-#endif //MATTICRAFT_JAVA_UTIL_OPTIONAL_H
+#endif

@@ -1,11 +1,12 @@
-// Port of org.lwjgl.stb.STBTruetype (implementation). Every function forwards to
-// the vendored stb_truetype.h; the mapping notes quote the LWJGL javadoc behaviour.
+
+
+
 
 #include "libmatti/org/lwjgl/stb/STBTruetype.h"
 
 int LIBMATTI_STBTT_InitFont(LIBMATTI_STBTT_Fontinfo *info, const unsigned char *data)
 {
-    // Java: stbtt_InitFont(info, buffer) resolves the first font in the file.
+// Java: stbtt_InitFont(info, buffer) resolves the first font in the file.
     return stbtt_InitFont(info, data, stbtt_GetFontOffsetForIndex(data, 0));
 }
 
@@ -39,9 +40,10 @@ void LIBMATTI_STBTT_PackSetSkipMissingCodepoints(LIBMATTI_STBTT_PackContext *con
 int LIBMATTI_STBTT_PackFontRanges(LIBMATTI_STBTT_PackContext *context, const unsigned char *data, int fontIndex,
                                   const LIBMATTI_STBTT_PackRange *ranges, int rangeCount)
 {
-    // The C pack range is layout-compatible with stbtt_pack_range (the port keeps
-    // the LWJGL field order); the cast mirrors LWJGL's native call. stb does not
-    // const-qualify the ranges (it writes the packed result back into them).
+
+
+
+
     return stbtt_PackFontRanges(context, data, fontIndex, (stbtt_pack_range *) ranges, rangeCount);
 }
 
@@ -49,8 +51,9 @@ void LIBMATTI_STBTT_GetPackedQuad(const LIBMATTI_STBTT_Packedchar *packedChars, 
                                   int charIndex, float *x, float *y, LIBMATTI_STBTT_AlignedQuad *quad,
                                   int alignToInteger)
 {
-    // stbtt_GetPackedQuad fills an stbtt_aligned_quad; copy into the port's struct
-    // (LWJGL returns the same six floats through the STBTTAlignedQuad buffer).
+
+
+
     stbtt_aligned_quad q;
     stbtt_GetPackedQuad(packedChars, texWidth, texHeight, charIndex, x, y, &q, alignToInteger);
     quad->x0 = q.x0;

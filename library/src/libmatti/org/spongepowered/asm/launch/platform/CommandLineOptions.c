@@ -1,4 +1,5 @@
-// Port of org.spongepowered.asm.launch.platform.CommandLineOptions.
+
+
 
 #include "libmatti/org/spongepowered/asm/launch/platform/CommandLineOptions.h"
 
@@ -30,12 +31,12 @@ static LIBMATTI_SP_CommandLineOptions *options_new(void)
 // Java: public static CommandLineOptions defaultArgs() { return CommandLineOptions.ofArgs(null); }
 LIBMATTI_SP_CommandLineOptions *LIBMATTI_SP_CommandLineOptions_DefaultArgs(void)
 {
-    // Java: String argv = System.getProperty("sun.java.command"); if (argv != null) args = argv.split(" ");
+// Java: String argv = System.getProperty("sun.java.command"); if (argv != null) args = argv.split(" ");
     LIBMATTI_SP_CommandLineOptions *options = options_new();
     const char *argv = LIBMATTI_JL_System_GetProperty("sun.java.command");
     if (argv != NULL)
     {
-        // Java: Arrays.asList(argv.split(" "))
+// Java: Arrays.asList(argv.split(" "))
         char *split = strdup(argv);
         const char **tokens = NULL;
         size_t tokenCount = 0;

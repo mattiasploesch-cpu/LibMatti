@@ -1,6 +1,7 @@
-// Math harness: checks the Mth table behaviour, the packed BlockPos long round trip,
-// the Vec3/BlockPos geometry, the Direction clockwise machinery, the ChunkPos packing
-// and the AABB clip ray-cast with the exact Java expectations.
+
+
+
+
 
 #include "libmatti/net/minecraft/core/BlockPos.h"
 #include "libmatti/net/minecraft/core/Direction.h"
@@ -28,7 +29,7 @@ static void check(int condition, const char *what)
 
 int main(void)
 {
-    // ------------------------------------------------------------------ Mth
+// ------------------------------------------------------------------ Mth
     // Java: sin/cos go through the 65536-entry table - close to the libm but not exact
     check(fabs(LIBMATTI_MC_Mth_Sin(0.0)) < 1e-4, "sin(0)");
     check(fabs(LIBMATTI_MC_Mth_Sin(M_PI / 2) - 1.0f) < 1e-4, "sin(pi/2)");
@@ -46,7 +47,7 @@ int main(void)
     check(LIBMATTI_MC_Mth_ClampedLerp(-0.5, 1.0, 2.0) == 1.0, "clampedLerp low");
     check(LIBMATTI_MC_Mth_ClampedLerp(1.5, 1.0, 2.0) == 2.0, "clampedLerp high");
     check(LIBMATTI_MC_Mth_SmallestEncompassingPowerOfTwo(17) == 32, "smallestEncompassingPowerOfTwo");
-    // Java: log2 = ceillog2 - (isPowerOfTwo ? 0 : 1) - 17 is not a power of two, so 4
+// Java: log2 = ceillog2 - (isPowerOfTwo ? 0 : 1) - 17 is not a power of two, so 4
     check(LIBMATTI_MC_Mth_Log2(16) == 4 && LIBMATTI_MC_Mth_Log2(17) == 4, "log2");
     check(LIBMATTI_MC_Mth_Sign(-3.5) == -1 && LIBMATTI_MC_Mth_Sign(0.0) == 0, "sign");
     check(LIBMATTI_MC_Mth_Quantize(25.0, 16) == 16, "quantize");
@@ -54,7 +55,8 @@ int main(void)
     check(LIBMATTI_MC_Mth_HsvToRgb(0.0f, 1.0f, 1.0f) == 0xFF0000, "hsvToRgb red");
     check(LIBMATTI_MC_Mth_HsvToRgb(120.0f / 360.0f, 1.0f, 1.0f) == 0x00FF00, "hsvToRgb green");
 
-    // ------------------------------------------------------------------ Direction
+
+
     check(LIBMATTI_MC_Direction_Get3DDataValue(LIBMATTI_MC_Direction_DOWN) == 0, "down data3d");
     check(LIBMATTI_MC_Direction_Get3DDataValue(LIBMATTI_MC_Direction_EAST) == 5, "east data3d");
     check(LIBMATTI_MC_Direction_Get2DDataValue(LIBMATTI_MC_Direction_SOUTH) == 0, "south data2d");
@@ -77,7 +79,8 @@ int main(void)
     check(LIBMATTI_MC_Direction_FromYRot(90.0) == LIBMATTI_MC_Direction_WEST, "fromYRot(90)");
     check(LIBMATTI_MC_Direction_ToYRot(LIBMATTI_MC_Direction_WEST) == 90.0f, "toYRot west");
 
-    // ------------------------------------------------------------------ Vec3
+
+
     LIBMATTI_MC_Vec3 *a = LIBMATTI_MC_Vec3_New(1.0, 2.0, 3.0);
     LIBMATTI_MC_Vec3 *b = LIBMATTI_MC_Vec3_New(4.0, 6.0, 3.0);
     LIBMATTI_MC_Vec3 *sum = LIBMATTI_MC_Vec3_Add(a, b);
@@ -99,7 +102,8 @@ int main(void)
     check(LIBMATTI_MC_Vec3_Get(LIBMATTI_MC_Vec3_New(1.0, 2.0, 3.0), LIBMATTI_MC_Direction_Axis_Y) == 2.0,
           "vec get axis");
 
-    // ------------------------------------------------------------------ BlockPos
+
+
     LIBMATTI_MC_BlockPos *pos = LIBMATTI_MC_BlockPos_New(123456, -700, -654321);
     int64_t packed = LIBMATTI_MC_BlockPos_AsLong(pos);
     check(LIBMATTI_MC_BlockPos_GetX((long) packed) == 123456, "packed x");
@@ -117,7 +121,8 @@ int main(void)
     LIBMATTI_MC_BlockPos_MutableMove(mutated, LIBMATTI_MC_Direction_EAST);
     check(mutated->base.x == 6 && mutated->base.y == 6 && mutated->base.z == 7, "mutable move east");
 
-    // ------------------------------------------------------------------ ChunkPos
+
+
     LIBMATTI_MC_ChunkPos *chunk = LIBMATTI_MC_ChunkPos_FromBlockPos(LIBMATTI_MC_BlockPos_New(35, 0, -17));
     check(chunk->x == 2 && chunk->z == -2, "chunk of block pos");
     int64_t chunkPacked = LIBMATTI_MC_ChunkPos_ToLong(chunk);
@@ -131,7 +136,8 @@ int main(void)
           "chunk region coords");
     check(LIBMATTI_MC_ChunkPos_Hash(0, 0) == LIBMATTI_MC_ChunkPos_Hash(0, 0), "chunk hash stable");
 
-    // ------------------------------------------------------------------ AABB
+
+
     LIBMATTI_MC_AABB *box = LIBMATTI_MC_AABB_New(0.0, 0.0, 0.0, 2.0, 1.0, 2.0);
     check(box->minX == 0.0 && box->maxX == 2.0, "aabb normalises min/max");
     LIBMATTI_MC_AABB *inflated = LIBMATTI_MC_AABB_Inflate(box, 1.0);
@@ -146,7 +152,7 @@ int main(void)
     check(fabs(LIBMATTI_MC_AABB_GetSize(box) - 5.0 / 3.0) < 1e-9, "aabb size");
     check(LIBMATTI_MC_AABB_DistanceToSqr(box, LIBMATTI_MC_Vec3_New(3.0, 0.5, 1.0)) == 1.0, "aabb distance");
 
-    // Java: the clip ray-cast - a ray through the box hits the west face
+// Java: the clip ray-cast - a ray through the box hits the west face
     int found = 0;
     LIBMATTI_MC_Vec3 *hit = LIBMATTI_MC_AABB_Clip(box, LIBMATTI_MC_Vec3_New(-1.0, 0.5, 1.0),
                                                   LIBMATTI_MC_Vec3_New(3.0, 0.5, 1.0), &found);

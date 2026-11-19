@@ -1,6 +1,7 @@
-// Port of com.electronwill.nightconfig.toml.ValueParser.
-// Java throws a ParsingException and returns Object; the port returns a LIBMATTI_NC_ValueResult
-// whose ok flag reports the failure instead.
+
+
+
+
 
 #ifndef MATTICRAFT_NC_TOML_VALUEPARSER_H
 #define MATTICRAFT_NC_TOML_VALUEPARSER_H
@@ -16,4 +17,4 @@ LIBMATTI_NC_ValueResult LIBMATTI_NC_ValueParser_ParseValue(LIBMATTI_NC_ReaderInp
                                                            LIBMATTI_NC_TomlParser *parser,
                                                            LIBMATTI_NC_Config *parentConfig);
 
-#endif //MATTICRAFT_NC_TOML_VALUEPARSER_H
+#endif

@@ -1,6 +1,7 @@
-// Port of net.neoforged.bus.EventBusErrorMessage.
-// Java implements org.apache.logging.log4j.message.Message / StringBuilderFormattable so log4j can
-// format the message lazily; the C logger takes a string, so the port returns formatTo's output.
+
+
+
+
 
 #ifndef MATTICRAFT_BUS_EVENTBUSERRORMESSAGE_H
 #define MATTICRAFT_BUS_EVENTBUSERRORMESSAGE_H
@@ -25,4 +26,4 @@ char *LIBMATTI_BUS_EventBusErrorMessage_FormatTo(const LIBMATTI_BUS_EventBusErro
 
 void LIBMATTI_BUS_EventBusErrorMessage_Free(LIBMATTI_BUS_EventBusErrorMessage *message);
 
-#endif //MATTICRAFT_BUS_EVENTBUSERRORMESSAGE_H
+#endif

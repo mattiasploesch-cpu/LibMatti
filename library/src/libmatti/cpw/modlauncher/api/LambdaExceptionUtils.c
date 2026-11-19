@@ -1,10 +1,12 @@
-// Port of cpw.mods.modlauncher.api.LambdaExceptionUtils.
+
+
 
 #include "LambdaExceptionUtils.h"
 
-// The Java wrappers build a new lambda that catches and rethrows unchecked.
-// C has no checked exceptions, so every wrapper hands back the callback it was
-// given; the call sites keep their own error contract.
+
+
+
+
 
 LIBMATTI_MLA_Consumer *LIBMATTI_MLA_LambdaExceptionUtils_RethrowConsumer(
     LIBMATTI_MLA_Consumer_WithExceptions *consumer)

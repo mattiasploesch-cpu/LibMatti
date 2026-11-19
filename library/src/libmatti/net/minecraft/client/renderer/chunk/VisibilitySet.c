@@ -1,9 +1,10 @@
-// Port of net.minecraft.client.renderer.chunk.VisibilitySet (implementation).
-//
-// Java packs one visibility bit per ordered direction pair into a long; the
-// bit index is (innerIndex(a) * 6 + innerIndex(b)) where innerIndex maps every
-// direction to 0..5 (Java's reserveIndex = ordinal - the Direction constants
-// are already 0..5 in the port).
+
+
+
+
+
+
+
 
 #include "libmatti/net/minecraft/client/renderer/chunk/VisibilitySet.h"
 
@@ -32,7 +33,7 @@ void LIBMATTI_MC_VisibilitySet_Add(LIBMATTI_MC_VisibilitySet *set, const LIBMATT
 {
     for (size_t i = 0; i < faceCount; i++)
     {
-        // Java: visibilityData |= 1L << getFaceIndex(reserve, reserve)
+// Java: visibilityData |= 1L << getFaceIndex(reserve, reserve)
         // Java adds the pair (d, d) per flooded edge face plus the mirror
         // pairs through the resolution below; the port sets both orders.
         LIBMATTI_MC_Direction face = faces[i];
@@ -45,13 +46,13 @@ void LIBMATTI_MC_VisibilitySet_Add(LIBMATTI_MC_VisibilitySet *set, const LIBMATT
 
 void LIBMATTI_MC_VisibilitySet_SetAll(LIBMATTI_MC_VisibilitySet *set, int visible)
 {
-    // Java: visibilityData = visible ? -1L : 0L
+// Java: visibilityData = visible ? -1L : 0L
     set->visibilityData = visible ? ~(uint64_t) 0 : 0;
 }
 
 void LIBMATTI_MC_VisibilitySet_SetDefault(LIBMATTI_MC_VisibilitySet *set)
 {
-    // Java: setAll(true) - every pair starts visible before the flood fill.
+// Java: setAll(true) - every pair starts visible before the flood fill.
     set->visibilityData = ~(uint64_t) 0;
 }
 
@@ -64,7 +65,7 @@ int LIBMATTI_MC_VisibilitySet_VisibilityBetweenFaces(const LIBMATTI_MC_Visibilit
 int LIBMATTI_MC_VisibilitySet_BetweenFaces(const LIBMATTI_MC_VisibilitySet *set,
                                            LIBMATTI_MC_Direction a, LIBMATTI_MC_Direction b)
 {
-    // Java: visibilityBetweenFaces(a, b) && visibilityBetweenFaces(b, a)
+// Java: visibilityBetweenFaces(a, b) && visibilityBetweenFaces(b, a)
     return LIBMATTI_MC_VisibilitySet_VisibilityBetweenFaces(set, a, b)
            && LIBMATTI_MC_VisibilitySet_VisibilityBetweenFaces(set, b, a);
 }

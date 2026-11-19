@@ -1,4 +1,5 @@
-// Port of net.minecraft.world.item.Rarity.
+
+
 
 #include "libmatti/net/minecraft/world/item/Rarity.h"
 
@@ -40,7 +41,7 @@ int LIBMATTI_MC_Rarity_Color(LIBMATTI_MC_Rarity rarity)
 
 LIBMATTI_MC_Rarity LIBMATTI_MC_Rarity_ById(int id)
 {
-    // Java: ByIdMap.continuous(..., OutOfBoundsStrategy.ZERO)
+// Java: ByIdMap.continuous(..., OutOfBoundsStrategy.ZERO)
     if (id < 0 || (size_t) id >= sizeof(VALUES) / sizeof(VALUES[0]))
         return VALUES[0];
     return VALUES[id];

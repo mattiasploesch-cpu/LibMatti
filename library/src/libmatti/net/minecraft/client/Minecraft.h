@@ -1,9 +1,10 @@
-// Port of net.minecraft.client.Minecraft (the game skeleton: window ownership,
-// the run loop, tick + render split, stop/shutdown). Everything behind the loop
-// (screens, entities, renderer internals) is the game port itself and stays out.
-//
-// Java fields the skeleton carries: window, deltaTracker, running/stopped,
-// frames, gameThread, launchedVersion/versionType, pause, noRender, smoothCam.
+
+
+
+
+
+
+
 
 #ifndef MATTICRAFT_NET_MINECRAFT_CLIENT_MINECRAFT_H
 #define MATTICRAFT_NET_MINECRAFT_CLIENT_MINECRAFT_H
@@ -56,4 +57,4 @@ int LIBMATTI_MC_Minecraft_GetFrames(const LIBMATTI_MC_Minecraft *minecraft);
 int LIBMATTI_MC_Minecraft_NoRender(const LIBMATTI_MC_Minecraft *minecraft);
 void LIBMATTI_MC_Minecraft_SetNoRender(LIBMATTI_MC_Minecraft *minecraft, int noRender);
 
-#endif //MATTICRAFT_NET_MINECRAFT_CLIENT_MINECRAFT_H
+#endif

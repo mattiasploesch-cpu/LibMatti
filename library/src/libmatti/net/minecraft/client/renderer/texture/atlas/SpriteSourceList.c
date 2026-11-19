@@ -18,8 +18,9 @@
 
 #define LOGGER() LIBMATTI_ML_LogManager_GetLogger()
 
-// The DirectoryLister needs a collected list of (namespace, path) resources
-// under a prefix - the ResourceOutput callback fills it.
+
+
+
 typedef struct LIBMATTI_MC_ListedResource
 {
     char *path;
@@ -100,7 +101,7 @@ static LIBMATTI_MC_SpriteSource *parse_source(const LIBMATTI_GSON_JsonElement *o
         LIBMATTI_GSON_JsonElement *pattern = LIBMATTI_GSON_JsonElement_GetMember(object, "pattern");
         if (pattern != NULL && LIBMATTI_GSON_JsonElement_IsJsonObject(pattern))
         {
-            // Java: IdentifierPattern CODEC - the namespace/path globs
+// Java: IdentifierPattern CODEC - the namespace/path globs
             LIBMATTI_GSON_JsonElement *ns = LIBMATTI_GSON_JsonElement_GetMember(pattern, "namespace");
             LIBMATTI_GSON_JsonElement *p = LIBMATTI_GSON_JsonElement_GetMember(pattern, "path");
             char *nsText = ns != NULL ? LIBMATTI_GSON_JsonElement_GetAsString(ns) : NULL;
@@ -127,11 +128,11 @@ LIBMATTI_MC_SpriteSource **LIBMATTI_MC_SpriteSourceList_Load(
     const LIBMATTI_MC_MultiPackResourceManager *resourceManager, const LIBMATTI_MC_Identifier *atlasId,
     size_t *outCount)
 {
-    // Java: ATLAS_INFO_CONVERTER.idToFile(atlasId) - "atlases/" + path + ".json"
+// Java: ATLAS_INFO_CONVERTER.idToFile(atlasId) - "atlases/" + path + ".json"
     char path[512];
     snprintf(path, sizeof(path), "atlases/%s.json", atlasId->path);
 
-    // Java: getResourceStack(identifier) looks the atlas definition up in every
+// Java: getResourceStack(identifier) looks the atlas definition up in every
     // namespace (the FileToIdConverter walks them all); the port merges the
     // per-namespace stacks in pack order like Java's getResourceStack does.
     size_t namespaceCount = 0;
@@ -156,8 +157,9 @@ LIBMATTI_MC_SpriteSource **LIBMATTI_MC_SpriteSourceList_Load(
 
         LIBMATTI_GSON_Gson *gson = LIBMATTI_GSON_Gson_New();
         LIBMATTI_GSON_JsonElement *root = LIBMATTI_GSON_Gson_FromJson(gson, (const char *) bytes, length);
-        // Resource_Open hands out the owning pointer (no copy) - the bytes
-        // stay with the resource (freed by Resource_Free below).
+
+
+
         if (root == NULL || !LIBMATTI_GSON_JsonElement_IsJsonObject(root))
         {
             LIBMATTI_GSON_JsonElement_Free(root);
@@ -218,7 +220,8 @@ typedef struct SpriteCollector
 
 static int identifier_matches_pattern(const LIBMATTI_MC_Identifier *identifier, const char *pattern)
 {
-    // The port's IdentifierPattern: "ns:path" with * wildcards per segment.
+
+
     const char *colon = strchr(pattern, ':');
     if (colon == NULL)
         return 1;
@@ -228,7 +231,7 @@ static int identifier_matches_pattern(const LIBMATTI_MC_Identifier *identifier, 
         return 0;
     if (strcmp(pathPattern, "*") == 0)
         return 1;
-    // Java: the path regex matches the whole path; the port keeps prefix/suffix globs
+// Java: the path regex matches the whole path; the port keeps prefix/suffix globs
     size_t patternLength = strlen(pathPattern);
     size_t pathLength = strlen(identifier->path);
     const char *star = strchr(pathPattern, '*');
@@ -253,7 +256,7 @@ static void collector_add(SpriteCollector *collector, LIBMATTI_MC_Identifier *sp
                  collector->entries[i].spriteId->path);
         if (strcmp(existing, key) == 0)
         {
-            // Java: the previous loader is discarded (closed)
+// Java: the previous loader is discarded (closed)
             LIBMATTI_MC_Resource_Free(collector->entries[i].resource);
             collector->entries[i].resource = resource;
             free(key);
@@ -287,14 +290,14 @@ LIBMATTI_MC_SpriteResourceEntry *LIBMATTI_MC_SpriteSourceList_Run(
         {
         case LIBMATTI_MC_SpriteSource_SINGLE_FILE:
         {
-            // Java: identifier = TEXTURE_ID_CONVERTER.idToFile(resourceId)
+// Java: identifier = TEXTURE_ID_CONVERTER.idToFile(resourceId)
             char path[512];
             snprintf(path, sizeof(path), "textures/%s.png", source->resourceId->path);
             LIBMATTI_MC_Resource *resource =
                 LIBMATTI_MC_MultiPackResourceManager_GetResource(resourceManager, source->resourceId->namespace, path);
             if (resource != NULL)
             {
-                // Java: spriteId.orElse(resourceId)
+// Java: spriteId.orElse(resourceId)
                 LIBMATTI_MC_Identifier *spriteId = source->spriteId != NULL
                                                        ? LIBMATTI_MC_Identifier_FromNamespaceAndPath(
                                                              source->spriteId->namespace, source->spriteId->path)
@@ -304,7 +307,7 @@ LIBMATTI_MC_SpriteResourceEntry *LIBMATTI_MC_SpriteSourceList_Run(
             }
             else
             {
-                // Java: LOGGER.warn("Missing sprite: {}", identifier)
+// Java: LOGGER.warn("Missing sprite: {}", identifier)
                 char message[600];
                 snprintf(message, sizeof(message), "Missing sprite: %s:%s", source->resourceId->namespace, path);
                 LIBMATTI_ML_Logger_Warn(LOGGER(), NULL, message);
@@ -313,14 +316,15 @@ LIBMATTI_MC_SpriteResourceEntry *LIBMATTI_MC_SpriteSourceList_Run(
         }
         case LIBMATTI_MC_SpriteSource_DIRECTORY_LISTER:
         {
-            // Java: FileToIdConverter("textures/" + sourcePath, ".png").listMatchingResources
+// Java: FileToIdConverter("textures/" + sourcePath, ".png").listMatchingResources
             // walks every namespace and fires for the .png files below the prefix.
             typedef struct DirCollector
             {
                 SpriteCollector *collector;
                 const LIBMATTI_MC_MultiPackResourceManager *resourceManager;
                 const char *idPrefix;
-                const char *dirPrefix; // "textures/<sourcePath>/"
+                const char *dirPrefix;
+
             } DirCollector;
 
             char dirPrefix[512];
@@ -330,11 +334,12 @@ LIBMATTI_MC_SpriteResourceEntry *LIBMATTI_MC_SpriteSourceList_Run(
 
             for (size_t ns = 0; ns < namespaceCount; ns++)
             {
-                // The callback collects the file list per namespace.
+
+
                 char searchPrefix[512];
                 snprintf(searchPrefix, sizeof(searchPrefix), "textures/%s", source->sourcePath);
 
-                // Java: listMatchingResources lists every resource under the
+// Java: listMatchingResources lists every resource under the
                 // prefix with the .png extension - the port filters in the callback.
                 size_t foundCount = 0;
                 char **paths = NULL;
@@ -342,7 +347,8 @@ LIBMATTI_MC_SpriteResourceEntry *LIBMATTI_MC_SpriteSourceList_Run(
                     (LIBMATTI_MC_ResourceOutput)(void (*)(void *, const char *, const char *, int, size_t)) NULL;
                 (void) onFile;
 
-                // The port lists through the manager and collects ns/path pairs.
+
+
                 LIBMATTI_MC_ListedResource *listed = NULL;
                 DirListContext context = {&listed, &foundCount, searchPrefix};
                 LIBMATTI_MC_MultiPackResourceManager_ListResources(resourceManager, searchPrefix, &context,
@@ -359,7 +365,7 @@ LIBMATTI_MC_SpriteResourceEntry *LIBMATTI_MC_SpriteSourceList_Run(
                         || strcmp(path + pathLength - 4, ".png") != 0)
                         continue;
 
-                    // Java: fileToId(location).withPrefix(idPrefix)
+// Java: fileToId(location).withPrefix(idPrefix)
                     char spritePath[512];
                     snprintf(spritePath, sizeof(spritePath), "%s%.*s", dirCollector.idPrefix,
                              (int) (pathLength - dirPrefixLength - 4), path + dirPrefixLength);
@@ -381,7 +387,7 @@ LIBMATTI_MC_SpriteResourceEntry *LIBMATTI_MC_SpriteSourceList_Run(
         }
         case LIBMATTI_MC_SpriteSource_SOURCE_FILTER:
         {
-            // Java: output.removeAll(this.filter.locationPredicate())
+// Java: output.removeAll(this.filter.locationPredicate())
             for (size_t e = 0; e < collector.count;)
             {
                 if (identifier_matches_pattern(collector.entries[e].spriteId, source->filterPattern))
@@ -402,9 +408,10 @@ LIBMATTI_MC_SpriteResourceEntry *LIBMATTI_MC_SpriteSourceList_Run(
         }
     }
 
-    // The DirectoryLister port above needs the resource-manager prefix listing;
-    // the simple case (no prefix listing available) yields nothing. The loader
-    // takes the entries as-is.
+
+
+
+
     (void) resourceManager;
 
     *outCount = collector.count;
@@ -431,14 +438,15 @@ LIBMATTI_MC_SpriteContents *LIBMATTI_MC_SpriteResourceLoader_LoadSprite(const LI
         return NULL;
 
     LIBMATTI_B3D_NativeImage *image = LIBMATTI_B3D_NativeImage_Read(bytes, length);
-    // Resource_Open hands out the owning pointer - the resource keeps it.
+
+
     if (image == NULL)
     {
-        // Java: LOGGER.error("Using missing texture, unable to load {}", ...); return null
+// Java: LOGGER.error("Using missing texture, unable to load {}", ...); return null
         return NULL;
     }
 
-    // Java: the animation metadata from the .mcmeta
+// Java: the animation metadata from the .mcmeta
     LIBMATTI_MC_AnimationMetadataSection *animation = NULL;
     size_t metadataLength = 0;
     const unsigned char *metadataBytes = LIBMATTI_MC_Resource_Metadata(resource, &metadataLength);
@@ -456,7 +464,7 @@ LIBMATTI_MC_SpriteContents *LIBMATTI_MC_SpriteResourceLoader_LoadSprite(const LI
         LIBMATTI_GSON_Gson_Free(gson);
     }
 
-    // Java: framesize = animation.isPresent() ? calculateFrameSize(...) : new FrameSize(w, h)
+// Java: framesize = animation.isPresent() ? calculateFrameSize(...) : new FrameSize(w, h)
     LIBMATTI_MC_FrameSize frameSize;
     if (animation != NULL)
         frameSize = LIBMATTI_MC_AnimationMetadataSection_CalculateFrameSize(animation, image->width, image->height);
@@ -466,7 +474,7 @@ LIBMATTI_MC_SpriteContents *LIBMATTI_MC_SpriteResourceLoader_LoadSprite(const LI
         frameSize.height = image->height;
     }
 
-    // Java: the multiple-of check errors out (close + null)
+// Java: the multiple-of check errors out (close + null)
     if (!LIBMATTI_MC_Mth_IsMultipleOf(image->width, frameSize.width)
         || !LIBMATTI_MC_Mth_IsMultipleOf(image->height, frameSize.height))
     {

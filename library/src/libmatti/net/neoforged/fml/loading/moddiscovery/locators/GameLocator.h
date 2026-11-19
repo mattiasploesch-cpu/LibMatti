@@ -1,5 +1,6 @@
-// Port of net.neoforged.fml.loading.moddiscovery.locators.GameLocator.
-// detectMinecraftVersion() parses version.json through the ported Gson.
+
+
+
 
 #ifndef MATTICRAFT_FML_LOADING_MODDISCOVERY_LOCATORS_GAMELOCATOR_H
 #define MATTICRAFT_FML_LOADING_MODDISCOVERY_LOCATORS_GAMELOCATOR_H
@@ -27,4 +28,4 @@ int LIBMATTI_FML_GameLocator_GetPriority(void *self);
 // Java: @Override public String toString() { return "game locator"; }
 char *LIBMATTI_FML_GameLocator_ToString(void *self);
 
-#endif //MATTICRAFT_FML_LOADING_MODDISCOVERY_LOCATORS_GAMELOCATOR_H
+#endif

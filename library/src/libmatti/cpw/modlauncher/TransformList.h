@@ -1,4 +1,5 @@
-// Port of cpw.mods.modlauncher.TransformList.
+
+
 
 #ifndef MATTICRAFT_MODLAUNCHER_TRANSFORMLIST_H
 #define MATTICRAFT_MODLAUNCHER_TRANSFORMLIST_H
@@ -20,7 +21,7 @@ typedef struct LIBMATTI_ML_TransformList
 {
     LIBMATTI_ML_TransformListEntry *entries;
     size_t count;
-    // Java: Class<T> nodeType
+// Java: Class<T> nodeType
     const char *nodeType;
 } LIBMATTI_ML_TransformList;
 
@@ -38,4 +39,4 @@ void LIBMATTI_ML_TransformList_AddTransformer(LIBMATTI_ML_TransformList *list,
 LIBMATTI_MLA_ITransformer **LIBMATTI_ML_TransformList_GetTransformersForLabel(
     LIBMATTI_ML_TransformList *list, LIBMATTI_ML_TransformTargetLabel *label, size_t *count);
 
-#endif //MATTICRAFT_MODLAUNCHER_TRANSFORMLIST_H
+#endif

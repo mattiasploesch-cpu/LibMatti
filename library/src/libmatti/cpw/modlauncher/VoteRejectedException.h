@@ -1,4 +1,5 @@
-// Port of cpw.mods.modlauncher.VoteRejectedException.
+
+
 
 #ifndef MATTICRAFT_MODLAUNCHER_VOTEREJECTEDEXCEPTION_H
 #define MATTICRAFT_MODLAUNCHER_VOTEREJECTEDEXCEPTION_H
@@ -15,4 +16,4 @@ typedef struct
     const char *nodeType;
 } LIBMATTI_ML_VoteRejectedException;
 
-#endif //MATTICRAFT_MODLAUNCHER_VOTEREJECTEDEXCEPTION_H
+#endif

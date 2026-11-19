@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.loading.ImmediateWindowHandler.
+
+
 
 #ifndef MATTICRAFT_FML_IMMEDIATEWINDOWHANDLER_H
 #define MATTICRAFT_FML_IMMEDIATEWINDOWHANDLER_H
@@ -32,4 +33,4 @@ void LIBMATTI_FML_ImmediateWindowHandler_DisplayFatalErrorAndExit(LIBMATTI_FML_M
                                                                   const char *modsFolder, const char *logFile,
                                                                   const char *crashReportFile);
 
-#endif //MATTICRAFT_FML_IMMEDIATEWINDOWHANDLER_H
+#endif

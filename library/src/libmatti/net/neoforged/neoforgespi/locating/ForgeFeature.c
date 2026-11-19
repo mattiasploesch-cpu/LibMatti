@@ -46,7 +46,7 @@ static int missingTest(void *self, void *value)
 int LIBMATTI_NEOFORGESPI_ForgeFeature_TestSideWithString(
     LIBMATTI_NEOFORGESPI_ForgeFeature_IFeatureTest *featureTest, LIBMATTI_DIST_Dist side, const char *value)
 {
-    // Java: return !applicableSides().isContained(side) || test(convertFromString(value));
+// Java: return !applicableSides().isContained(side) || test(convertFromString(value));
     if (!LIBMATTI_NEOFORGESPI_IModInfo_DependencySide_IsContained(featureTest->applicableSides(featureTest->self), side))
         return 1;
     return featureTest->test(featureTest->self, featureTest->convertFromString(featureTest->self, value));
@@ -58,7 +58,7 @@ static LIBMATTI_NEOFORGESPI_ForgeFeature_IFeatureTest *getFeatureTest(const char
         if (strcmp(features[i].name, featureName) == 0)
             return features[i].featureTest;
 
-    // Java: features.getOrDefault(bound.featureName(), MISSING)
+// Java: features.getOrDefault(bound.featureName(), MISSING)
     static LIBMATTI_NEOFORGESPI_ForgeFeature_IFeatureTest missing = {
         .self = NULL,
         .applicableSides = missingApplicableSides,
@@ -102,7 +102,8 @@ void *LIBMATTI_NEOFORGESPI_ForgeFeature_FeatureValue(const LIBMATTI_NEOFORGESPI_
     return (void *)getFeatureTest(bound->featureName)->featureValue(getFeatureTest(bound->featureName)->self);
 }
 
-// --- VersionFeatureTest -----------------------------------------------------
+
+
 
 typedef struct
 {
@@ -134,7 +135,7 @@ static int versionTest(void *self, void *value)
 static void *versionConvertFromString(void *self, const char *value)
 {
     (void) self;
-    // Java: the InvalidVersionSpecificationException becomes a RuntimeException through
+// Java: the InvalidVersionSpecificationException becomes a RuntimeException through
     //       MavenVersionAdapter; the port terminates with the stack trace like an uncaught throw.
     return LIBMATTI_NEOFORGESPI_MavenVersionAdapter_CreateFromVersionSpec(value);
 }
@@ -161,7 +162,8 @@ LIBMATTI_NEOFORGESPI_ForgeFeature_IFeatureTest *LIBMATTI_NEOFORGESPI_ForgeFeatur
     return LIBMATTI_NEOFORGESPI_ForgeFeature_VersionFeatureTest_New(side, version);
 }
 
-// --- BooleanFeatureTest -----------------------------------------------------
+
+
 
 typedef struct
 {

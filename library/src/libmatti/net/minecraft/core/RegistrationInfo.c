@@ -1,4 +1,5 @@
-// Port of net.minecraft.core.RegistrationInfo.
+
+
 
 #include "libmatti/net/minecraft/core/RegistrationInfo.h"
 

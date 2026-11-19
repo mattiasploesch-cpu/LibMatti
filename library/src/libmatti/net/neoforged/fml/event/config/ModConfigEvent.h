@@ -14,9 +14,9 @@ typedef struct LIBMATTI_FML_Event_Config_ModConfigEvent LIBMATTI_FML_Event_Confi
 
 struct LIBMATTI_FML_Event_Config_ModConfigEvent
 {
-    // Java: extends Event implements IModBusEvent
+// Java: extends Event implements IModBusEvent
     LIBMATTI_BUS_Event base;
-    // Java: private final ModConfig config
+// Java: private final ModConfig config
     LIBMATTI_FML_ModConfig *config;
 };
 
@@ -40,4 +40,4 @@ void LIBMATTI_FML_Event_Config_ModConfigEvent_Free(LIBMATTI_FML_Event_Config_Mod
 LIBMATTI_FML_ModConfig *LIBMATTI_FML_Event_Config_ModConfigEvent_GetConfig(
     const LIBMATTI_FML_Event_Config_ModConfigEvent *event);
 
-#endif //MATTICRAFT_FML_EVENT_CONFIG_MODCONFIGEVENT_H
+#endif

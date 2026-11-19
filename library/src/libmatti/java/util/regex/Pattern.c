@@ -4,41 +4,64 @@
 #include <stdlib.h>
 #include <string.h>
 
-// ---------------------------------------------------------------------------
-// Compiled node model: a sequence of nodes; alternation and groups are trees.
-// ---------------------------------------------------------------------------
+
+
+
+
 
 typedef enum
 {
-    NODE_CHAR,       // a single literal char
-    NODE_ANY,        // .
-    NODE_CLASS,      // [..]
-    NODE_DIGIT,      // \d
-    NODE_NOT_DIGIT,  // \D
-    NODE_WORD,       // \w
-    NODE_NOT_WORD,   // \W
-    NODE_SPACE,      // \s
-    NODE_NOT_SPACE,  // \S
-    NODE_GROUP,      // (...)
-    NODE_ALT,        // a|b
-    NODE_BOL,        // ^
-    NODE_EOL,        // $
-    NODE_EMPTY       // empty match
+    NODE_CHAR,
+
+    NODE_ANY,
+
+    NODE_CLASS,
+
+    NODE_DIGIT,
+
+    NODE_NOT_DIGIT,
+
+    NODE_WORD,
+
+    NODE_NOT_WORD,
+
+    NODE_SPACE,
+
+    NODE_NOT_SPACE,
+
+    NODE_GROUP,
+
+    NODE_ALT,
+
+    NODE_BOL,
+
+    NODE_EOL,
+
+    NODE_EMPTY
+
 } NodeKind;
 
 typedef struct Node Node;
 struct Node
 {
     NodeKind kind;
-    int ch;                 // NODE_CHAR
-    int negated;            // NODE_CLASS
-    unsigned char *bitmap;  // NODE_CLASS: 256-bit set
-    int caseInsensitive;    // NODE_CHAR / NODE_CLASS
-    Node **children;        // NODE_GROUP / NODE_ALT (alternatives are the children)
+    int ch;
+
+    int negated;
+
+    unsigned char *bitmap;
+
+    int caseInsensitive;
+
+    Node **children;
+
     size_t childCount;
-    // quantifier applied to this node
-    int min, max;           // -1 max = unbounded
-    Node *quantified;       // the node the quantifier wraps (used in ALT/GROUP wrappers)
+
+
+    int min, max;
+
+    Node *quantified;
+
 };
 
 struct LIBMATTI_JU_Pattern
@@ -54,16 +77,19 @@ struct LIBMATTI_JU_Matcher
     char *input;
     size_t inputLength;
     size_t position;
-    // match results: group 0 + capture groups
+
+
     long *starts;
     long *ends;
-    size_t groupCapacity; // groupCount + 1
+    size_t groupCapacity;
+
     int matched;
 };
 
-// ---------------------------------------------------------------------------
-// Parser
-// ---------------------------------------------------------------------------
+
+
+
+
 
 typedef struct
 {
@@ -144,7 +170,8 @@ static Node *parse_class(Parser *parser)
     Node *class = node_new(NODE_CLASS);
     class->caseInsensitive = (parser->flags & LIBMATTI_JU_REGEX_CASE_INSENSITIVE) != 0;
 
-    next(parser); // consume '['
+    next(parser);
+
     if (peek(parser) == '^')
     {
         class->negated = 1;
@@ -174,7 +201,7 @@ static Node *parse_class(Parser *parser)
             if (escaped == 'd' || escaped == 'D' || escaped == 'w' || escaped == 'W' ||
                 escaped == 's' || escaped == 'S')
             {
-                // Java: the predefined class is inlined into the set
+// Java: the predefined class is inlined into the set
                 for (int c = 0; c < 256; c++)
                 {
                     int match = escaped == 'd' ? isdigit(c)
@@ -200,7 +227,8 @@ static Node *parse_class(Parser *parser)
         if (peek(parser) == '-' && parser->regex[parser->position + 1] != ']' &&
             parser->regex[parser->position + 1] != '\0')
         {
-            next(parser); // '-'
+            next(parser);
+
             int to = next(parser);
             class_add_range(class, ch, to, class->caseInsensitive);
         }
@@ -216,7 +244,8 @@ static Node *parse_class(Parser *parser)
     }
 }
 
-// Parses a quantifier after an atom, wrapping the atom
+
+
 static Node *apply_quantifier(Parser *parser, Node *atom)
 {
     int ch = peek(parser);
@@ -240,7 +269,7 @@ static Node *apply_quantifier(Parser *parser, Node *atom)
     }
     else if (ch == '{')
     {
-        // Java: {n} {n,} {n,m}
+// Java: {n} {n,} {n,m}
         next(parser);
         int min = 0;
         while (isdigit(peek(parser)))
@@ -280,8 +309,10 @@ static Node *parse_atom(Parser *parser)
         int nonCapturing = 0;
         if (peek(parser) == '?' && parser->regex[parser->position + 1] == ':')
         {
-            next(parser); // '?'
-            next(parser); // ':'
+            next(parser);
+
+            next(parser);
+
             nonCapturing = 1;
         }
         Node *group = node_new(NODE_GROUP);
@@ -291,11 +322,12 @@ static Node *parse_atom(Parser *parser)
             parser->error = "Unclosed group";
             return group;
         }
-        next(parser); // ')'
+        next(parser);
+
 
         if (nonCapturing)
         {
-            // Java: a non-capturing group is transparent
+// Java: a non-capturing group is transparent
             alternative->min = group->min;
             alternative->max = group->max;
             free(group);
@@ -320,7 +352,8 @@ static Node *parse_atom(Parser *parser)
         {
             node->caseInsensitive = (parser->flags & LIBMATTI_JU_REGEX_CASE_INSENSITIVE) != 0;
             if (node->caseInsensitive && node->ch >= 'a' && node->ch <= 'z')
-                node->ch -= 32; // normalized to upper, match folds both
+                node->ch -= 32;
+
         }
         return apply_quantifier(parser, node);
     }
@@ -352,10 +385,12 @@ static Node *parse_atom(Parser *parser)
     return apply_quantifier(parser, node);
 }
 
-// A sequence is a chain: nodes are linked as nested "rest" through a wrapper
+
+
 static Node *parse_sequence(Parser *parser)
 {
-    Node *sequence = node_new(NODE_GROUP); // an unnamed group as plain container
+    Node *sequence = node_new(NODE_GROUP);
+
     size_t capacity = 8;
     sequence->children = malloc(sizeof(Node *) * capacity);
     sequence->childCount = 0;
@@ -398,9 +433,10 @@ static Node *parse_alternation(Parser *parser)
     return alt;
 }
 
-// ---------------------------------------------------------------------------
-// Backtracking matcher
-// ---------------------------------------------------------------------------
+
+
+
+
 
 static int match_node(Node *node, size_t *position, LIBMATTI_JU_Matcher *matcher, size_t *groupStarts, size_t *groupEnds);
 
@@ -440,7 +476,8 @@ static int kind_matches(NodeKind kind, int ch)
     }
 }
 
-// Matches a sequence of children (used by GROUP containers and ALT branches)
+
+
 static int match_children(Node **children, size_t childCount, size_t index, size_t *position,
                           LIBMATTI_JU_Matcher *matcher, size_t *groupStarts, size_t *groupEnds)
 {
@@ -449,7 +486,8 @@ static int match_children(Node **children, size_t childCount, size_t index, size
 
     Node *child = children[index];
 
-    // Quantifier handling: the child's min/max wrap the child itself
+
+
     int count = 0;
     size_t rollback = *position;
     size_t lastStart = (size_t) -1;
@@ -460,7 +498,8 @@ static int match_children(Node **children, size_t childCount, size_t index, size
             break;
         if (*position == before)
         {
-            // zero-width match: no progress, stop looping
+
+
             count++;
             break;
         }
@@ -473,16 +512,18 @@ static int match_children(Node **children, size_t childCount, size_t index, size
         return 0;
     }
 
-    // The extra repetitions are re-matched greedily in reverse order by
-    // backtracking: undo repetitions until the rest matches.
+
+
+
     while (1)
     {
         if (match_children(children, childCount, index + 1, position, matcher, groupStarts, groupEnds))
             return 1;
         if (count <= child->min)
             break;
-        // Backtrack one repetition: the greedy loop cannot re-parse the input
-        // backwards, so fail here (the port keeps the simple greedy semantics).
+
+
+
         break;
     }
     *position = rollback;
@@ -499,7 +540,8 @@ static int match_node(Node *node, size_t *position, LIBMATTI_JU_Matcher *matcher
             {
                 if (*position == 0)
                     return 1;
-                // MULTILINE: after a line terminator
+
+
                 if ((matcher != NULL) && (matcher->pattern && matcher->pattern->root && 0))
                     return 1;
             }
@@ -523,7 +565,8 @@ static int match_node(Node *node, size_t *position, LIBMATTI_JU_Matcher *matcher
                 return 0;
             if (!(0) && 1)
             {
-                // DOTALL not set: '.' does not match line terminators
+
+
             }
             int ch = (unsigned char) matcher->input[*position];
             if (ch == '\n' || ch == '\r')
@@ -574,8 +617,9 @@ static int match_node(Node *node, size_t *position, LIBMATTI_JU_Matcher *matcher
     return 0;
 }
 
-// The quantifier loop lives in match_children; the top-level entry matches
-// the root (ALT) and requires the full requested span.
+
+
+
 static int match_at(const LIBMATTI_JU_Matcher *matcher, size_t start, int requireEnd,
                     size_t *groupStarts, size_t *groupEnds)
 {
@@ -599,9 +643,10 @@ static int match_at(const LIBMATTI_JU_Matcher *matcher, size_t start, int requir
     return 0;
 }
 
-// ---------------------------------------------------------------------------
-// Public API
-// ---------------------------------------------------------------------------
+
+
+
+
 
 LIBMATTI_JU_Pattern *LIBMATTI_JU_Pattern_CompileWithFlags(const char *regex, int flags)
 {
@@ -624,7 +669,7 @@ void LIBMATTI_JU_Pattern_Free(LIBMATTI_JU_Pattern *pattern)
     if (pattern == NULL)
         return;
     free(pattern->regex);
-    // Java: the compiled nodes are GC'd; the port leaks the tree by design
+// Java: the compiled nodes are GC'd; the port leaks the tree by design
     // (patterns live for the process lifetime like the Java static fields)
     free(pattern);
 }
@@ -779,7 +824,7 @@ void LIBMATTI_JU_Matcher_Reset(LIBMATTI_JU_Matcher *matcher)
 
 char *LIBMATTI_JU_Pattern_Quote(const char *s)
 {
-    // Java: "\\Q" + s + "\\E"
+// Java: "\\Q" + s + "\\E"
     size_t length = strlen(s);
     char *result = malloc(length + 5);
     memcpy(result, "\\Q", 2);
@@ -801,7 +846,7 @@ char **LIBMATTI_JU_Pattern_Split(const LIBMATTI_JU_Pattern *pattern, const char 
         long start = LIBMATTI_JU_Matcher_Start(matcher);
         long end = LIBMATTI_JU_Matcher_End(matcher);
         if (start == end && start == (long) last)
-            continue; // Java: a zero-width match at the split point adds nothing
+            continue;// Java: a zero-width match at the split point adds nothing
         if (partCount == capacity)
         {
             capacity *= 2;

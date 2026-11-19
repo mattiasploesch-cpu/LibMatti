@@ -1,7 +1,8 @@
-// The org.objectweb.asm.ClassReader/ClassWriter constant pool representation.
-// ASM keeps this internal; the C port exposes it so that ClassNode can carry the
-// pool it was parsed from and ClassWriter can re-use the pool indices (which
-// keeps raw, unparsed attributes valid).
+
+
+
+
+
 
 #ifndef MATTICRAFT_ASM_CONSTANTPOOL_H
 #define MATTICRAFT_ASM_CONSTANTPOOL_H
@@ -48,4 +49,4 @@ int LIBMATTI_ASM_ConstantPool_NewFloat(LIBMATTI_ASM_ConstantPool *pool, float va
 int LIBMATTI_ASM_ConstantPool_NewLong(LIBMATTI_ASM_ConstantPool *pool, long long value);
 int LIBMATTI_ASM_ConstantPool_NewDouble(LIBMATTI_ASM_ConstantPool *pool, double value);
 
-#endif //MATTICRAFT_ASM_CONSTANTPOOL_H
+#endif

@@ -1,6 +1,7 @@
-// Port of net.neoforged.fml.classloading.transformation.ClassTransformStatistics.
-// Java's ConcurrentHashMap/atomics map to plain arrays and counters: the ported launcher
-// transforms on one thread (the JVM-side map is per-processor bookkeeping).
+
+
+
+
 
 #ifndef MATTICRAFT_FML_CLASSLOADING_TRANSFORMATION_CLASSTRANSFORMSTATISTICS_H
 #define MATTICRAFT_FML_CLASSLOADING_TRANSFORMATION_CLASSTRANSFORMSTATISTICS_H
@@ -32,4 +33,4 @@ void LIBMATTI_FML_ClassTransformStatistics_CheckTransformationBehavior(void);
 // Java: public static synchronized String computeCrashReportEntry(ClassProcessorSet classProcessorSet); caller frees
 char *LIBMATTI_FML_ClassTransformStatistics_ComputeCrashReportEntry(const LIBMATTI_FML_ClassProcessorSet *set);
 
-#endif //MATTICRAFT_FML_CLASSLOADING_TRANSFORMATION_CLASSTRANSFORMSTATISTICS_H
+#endif

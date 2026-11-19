@@ -1,4 +1,5 @@
-// Port of org.spongepowered.asm.launch.MixinBootstrap.
+
+
 
 #include "libmatti/org/spongepowered/asm/launch/MixinBootstrap.h"
 
@@ -52,7 +53,7 @@ LIBMATTI_SP_MixinPlatformManager *LIBMATTI_SP_MixinBootstrap_GetPlatform(void)
 
     if (platform == NULL)
     {
-        // Java: Object globalPlatformManager = GlobalProperties.get(Keys.PLATFORM_MANAGER);
+// Java: Object globalPlatformManager = GlobalProperties.get(Keys.PLATFORM_MANAGER);
         LIBMATTI_SP_MixinPlatformManager *globalPlatformManager =
             LIBMATTI_SP_GlobalProperties_Get(LIBMATTI_SP_GlobalProperties_Keys_PLATFORM_MANAGER());
         if (globalPlatformManager != NULL)
@@ -61,7 +62,7 @@ LIBMATTI_SP_MixinPlatformManager *LIBMATTI_SP_MixinBootstrap_GetPlatform(void)
         }
         else
         {
-            // Java: platform = new MixinPlatformManager(); GlobalProperties.put(...);
+// Java: platform = new MixinPlatformManager(); GlobalProperties.put(...);
             //       platform.init();
             platform = LIBMATTI_SP_MixinPlatformManager_New();
             LIBMATTI_SP_GlobalProperties_Put(LIBMATTI_SP_GlobalProperties_Keys_PLATFORM_MANAGER(), platform);
@@ -80,7 +81,7 @@ static int is_subsystem_registered(void)
 // Java: private static boolean checkSubsystemVersion()
 static int check_subsystem_version(void)
 {
-    // Java: MixinBootstrap.VERSION.equals(MixinBootstrap.getActiveSubsystemVersion());
+// Java: MixinBootstrap.VERSION.equals(MixinBootstrap.getActiveSubsystemVersion());
     const char *active = LIBMATTI_SP_GlobalProperties_GetString(LIBMATTI_SP_GlobalProperties_Keys_INIT(), "");
     return strcmp(LIBMATTI_SP_MixinBootstrap_VERSION, active) == 0;
 }
@@ -115,7 +116,7 @@ int LIBMATTI_SP_MixinBootstrap_Start(void)
     {
         if (!check_subsystem_version())
         {
-            // Java: throw new MixinInitialisationError("Mixin subsystem version " + active
+// Java: throw new MixinInitialisationError("Mixin subsystem version " + active
             //       + " was already initialised. Cannot bootstrap version " + VERSION);
             const char *active = LIBMATTI_SP_GlobalProperties_GetString(LIBMATTI_SP_GlobalProperties_Keys_INIT(), "");
             char *msg = malloc(strlen("Mixin subsystem version  was already initialised. Cannot bootstrap version 0.8.7")
@@ -124,7 +125,8 @@ int LIBMATTI_SP_MixinBootstrap_Start(void)
                     active, LIBMATTI_SP_MixinBootstrap_VERSION);
             LIBMATTI_SP_MixinInitialisationError *error = LIBMATTI_SP_MixinInitialisationError_New(msg);
             free(msg);
-            // The port surfaces the error through the launcher's error report instead of unwinding.
+
+
             LIBMATTI_SP_MixinInitialisationError_Free(error);
             return 0;
         }
@@ -139,7 +141,7 @@ int LIBMATTI_SP_MixinBootstrap_Start(void)
         initialised = 1;
 
         LIBMATTI_SP_IMixinService *service = LIBMATTI_SP_MixinService_GetService();
-        // Java: Phase initialPhase = MixinService.getService().getInitialPhase();
+// Java: Phase initialPhase = MixinService.getService().getInitialPhase();
         LIBMATTI_SP_MixinEnvironment_Phase initialPhaseValue =
             service != NULL && service->getInitialPhase != NULL
                 ? service->getInitialPhase(service->self)
@@ -182,17 +184,17 @@ void LIBMATTI_SP_MixinBootstrap_DoInit(LIBMATTI_SP_CommandLineOptions *args)
     {
         if (is_subsystem_registered())
         {
-            // Java: logger.warn("Multiple Mixin containers present, init suppressed for {}", VERSION);
+// Java: logger.warn("Multiple Mixin containers present, init suppressed for {}", VERSION);
             LIBMATTI_SP_ILogger_Warn(logger, "Multiple Mixin containers present, init suppressed for " LIBMATTI_SP_MixinBootstrap_VERSION);
             return;
         }
 
-        // Java: throw new IllegalStateException("MixinBootstrap.doInit() called before MixinBootstrap.start()");
+// Java: throw new IllegalStateException("MixinBootstrap.doInit() called before MixinBootstrap.start()");
         LIBMATTI_SP_ILogger_Error(logger, "MixinBootstrap.doInit() called before MixinBootstrap.start()");
         return;
     }
 
-    // Java: MixinBootstrap.getPlatform().getPhaseProviderClasses(); (registration is commented
+// Java: MixinBootstrap.getPlatform().getPhaseProviderClasses(); (registration is commented
     // out in the original)
     size_t phaseProviderCount = 0;
     char **phaseProviders =
@@ -203,7 +205,7 @@ void LIBMATTI_SP_MixinBootstrap_DoInit(LIBMATTI_SP_CommandLineOptions *args)
 
     if (initState)
     {
-        // Java: MixinBootstrap.getPlatform().prepare(args); MixinService.getService().init();
+// Java: MixinBootstrap.getPlatform().prepare(args); MixinService.getService().init();
         LIBMATTI_SP_MixinPlatformManager_Prepare(LIBMATTI_SP_MixinBootstrap_GetPlatform(), args);
         LIBMATTI_SP_IMixinService *service = LIBMATTI_SP_MixinService_GetService();
         if (service != NULL && service->init != NULL) service->init(service->self);

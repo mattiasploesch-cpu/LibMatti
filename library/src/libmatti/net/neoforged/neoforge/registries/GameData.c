@@ -1,4 +1,5 @@
-// Port of net.neoforged.neoforge.registries.GameData.
+
+
 
 #include "libmatti/net/neoforged/neoforge/registries/GameData.h"
 
@@ -41,11 +42,14 @@ void LIBMATTI_NEOFORGE_GameData_AddRootRegistry(const char *registryName)
 // Java: public static Set<Identifier> getRegistrationOrder()
 char **LIBMATTI_NEOFORGE_GameData_GetRegistrationOrder(size_t *count)
 {
-    // Java: Attributes first (Item and MobEffect depend on it at construction time)
+// Java: Attributes first (Item and MobEffect depend on it at construction time)
     static const char *VANILLA_FIRST[] = {
-        "minecraft:attribute",          // Registries.ATTRIBUTE
-        "minecraft:data_component_type", // Registries.DATA_COMPONENT_TYPE
-        "minecraft:particle_type",      // Registries.PARTICLE_TYPE
+        "minecraft:attribute",
+
+        "minecraft:data_component_type",
+
+        "minecraft:particle_type",
+
         NULL};
 
     char **ordered = NULL;
@@ -57,7 +61,7 @@ char **LIBMATTI_NEOFORGE_GameData_GetRegistrationOrder(size_t *count)
             add_name(&ordered, &orderedCount, VANILLA_FIRST[i]);
     }
 
-    // Java: BuiltInRegistries.getVanillaRegistrationOrder() - the remaining vanilla registries
+// Java: BuiltInRegistries.getVanillaRegistrationOrder() - the remaining vanilla registries
     for (size_t i = 0; i < rootRegistryCount; i++)
     {
         const char *name = rootRegistries[i];
@@ -70,7 +74,7 @@ char **LIBMATTI_NEOFORGE_GameData_GetRegistrationOrder(size_t *count)
             }
         if (alreadyAdded) continue;
 
-        // Java: modded registries come after the vanilla ones, alphabetically; the port sorts
+// Java: modded registries come after the vanilla ones, alphabetically; the port sorts
         // the whole remainder by name (minecraft: before every other namespace is the Java
         // compareNamespaced behaviour for the built-in set)
         add_name(&ordered, &orderedCount, name);
@@ -85,7 +89,7 @@ void LIBMATTI_NEOFORGE_GameData_UnfreezeData(void)
 {
     LIBMATTI_ML_Logger_Debug(LIBMATTI_ML_LogManager_GetLogger(), NULL, "Unfreezing registries");
     frozen = 0;
-    // Java: BuiltInRegistries.REGISTRY.stream().filter(r -> r instanceof BaseMappedRegistry)
+// Java: BuiltInRegistries.REGISTRY.stream().filter(r -> r instanceof BaseMappedRegistry)
     //       .forEach(r -> ((BaseMappedRegistry<?>) r).unfreeze(true)) - every built-in registry
     //       lifts its write guard
     size_t count = 0;
@@ -104,7 +108,7 @@ void LIBMATTI_NEOFORGE_GameData_UnfreezeData(void)
 void LIBMATTI_NEOFORGE_GameData_FreezeData(void)
 {
     LIBMATTI_ML_Logger_Debug(LIBMATTI_ML_LogManager_GetLogger(), NULL, "Freezing registries");
-    // Java: BuiltInRegistries.REGISTRY.stream().filter(r -> r instanceof MappedRegistry).forEach(r -> {
+// Java: BuiltInRegistries.REGISTRY.stream().filter(r -> r instanceof MappedRegistry).forEach(r -> {
     //       ((MappedRegistry<?>) r).bindAllTagsToEmpty(); ((MappedRegistry<?>) r).freeze(); })
     size_t count = 0;
     LIBMATTI_MC_ResourceKey **keys = LIBMATTI_MC_MappedRegistry_RegistryKeySet(
@@ -116,7 +120,7 @@ void LIBMATTI_NEOFORGE_GameData_FreezeData(void)
         if (entry != NULL)
             LIBMATTI_MC_MappedRegistry_Freeze(entry);
     }
-    // Java: RegistryManager.takeFrozenSnapshot() - the snapshot registry model is the game port's
+// Java: RegistryManager.takeFrozenSnapshot() - the snapshot registry model is the game port's
     //       part
     LIBMATTI_ML_Logger_Debug(LIBMATTI_ML_LogManager_GetLogger(), NULL, "All registries frozen");
     frozen = 1;
@@ -130,12 +134,12 @@ void LIBMATTI_NEOFORGE_GameData_PostRegisterEvents(void)
 
     for (size_t i = 0; i < orderedCount; i++)
     {
-        // Java: StartupNotificationManager.modLoaderMessage("REGISTERING " + registryKey.identifier())
+// Java: StartupNotificationManager.modLoaderMessage("REGISTERING " + registryKey.identifier())
         char message[256];
         snprintf(message, sizeof(message), "REGISTERING %s", ordered[i]);
         LIBMATTI_FML_StartupNotificationManager_ModLoaderMessage(message);
 
-        // Java: the events get the real registry object - look it up in BuiltInRegistries.REGISTRY
+// Java: the events get the real registry object - look it up in BuiltInRegistries.REGISTRY
         LIBMATTI_MC_Identifier *location = LIBMATTI_MC_Identifier_Parse(ordered[i]);
         LIBMATTI_MC_MappedRegistry *registry =
             LIBMATTI_MC_MappedRegistry_GetValue(LIBMATTI_MC_BuiltInRegistries_Registry(), location);

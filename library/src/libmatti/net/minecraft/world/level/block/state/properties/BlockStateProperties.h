@@ -170,4 +170,4 @@ const LIBMATTI_MC_Property *LIBMATTI_MC_BlockStateProperties_COPPER_GOLEM_POSE(v
 }
 #endif
 
-#endif //MATTICRAFT_MC_BLOCKSTATE_BLOCKSTATEPROPERTIES_H
+#endif

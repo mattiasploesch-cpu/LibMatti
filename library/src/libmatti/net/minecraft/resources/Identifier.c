@@ -1,4 +1,5 @@
-// Port of net.minecraft.resources.Identifier.
+
+
 
 #include "libmatti/net/minecraft/resources/Identifier.h"
 

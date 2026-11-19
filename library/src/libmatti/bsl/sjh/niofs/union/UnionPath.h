@@ -1,7 +1,8 @@
-//
-// Created by administrator on 09.09.26.
-//
-// Port of cpw.mods.niofs.union.UnionPath (java.nio.file.Path).
+
+
+
+
+
 
 #ifndef MATTICRAFT_UNIONPATH_H
 #define MATTICRAFT_UNIONPATH_H
@@ -17,9 +18,10 @@ typedef struct LIBMATTI_UNION_UnionPath
 {
     LIBMATTI_UNION_UnionFileSystem *fileSystem;
     int absolute;
-    char **pathParts; // String[] pathParts
+    char **pathParts;
+
     size_t partCount;
-    struct LIBMATTI_UNION_UnionPath *normalized; // cache, computed once (Java: field)
+    struct LIBMATTI_UNION_UnionPath *normalized;// cache, computed once (Java: field)
 } LIBMATTI_UNION_UnionPath;
 
 // Java: UnionPath(UnionFileSystem, String... pathParts) - splits/joins like Java
@@ -48,4 +50,4 @@ int LIBMATTI_UNION_UnionPath_Equals(const LIBMATTI_UNION_UnionPath *path, const 
 // Java: toUri() - "union:" + key + "!" + absolute path
 LIBMATTI_JN_URI *LIBMATTI_UNION_UnionPath_ToUri(const LIBMATTI_UNION_UnionPath *path);
 
-#endif //MATTICRAFT_UNIONPATH_H
+#endif

@@ -1,4 +1,5 @@
-// Port of net.minecraft.world.item.ToolMaterial.
+
+
 
 #ifndef MATTICRAFT_MC_WORLD_ITEM_TOOLMATERIAL_H
 #define MATTICRAFT_MC_WORLD_ITEM_TOOLMATERIAL_H
@@ -41,4 +42,4 @@ void LIBMATTI_MC_ToolMaterial_ApplyCommonProperties(const LIBMATTI_MC_ToolMateri
 }
 #endif
 
-#endif //MATTICRAFT_MC_WORLD_ITEM_TOOLMATERIAL_H
+#endif

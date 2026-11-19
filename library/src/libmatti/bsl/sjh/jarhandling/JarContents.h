@@ -1,7 +1,8 @@
-//
-// Created by administrator on 09.09.26.
-//
-// Port of cpw.mods.jarhandling.JarContents.
+
+
+
+
+
 
 #ifndef MATTICRAFT_JARCONTENTS_H
 #define MATTICRAFT_JARCONTENTS_H
@@ -40,4 +41,4 @@ LIBMATTI_JH_Provider *LIBMATTI_JH_JarContents_GetMetaInfServices(const LIBMATTI_
 // Java: close()
 void LIBMATTI_JH_JarContents_Close(LIBMATTI_JH_JarContents *contents);
 
-#endif //MATTICRAFT_JARCONTENTS_H
+#endif

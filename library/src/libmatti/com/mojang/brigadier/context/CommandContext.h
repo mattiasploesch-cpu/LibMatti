@@ -1,4 +1,5 @@
-// Port of com.mojang.brigadier.context.CommandContextBuilder and CommandContext.
+
+
 
 #ifndef MATTICRAFT_BR_CONTEXT_COMMANDCONTEXT_H
 #define MATTICRAFT_BR_CONTEXT_COMMANDCONTEXT_H
@@ -17,21 +18,21 @@ struct LIBMATTI_BR_CommandContextBuilder
     LIBMATTI_BR_CommandDispatcher *dispatcher;
     const void *source;
     LIBMATTI_BR_CommandNode *rootNode;
-    // Java: private final Map<String, ParsedArgument<S, ?>> arguments (ordered)
+// Java: private final Map<String, ParsedArgument<S, ?>> arguments (ordered)
     char **argumentNames;
     LIBMATTI_BR_ParsedArgument **argumentValues;
     size_t argumentCount;
-    // Java: private final List<ParsedCommandNode<S>> nodes
+// Java: private final List<ParsedCommandNode<S>> nodes
     LIBMATTI_BR_ParsedCommandNode *nodes;
     size_t nodeCount;
-    // Java: private Command<S> command
+// Java: private Command<S> command
     LIBMATTI_BR_Command command;
     void *commandUserdata;
-    // Java: private CommandContextBuilder<S> child
+// Java: private CommandContextBuilder<S> child
     LIBMATTI_BR_CommandContextBuilder *child;
-    // Java: private StringRange range
+// Java: private StringRange range
     LIBMATTI_BR_StringRange range;
-    // Java: private RedirectModifier<S> modifier
+// Java: private RedirectModifier<S> modifier
     LIBMATTI_BR_RedirectModifier modifier;
     void *modifierUserdata;
     int forks;
@@ -58,8 +59,9 @@ LIBMATTI_BR_StringRange LIBMATTI_BR_CommandContextBuilder_GetRange(const LIBMATT
 // Java: public CommandContext<S> build(final String input) - the caller owns the result
 LIBMATTI_BR_CommandContext *LIBMATTI_BR_CommandContextBuilder_Build(const LIBMATTI_BR_CommandContextBuilder *self,
                                                                     const char *input);
-// The port's copies are deep (Java's copy() shares the argument map; the port's
-// parsed arguments move with the copy, so the original must not be freed after a copy).
+
+
+
 void LIBMATTI_BR_CommandContextBuilder_Free(LIBMATTI_BR_CommandContextBuilder *self);
 
 // ---------------------------------------------------------------------------
@@ -72,7 +74,7 @@ typedef struct LIBMATTI_BR_CommandContext
     char *input;
     LIBMATTI_BR_Command command;
     void *commandUserdata;
-    // Java: private final Map<String, ParsedArgument<S, ?>> arguments
+// Java: private final Map<String, ParsedArgument<S, ?>> arguments
     char **argumentNames;
     LIBMATTI_BR_ParsedArgument **argumentValues;
     size_t argumentCount;

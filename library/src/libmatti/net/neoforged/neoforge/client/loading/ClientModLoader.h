@@ -1,6 +1,7 @@
-// Port of net.neoforged.neoforge.client.loading.ClientModLoader.
-// The game calls begin() right after Bootstrap.validate(), finish() when the resource pack
-// repository is set up and completeModLoading() where Minecraft expects the reload runnable.
+
+
+
+
 
 #ifndef MATTICRAFT_NEOFORGE_CLIENT_LOADING_CLIENTMODLOADER_H
 #define MATTICRAFT_NEOFORGE_CLIENT_LOADING_CLIENTMODLOADER_H
@@ -26,4 +27,4 @@ void (*LIBMATTI_NEOFORGE_ClientModLoader_CompleteModLoading(void (*initialScreen
 // Java: static boolean isLoading()
 int LIBMATTI_NEOFORGE_ClientModLoader_IsLoading(void);
 
-#endif //MATTICRAFT_NEOFORGE_CLIENT_LOADING_CLIENTMODLOADER_H
+#endif

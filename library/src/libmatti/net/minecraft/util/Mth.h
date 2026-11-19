@@ -1,6 +1,7 @@
-// Port of net.minecraft.util.Mth (the math helpers the game uses everywhere).
-// The SIN lookup table, the asin/atan2 fast paths and every integer trick follow the
-// Java implementation exactly; the JOML/Quaternion parts stay org.joml's port.
+
+
+
+
 
 #ifndef MATTICRAFT_NET_MINECRAFT_UTIL_MTH_H
 #define MATTICRAFT_NET_MINECRAFT_UTIL_MTH_H
@@ -219,4 +220,4 @@ float LIBMATTI_MC_Mth_LengthSquared3F(float x, float y, float z);
 // Java: public static int quantize(double, int)
 int LIBMATTI_MC_Mth_Quantize(double value, int factor);
 
-#endif //MATTICRAFT_NET_MINECRAFT_UTIL_MTH_H
+#endif

@@ -1,4 +1,5 @@
-// Port of net.minecraft.world.item.ItemStack (the data part).
+
+
 
 #include "libmatti/net/minecraft/world/item/ItemStack.h"
 
@@ -12,7 +13,7 @@ LIBMATTI_MC_ItemStack *LIBMATTI_MC_ItemStack_Empty(void)
     static LIBMATTI_MC_ItemStack *empty;
     if (empty == NULL)
     {
-        // Java: private ItemStack(@Nullable Void) - item = null, components over DataComponentMap.EMPTY
+// Java: private ItemStack(@Nullable Void) - item = null, components over DataComponentMap.EMPTY
         empty = calloc(1, sizeof(LIBMATTI_MC_ItemStack));
         empty->components = LIBMATTI_MC_PatchedDataComponentMap_New(LIBMATTI_MC_DataComponentMap_Empty());
     }
@@ -26,7 +27,7 @@ LIBMATTI_MC_ItemStack *LIBMATTI_MC_ItemStack_New(LIBMATTI_MC_Item *item)
 
 LIBMATTI_MC_ItemStack *LIBMATTI_MC_ItemStack_NewWithCount(LIBMATTI_MC_Item *item, int count)
 {
-    // Java: new PatchedDataComponentMap(item.components())
+// Java: new PatchedDataComponentMap(item.components())
     return LIBMATTI_MC_ItemStack_NewWithComponents(item, count,
                                                    LIBMATTI_MC_PatchedDataComponentMap_New(LIBMATTI_MC_Item_GetComponents(item)));
 }
@@ -43,7 +44,7 @@ LIBMATTI_MC_ItemStack *LIBMATTI_MC_ItemStack_NewWithComponents(LIBMATTI_MC_Item 
 
 bool LIBMATTI_MC_ItemStack_IsEmpty(const LIBMATTI_MC_ItemStack *stack)
 {
-    // Java: this == EMPTY || this.item == null || this.count <= 0
+// Java: this == EMPTY || this.item == null || this.count <= 0
     return stack == NULL || stack == LIBMATTI_MC_ItemStack_Empty() || stack->item == NULL || stack->count <= 0;
 }
 
@@ -63,7 +64,7 @@ void LIBMATTI_MC_ItemStack_SetCount(LIBMATTI_MC_ItemStack *stack, int count)
 
 LIBMATTI_MC_Item *LIBMATTI_MC_ItemStack_GetItem(const LIBMATTI_MC_ItemStack *stack)
 {
-    // Java: this.isEmpty() ? Items.AIR : this.item
+// Java: this.isEmpty() ? Items.AIR : this.item
     if (LIBMATTI_MC_ItemStack_IsEmpty(stack))
         return LIBMATTI_MC_VanillaItems_AIR();
     return stack->item;
@@ -71,7 +72,7 @@ LIBMATTI_MC_Item *LIBMATTI_MC_ItemStack_GetItem(const LIBMATTI_MC_ItemStack *sta
 
 LIBMATTI_MC_DataComponentMap *LIBMATTI_MC_ItemStack_GetComponents(const LIBMATTI_MC_ItemStack *stack)
 {
-    // Java: (DataComponentMap)(!this.isEmpty() ? this.components : DataComponentMap.EMPTY)
+// Java: (DataComponentMap)(!this.isEmpty() ? this.components : DataComponentMap.EMPTY)
     // The patched map is cast to its interface in Java; the port exposes the same
     // (type, value) view over the live map through the prototype ordering.
     (void) stack;
@@ -80,7 +81,7 @@ LIBMATTI_MC_DataComponentMap *LIBMATTI_MC_ItemStack_GetComponents(const LIBMATTI
 
 LIBMATTI_MC_DataComponentPatch *LIBMATTI_MC_ItemStack_GetComponentsPatch(const LIBMATTI_MC_ItemStack *stack)
 {
-    // Java: !this.isEmpty() ? this.components.asPatch() : DataComponentPatch.EMPTY
+// Java: !this.isEmpty() ? this.components.asPatch() : DataComponentPatch.EMPTY
     if (LIBMATTI_MC_ItemStack_IsEmpty(stack))
         return LIBMATTI_MC_DataComponentPatch_Empty();
     return LIBMATTI_MC_PatchedDataComponentMap_AsPatch(stack->components);
@@ -128,7 +129,7 @@ bool LIBMATTI_MC_ItemStack_HasNonDefault(const LIBMATTI_MC_ItemStack *stack, con
 
 int LIBMATTI_MC_ItemStack_GetMaxStackSize(const LIBMATTI_MC_ItemStack *stack)
 {
-    // Java: this.getOrDefault(DataComponents.MAX_STACK_SIZE, 1)
+// Java: this.getOrDefault(DataComponents.MAX_STACK_SIZE, 1)
     static int one = 1;
     int *value = LIBMATTI_MC_ItemStack_GetOrDefault(stack, LIBMATTI_MC_DataComponents_MAX_STACK_SIZE(), &one);
     return *value;
@@ -136,27 +137,27 @@ int LIBMATTI_MC_ItemStack_GetMaxStackSize(const LIBMATTI_MC_ItemStack *stack)
 
 bool LIBMATTI_MC_ItemStack_IsStackable(const LIBMATTI_MC_ItemStack *stack)
 {
-    // Java: this.isStackable() -> getMaxStackSize() > 1 && (!this.isDamageableItem() || !this.isDamaged())
+// Java: this.isStackable() -> getMaxStackSize() > 1 && (!this.isDamageableItem() || !this.isDamaged())
     return LIBMATTI_MC_ItemStack_GetMaxStackSize(stack) > 1
            && (!LIBMATTI_MC_ItemStack_IsDamageableItem(stack) || !LIBMATTI_MC_ItemStack_IsDamaged(stack));
 }
 
 bool LIBMATTI_MC_ItemStack_IsDamageableItem(const LIBMATTI_MC_ItemStack *stack)
 {
-    // Java: this.has(DataComponents.MAX_DAMAGE) && this.getOrDefault(DataComponents.MAX_STACK_SIZE, 1) == 1
+// Java: this.has(DataComponents.MAX_DAMAGE) && this.getOrDefault(DataComponents.MAX_STACK_SIZE, 1) == 1
     return LIBMATTI_MC_ItemStack_Has(stack, LIBMATTI_MC_DataComponents_MAX_DAMAGE())
            && LIBMATTI_MC_ItemStack_GetMaxStackSize(stack) == 1;
 }
 
 bool LIBMATTI_MC_ItemStack_IsDamaged(const LIBMATTI_MC_ItemStack *stack)
 {
-    // Java: this.isDamageableItem() && this.getDamageValue() > 0
+// Java: this.isDamageableItem() && this.getDamageValue() > 0
     return LIBMATTI_MC_ItemStack_IsDamageableItem(stack) && LIBMATTI_MC_ItemStack_GetDamageValue(stack) > 0;
 }
 
 int LIBMATTI_MC_ItemStack_GetDamageValue(const LIBMATTI_MC_ItemStack *stack)
 {
-    // Java: this.getOrDefault(DataComponents.DAMAGE, 0)
+// Java: this.getOrDefault(DataComponents.DAMAGE, 0)
     static int zero = 0;
     int *value = LIBMATTI_MC_ItemStack_GetOrDefault(stack, LIBMATTI_MC_DataComponents_DAMAGE(), &zero);
     return *value;
@@ -164,7 +165,7 @@ int LIBMATTI_MC_ItemStack_GetDamageValue(const LIBMATTI_MC_ItemStack *stack)
 
 void LIBMATTI_MC_ItemStack_SetDamageValue(LIBMATTI_MC_ItemStack *stack, int damage)
 {
-    // Java: this.set(DataComponents.DAMAGE, p_41722_)
+// Java: this.set(DataComponents.DAMAGE, p_41722_)
     static int stored;
     stored = damage;
     LIBMATTI_MC_ItemStack_Set(stack, LIBMATTI_MC_DataComponents_DAMAGE(), &stored);
@@ -172,7 +173,7 @@ void LIBMATTI_MC_ItemStack_SetDamageValue(LIBMATTI_MC_ItemStack *stack, int dama
 
 int LIBMATTI_MC_ItemStack_GetMaxDamage(const LIBMATTI_MC_ItemStack *stack)
 {
-    // Java: this.getOrDefault(DataComponents.MAX_DAMAGE, 0)
+// Java: this.getOrDefault(DataComponents.MAX_DAMAGE, 0)
     static int zero = 0;
     int *value = LIBMATTI_MC_ItemStack_GetOrDefault(stack, LIBMATTI_MC_DataComponents_MAX_DAMAGE(), &zero);
     return *value;
@@ -180,7 +181,7 @@ int LIBMATTI_MC_ItemStack_GetMaxDamage(const LIBMATTI_MC_ItemStack *stack)
 
 LIBMATTI_MC_ItemStack *LIBMATTI_MC_ItemStack_Split(LIBMATTI_MC_ItemStack *stack, int amount)
 {
-    // Java: int i = Math.min(this.getCount(), Math.max(1, amount)); ItemStack itemstack =
+// Java: int i = Math.min(this.getCount(), Math.max(1, amount)); ItemStack itemstack =
     // this.copyWithCount(i); this.setCount(this.getCount() - i); return itemstack;
     int take = amount < 1 ? 1 : amount;
     if (take > LIBMATTI_MC_ItemStack_GetCount(stack))
@@ -194,7 +195,7 @@ LIBMATTI_MC_ItemStack *LIBMATTI_MC_ItemStack_Copy(const LIBMATTI_MC_ItemStack *s
 {
     if (LIBMATTI_MC_ItemStack_IsEmpty(stack))
         return LIBMATTI_MC_ItemStack_Empty();
-    // Java: new ItemStack(this.getItem(), this.count, this.components.copy()); itemstack.setPopTime(...)
+// Java: new ItemStack(this.getItem(), this.count, this.components.copy()); itemstack.setPopTime(...)
     LIBMATTI_MC_ItemStack *copy = LIBMATTI_MC_ItemStack_NewWithComponents(
             stack->item, stack->count, LIBMATTI_MC_PatchedDataComponentMap_Copy(stack->components));
     copy->popTime = stack->popTime;
@@ -205,7 +206,7 @@ LIBMATTI_MC_ItemStack *LIBMATTI_MC_ItemStack_CopyWithCount(const LIBMATTI_MC_Ite
 {
     if (LIBMATTI_MC_ItemStack_IsEmpty(stack))
         return LIBMATTI_MC_ItemStack_Empty();
-    // Java: ItemStack itemstack = this.copy(); itemstack.setCount(p_256354_); return itemstack;
+// Java: ItemStack itemstack = this.copy(); itemstack.setCount(p_256354_); return itemstack;
     LIBMATTI_MC_ItemStack *copy = LIBMATTI_MC_ItemStack_Copy(stack);
     LIBMATTI_MC_ItemStack_SetCount(copy, count);
     return copy;
@@ -213,13 +214,13 @@ LIBMATTI_MC_ItemStack *LIBMATTI_MC_ItemStack_CopyWithCount(const LIBMATTI_MC_Ite
 
 void LIBMATTI_MC_ItemStack_Grow(LIBMATTI_MC_ItemStack *stack, int amount)
 {
-    // Java: this.setCount(this.getCount() + p_41566_)
+// Java: this.setCount(this.getCount() + p_41566_)
     LIBMATTI_MC_ItemStack_SetCount(stack, LIBMATTI_MC_ItemStack_GetCount(stack) + amount);
 }
 
 void LIBMATTI_MC_ItemStack_Shrink(LIBMATTI_MC_ItemStack *stack, int amount)
 {
-    // Java: this.grow(-p_41576_)
+// Java: this.grow(-p_41576_)
     LIBMATTI_MC_ItemStack_Grow(stack, -amount);
 }
 
@@ -236,7 +237,7 @@ void LIBMATTI_MC_ItemStack_SetPopTime(LIBMATTI_MC_ItemStack *stack, int popTime)
 
 bool LIBMATTI_MC_ItemStack_Matches(const LIBMATTI_MC_ItemStack *a, const LIBMATTI_MC_ItemStack *b)
 {
-    // Java: a.isEmpty() && b.isEmpty() || !a.isEmpty() && !b.isEmpty() && a.count == b.count
+// Java: a.isEmpty() && b.isEmpty() || !a.isEmpty() && !b.isEmpty() && a.count == b.count
     //       && a.item == b.item && Objects.equals(a.components, b.components)
     if (LIBMATTI_MC_ItemStack_IsEmpty(a) || LIBMATTI_MC_ItemStack_IsEmpty(b))
         return LIBMATTI_MC_ItemStack_IsEmpty(a) && LIBMATTI_MC_ItemStack_IsEmpty(b);
@@ -247,7 +248,7 @@ bool LIBMATTI_MC_ItemStack_Matches(const LIBMATTI_MC_ItemStack *a, const LIBMATT
 
 bool LIBMATTI_MC_ItemStack_IsSameItem(const LIBMATTI_MC_ItemStack *a, const LIBMATTI_MC_ItemStack *b)
 {
-    // Java: !p_287761_.isEmpty() && !p_287676_.isEmpty() && (p_287761_.item == p_287676_.item || ...)
+// Java: !p_287761_.isEmpty() && !p_287676_.isEmpty() && (p_287761_.item == p_287676_.item || ...)
     if (LIBMATTI_MC_ItemStack_IsEmpty(a) || LIBMATTI_MC_ItemStack_IsEmpty(b))
         return false;
     return a->item == b->item;
@@ -255,7 +256,7 @@ bool LIBMATTI_MC_ItemStack_IsSameItem(const LIBMATTI_MC_ItemStack *a, const LIBM
 
 bool LIBMATTI_MC_ItemStack_IsSameItemSameComponents(const LIBMATTI_MC_ItemStack *a, const LIBMATTI_MC_ItemStack *b)
 {
-    // Java: this.isSameItem(other) && (other.isEmpty() && isEmpty() || components.equals(other.components))
+// Java: this.isSameItem(other) && (other.isEmpty() && isEmpty() || components.equals(other.components))
     if (!LIBMATTI_MC_ItemStack_IsSameItem(a, b))
         return false;
     if (LIBMATTI_MC_ItemStack_IsEmpty(a) && LIBMATTI_MC_ItemStack_IsEmpty(b))
@@ -265,7 +266,7 @@ bool LIBMATTI_MC_ItemStack_IsSameItemSameComponents(const LIBMATTI_MC_ItemStack 
 
 bool LIBMATTI_MC_ItemStack_Is(const LIBMATTI_MC_ItemStack *stack, const LIBMATTI_MC_Item *item)
 {
-    // Java: this.getItem() == p_150931_
+// Java: this.getItem() == p_150931_
     return LIBMATTI_MC_ItemStack_GetItem(stack) == item;
 }
 

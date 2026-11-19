@@ -50,7 +50,7 @@ LIBMATTI_FML_NeoForgeLaunchHandler *LIBMATTI_FML_NeoForgeLaunchHandler_New(void)
     LIBMATTI_FML_NeoForgeLaunchHandler *handler = calloc(1, sizeof(LIBMATTI_FML_NeoForgeLaunchHandler));
     handler->base.name = neoforge_name;
     handler->base.launchService = neoforge_launch_service;
-    // Java: getPaths() is not overridden -> the interface default returns an empty array
+// Java: getPaths() is not overridden -> the interface default returns an empty array
     handler->base.getPaths = NULL;
     return handler;
 }

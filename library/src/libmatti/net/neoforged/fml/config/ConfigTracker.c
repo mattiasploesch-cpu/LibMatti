@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.config.ConfigTracker.
+
+
 
 #include "libmatti/net/neoforged/fml/config/ConfigTracker.h"
 
@@ -37,7 +38,7 @@ static void config_watcher_handler(void *self, void *userdata)
 
     pthread_mutex_lock(&modConfig->lock);
     LIBMATTI_ML_Logger_Debug(LOGGER(), &CONFIG_MARKER, "Config file {} changed, re-loading", modConfig->fileName);
-    // Java: the watcher fires with the path it registered; ModConfig keeps no path of its own,
+// Java: the watcher fires with the path it registered; ModConfig keeps no path of its own,
     //       the reload re-resolves through the loaded config's path.
     const char *path = modConfig->loadedConfig != NULL ? modConfig->loadedConfig->path : NULL;
     if (path != NULL)
@@ -55,23 +56,23 @@ typedef struct
 typedef struct
 {
     char *modId;
-    // Java: List<ModConfig> configsByMod (Collections.synchronizedList)
+// Java: List<ModConfig> configsByMod (Collections.synchronizedList)
     LIBMATTI_FML_ModConfig **configs;
     size_t configCount;
 } ConfigsByModEntry;
 
 struct LIBMATTI_FML_ConfigTracker
 {
-    // Java: final ConcurrentHashMap<String, ModConfig> fileMap
+// Java: final ConcurrentHashMap<String, ModConfig> fileMap
     FileMapEntry *fileMap;
     size_t fileMapCount;
-    // Java: final EnumMap<ModConfig.Type, Set<ModConfig>> configSets (LinkedHashSet, insertion order)
+// Java: final EnumMap<ModConfig.Type, Set<ModConfig>> configSets (LinkedHashSet, insertion order)
     LIBMATTI_FML_ModConfig *configSets[4][16];
     size_t configSetCounts[4];
-    // Java: final ConcurrentHashMap<String, List<ModConfig>> configsByMod
+// Java: final ConcurrentHashMap<String, List<ModConfig>> configsByMod
     ConfigsByModEntry *configsByMod;
     size_t configsByModCount;
-    // Java: private final Map<String, ReentrantLock> locksByMod
+// Java: private final Map<String, ReentrantLock> locksByMod
     struct
     {
         char *modId;
@@ -139,12 +140,12 @@ static char *default_config_name(LIBMATTI_FML_ModConfig_Type type, const char *m
 // Java: void trackConfig(ModConfig config)
 static void track_config(LIBMATTI_FML_ConfigTracker *configTracker, LIBMATTI_FML_ModConfig *config)
 {
-    // Java: var previousValue = this.fileMap.putIfAbsent(config.getFileName(), config);
+// Java: var previousValue = this.fileMap.putIfAbsent(config.getFileName(), config);
     for (size_t i = 0; i < configTracker->fileMapCount; i++)
     {
         if (strcmp(configTracker->fileMap[i].fileName, config->fileName) != 0) continue;
 
-        // Java: throw new RuntimeException(errorMessage)
+// Java: throw new RuntimeException(errorMessage)
         LIBMATTI_ML_Logger_Error(LOGGER(), &CONFIG_MARKER,
                                  "Detected config file conflict on {} from {} (already registered by {})",
                                  config->fileName, LIBMATTI_FML_ModConfig_GetModId(config),
@@ -157,11 +158,11 @@ static void track_config(LIBMATTI_FML_ConfigTracker *configTracker, LIBMATTI_FML
     configTracker->fileMap[configTracker->fileMapCount].config = config;
     configTracker->fileMapCount++;
 
-    // Java: this.configSets.get(config.getType()).add(config)
+// Java: this.configSets.get(config.getType()).add(config)
     LIBMATTI_FML_ModConfig_Type type = config->type;
     configTracker->configSets[type][configTracker->configSetCounts[type]++] = config;
 
-    // Java: this.configsByMod.computeIfAbsent(config.getModId(), k -> new ArrayList<>()).add(config)
+// Java: this.configsByMod.computeIfAbsent(config.getModId(), k -> new ArrayList<>()).add(config)
     ConfigsByModEntry *entry = NULL;
     for (size_t i = 0; i < configTracker->configsByModCount; i++)
     {
@@ -183,7 +184,7 @@ static void track_config(LIBMATTI_FML_ConfigTracker *configTracker, LIBMATTI_FML
     entry->configs = realloc(entry->configs, sizeof(LIBMATTI_FML_ModConfig *) * (entry->configCount + 1));
     entry->configs[entry->configCount++] = config;
 
-    // Java: LOGGER.debug(CONFIG, "Config file {} for {} tracking", config.getFileName(), config.getModId());
+// Java: LOGGER.debug(CONFIG, "Config file {} for {} tracking", config.getFileName(), config.getModId());
     LIBMATTI_ML_Logger_Debug(LOGGER(), &CONFIG_MARKER, "Config file {} for {} tracking", config->fileName,
                              LIBMATTI_FML_ModConfig_GetModId(config));
 }
@@ -213,7 +214,7 @@ LIBMATTI_FML_ModConfig *LIBMATTI_FML_ConfigTracker_RegisterConfigNamed(LIBMATTI_
                                                                        LIBMATTI_FML_ModContainer *container,
                                                                        const char *fileName)
 {
-    // Java: locksByMod.computeIfAbsent(container.getModId(), m -> new ReentrantLock())
+// Java: locksByMod.computeIfAbsent(container.getModId(), m -> new ReentrantLock())
     pthread_mutex_t *lock = NULL;
     for (size_t i = 0; i < configTracker->locksByModCount; i++)
     {
@@ -237,12 +238,12 @@ LIBMATTI_FML_ModConfig *LIBMATTI_FML_ConfigTracker_RegisterConfigNamed(LIBMATTI_
 
     LIBMATTI_FML_ModConfig *modConfig = LIBMATTI_FML_ModConfig_New(type, spec, container, fileName, lock);
 
-    // Java: spec.validateSpec(modConfig)
+// Java: spec.validateSpec(modConfig)
     if (spec->validateSpec != NULL) spec->validateSpec(spec->self, modConfig);
 
     track_config(configTracker, modConfig);
 
-    // Java: if (modConfig.getType() == ModConfig.Type.STARTUP) openConfig(modConfig, FMLPaths.CONFIGDIR.get(), null);
+// Java: if (modConfig.getType() == ModConfig.Type.STARTUP) openConfig(modConfig, FMLPaths.CONFIGDIR.get(), null);
     if (modConfig->type == LIBMATTI_FML_ModConfig_TYPE_STARTUP)
         LIBMATTI_FML_ConfigTracker_OpenConfig(modConfig, LIBMATTI_FML_FMLPaths_Get(LIBMATTI_FML_FMLPaths_CONFIGDIR),
                                               NULL);
@@ -262,10 +263,10 @@ void LIBMATTI_FML_ConfigTracker_LoadConfigsWithOverride(LIBMATTI_FML_ConfigTrack
                                                         const char *configBasePath,
                                                         const char *configOverrideBasePath)
 {
-    // Java: LOGGER.debug(CONFIG, "Loading configs type {}", type);
+// Java: LOGGER.debug(CONFIG, "Loading configs type {}", type);
     LIBMATTI_ML_Logger_Debug(LOGGER(), &CONFIG_MARKER, "Loading configs type {}",
                              LIBMATTI_FML_ModConfig_Type_Extension(type));
-    // Java: this.configSets.get(type).forEach(config -> openConfig(config, configBasePath, configOverrideBasePath));
+// Java: this.configSets.get(type).forEach(config -> openConfig(config, configBasePath, configOverrideBasePath));
     // The set does not change during loading, so the size snapshot is safe (Java iterates the live set).
     size_t count = configTracker->configSetCounts[type];
     for (size_t i = 0; i < count; i++)
@@ -318,7 +319,7 @@ void LIBMATTI_FML_ConfigTracker_OpenConfig(LIBMATTI_FML_ModConfig *config, const
                                           NULL);
     LIBMATTI_ML_Logger_Debug(LOGGER(), &CONFIG_MARKER, "Loaded TOML config file {}", configPath);
 
-    // Java: FileWatcher.defaultInstance().addWatch(configPath, new ConfigWatcher(config, configPath,
+// Java: FileWatcher.defaultInstance().addWatch(configPath, new ConfigWatcher(config, configPath,
     //           Thread.currentThread().getContextClassLoader()))
     if (!LIBMATTI_FML_FMLConfig_GetBoolConfigValue(LIBMATTI_FML_FMLConfig_DISABLE_CONFIG_WATCHER))
     {
@@ -327,7 +328,7 @@ void LIBMATTI_FML_ConfigTracker_OpenConfig(LIBMATTI_FML_ModConfig *config, const
             watcher, configPath, config_watcher_handler, config, NULL);
         if (exception != NULL)
         {
-            // Java: WatchingException propagates out of addWatch
+// Java: WatchingException propagates out of addWatch
             LIBMATTI_ML_Logger_Error(LOGGER(), &CONFIG_MARKER, "Failed to watch config file {}: {}", configPath,
                                      exception->message != NULL ? exception->message : "watch failed");
             LIBMATTI_NC_FileWatcher_WatchingException_Free(exception);
@@ -344,13 +345,13 @@ void LIBMATTI_FML_ConfigTracker_OpenConfig(LIBMATTI_FML_ModConfig *config, const
 // Java: private static void backUpConfig(Path commentedFileConfig) { backUpConfig(commentedFileConfig, 5); }
 static void back_up_config(const char *commentedFileConfig)
 {
-    // Java: Path bakFileLocation = commentedFileConfig.getParent();
+// Java: Path bakFileLocation = commentedFileConfig.getParent();
     char *bakFileLocation = LIBMATTI_JNF_Path_GetParent(commentedFileConfig);
-    // Java: String bakFileName = FilenameUtils.removeExtension(...getFileName());
+// Java: String bakFileName = FilenameUtils.removeExtension(...getFileName());
     char *fileName = LIBMATTI_JNF_Path_GetFileName(commentedFileConfig);
     const char *dot = fileName != NULL ? strrchr(fileName, '.') : NULL;
     size_t baseLength = dot != NULL ? (size_t) (dot - fileName) : strlen(fileName);
-    // Java: String bakFileExtension = FilenameUtils.getExtension(...) + ".bak"
+// Java: String bakFileExtension = FilenameUtils.getExtension(...) + ".bak"
     const char *extension = dot != NULL ? dot + 1 : "";
     size_t extLength = strlen(extension) + 4;
 
@@ -358,7 +359,7 @@ static void back_up_config(const char *commentedFileConfig)
     char *previousBak = malloc(baseLength + 1 + 2 + 1 + extLength + 1);
     char *currentBak = malloc(baseLength + 1 + 2 + 1 + extLength + 1);
 
-    // Java: for (int i = maxBackups; i > 0; i--) { ... shift the .bak files, then copy the config }
+// Java: for (int i = maxBackups; i > 0; i--) { ... shift the .bak files, then copy the config }
     for (int i = maxBackups; i > 0; i--)
     {
         snprintf(previousBak, baseLength + 6 + extLength, "%.*s-%d.%s.bak", (int) baseLength, fileName, i, extension);
@@ -372,7 +373,7 @@ static void back_up_config(const char *commentedFileConfig)
         }
         else if (LIBMATTI_JNF_Files_Exists(currentBak))
         {
-            // Java: Files.move(oldBak, bakFileLocation.resolve(bakFileName + "-" + (i + 1) + "." + bakFileExtension))
+// Java: Files.move(oldBak, bakFileLocation.resolve(bakFileName + "-" + (i + 1) + "." + bakFileExtension))
             FILE *from = fopen(currentBak, "rb");
             FILE *to = fopen(previousBak, "wb");
             if (from != NULL && to != NULL)
@@ -386,7 +387,7 @@ static void back_up_config(const char *commentedFileConfig)
         }
     }
 
-    // Java: Files.copy(commentedFileConfig, bakFile)
+// Java: Files.copy(commentedFileConfig, bakFile)
     snprintf(currentBak, baseLength + 5 + extLength, "%.*s-1.%s.bak", (int) baseLength, fileName, extension);
     FILE *from = fopen(commentedFileConfig, "rb");
     FILE *to = fopen(currentBak, "wb");
@@ -398,7 +399,7 @@ static void back_up_config(const char *commentedFileConfig)
     }
     else
     {
-        // Java: LOGGER.warn(CONFIG, "Failed to back up config file {}", commentedFileConfig, exception);
+// Java: LOGGER.warn(CONFIG, "Failed to back up config file {}", commentedFileConfig, exception);
         LIBMATTI_ML_Logger_Warn(LOGGER(), &CONFIG_MARKER, "Failed to back up config file {}", commentedFileConfig);
     }
     if (from != NULL) fclose(from);
@@ -477,7 +478,7 @@ static LIBMATTI_NC_Config *read_config(const char *path, int *failed, char **err
 
     if (!LIBMATTI_JNF_Files_Exists(path)) return NULL;
 
-    // Java: try (var reader = Files.newBufferedReader(path))
+// Java: try (var reader = Files.newBufferedReader(path))
     FILE *stream = fopen(path, "rb");
     if (stream == NULL)
     {
@@ -492,13 +493,13 @@ static LIBMATTI_NC_Config *read_config(const char *path, int *failed, char **err
     fclose(stream);
     data[read] = '\0';
 
-    // Java: var config = new SynchronizedConfig(TomlFormat.instance(), LinkedHashMap::new);
+// Java: var config = new SynchronizedConfig(TomlFormat.instance(), LinkedHashMap::new);
     //       config.bulkCommentedUpdate(view -> new TomlParser().parse(reader, view, ParsingMode.REPLACE));
     LIBMATTI_NC_TomlParser *parser = LIBMATTI_NC_TomlParser_New();
     LIBMATTI_NC_Config *config = LIBMATTI_NC_TomlParser_Parse(parser, data, read);
     if (config == NULL)
     {
-        // Java: throw new ParsingException(...)
+// Java: throw new ParsingException(...)
         *failed = 1;
         *errorMessage = strdup(LIBMATTI_NC_TomlParser_ErrorMessage(parser));
     }
@@ -522,7 +523,7 @@ void LIBMATTI_FML_ConfigTracker_LoadConfig(LIBMATTI_FML_ModConfig *modConfig, co
 
     if (!failed && config != NULL)
     {
-        // Java: if (!modConfig.getSpec().isCorrect(config)) { LOGGER.warn(CONFIG, "Configuration file {} is not correct. Correcting", path);
+// Java: if (!modConfig.getSpec().isCorrect(config)) { LOGGER.warn(CONFIG, "Configuration file {} is not correct. Correcting", path);
         //           backUpConfig(path); modConfig.getSpec().correct(config); writeConfig(path, config); }
         if (!modConfig->spec->isCorrect(modConfig->spec->self, config))
         {
@@ -534,11 +535,11 @@ void LIBMATTI_FML_ConfigTracker_LoadConfig(LIBMATTI_FML_ModConfig *modConfig, co
     }
     else if (config == NULL && !failed)
     {
-        // Java: catch (NoSuchFileException ignored) { setupConfigFile(modConfig, path); config = readConfig(path); }
+// Java: catch (NoSuchFileException ignored) { setupConfigFile(modConfig, path); config = readConfig(path); }
         //       - "Config file does not exist yet"
         if (!setup_config_file(modConfig, path))
         {
-            // Java: throw new RuntimeException("Failed to create default config file " + ...)
+// Java: throw new RuntimeException("Failed to create default config file " + ...)
             LIBMATTI_ML_Logger_Error(LOGGER(), &CONFIG_MARKER,
                                      "Failed to create default config file {} of type {} for modid {}",
                                      modConfig->fileName, LIBMATTI_FML_ModConfig_Type_Extension(modConfig->type),
@@ -558,7 +559,7 @@ void LIBMATTI_FML_ConfigTracker_LoadConfig(LIBMATTI_FML_ModConfig *modConfig, co
     }
     else
     {
-        // Java: catch (IOException | ParsingException ex) { LOGGER.warn(CONFIG, "Failed to load config {}: {}. Attempting to recreate", ...);
+// Java: catch (IOException | ParsingException ex) { LOGGER.warn(CONFIG, "Failed to load config {}: {}. Attempting to recreate", ...);
         //           backUpConfig(path); Files.delete(path); setupConfigFile(modConfig, path); config = readConfig(path); }
         LIBMATTI_ML_Logger_Warn(LOGGER(), &CONFIG_MARKER,
                                 "Failed to load config {}: {}. Attempting to recreate", modConfig->fileName,
@@ -569,7 +570,7 @@ void LIBMATTI_FML_ConfigTracker_LoadConfig(LIBMATTI_FML_ModConfig *modConfig, co
 
         if (!setup_config_file(modConfig, path) || (config = read_config(path, &failed, &errorMessage)) == NULL)
         {
-            // Java: throw new RuntimeException("Failed to recreate config file " + ...)
+// Java: throw new RuntimeException("Failed to recreate config file " + ...)
             LIBMATTI_ML_Logger_Error(LOGGER(), &CONFIG_MARKER,
                                      "Failed to recreate config file {} of type {} for modid {}",
                                      modConfig->fileName, LIBMATTI_FML_ModConfig_Type_Extension(modConfig->type),
@@ -578,12 +579,13 @@ void LIBMATTI_FML_ConfigTracker_LoadConfig(LIBMATTI_FML_ModConfig *modConfig, co
         }
     }
 
-    // Java: modConfig.setConfig(new LoadedConfig(config, path, modConfig), eventConstructor);
+// Java: modConfig.setConfig(new LoadedConfig(config, path, modConfig), eventConstructor);
     LIBMATTI_FML_LoadedConfig *loaded = LIBMATTI_FML_LoadedConfig_New(config, path, modConfig);
     (void) eventUserdata;
     LIBMATTI_FML_ModConfig_SetConfig(modConfig, loaded, eventConstructor, NULL);
-    // Java leaves the LoadedConfig to the garbage collector; the port frees the wrapper, the config
-    // stays alive through the spec (acceptConfig) and the file.
+
+
+
     LIBMATTI_FML_LoadedConfig_Free(loaded);
 }
 
@@ -604,7 +606,7 @@ static void unload(const char *path)
     if (LIBMATTI_FML_FMLConfig_GetBoolConfigValue(LIBMATTI_FML_FMLConfig_DISABLE_CONFIG_WATCHER))
         return;
 
-    // Java: FileWatcher.defaultInstance().removeWatch(path) - removeWatch does not throw in the port,
+// Java: FileWatcher.defaultInstance().removeWatch(path) - removeWatch does not throw in the port,
     //       the catch clause is unreachable (kept for the 1:1 flow).
     LIBMATTI_NC_FileWatcher_RemoveWatch(LIBMATTI_NC_FileWatcher_DefaultInstance(), path);
 }
@@ -615,7 +617,7 @@ static void unload_config(LIBMATTI_FML_ModConfig *config)
 {
     if (config->loadedConfig == NULL) return;
 
-    // Java: if (config.loadedConfig.path() != null) LOGGER.trace(... unload path) else LOGGER.trace(non-file)
+// Java: if (config.loadedConfig.path() != null) LOGGER.trace(... unload path) else LOGGER.trace(non-file)
     if (config->loadedConfig->path != NULL)
     {
         LIBMATTI_ML_Logger_Trace(LOGGER(), &CONFIG_MARKER, "Closing and unloading config file type {} at {} for {}",
@@ -636,7 +638,7 @@ static void unload_config(LIBMATTI_FML_ModConfig *config)
 void LIBMATTI_FML_ConfigTracker_UnloadConfigs(LIBMATTI_FML_ConfigTracker *configTracker,
                                               LIBMATTI_FML_ModConfig_Type type)
 {
-    // Java: LOGGER.debug(CONFIG, "Unloading configs type {}", type);
+// Java: LOGGER.debug(CONFIG, "Unloading configs type {}", type);
     LIBMATTI_ML_Logger_Debug(LOGGER(), &CONFIG_MARKER, "Unloading configs type {}",
                              LIBMATTI_FML_ModConfig_Type_Extension(type));
     for (size_t i = 0; i < configTracker->configSetCounts[type]; i++)

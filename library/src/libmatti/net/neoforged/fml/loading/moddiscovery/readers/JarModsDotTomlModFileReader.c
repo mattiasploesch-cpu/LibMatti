@@ -39,7 +39,7 @@ LIBMATTI_NEOFORGESPI_IModFile *LIBMATTI_FML_JarModsDotTomlModFileReader_CreateMo
                                  LIBMATTI_FML_MODS_TOML, hasType ? "typed" : "untyped",
                                  LIBMATTI_FML_JarContents_GetPrimaryPath(contents));
 
-        // Java: var mjm = new ModJarMetadata(); mod = new ModFile(contents, mjm, ModFileParser::modsTomlParser, discoveryAttributes); mjm.setModFile(mod);
+// Java: var mjm = new ModJarMetadata(); mod = new ModFile(contents, mjm, ModFileParser::modsTomlParser, discoveryAttributes); mjm.setModFile(mod);
         LIBMATTI_FML_ModJarMetadata *mjm = LIBMATTI_FML_ModJarMetadata_New();
         LIBMATTI_FML_ModFile *mod = LIBMATTI_FML_ModFile_NewWithMetadata(
             contents, LIBMATTI_FML_ModJarMetadata_AsJarModuleInfo(mjm),
@@ -55,7 +55,7 @@ LIBMATTI_NEOFORGESPI_IModFile *LIBMATTI_FML_JarModsDotTomlModFileReader_CreateMo
                                  LIBMATTI_FML_MODS_TOML_MANIFEST, "typed",
                                  LIBMATTI_FML_JarContents_GetPrimaryPath(contents));
 
-        // Java: mod = new ModFile(contents, null, JarModsDotTomlModFileReader::manifestParser, type, discoveryAttributes);
+// Java: mod = new ModFile(contents, null, JarModsDotTomlModFileReader::manifestParser, type, discoveryAttributes);
         LIBMATTI_FML_ModFile *mod = LIBMATTI_FML_ModFile_NewWithMetadataAndType(
             contents, NULL, LIBMATTI_FML_JarModsDotTomlModFileReader_ManifestParserAdapter, NULL, type,
             discoveryAttributes);
@@ -69,17 +69,17 @@ LIBMATTI_NEOFORGESPI_IModFile *LIBMATTI_FML_JarModsDotTomlModFileReader_CreateMo
 int LIBMATTI_FML_JarModsDotTomlModFileReader_GetModType(LIBMATTI_FML_JarContents *jar,
                                                        LIBMATTI_NEOFORGESPI_IModFile_Type *out)
 {
-    // Java: Manifest jarManifest = jar.getManifest(); if (jarManifest == null) return null;
+// Java: Manifest jarManifest = jar.getManifest(); if (jarManifest == null) return null;
     LIBMATTI_JU_Manifest *jarManifest = LIBMATTI_FML_JarContents_GetManifest(jar);
     if (jarManifest == NULL)
         return 0;
 
-    // Java: var typeString = jarManifest.getMainAttributes().getValue(ModFile.TYPE);
+// Java: var typeString = jarManifest.getMainAttributes().getValue(ModFile.TYPE);
     const char *typeString = LIBMATTI_JU_Manifest_GetMainValue(jarManifest, LIBMATTI_FML_MODFILE_TYPE);
     if (typeString == NULL)
         return 0;
 
-    // Java: catch (IllegalArgumentException e) { throw new ModLoadingException(ModLoadingIssue.error("fml.modloadingissue.brokenfile.unknownfmlmodtype", typeString)...); }
+// Java: catch (IllegalArgumentException e) { throw new ModLoadingException(ModLoadingIssue.error("fml.modloadingissue.brokenfile.unknownfmlmodtype", typeString)...); }
     if (strcmp(typeString, "MOD") == 0)
     {
         *out = LIBMATTI_NEOFORGESPI_IModFile_Type_MOD;
@@ -100,7 +100,7 @@ int LIBMATTI_FML_JarModsDotTomlModFileReader_GetModType(LIBMATTI_FML_JarContents
         LIBMATTI_FML_ModLoadingIssue_Error("fml.modloadingissue.brokenfile.unknownfmlmodtype", &typeString, 1);
     LIBMATTI_FML_ModLoadingIssue *withPath =
         LIBMATTI_FML_ModLoadingIssue_WithAffectedPath(issue, LIBMATTI_FML_JarContents_GetPrimaryPath(jar));
-    // Java: throw new ModLoadingException(withPath) - the port records the issue with
+// Java: throw new ModLoadingException(withPath) - the port records the issue with
     // ModLoader, which throwIfErrors finds.
     LIBMATTI_FML_ModLoader_AddLoadingIssue(withPath);
     LIBMATTI_ML_Logger_Error(LOGGER(), NULL, "{}", "fml.modloadingissue.brokenfile.unknownfmlmodtype");
@@ -222,7 +222,7 @@ static void *default_getConfig(void *self)
 LIBMATTI_NEOFORGESPI_IModFileInfo *LIBMATTI_FML_JarModsDotTomlModFileReader_ManifestParser(
     LIBMATTI_NEOFORGESPI_IModFile *mod)
 {
-    // Java: Function<String, Optional<String>> cfg = name -> Optional.ofNullable(mod.getContents().getManifest().getMainAttributes().getValue(name));
+// Java: Function<String, Optional<String>> cfg = name -> Optional.ofNullable(mod.getContents().getManifest().getMainAttributes().getValue(name));
     LIBMATTI_JU_Manifest *manifest = LIBMATTI_FML_JarContents_GetManifest(
         LIBMATTI_NEOFORGESPI_IModFile_GetContents(mod));
     const char *licenseValue = manifest != NULL ? LIBMATTI_JU_Manifest_GetMainValue(manifest, "LICENSE") : NULL;
@@ -231,7 +231,7 @@ LIBMATTI_NEOFORGESPI_IModFileInfo *LIBMATTI_FML_JarModsDotTomlModFileReader_Mani
     modFileInfo->license = strdup(licenseValue != NULL ? licenseValue : "");
     modFileInfo->mod = mod;
 
-    // Java: var dummy = new IConfigurable() { ... };
+// Java: var dummy = new IConfigurable() { ... };
     modFileInfo->dummy = calloc(1, sizeof(LIBMATTI_NEOFORGESPI_IConfigurable));
     modFileInfo->dummy->self = modFileInfo;
     modFileInfo->dummy->getConfigElement = default_getConfigElement;
@@ -263,7 +263,7 @@ LIBMATTI_NEOFORGESPI_IModFile *LIBMATTI_FML_JarModsDotTomlModFileReader_Read(
     const LIBMATTI_NEOFORGESPI_ModFileDiscoveryAttributes *discoveryAttributes)
 {
     (void) self;
-    // Java: return createModFile(jar, discoveryAttributes.withReader(this));
+// Java: return createModFile(jar, discoveryAttributes.withReader(this));
     LIBMATTI_NEOFORGESPI_ModFileDiscoveryAttributes attributes =
         LIBMATTI_NEOFORGESPI_ModFileDiscoveryAttributes_WithReader(discoveryAttributes,
                                                                    LIBMATTI_FML_JarModsDotTomlModFileReader_AsReader());

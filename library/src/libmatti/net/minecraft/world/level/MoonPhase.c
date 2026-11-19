@@ -1,4 +1,5 @@
-// Port of net.minecraft.world.level.MoonPhase (implementation).
+
+
 
 #include "libmatti/net/minecraft/world/level/MoonPhase.h"
 

@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.loading.toposort.TopologicalSort.
+
+
 
 #ifndef MATTICRAFT_FML_LOADING_TOPOSORT_TOPOLOGICALSORT_H
 #define MATTICRAFT_FML_LOADING_TOPOSORT_TOPOLOGICALSORT_H
@@ -15,4 +16,4 @@ void **LIBMATTI_FML_TopologicalSort_TopologicalSort(LIBMATTI_FML_Graph *graph,
                                                     void *userdata, size_t *count,
                                                     LIBMATTI_FML_CyclePresentException **cycles);
 
-#endif //MATTICRAFT_FML_LOADING_TOPOSORT_TOPOLOGICALSORT_H
+#endif

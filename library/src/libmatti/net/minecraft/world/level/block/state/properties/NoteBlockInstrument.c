@@ -1,4 +1,5 @@
-// Port of net.minecraft.world.level.block.state.properties.NoteBlockInstrument.
+
+
 
 #include "libmatti/net/minecraft/world/level/block/state/properties/NoteBlockInstrument.h"
 

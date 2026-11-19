@@ -1,6 +1,7 @@
-// Port of net.minecraft.world.level.Level (the in-memory part: chunk storage,
-// block access, level data fields). The tick loop, entities, neighbour updates
-// and the chunk source stay with the game port.
+
+
+
+
 
 #ifndef MATTICRAFT_MC_WORLD_LEVEL_LEVEL_H
 #define MATTICRAFT_MC_WORLD_LEVEL_LEVEL_H
@@ -41,21 +42,21 @@ extern "C" {
 // Java: public class Level implements LevelAccessor
 typedef struct LIBMATTI_MC_Level
 {
-    // Java: the LevelHeightAccessor surface (dimension height range)
+// Java: the LevelHeightAccessor surface (dimension height range)
     LIBMATTI_MC_LevelHeightAccessor heightAccessor;
-    // Java: private final ResourceKey<Level> dimension
+// Java: private final ResourceKey<Level> dimension
     LIBMATTI_MC_ResourceKey *dimension;
-    // Java: private final boolean isClientSide
+// Java: private final boolean isClientSide
     bool isClientSide;
-    // Java: private final boolean isDebug
+// Java: private final boolean isDebug
     bool isDebug;
-    // Java: protected final WritableLevelData levelData (fields flattened until the
+// Java: protected final WritableLevelData levelData (fields flattened until the
     // LevelData model lands)
     long gameTime;
     long dayTime;
     bool raining;
     bool thundering;
-    // Java: the in-memory chunk map (LongOpenHashMap in Java's ClientChunkCache/
+// Java: the in-memory chunk map (LongOpenHashMap in Java's ClientChunkCache/
     // ServerChunkCache; the port keys by ChunkPos.toLong())
     struct ChunkEntry
     {
@@ -64,7 +65,7 @@ typedef struct LIBMATTI_MC_Level
     } *chunks;
     int chunkCount;
     int chunkCapacity;
-    // Java: private final EntityLookup entityLookup (the entitiesById map) - the
+// Java: private final EntityLookup entityLookup (the entitiesById map) - the
     // port keeps a growable pointer array until the P5 tick loop needs the map
     struct LIBMATTI_MC_Entity **entities;
     int entityCount;
@@ -115,7 +116,8 @@ bool LIBMATTI_MC_Level_IsClientSide(struct LIBMATTI_MC_Level *level);
 bool LIBMATTI_MC_Level_IsDebug(struct LIBMATTI_MC_Level *level);
 LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Level_GetDimension(struct LIBMATTI_MC_Level *level);
 
-// BlockGetter surface on the Level - getBlockEntity returns the typed BlockEntity
+
+
 LIBMATTI_MC_BlockEntity *LIBMATTI_MC_Level_GetBlockEntity(struct LIBMATTI_MC_Level *level, const LIBMATTI_MC_BlockPos *pos);
 int LIBMATTI_MC_Level_GetLightEmission(struct LIBMATTI_MC_Level *level, const LIBMATTI_MC_BlockPos *pos);
 
@@ -123,7 +125,8 @@ int LIBMATTI_MC_Level_GetLightEmission(struct LIBMATTI_MC_Level *level, const LI
 // game port overrides; kept for the call sites
 void LIBMATTI_MC_Level_UpdateNeighborsAt(struct LIBMATTI_MC_Level *level, const LIBMATTI_MC_BlockPos *pos, const LIBMATTI_MC_Block *block);
 
-// the number of loaded chunks (the test surface)
+
+
 int LIBMATTI_MC_Level_GetChunkCount(struct LIBMATTI_MC_Level *level);
 void LIBMATTI_MC_Level_Free(struct LIBMATTI_MC_Level *level);
 
@@ -153,4 +156,4 @@ bool LIBMATTI_MC_Level_NoBlockCollision(struct LIBMATTI_MC_Level *level, const L
 }
 #endif
 
-#endif //MATTICRAFT_MC_WORLD_LEVEL_LEVEL_H
+#endif

@@ -53,7 +53,8 @@ void LIBMATTI_FML_Graph_PutEdge(LIBMATTI_FML_Graph *graph, void *from, void *to)
     int index = nodeIndex(graph, from);
     for (size_t i = 0; i < graph->successorCounts[index]; i++)
         if (graph->successors[index][i] == to)
-            return; // Guava's graph is a set of edges
+            return;
+
 
     graph->successors[index] = realloc(graph->successors[index],
                                        sizeof(void *) * (graph->successorCounts[index] + 1));
@@ -133,7 +134,8 @@ void **LIBMATTI_FML_Graph_ReachableNodes(const LIBMATTI_FML_Graph *graph, const 
         return NULL;
     }
 
-    // breadth-first over the successors
+
+
     result[(*count)++] = (void *) node;
     for (size_t i = 0; i < *count; i++)
     {

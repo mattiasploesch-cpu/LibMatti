@@ -7,7 +7,7 @@
 
 char *LIBMATTI_JT_MessageFormat_Format(const char *pattern, const char *const *values, size_t count)
 {
-    // Java: the '{' opens a placeholder, digits index the argument, '}' closes;
+// Java: the '{' opens a placeholder, digits index the argument, '}' closes;
     // '\'' quotes the next character
     size_t capacity = strlen(pattern) + 64;
     char *out = malloc(capacity);
@@ -19,7 +19,7 @@ char *LIBMATTI_JT_MessageFormat_Format(const char *pattern, const char *const *v
 
         if (ch == '\'' && pattern[i + 1] != '\0')
         {
-            // Java: two quotes are a literal quote, one quotes the next char
+// Java: two quotes are a literal quote, one quotes the next char
             out[outIndex++] = pattern[++i];
             continue;
         }
@@ -57,7 +57,7 @@ char *LIBMATTI_JT_MessageFormat_Format(const char *pattern, const char *const *v
 
 char *LIBMATTI_JT_DateFormat_FormatEpoch(long long epochMillis, const char *pattern)
 {
-    // Java: SimpleDateFormat in UTC (the log format uses UTC)
+// Java: SimpleDateFormat in UTC (the log format uses UTC)
     time_t seconds = (time_t) (epochMillis / 1000);
     struct tm tm_utc;
     gmtime_r(&seconds, &tm_utc);

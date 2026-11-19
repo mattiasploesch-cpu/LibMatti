@@ -1,5 +1,6 @@
-// Port of net.minecraft.client.resources.model.SimpleUnbakedGeometry.bake
-// (implementation) over the ModelBaker surface.
+
+
+
 
 #include "libmatti/net/minecraft/client/resources/model/ModelBaker.h"
 
@@ -35,7 +36,7 @@ int LIBMATTI_MC_ModelBaker_Bake(const LIBMATTI_MC_BlockModel *model, LIBMATTI_MC
     if (model == NULL || resolver == NULL || out == NULL)
         return 0;
     if (!model->elementsPresent)
-        return 1; // Java: an inherit-only model bakes to the empty collection.
+        return 1;// Java: an inherit-only model bakes to the empty collection.
 
     memset(out, 0, sizeof(*out));
     for (size_t e = 0; e < model->elementCount; e++)
@@ -47,14 +48,14 @@ int LIBMATTI_MC_ModelBaker_Bake(const LIBMATTI_MC_BlockModel *model, LIBMATTI_MC
             const LIBMATTI_MC_BlockElementFace *face = element->faces[d];
             if (face == NULL)
                 continue;
-            // Java: the axis-extent gate
+// Java: the axis-extent gate
             if (!axis_has_extent(element, direction))
                 continue;
 
-            // Java: SpriteGetter.resolveSlot - resolve "#ref" chains first.
+// Java: SpriteGetter.resolveSlot - resolve "#ref" chains first.
             char *textureId = LIBMATTI_MC_BlockModel_ResolveTexture(model, face->texture);
             if (textureId == NULL)
-                return 0; // Java: the missing-sprite throw.
+                return 0;// Java: the missing-sprite throw.
             float uvRect[4];
             int resolved = resolver(userdata, textureId, uvRect);
             free(textureId);
@@ -67,7 +68,7 @@ int LIBMATTI_MC_ModelBaker_Bake(const LIBMATTI_MC_BlockModel *model, LIBMATTI_MC
             LIBMATTI_MC_FaceBakery_BakeQuad(from, to, face, uvRect, direction, element->rotation,
                                             face->tintIndex, element->shade, &quad);
 
-            // Java: cullForDirection == null -> unculled, else the culled bucket.
+// Java: cullForDirection == null -> unculled, else the culled bucket.
             if (face->cullForDirection == NULL)
                 LIBMATTI_MC_QuadCollection_AddUnculledFace(out, &quad);
             else

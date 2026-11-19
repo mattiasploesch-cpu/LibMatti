@@ -1,8 +1,9 @@
-// Port of java.util.regex.Pattern / Matcher.
-// The engine is a classic backtracking matcher supporting the constructs the
-// loader and the game use: literals, ., character classes [..] with ranges and
-// negation, the predefined classes \d \D \w \W \s \S, groups (...), alternation
-// |, quantifiers * + ? {n,m} (greedy), anchors ^ $, and escapes.
+
+
+
+
+
+
 
 #ifndef MATTICRAFT_JAVA_UTIL_REGEX_PATTERN_H
 #define MATTICRAFT_JAVA_UTIL_REGEX_PATTERN_H
@@ -53,4 +54,4 @@ char *LIBMATTI_JU_Pattern_Quote(const char *s);
 // Java: public String[] split(CharSequence input) - NULL-terminated array, caller frees
 char **LIBMATTI_JU_Pattern_Split(const LIBMATTI_JU_Pattern *pattern, const char *input, size_t *count);
 
-#endif //MATTICRAFT_JAVA_UTIL_REGEX_PATTERN_H
+#endif

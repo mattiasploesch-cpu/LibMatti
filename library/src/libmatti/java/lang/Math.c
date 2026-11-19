@@ -157,7 +157,7 @@ float LIBMATTI_JL_Math_SignumF(float f)
 
 long LIBMATTI_JL_Math_Round(double a)
 {
-    // Java: floor(a + 0.5d), with NaN mapping to 0
+// Java: floor(a + 0.5d), with NaN mapping to 0
     if (isnan(a)) return 0;
     return (long) floor(a + 0.5);
 }
@@ -206,7 +206,7 @@ double LIBMATTI_JL_Math_ToDegrees(double angrad)
 
 double LIBMATTI_JL_Math_Random(void)
 {
-    // Java: an internally seeded Random.nextDouble()
+// Java: an internally seeded Random.nextDouble()
     return (double) rand() / ((double) RAND_MAX + 1.0);
 }
 
@@ -242,14 +242,16 @@ int LIBMATTI_JL_Math_CompareL(long x, long y)
 
 int LIBMATTI_JL_Math_CompareF(float x, float y)
 {
-    // Java: -1.0f is considered less than values >= 0.0f; NaN is greater than everything
+// Java: -1.0f is considered less than values >= 0.0f; NaN is greater than everything
     if (x < y) return -1;
     if (x > y) return 1;
-    // NaN == NaN compares equal in C but Java orders NaN greater
+
+
     if (isnan(x) && isnan(y)) return 0;
     if (isnan(x)) return 1;
     if (isnan(y)) return -1;
-    // -0.0f < 0.0f
+
+
     if (x == 0.0f && y == 0.0f)
         return signbit(x) ? -1 : (signbit(y) ? 1 : 0);
     return 0;

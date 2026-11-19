@@ -39,12 +39,12 @@ LIBMATTI_JL_Class *LIBMATTI_JL_Class_Register(const char *name, void *classLoade
     clazz->name = strdup(name);
     clazz->classLoader = classLoader;
     clazz->resourceDirectory = package_directory(name);
-    // Java: every class except Object has Object as its superclass
+// Java: every class except Object has Object as its superclass
     if (strcmp(name, "java.lang.Object") != 0) clazz->superclass = LIBMATTI_JL_Class_ObjectType();
 
     classes = realloc(classes, sizeof(*classes) * (classCount + 1));
     classes[classCount++] = clazz;
-    // Java: the JVM runs the registered java.lang.instrument transformers at define-time
+// Java: the JVM runs the registered java.lang.instrument transformers at define-time
     LIBMATTI_JLI_Instrumentation_OnClassDefined(clazz->name, classLoader, clazz->resourceDirectory);
     return clazz;
 }

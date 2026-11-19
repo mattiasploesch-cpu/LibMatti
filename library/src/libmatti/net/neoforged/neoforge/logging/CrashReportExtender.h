@@ -1,4 +1,5 @@
-// Port of net.neoforged.neoforge.logging.CrashReportExtender.
+
+
 
 #ifndef MATTICRAFT_NEOFORGE_LOGGING_CRASHREPORTEXTENDER_H
 #define MATTICRAFT_NEOFORGE_LOGGING_CRASHREPORTEXTENDER_H
@@ -15,4 +16,4 @@ char *LIBMATTI_NEOFORGE_CrashReportExtender_DumpModLoadingCrashReport(const LIBM
                                                                      LIBMATTI_FML_ModLoadingIssue **issues,
                                                                      size_t issueCount, const char *topLevelDir);
 
-#endif //MATTICRAFT_NEOFORGE_LOGGING_CRASHREPORTEXTENDER_H
+#endif

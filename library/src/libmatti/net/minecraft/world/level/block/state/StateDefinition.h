@@ -1,7 +1,8 @@
-// Port of net.minecraft.world.level.block.state.StateDefinition (the per-block state
-// table). Java builds the cartesian product of every property's possible values in the
-// property declaration order; the C port keeps the same table layout so the state index
-// arithmetic works like Java's, and wires the neighbours through populateNeighbours.
+
+
+
+
+
 
 #ifndef MATTICRAFT_MC_BLOCKSTATE_STATEDEFINITION_H
 #define MATTICRAFT_MC_BLOCKSTATE_STATEDEFINITION_H
@@ -15,12 +16,12 @@ extern "C" {
 // Java: public class StateDefinition<O, S>
 typedef struct LIBMATTI_MC_StateDefinition
 {
-    // Java: private final O owner
+// Java: private final O owner
     void *owner;
-    // Java: private final ImmutableSortedMap<String, Property<?>> propertiesByName
+// Java: private final ImmutableSortedMap<String, Property<?>> propertiesByName
     LIBMATTI_MC_Property **properties;
     int propertyCount;
-    // Java: private final ImmutableList<S> states (the cartesian product in declaration order)
+// Java: private final ImmutableList<S> states (the cartesian product in declaration order)
     LIBMATTI_MC_StateHolder **states;
     int stateCount;
 } LIBMATTI_MC_StateDefinition;
@@ -60,4 +61,4 @@ LIBMATTI_MC_Property *LIBMATTI_MC_StateDefinition_GetProperty(const LIBMATTI_MC_
 }
 #endif
 
-#endif //MATTICRAFT_MC_BLOCKSTATE_STATEDEFINITION_H
+#endif

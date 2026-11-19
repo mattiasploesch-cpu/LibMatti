@@ -11,4 +11,4 @@
 void LIBMATTI_JS_JOptionPane_ShowMessageDialog(void *parentComponent, const char *message, const char *title,
                                                int messageType, LIBMATTI_JS_ImageIcon *icon);
 
-#endif //MATTICRAFT_JAVAX_SWING_JOPTIONPANE_H
+#endif

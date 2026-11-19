@@ -12,7 +12,7 @@
 typedef struct LIBMATTI_MC_Nbt_ListTag
 {
     uint8_t id;
-    // Java: private final List<Tag> list - owned by the list
+// Java: private final List<Tag> list - owned by the list
     LIBMATTI_MC_Nbt_Tag **elements;
     size_t count;
     size_t capacity;
@@ -22,7 +22,8 @@ typedef struct LIBMATTI_MC_Nbt_ListTag
 LIBMATTI_MC_Nbt_ListTag *LIBMATTI_MC_Nbt_ListTag_New(void);
 // Java: public ListTag copy() as a Tag
 LIBMATTI_MC_Nbt_Tag *LIBMATTI_MC_Nbt_ListTag_CopyTag(const LIBMATTI_MC_Nbt_ListTag *list);
-// the LIBMATTI_MC_Nbt_Tag_Free dispatch for TAG_LIST
+
+
 void LIBMATTI_MC_Nbt_ListTag_FreeEntries(LIBMATTI_MC_Nbt_ListTag *list);
 
 // Java: public int size()
@@ -61,11 +62,12 @@ int LIBMATTI_MC_Nbt_ListTag_GetInt(const LIBMATTI_MC_Nbt_ListTag *list, int inde
 int LIBMATTI_MC_Nbt_ListTag_GetDouble(const LIBMATTI_MC_Nbt_ListTag *list, int index, double *out);
 int LIBMATTI_MC_Nbt_ListTag_GetFloat(const LIBMATTI_MC_Nbt_ListTag *list, int index, float *out);
 int LIBMATTI_MC_Nbt_ListTag_GetString(const LIBMATTI_MC_Nbt_ListTag *list, int index, const char **out);
-// the *Or fallbacks
+
+
 int16_t LIBMATTI_MC_Nbt_ListTag_GetShortOr(const LIBMATTI_MC_Nbt_ListTag *list, int index, int16_t fallback);
 int32_t LIBMATTI_MC_Nbt_ListTag_GetIntOr(const LIBMATTI_MC_Nbt_ListTag *list, int index, int32_t fallback);
 double LIBMATTI_MC_Nbt_ListTag_GetDoubleOr(const LIBMATTI_MC_Nbt_ListTag *list, int index, double fallback);
 float LIBMATTI_MC_Nbt_ListTag_GetFloatOr(const LIBMATTI_MC_Nbt_ListTag *list, int index, float fallback);
 const char *LIBMATTI_MC_Nbt_ListTag_GetStringOr(const LIBMATTI_MC_Nbt_ListTag *list, int index, const char *fallback);
 
-#endif //MATTICRAFT_NET_MINECRAFT_NBT_LISTTAG_H
+#endif

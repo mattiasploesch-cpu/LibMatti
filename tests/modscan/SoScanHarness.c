@@ -1,5 +1,6 @@
-// Throwaway harness 2: reads the real mod .so through the port's JarContents and runs the
-// same class scan the Scanner runs, so the ELF-section entry names reach the scan as .class.
+
+
+
 
 #include "libmatti/net/neoforged/fml/jarcontents/JarContents.h"
 #include "libmatti/net/neoforged/fml/loading/modscan/ModClassVisitor.h"

@@ -1,7 +1,8 @@
-//
-// Created by administrator on 09.09.26.
-//
-// Port of cpw.mods.jarhandling.impl.SecureJarVerifier.
+
+
+
+
+
 
 #ifndef MATTICRAFT_SECUREJARVERIFIER_H
 #define MATTICRAFT_SECUREJARVERIFIER_H
@@ -18,4 +19,4 @@ typedef struct
 // Java: static boolean hasSignatures(JarVerifier) - TODO stub returning 0
 int LIBMATTI_JH_SecureJarVerifier_HasSignatures(void);
 
-#endif //MATTICRAFT_SECUREJARVERIFIER_H
+#endif

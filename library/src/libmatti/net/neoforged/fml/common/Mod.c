@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.common.Mod.
+
+
 
 #include "libmatti/net/neoforged/fml/common/Mod.h"
 

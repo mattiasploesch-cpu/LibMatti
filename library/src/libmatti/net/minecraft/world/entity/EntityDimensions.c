@@ -1,4 +1,5 @@
-// Port of net.minecraft.world.entity.EntityDimensions (implementation).
+
+
 
 #include "libmatti/net/minecraft/world/entity/EntityDimensions.h"
 
@@ -6,7 +7,7 @@
 
 float LIBMATTI_MC_EntityDimensions_DefaultEyeHeight(float height)
 {
-    // Java: private static float defaultEyeHeight(float p_331315_) - height * 0.85F
+// Java: private static float defaultEyeHeight(float p_331315_) - height * 0.85F
     return height * 0.85f;
 }
 
@@ -49,7 +50,7 @@ LIBMATTI_MC_EntityDimensions *LIBMATTI_MC_EntityDimensions_WithEyeHeight(const L
 {
     if (dimensions == NULL)
         return NULL;
-    // Java: the record copy takes the same attachments over - the port clones the
+// Java: the record copy takes the same attachments over - the port clones the
     // ownership by moving it into a fresh attachments default (the record never
     // shares into a free path, so the copy rebuilds the attachments)
     return dimensions_new(dimensions->width, dimensions->height, eyeHeight,
@@ -78,7 +79,7 @@ LIBMATTI_MC_EntityDimensions *LIBMATTI_MC_EntityDimensions_ScaleXY(const LIBMATT
 {
     if (dimensions == NULL)
         return NULL;
-    // Java: fixed dimensions (or the identity scale) return this
+// Java: fixed dimensions (or the identity scale) return this
     if (dimensions->fixed || (scaleX == 1.0f && scaleY == 1.0f))
         return LIBMATTI_MC_EntityDimensions_New(dimensions->width, dimensions->height, dimensions->eyeHeight,
                                                 LIBMATTI_MC_EntityAttachments_CreateDefault(dimensions->width, dimensions->height),
@@ -93,7 +94,7 @@ LIBMATTI_MC_AABB *LIBMATTI_MC_EntityDimensions_MakeBoundingBoxAt(const LIBMATTI_
 {
     if (dimensions == NULL)
         return NULL;
-    // Java: half = width / 2; new AABB(x - half, y, z - half, x + half, y + height, z + half)
+// Java: half = width / 2; new AABB(x - half, y, z - half, x + half, y + height, z + half)
     float half = dimensions->width / 2.0f;
     return LIBMATTI_MC_AABB_New(x - half, y, z - half, x + half, y + dimensions->height, z + half);
 }

@@ -1,4 +1,5 @@
-// Port of org.apache.maven.artifact.versioning.Restriction.
+
+
 
 #include "libmatti/org/apache/maven/artifact/versioning/Restriction.h"
 
@@ -29,7 +30,7 @@ LIBMATTI_MAVEN_Restriction *LIBMATTI_MAVEN_Restriction_New(LIBMATTI_MAVEN_Artifa
 
 void LIBMATTI_MAVEN_Restriction_Free(LIBMATTI_MAVEN_Restriction *restriction)
 {
-    // Java: EVERYTHING is a shared constant
+// Java: EVERYTHING is a shared constant
     if (restriction == NULL || restriction == &everything) return;
     free(restriction);
 }

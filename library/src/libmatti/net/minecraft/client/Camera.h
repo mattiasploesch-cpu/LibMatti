@@ -1,8 +1,9 @@
-// Port of net.minecraft.client.Camera - the camera position/rotation state
-// and the basis vectors derived from it. The Java entity/minecart/fluid
-// branches arrive with P5 (entities); the port exposes the transforms the
-// game renderer needs: setup from yaw/pitch, move along the basis and the
-// accessors the frustum/rendering paths read.
+
+
+
+
+
+
 
 #ifndef MATTICRAFT_MC_CLIENT_CAMERA_H
 #define MATTICRAFT_MC_CLIENT_CAMERA_H
@@ -20,22 +21,22 @@ extern "C" {
 // Java: public class Camera
 typedef struct LIBMATTI_MC_Camera
 {
-    // Java: private boolean initialized
+// Java: private boolean initialized
     int initialized;
-    // Java: private Vec3 position - the eye point in world space
+// Java: private Vec3 position - the eye point in world space
     double x, y, z;
-    // Java: private final BlockPos.MutableBlockPos blockPosition
+// Java: private final BlockPos.MutableBlockPos blockPosition
     int blockX, blockY, blockZ;
-    // Java: private final Vector3f forwards / up / left
+// Java: private final Vector3f forwards / up / left
     LIBMATTI_JOML_Vector3f forwards;
     LIBMATTI_JOML_Vector3f up;
     LIBMATTI_JOML_Vector3f left;
-    // Java: private float xRot / yRot - pitch / yaw in degrees
+// Java: private float xRot / yRot - pitch / yaw in degrees
     float xRot;
     float yRot;
-    // Java: private final Quaternionf rotation
+// Java: private final Quaternionf rotation
     LIBMATTI_JOML_Quaternionf rotation;
-    // Java: private boolean detached / eyeHeight / eyeHeightOld / partialTickTime
+// Java: private boolean detached / eyeHeight / eyeHeightOld / partialTickTime
     int detached;
     float eyeHeight;
     float eyeHeightOld;

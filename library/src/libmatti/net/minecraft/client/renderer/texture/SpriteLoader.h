@@ -1,6 +1,7 @@
-// Port of net.minecraft.client.renderer.texture.SpriteLoader and its
-// Preparations record. The sprite suppliers (SpriteSourceList) feed the
-// stitch; the port runs everything synchronously (Java's executor chain).
+
+
+
+
 
 #ifndef MATTICRAFT_MC_CLIENT_RENDERER_TEXTURE_SPRITELOADER_H
 #define MATTICRAFT_MC_CLIENT_RENDERER_TEXTURE_SPRITELOADER_H
@@ -24,7 +25,7 @@ typedef struct LIBMATTI_MC_SpriteLoader_Preparations
     int height;
     int mipLevel;
     LIBMATTI_MC_TextureAtlasSprite *missing;
-    // Java: Map<Identifier, TextureAtlasSprite> regions
+// Java: Map<Identifier, TextureAtlasSprite> regions
     LIBMATTI_MC_TextureAtlasSprite **sprites;
     LIBMATTI_MC_Identifier **spriteNames;
     size_t spriteCount;
@@ -54,4 +55,4 @@ void LIBMATTI_MC_SpriteLoader_Preparations_Free(LIBMATTI_MC_SpriteLoader_Prepara
 }
 #endif
 
-#endif //MATTICRAFT_MC_CLIENT_RENDERER_TEXTURE_SPRITELOADER_H
+#endif

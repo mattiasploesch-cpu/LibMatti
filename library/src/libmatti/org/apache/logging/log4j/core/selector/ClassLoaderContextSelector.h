@@ -5,4 +5,4 @@
 
 char *LIBMATTI_L4J_ClassLoaderContextSelector_ToContextMapKey(const LIBMATTI_CL_ClassLoader *loader);
 
-#endif //MATTICRAFT_L4J_CLASSLOADERCONTEXTSELECTOR_H
+#endif

@@ -1,6 +1,7 @@
-// Port of org.spongepowered.asm.launch.MixinBootstrap (sponge-mixin 0.17.3+mixin.0.8.7).
-// "Bootstraps the mixin subsystem. This class acts as a bridge between the mixin subsystem and
-// the tweaker or coremod which is bootstrapping it."
+
+
+
+
 
 #ifndef MATTICRAFT_SP_ASM_LAUNCH_MIXINBOOTSTRAP_H
 #define MATTICRAFT_SP_ASM_LAUNCH_MIXINBOOTSTRAP_H
@@ -28,4 +29,4 @@ void LIBMATTI_SP_MixinBootstrap_DoInit(LIBMATTI_SP_CommandLineOptions *args);
 // Java: static void inject() (package-private)
 void LIBMATTI_SP_MixinBootstrap_Inject(void);
 
-#endif //MATTICRAFT_SP_ASM_LAUNCH_MIXINBOOTSTRAP_H
+#endif

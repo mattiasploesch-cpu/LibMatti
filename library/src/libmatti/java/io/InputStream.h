@@ -1,7 +1,8 @@
-//
-// Created by administrator on 09.09.26.
-//
-// Port of java.io.InputStream.
+
+
+
+
+
 
 #ifndef MATTICRAFT_INPUTSTREAM_H
 #define MATTICRAFT_INPUTSTREAM_H
@@ -24,4 +25,4 @@ void LIBMATTI_JI_InputStream_Free(LIBMATTI_JI_InputStream *stream);
 // as a newly allocated buffer (caller frees), advancing the position
 unsigned char *LIBMATTI_JI_InputStream_ReadAllBytes(LIBMATTI_JI_InputStream *stream, size_t *outLength);
 
-#endif //MATTICRAFT_INPUTSTREAM_H
+#endif

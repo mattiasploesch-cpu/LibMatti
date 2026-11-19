@@ -1,6 +1,7 @@
-// Port of net.neoforged.fml.config.ModConfig.
-// Java's package-private constructor runs inside ConfigTracker.registerConfig; the port keeps the
-// fields and the per-mod ReentrantLock (a pthread mutex) the same way.
+
+
+
+
 
 #ifndef MATTICRAFT_FML_CONFIG_MODCONFIG_H
 #define MATTICRAFT_FML_CONFIG_MODCONFIG_H
@@ -30,17 +31,17 @@ const char *LIBMATTI_FML_ModConfig_Type_Extension(LIBMATTI_FML_ModConfig_Type ty
 // Java: public final class ModConfig
 struct LIBMATTI_FML_ModConfig
 {
-    // Java: private final Type type
+// Java: private final Type type
     LIBMATTI_FML_ModConfig_Type type;
-    // Java: private final IConfigSpec spec
+// Java: private final IConfigSpec spec
     LIBMATTI_FML_IConfigSpec *spec;
-    // Java: private final String fileName
+// Java: private final String fileName
     char *fileName;
-    // Java: final ModContainer container
+// Java: final ModContainer container
     LIBMATTI_FML_ModContainer *container;
-    // Java: @Nullable LoadedConfig loadedConfig (package-private)
+// Java: @Nullable LoadedConfig loadedConfig (package-private)
     LIBMATTI_FML_LoadedConfig *loadedConfig;
-    // Java: final Lock lock (ReentrantLock) - guards reloads and event dispatches
+// Java: final Lock lock (ReentrantLock) - guards reloads and event dispatches
     pthread_mutex_t lock;
 };
 
@@ -50,7 +51,8 @@ LIBMATTI_FML_ModConfig *LIBMATTI_FML_ModConfig_New(LIBMATTI_FML_ModConfig_Type t
                                                    LIBMATTI_FML_ModContainer *container, const char *fileName,
                                                    pthread_mutex_t *lock);
 void LIBMATTI_FML_ModConfig_Free(LIBMATTI_FML_ModConfig *config);
-// Java keeps the lock object alive separately (locksByMod); the port frees it the same way.
+
+
 void LIBMATTI_FML_ModConfig_FreeLock(pthread_mutex_t *lock);
 
 // Java: public Type getType()
@@ -74,4 +76,4 @@ void LIBMATTI_FML_ModConfig_SetConfig(LIBMATTI_FML_ModConfig *config, LIBMATTI_F
                                           LIBMATTI_FML_ModConfig *config),
                                       void *eventUserdata);
 
-#endif //MATTICRAFT_FML_CONFIG_MODCONFIG_H
+#endif

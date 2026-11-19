@@ -1,5 +1,6 @@
-// Port of net.minecraft.world.level.ChunkPos (the chunk coordinate pair with its packed
-// long form). The codec/stream parts stay out until the network port needs them.
+
+
+
 
 #ifndef MATTICRAFT_NET_MINECRAFT_WORLD_LEVEL_CHUNKPOS_H
 #define MATTICRAFT_NET_MINECRAFT_WORLD_LEVEL_CHUNKPOS_H
@@ -15,7 +16,7 @@ extern "C" {
 // Java: public class ChunkPos
 typedef struct LIBMATTI_MC_ChunkPos
 {
-    // Java: public final int x / z
+// Java: public final int x / z
     int x;
     int z;
 } LIBMATTI_MC_ChunkPos;
@@ -86,4 +87,4 @@ int LIBMATTI_MC_ChunkPos_DistanceSquared(const LIBMATTI_MC_ChunkPos *a, const LI
 }
 #endif
 
-#endif //MATTICRAFT_NET_MINECRAFT_WORLD_LEVEL_CHUNKPOS_H
+#endif

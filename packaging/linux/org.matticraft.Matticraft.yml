@@ -1,0 +1,35 @@
+# Flatpak manifest (org.matticraft.Matticraft).
+# The runtime provides libGL/Vulkan; SDL3/GLFW are built as modules because the
+# freedesktop runtime does not ship the development versions.
+app-id: org.matticraft.Matticraft
+runtime: org.freedesktop.Platform
+runtime-version: '24.08'
+sdk: org.freedesktop.Sdk
+sdk-extensions:
+  - org.freedesktop.Sdk.Extension.rust-stable
+command: matticraft-launcher
+finish-args:
+  - --share=ipc
+  - --socket=wayland
+  - --socket=fallback-x11
+  - --device=dri
+  - --share=network
+  - --filesystem=home
+modules:
+  - name: matticraft
+    buildsystem: cmake-ninja
+    builddir: true
+    config-opts:
+      - -DCMAKE_BUILD_TYPE=Release
+    build-options:
+      append-path: /usr/lib/sdk/rust-stable/bin
+      # cargo fetches the launcher crates; release builds should pin a
+      # vendored source list once the workspace is frozen.
+      build-args:
+        - --share=network
+    sources:
+      - type: dir
+        path: ../..
+    build-commands:
+      - cmake --build . --target launcher vulkancraft runClient matti_shared -j ${FLATPAK_BUILDER_N_JOBS}
+      - cmake --install . --prefix /app

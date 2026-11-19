@@ -1,6 +1,7 @@
-// Port of net.neoforged.fml.loading.modscan.BackgroundScanHandler.
-// Java's ModContentScanner is a fixed pool; the port uses the queued java.util.concurrent executor
-// (commands drain right after submission, which for the loader is the same result).
+
+
+
+
 
 #ifndef MATTICRAFT_FML_LOADING_MODSCAN_BACKGROUNDSCANHANDLER_H
 #define MATTICRAFT_FML_LOADING_MODSCAN_BACKGROUNDSCANHANDLER_H
@@ -44,4 +45,4 @@ int LIBMATTI_FML_BackgroundScanHandler_WaitForScanToComplete(LIBMATTI_FML_Backgr
 // Java: the enum name, used for logging
 const char *LIBMATTI_FML_BackgroundScanHandler_StatusName(LIBMATTI_FML_BackgroundScanHandler_ScanStatus status);
 
-#endif //MATTICRAFT_FML_LOADING_MODSCAN_BACKGROUNDSCANHANDLER_H
+#endif

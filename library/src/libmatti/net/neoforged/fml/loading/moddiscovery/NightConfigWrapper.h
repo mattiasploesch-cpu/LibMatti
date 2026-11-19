@@ -1,6 +1,7 @@
-// Port of net.neoforged.fml.loading.moddiscovery.NightConfigWrapper.
-// com.electronwill.nightconfig.core.UnmodifiableConfig is the ported
-// LIBMATTI_NC_Config (com/electronwill/nightconfig/core/Config.h).
+
+
+
+
 
 #ifndef MATTICRAFT_FML_LOADING_MODDISCOVERY_NIGHTCONFIGWRAPPER_H
 #define MATTICRAFT_FML_LOADING_MODDISCOVERY_NIGHTCONFIGWRAPPER_H
@@ -37,4 +38,4 @@ int LIBMATTI_FML_NightConfigWrapper_GetConfigElement(void *self, const char *con
 LIBMATTI_NEOFORGESPI_IConfigurable **LIBMATTI_FML_NightConfigWrapper_GetConfigList(void *self, const char *const *key,
                                                                                     size_t keyCount, size_t *count);
 
-#endif //MATTICRAFT_FML_LOADING_MODDISCOVERY_NIGHTCONFIGWRAPPER_H
+#endif

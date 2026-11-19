@@ -1,6 +1,7 @@
-// Port of java.util.concurrent.CompletableFuture<T> for the loader's use:
-// T is void*, completion is explicit (the port has no background threads on
-// its own - the host completes futures from its own code).
+
+
+
+
 
 #ifndef MATTICRAFT_JAVA_UTIL_CONCURRENT_COMPLETABLEFUTURE_H
 #define MATTICRAFT_JAVA_UTIL_CONCURRENT_COMPLETABLEFUTURE_H
@@ -42,4 +43,4 @@ LIBMATTI_JUC_CompletableFuture *LIBMATTI_JUC_CompletableFuture_ThenRun(
 LIBMATTI_JUC_CompletableFuture *LIBMATTI_JUC_CompletableFuture_AllOf(
     LIBMATTI_JUC_CompletableFuture **futures, size_t count);
 
-#endif //MATTICRAFT_JAVA_UTIL_CONCURRENT_COMPLETABLEFUTURE_H
+#endif

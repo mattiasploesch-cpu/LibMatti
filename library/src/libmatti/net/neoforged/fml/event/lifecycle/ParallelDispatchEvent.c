@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.event.lifecycle.ParallelDispatchEvent.
+
+
 
 #include "libmatti/net/neoforged/fml/event/lifecycle/ParallelDispatchEvent.h"
 
@@ -27,7 +28,7 @@ LIBMATTI_JUC_CompletableFuture *LIBMATTI_FML_Event_Lifecycle_ParallelDispatchEve
     const LIBMATTI_FML_Event_Lifecycle_ParallelDispatchEvent *event, LIBMATTI_FML_DeferredWorkQueue_Task work,
     void *userdata)
 {
-    // Java: return workQueue.enqueueWork(getContainer(), work);
+// Java: return workQueue.enqueueWork(getContainer(), work);
     return LIBMATTI_FML_DeferredWorkQueue_EnqueueWork(event->workQueue,
                                                LIBMATTI_FML_Event_Lifecycle_ModLifecycleEvent_GetContainer(&event->base),
                                                work, userdata);
@@ -38,7 +39,7 @@ LIBMATTI_JUC_CompletableFuture *LIBMATTI_FML_Event_Lifecycle_ParallelDispatchEve
     const LIBMATTI_FML_Event_Lifecycle_ParallelDispatchEvent *event, LIBMATTI_FML_DeferredWorkQueue_Supplier work,
     void *userdata)
 {
-    // Java: return workQueue.enqueueWork(getContainer(), work);
+// Java: return workQueue.enqueueWork(getContainer(), work);
     return LIBMATTI_FML_DeferredWorkQueue_EnqueueWorkSupplier(
         event->workQueue, LIBMATTI_FML_Event_Lifecycle_ModLifecycleEvent_GetContainer(&event->base), work, userdata);
 }

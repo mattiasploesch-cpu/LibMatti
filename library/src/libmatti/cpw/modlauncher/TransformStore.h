@@ -1,4 +1,5 @@
-// Port of cpw.mods.modlauncher.TransformStore.
+
+
 
 #ifndef MATTICRAFT_MODLAUNCHER_TRANSFORMSTORE_H
 #define MATTICRAFT_MODLAUNCHER_TRANSFORMSTORE_H
@@ -13,10 +14,10 @@
 // Java: public class TransformStore
 typedef struct LIBMATTI_ML_TransformStore
 {
-    // Java: Set<String> classNeedsTransforming
+// Java: Set<String> classNeedsTransforming
     char **classNeedsTransforming;
     size_t classCount;
-    // Java: Map<TargetType<?>, TransformList<?>> transformers (an EnumMap-shaped array)
+// Java: Map<TargetType<?>, TransformList<?>> transformers (an EnumMap-shaped array)
     LIBMATTI_ML_TransformList *transformers[4];
 } LIBMATTI_ML_TransformStore;
 
@@ -43,4 +44,4 @@ void LIBMATTI_ML_TransformStore_AddTransformer(LIBMATTI_ML_TransformStore *store
 // Java: boolean needsTransforming(String internalClassName)
 int LIBMATTI_ML_TransformStore_NeedsTransforming(const LIBMATTI_ML_TransformStore *store, const char *internalClassName);
 
-#endif //MATTICRAFT_MODLAUNCHER_TRANSFORMSTORE_H
+#endif

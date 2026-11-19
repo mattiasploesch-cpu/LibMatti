@@ -1,4 +1,5 @@
-// Port of org.spongepowered.asm.launch.GlobalProperties.
+
+
 
 #include "libmatti/org/spongepowered/asm/launch/GlobalProperties.h"
 

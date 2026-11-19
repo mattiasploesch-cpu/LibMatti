@@ -1,4 +1,5 @@
-// Port of net.minecraft.server.packs.PackType.
+
+
 
 #include "libmatti/net/minecraft/server/packs/PackType.h"
 

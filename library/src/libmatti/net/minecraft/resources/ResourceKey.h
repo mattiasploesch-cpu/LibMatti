@@ -1,7 +1,8 @@
-// Port of net.minecraft.resources.ResourceKey.
-// Java interns every key through a ConcurrentMap keyed by (registry, identifier); the C port
-// keeps the same intern table so two create() calls for the same pair return one object and
-// pointer equality works like Java's identity semantics.
+
+
+
+
+
 
 #ifndef MATTICRAFT_NET_MINECRAFT_RESOURCES_RESOURCEKEY_H
 #define MATTICRAFT_NET_MINECRAFT_RESOURCES_RESOURCEKEY_H
@@ -13,9 +14,9 @@ typedef struct LIBMATTI_MC_ResourceKey LIBMATTI_MC_ResourceKey;
 
 struct LIBMATTI_MC_ResourceKey
 {
-    // Java: private final Identifier registryName;
+// Java: private final Identifier registryName;
     LIBMATTI_MC_Identifier *registryName;
-    // Java: private final Identifier identifier;
+// Java: private final Identifier identifier;
     LIBMATTI_MC_Identifier *identifier;
 };
 
@@ -29,7 +30,8 @@ LIBMATTI_MC_ResourceKey *LIBMATTI_MC_ResourceKey_Create(const LIBMATTI_MC_Resour
 // Java: public static <T> ResourceKey<Registry<T>> createRegistryKey(Identifier identifier) -
 // registry name is Registries.ROOT_REGISTRY_NAME ("minecraft:root")
 LIBMATTI_MC_ResourceKey *LIBMATTI_MC_ResourceKey_CreateRegistryKey(const LIBMATTI_MC_Identifier *identifier);
-// convenience: createRegistryKey from a plain "namespace:path" string
+
+
 LIBMATTI_MC_ResourceKey *LIBMATTI_MC_ResourceKey_CreateRegistryKeyParsed(const char *location);
 
 // Java: public Identifier identifier() / registry()
@@ -50,4 +52,4 @@ char *LIBMATTI_MC_ResourceKey_ToString(const LIBMATTI_MC_ResourceKey *key);
 // object (pointer equality), exactly Java's identity semantics
 int LIBMATTI_MC_ResourceKey_Same(const LIBMATTI_MC_ResourceKey *a, const LIBMATTI_MC_ResourceKey *b);
 
-#endif //MATTICRAFT_NET_MINECRAFT_RESOURCES_RESOURCEKEY_H
+#endif

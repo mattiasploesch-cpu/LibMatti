@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.loading.moddiscovery.ModJarMetadata.
+
+
 
 #ifndef MATTICRAFT_FML_LOADING_MODDISCOVERY_MODJARMETADATA_H
 #define MATTICRAFT_FML_LOADING_MODDISCOVERY_MODJARMETADATA_H
@@ -12,7 +13,7 @@ struct LIBMATTI_FML_ModJarMetadata
 {
     LIBMATTI_FML_JarModuleInfo base;
 
-    // Java: private IModFile modFile
+// Java: private IModFile modFile
     LIBMATTI_NEOFORGESPI_IModFile *modFile;
 };
 
@@ -27,4 +28,4 @@ LIBMATTI_FML_JarModuleInfo *LIBMATTI_FML_ModJarMetadata_AsJarModuleInfo(LIBMATTI
 // Java: @Override public String toString()
 char *LIBMATTI_FML_ModJarMetadata_ToString(const LIBMATTI_FML_ModJarMetadata *metadata);
 
-#endif //MATTICRAFT_FML_LOADING_MODDISCOVERY_MODJARMETADATA_H
+#endif

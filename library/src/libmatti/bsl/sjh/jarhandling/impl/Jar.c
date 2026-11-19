@@ -1,6 +1,7 @@
-//
-// Created by administrator on 09.09.26.
-//
+
+
+
+
 
 #include "Jar.h"
 
@@ -64,13 +65,14 @@ static LIBMATTI_JU_Manifest *jar_provider_get_manifest(LIBMATTI_JH_ModuleDataPro
     return provider->jar->manifest;
 }
 
-// ---------------------------------------------------------------------------
-// Jar
-// ---------------------------------------------------------------------------
+
+
+
+
 
 LIBMATTI_JN_URI *LIBMATTI_JH_Jar_GetURI(const LIBMATTI_JH_Jar *jar)
 {
-    // Java: filesystem.getRootDirectories().iterator().next().toUri()
+// Java: filesystem.getRootDirectories().iterator().next().toUri()
     return LIBMATTI_UNION_UnionPath_ToUri(jar->filesystem->root);
 }
 
@@ -84,9 +86,10 @@ int LIBMATTI_JH_Jar_FindFile(const LIBMATTI_JH_Jar *jar, const char *name, LIBMA
     return LIBMATTI_JH_JarContents_FindFile((LIBMATTI_JH_JarContents *)jar->contents, name, out);
 }
 
-// ---------------------------------------------------------------------------
-// SecureJar implementation
-// ---------------------------------------------------------------------------
+
+
+
+
 
 static LIBMATTI_JH_ModuleDataProvider *jar_module_data_provider(LIBMATTI_JH_SecureJar *self)
 {
@@ -104,7 +107,7 @@ static LIBMATTI_JH_Status jar_verify_path(LIBMATTI_JH_SecureJar *self, const cha
 {
     (void)self;
     (void)path;
-    // TODO: signingData.verifyPath
+// TODO: signingData.verifyPath
     return LIBMATTI_JH_STATUS_NONE;
 }
 
@@ -112,14 +115,14 @@ static LIBMATTI_JH_Status jar_get_file_status(LIBMATTI_JH_SecureJar *self, const
 {
     (void)self;
     (void)name;
-    // TODO: signingData.getFileStatus
+// TODO: signingData.getFileStatus
     return LIBMATTI_JH_STATUS_NONE;
 }
 
 static int jar_has_security_data(LIBMATTI_JH_SecureJar *self)
 {
     (void)self;
-    // TODO: signingData.hasSecurityData()
+// TODO: signingData.hasSecurityData()
     return 0;
 }
 
@@ -146,7 +149,7 @@ static void jar_close(LIBMATTI_JH_SecureJar *self)
 {
     LIBMATTI_JH_Jar *jar = (LIBMATTI_JH_Jar *)self;
 
-    // Java: contents.close() - the metadata must outlive the contents' caches
+// Java: contents.close() - the metadata must outlive the contents' caches
     LIBMATTI_JH_JarMetadata_Free(jar->metadata);
     LIBMATTI_JH_JarContents_Close((LIBMATTI_JH_JarContents *)jar->contents);
     free(jar);

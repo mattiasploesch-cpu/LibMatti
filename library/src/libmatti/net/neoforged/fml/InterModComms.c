@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.InterModComms.
+
+
 
 #include "libmatti/net/neoforged/fml/InterModComms.h"
 
@@ -28,7 +29,7 @@ static IMCQueue *queue_for(const char *modId, int create)
 
     if (!create) return NULL;
 
-    // Java: containerQueues.computeIfAbsent(modId, k -> new ConcurrentLinkedQueue<>())
+// Java: containerQueues.computeIfAbsent(modId, k -> new ConcurrentLinkedQueue<>())
     containerQueues = realloc(containerQueues, sizeof(*containerQueues) * (containerQueueCount + 1));
     IMCQueue *queue = &containerQueues[containerQueueCount++];
     queue->modId = strdup(modId);
@@ -81,7 +82,7 @@ void LIBMATTI_FML_InterModComms_GetMessages(
         return;
     }
 
-    // Java: tryAdvance yields the next matching message and removes it from the queue
+// Java: tryAdvance yields the next matching message and removes it from the queue
     for (size_t i = 0; i < queue->count;)
     {
         LIBMATTI_FML_InterModComms_IMCMessage *message = &queue->messages[i];

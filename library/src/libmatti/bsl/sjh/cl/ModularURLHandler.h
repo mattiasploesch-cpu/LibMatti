@@ -1,4 +1,5 @@
-// Port of cpw.mods.cl.ModularURLHandler (java.net.URLStreamHandlerFactory).
+
+
 
 #ifndef MATTICRAFT_MODULARURLHANDLER_H
 #define MATTICRAFT_MODULARURLHANDLER_H
@@ -18,8 +19,8 @@ typedef struct
 {
     const char *(*protocol)(void);
     LIBMATTI_JI_InputStream *(*inputStreamFunction)(LIBMATTI_CL_URL *url);
-    long (*getLastModified)(LIBMATTI_CL_URL *url); // Java: default 0
-    long (*getContentLength)(LIBMATTI_CL_URL *url); // Java: default -1
+    long (*getLastModified)(LIBMATTI_CL_URL *url);// Java: default 0
+    long (*getContentLength)(LIBMATTI_CL_URL *url);// Java: default -1
 } LIBMATTI_CL_IURLProvider;
 
 // Java: static class FunctionURLStreamHandler extends URLStreamHandler
@@ -38,7 +39,7 @@ typedef struct
 // Java: class ModularURLHandler implements URLStreamHandlerFactory
 typedef struct
 {
-    // Java: Map<String, IURLProvider> handlers
+// Java: Map<String, IURLProvider> handlers
     char **protocols;
     LIBMATTI_CL_IURLProvider **handlers;
     size_t count;
@@ -67,4 +68,4 @@ long LIBMATTI_CL_FunctionURLConnection_GetContentLengthLong(const LIBMATTI_CL_Fu
 // Java: long getLastModified()
 long LIBMATTI_CL_FunctionURLConnection_GetLastModified(const LIBMATTI_CL_FunctionURLConnection *connection);
 
-#endif //MATTICRAFT_MODULARURLHANDLER_H
+#endif

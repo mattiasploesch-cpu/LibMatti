@@ -1,0 +1,26 @@
+# Windows cross build from Linux. Pick the target with
+#   -DMATTI_MINGW_TRIPLE=x86_64-w64-mingw32   (default)
+#   -DMATTI_MINGW_TRIPLE=i686-w64-mingw32
+set(CMAKE_SYSTEM_NAME Windows)
+if(NOT MATTI_MINGW_TRIPLE)
+    set(MATTI_MINGW_TRIPLE "x86_64-w64-mingw32")
+endif()
+if(MATTI_MINGW_TRIPLE MATCHES "^i686")
+    set(CMAKE_SYSTEM_PROCESSOR x86)
+elseif(MATTI_MINGW_TRIPLE MATCHES "^aarch64")
+    set(CMAKE_SYSTEM_PROCESSOR arm64)
+else()
+    set(CMAKE_SYSTEM_PROCESSOR x86_64)
+endif()
+
+set(CMAKE_C_COMPILER "${MATTI_MINGW_TRIPLE}-gcc")
+set(CMAKE_RC_COMPILER "${MATTI_MINGW_TRIPLE}-windres")
+
+# The sysroot of the cross distribution (Debian/Ubuntu: /usr/<triple>).
+if(EXISTS "/usr/${MATTI_MINGW_TRIPLE}")
+    set(CMAKE_FIND_ROOT_PATH "/usr/${MATTI_MINGW_TRIPLE}")
+endif()
+set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
+set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
+set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
+set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ONLY)

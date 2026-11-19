@@ -1,7 +1,8 @@
-// Port of net.minecraft.client.renderer.chunk.SectionCompiler - the compile
-// pass that walks the section's 18^3 block region, skips the occluded faces,
-// packs the visible geometry into the per-layer buffers and resolves the face
-// visibility through the VisGraph.
+
+
+
+
+
 
 #ifndef MATTICRAFT_MC_CLIENT_RENDERER_CHUNK_SECTIONCOMPILER_H
 #define MATTICRAFT_MC_CLIENT_RENDERER_CHUNK_SECTIONCOMPILER_H
@@ -20,16 +21,17 @@ extern "C" {
 // callback the game layer wires.
 typedef struct LIBMATTI_MC_SectionCompiler
 {
-    // The sprite rect provider for a block's face texture: fills uv with the
-    // {u0, v0, u1, v1} atlas rect of the block's default sprite. The game layer
-    // resolves through the block atlas; NULL means the missing-texture sprite.
+
+
+
+
     void (*spriteRectForBlock)(void *userdata, const struct LIBMATTI_MC_Block *block, float uv[4]);
     void *userdata;
-    // Java: the block-model resolver (ModelManager) - when set, the compiler
+// Java: the block-model resolver (ModelManager) - when set, the compiler
     // renders the baked model quads for the block's model id instead of the
     // hardcoded cube faces. The block carries its model id.
     const struct LIBMATTI_MC_QuadCollection *(*modelForBlock)(void *userdata, const struct LIBMATTI_MC_Block *block);
-    // Java: this.blockRenderer - the BlockRenderDispatcher the compile walks
+// Java: this.blockRenderer - the BlockRenderDispatcher the compile walks
     // through (tesselateBlock's AO path). When set, the model path renders
     // through the dispatcher (AO + tint) instead of the flat emit.
     struct LIBMATTI_MC_BlockRenderDispatcher *blockRenderer;
@@ -50,4 +52,4 @@ LIBMATTI_MC_CompiledSectionMesh *LIBMATTI_MC_SectionCompiler_Compile(
 }
 #endif
 
-#endif //MATTICRAFT_MC_CLIENT_RENDERER_CHUNK_SECTIONCOMPILER_H
+#endif

@@ -1,4 +1,5 @@
-// Port of net.neoforged.neoforgespi.IIssueReporting.
+
+
 
 #ifndef MATTICRAFT_NEOFORGESPI_IISSUEREPORTING_H
 #define MATTICRAFT_NEOFORGESPI_IISSUEREPORTING_H
@@ -12,7 +13,7 @@ struct LIBMATTI_NEOFORGESPI_IIssueReporting
 {
     void *self;
 
-    // Java: void addIssue(ModLoadingIssue issue)
+// Java: void addIssue(ModLoadingIssue issue)
     void (*addIssue)(void *self, LIBMATTI_FML_ModLoadingIssue *issue);
 };
 
@@ -20,4 +21,4 @@ struct LIBMATTI_NEOFORGESPI_IIssueReporting
 void LIBMATTI_NEOFORGESPI_IIssueReporting_AddIssue(const LIBMATTI_NEOFORGESPI_IIssueReporting *reporter,
                                                    LIBMATTI_FML_ModLoadingIssue *issue);
 
-#endif //MATTICRAFT_NEOFORGESPI_IISSUEREPORTING_H
+#endif

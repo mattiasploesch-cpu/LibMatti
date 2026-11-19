@@ -1,13 +1,16 @@
-// Port of the org.lwjgl.opengl binding implementation. LWJGL loads the GL
-// entry points once per context through GLCapabilities.create(): every
-// function is fetched through the platform's GetProcAddress (glXGetProcAddress
-// on X11, eglGetProcAddress on Wayland) with a dlsym fallback for the GL 1.1
-// ABI symbols. The port keeps exactly that chain behind dlopen, so a missing
-// or unloaded driver library means "not available" instead of a hard link
-// error.
+
+
+
+
+
+
+
+
 
 #include "libmatti/org/lwjgl/opengl/GL.h"
 #include "libmatti/org/lwjgl/opengl/Constants.h"
+
+#include "libmatti/matti/native/Library.h"
 
 #include <dlfcn.h>
 #include <stdint.h>
@@ -22,8 +25,9 @@ static void *gl_proc_get(void *unused, const char *name);
 static unsigned char (*glXGetProcAddressARB)(const unsigned char *) = NULL;
 static void *(*eglGetProcAddress)(const char *) = NULL;
 
-// One resolver per entry point, exactly like LWJGL's generated
-// GLCapabilities.create() function table.
+
+
+
 #define GL_PROC(field, name)                                                                     \
     do                                                                                           \
     {                                                                                            \
@@ -169,8 +173,9 @@ static int gl_loaded = 0;
 static int gl_have_description = 0;
 static char gl_description[192];
 
-// The ABI entry points every GL 1.1 driver exports; LWJGL falls back to the
-// system loader for exactly these through NativeLibrary.getFunction.
+
+
+
 static void *gl_proc_get(void *unused, const char *name)
 {
     (void) unused;
@@ -179,10 +184,11 @@ static void *gl_proc_get(void *unused, const char *name)
         address = (void *) glXGetProcAddressARB((const unsigned char *) name);
     if (address == NULL && eglGetProcAddress != NULL)
         address = eglGetProcAddress(name);
-    // Some drivers (Mesa's glXGetProcAddressARB without a bound context) hand
-    // out tiny dispatch-table offsets instead of real entry points; anything
-    // below one page is not executable code, so the lookup falls through to
-    // the libGL ABI symbols (dlsym) instead of taking the bogus pointer.
+
+
+
+
+
     if ((uintptr_t) address < 4096)
         address = dlsym(gl_lib, name);
     if ((uintptr_t) address < 4096)
@@ -194,14 +200,18 @@ int LIBMATTI_GL_Load(void)
 {
     if (gl_lib == NULL)
     {
-        const char *names[] = {"libGL.so.1", "libGL.so", "libEGL.so.1", "libOSMesa.so.8", NULL};
-        for (int i = 0; names[i] != NULL; i++)
+
+
+
+
+        gl_lib = LIBMATTI_NATIVE_OpenEmbeddedLibrary(MATTI_NATIVE_GL_SECTION);
+        if (gl_lib == NULL)
         {
-            gl_lib = dlopen(names[i], RTLD_NOW | RTLD_LOCAL);
-            if (gl_lib != NULL) break;
+            static const char *const names[] = {"libGL.so.1", "libGL.so", "libEGL.so.1", "libOSMesa.so.8", NULL};
+            gl_lib = LIBMATTI_NATIVE_OpenLibrary(names);
         }
         if (gl_lib == NULL) return 0;
-        // Java: GLCapabilities.create() resolves the GetProcAddress entry
+// Java: GLCapabilities.create() resolves the GetProcAddress entry
         // points first; the per-function lookups use whichever answers.
         glXGetProcAddressARB = (unsigned char (*)(const unsigned char *)) dlsym(gl_lib, "glXGetProcAddressARB");
         eglGetProcAddress = (void *(*)(const char *)) dlsym(gl_lib, "eglGetProcAddress");
@@ -346,7 +356,7 @@ int LIBMATTI_GL_Load(void)
 
 void LIBMATTI_GL_Unload(void)
 {
-    // Java: LWJGL keeps the function table for the process lifetime; the port
+// Java: LWJGL keeps the function table for the process lifetime; the port
     // resets the handles so a later Load() re-resolves them.
     gl_loaded = 0;
     gl_have_description = 0;
@@ -362,11 +372,12 @@ const char *LIBMATTI_GL_Describe(void)
     return gl_have_description ? gl_description : NULL;
 }
 
-// ---------------------------------------------------------------------------
-// The wrappers. Every function checks its entry point like LWJGL's generated
-// calls (a NULL entry point means the driver lacks the extension) and no-ops
-// with the documented fallback value.
-// ---------------------------------------------------------------------------
+
+
+
+
+
+
 
 void LIBMATTI_GL_glViewport(int x, int y, int width, int height)
 {
@@ -464,10 +475,11 @@ const char *LIBMATTI_GL_glGetString(unsigned int name)
 {
     const char *(*fn)(unsigned int) = (const char *(*)(unsigned int)) p_glGetString;
     const char *value = fn != NULL ? fn(name) : NULL;
-    // Java: GlDevice renders the "GL_VENDOR GL_RENDERER GL_VERSION" line during
+// Java: GlDevice renders the "GL_VENDOR GL_RENDERER GL_VERSION" line during
     // startup. The calls need a current context (LWJGL documents that for
     // GLCapabilities.create()); the port caches them when the game makes them.
-    if (value != NULL && (name == 7936 || name == 7937 || name == 7938)) // GL_VENDOR/GL_RENDERER/GL_VERSION
+    if (value != NULL && (name == 7936 || name == 7937 || name == 7938))
+
     {
         snprintf(gl_description, sizeof(gl_description), "%s", value);
         gl_have_description = 1;
@@ -477,7 +489,7 @@ const char *LIBMATTI_GL_glGetString(unsigned int name)
 
 int LIBMATTI_GL_glGetInteger(unsigned int pname)
 {
-    // Java: GL11.glGetInteger wraps glGetIntegerv with a one-element buffer.
+// Java: GL11.glGetInteger wraps glGetIntegerv with a one-element buffer.
     int value = 0;
     void (*fn)(unsigned int, int *) = (void (*)(unsigned int, int *)) p_glGetIntegerv;
     if (fn != NULL) fn(pname, &value);
@@ -486,7 +498,7 @@ int LIBMATTI_GL_glGetInteger(unsigned int pname)
 
 float LIBMATTI_GL_glGetFloat(unsigned int pname)
 {
-    // Java: GL11.glGetFloat wraps glGetFloatv with a one-element buffer.
+// Java: GL11.glGetFloat wraps glGetFloatv with a one-element buffer.
     float value = 0.0f;
     void (*fn)(unsigned int, float *) = (void (*)(unsigned int, float *)) p_glGetFloatv;
     if (fn != NULL) fn(pname, &value);
@@ -609,7 +621,7 @@ unsigned int LIBMATTI_GL_glCreateShader(unsigned int type)
 
 void LIBMATTI_GL_glShaderSource(unsigned int shader, const char *source)
 {
-    // Java: GlStateManager.glShaderSource packs the source into a
+// Java: GlStateManager.glShaderSource packs the source into a
     // one-element pointer array before the native call; the port does the
     // same in C.
     void (*fn)(unsigned int, int, const char **, const int *) =
@@ -634,7 +646,7 @@ void LIBMATTI_GL_glDeleteShader(unsigned int shader)
 
 int LIBMATTI_GL_glGetShaderi(unsigned int shader, unsigned int pname)
 {
-    // Java: GL20.glGetShaderi wraps glGetShaderiv with a one-element buffer.
+// Java: GL20.glGetShaderi wraps glGetShaderiv with a one-element buffer.
     int value = 0;
     void (*fn)(unsigned int, unsigned int, int *) = (void (*)(unsigned int, unsigned int, int *)) p_glGetShaderiv;
     if (fn != NULL) fn(shader, pname, &value);
@@ -643,14 +655,15 @@ int LIBMATTI_GL_glGetShaderi(unsigned int shader, unsigned int pname)
 
 const char *LIBMATTI_GL_glGetShaderInfoLog(unsigned int shader)
 {
-    // Java: GL20.glGetShaderInfoLog wraps glGetShaderInfoLog with a sized
+// Java: GL20.glGetShaderInfoLog wraps glGetShaderInfoLog with a sized
     // buffer; LWJGL sizes it from glGetShaderiv(GL_INFO_LOG_LENGTH). The port
     // returns the thread-local buffer GLDebug formats too.
     static char log[4096];
     log[0] = '\0';
     int length = 0;
     void (*fnIv)(unsigned int, unsigned int, int *) = (void (*)(unsigned int, unsigned int, int *)) p_glGetShaderiv;
-    if (fnIv != NULL) fnIv(shader, 35716, &length); // GL_INFO_LOG_LENGTH
+    if (fnIv != NULL) fnIv(shader, 35716, &length);
+
     if (length <= 0) return log;
     if (length > (int) sizeof(log) - 1) length = (int) sizeof(log) - 1;
     void (*fn)(unsigned int, int, int *, char *) =
@@ -685,7 +698,7 @@ void LIBMATTI_GL_glLinkProgram(unsigned int program)
 
 int LIBMATTI_GL_glGetProgrami(unsigned int program, unsigned int pname)
 {
-    // Java: GL20.glGetProgrami wraps glGetProgramiv with a one-element buffer.
+// Java: GL20.glGetProgrami wraps glGetProgramiv with a one-element buffer.
     int value = 0;
     void (*fn)(unsigned int, unsigned int, int *) = (void (*)(unsigned int, unsigned int, int *)) p_glGetProgramiv;
     if (fn != NULL) fn(program, pname, &value);
@@ -698,7 +711,8 @@ const char *LIBMATTI_GL_glGetProgramInfoLog(unsigned int program)
     log[0] = '\0';
     int length = 0;
     void (*fnIv)(unsigned int, unsigned int, int *) = (void (*)(unsigned int, unsigned int, int *)) p_glGetProgramiv;
-    if (fnIv != NULL) fnIv(program, 35716, &length); // GL_INFO_LOG_LENGTH
+    if (fnIv != NULL) fnIv(program, 35716, &length);
+
     if (length <= 0) return log;
     if (length > (int) sizeof(log) - 1) length = (int) sizeof(log) - 1;
     void (*fn)(unsigned int, int, int *, char *) =
@@ -745,8 +759,9 @@ void LIBMATTI_GL_glUniform3f(int location, float v0, float v1, float v2)
 
 void LIBMATTI_GL_glUniformMatrix4fv(int location, int transpose, const float *value)
 {
-    // The real signature is (location, count, transpose, value); the port's
-    // wrapper takes (location, transpose, value) and uploads one matrix.
+
+
+
     void (*fn)(int, int, int, const float *) = (void (*)(int, int, int, const float *)) p_glUniformMatrix4fv;
     if (fn != NULL) fn(location, 1, transpose, value);
 }
@@ -945,7 +960,7 @@ void LIBMATTI_GL_glTexParameterf(unsigned int target, unsigned int pname, float 
 
 int LIBMATTI_GL_glGetTexLevelParameteri(unsigned int target, int level, unsigned int pname)
 {
-    // Java: GL11.glGetTexLevelParameteri wraps glGetTexLevelParameteriv with a
+// Java: GL11.glGetTexLevelParameteri wraps glGetTexLevelParameteriv with a
     // one-element buffer.
     int value = 0;
     void (*fn)(unsigned int, int, unsigned int, int *) =
@@ -1009,7 +1024,7 @@ int LIBMATTI_GL_glGetUniformBlockIndex(unsigned int program, const char *uniform
 
 void LIBMATTI_GL_glGetActiveUniformBlockName(unsigned int program, unsigned int uniformBlockIndex, char *uniformBlockName)
 {
-    // Java: GL31.glGetActiveUniformBlockName writes up to the buffer size; the
+// Java: GL31.glGetActiveUniformBlockName writes up to the buffer size; the
     // game sizes the array from GL_ACTIVE_UNIFORM_BLOCK_MAX_NAME_LENGTH. The
     // port passes a 256-sized buffer like the generated LWJGL call.
     void (*fn)(unsigned int, unsigned int, int, int *, char *) =
@@ -1041,7 +1056,7 @@ void *LIBMATTI_GL_glFenceSync(unsigned int condition, unsigned int flags)
 
 unsigned int LIBMATTI_GL_glClientWaitSync(void *sync, unsigned int flags, unsigned long long timeout)
 {
-    // Java: GL32.glClientWaitSync returns the GLenum status (GLint in the C API).
+// Java: GL32.glClientWaitSync returns the GLenum status (GLint in the C API).
     unsigned int (*fn)(void *, unsigned int, unsigned long long) =
         (unsigned int (*)(void *, unsigned int, unsigned long long)) p_glClientWaitSync;
     return fn != NULL ? fn(sync, flags, timeout) : LIBMATTI_GL_GL_WAIT_FAILED;
@@ -1125,7 +1140,7 @@ void LIBMATTI_GL_glEndQuery(unsigned int target)
 
 int LIBMATTI_GL_glGetQueryObjecti(unsigned int id, unsigned int pname)
 {
-    // Java: ARBTimerQuery.glGetQueryObjecti wraps glGetQueryObjectiv with a
+// Java: ARBTimerQuery.glGetQueryObjecti wraps glGetQueryObjectiv with a
     // one-element buffer.
     int value = 0;
     void (*fn)(unsigned int, unsigned int, int *) = (void (*)(unsigned int, unsigned int, int *)) p_glGetQueryObjectiv;
@@ -1135,7 +1150,7 @@ int LIBMATTI_GL_glGetQueryObjecti(unsigned int id, unsigned int pname)
 
 long long LIBMATTI_GL_glGetQueryObjecti64(unsigned int id, unsigned int pname)
 {
-    // Java: ARBTimerQuery.glGetQueryObjecti64 wraps glGetQueryObjecti64v with
+// Java: ARBTimerQuery.glGetQueryObjecti64 wraps glGetQueryObjecti64v with
     // a one-element buffer.
     long long value = 0;
     void (*fn)(unsigned int, unsigned int, long long *) =
@@ -1253,7 +1268,7 @@ void LIBMATTI_GL_glBindVertexBuffer(unsigned int bindingindex, unsigned int buff
 
 void LIBMATTI_GL_glObjectLabel(unsigned int identifier, unsigned int name, const char *label)
 {
-    // Java: KHRDebug.glObjectLabel takes (identifier, name, length, label) and
+// Java: KHRDebug.glObjectLabel takes (identifier, name, length, label) and
     // LWJGL measures the string; the port passes the measured length like the
     // generated call.
     void (*fn)(unsigned int, unsigned int, int, const char *) =
@@ -1263,7 +1278,7 @@ void LIBMATTI_GL_glObjectLabel(unsigned int identifier, unsigned int name, const
 
 void LIBMATTI_GL_glPushDebugGroup(unsigned int source, unsigned int id, const char *message)
 {
-    // Java: KHRDebug.glPushDebugGroup takes (source, id, length, message).
+// Java: KHRDebug.glPushDebugGroup takes (source, id, length, message).
     void (*fn)(unsigned int, unsigned int, int, const char *) =
         (void (*)(unsigned int, unsigned int, int, const char *)) p_glPushDebugGroup;
     if (fn != NULL) fn(source, id, message != NULL ? (int) strlen(message) : 0, message);
@@ -1305,7 +1320,7 @@ void LIBMATTI_GL_glDebugMessageCallbackARB(LIBMATTI_GL_DebugMessageCallbackI cal
 
 void LIBMATTI_GL_glLabelObjectEXT(unsigned int type, unsigned int object, const char *label)
 {
-    // Java: EXTDebugLabel.glLabelObjectEXT takes (type, object, length, label).
+// Java: EXTDebugLabel.glLabelObjectEXT takes (type, object, length, label).
     void (*fn)(unsigned int, unsigned int, int, const char *) =
         (void (*)(unsigned int, unsigned int, int, const char *)) p_glLabelObjectEXT;
     if (fn != NULL) fn(type, object, label != NULL ? (int) strlen(label) : 0, label);
