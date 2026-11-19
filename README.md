@@ -133,7 +133,8 @@ nix develop                   # CMake, Rust and the runtime libraries
 `search.nix.org` indexes nixpkgs, not arbitrary flakes. The flake packages work
 immediately; the nixpkgs names are `matticraft`, `libmatti` and the `dev` output
 of `libmatti`. Making them appear on `search.nix.org` therefore requires a
-merged nixpkgs pull request.
+merged nixpkgs pull request. The prepared, not-yet-submitted PR files are in
+`nixpkgs-pr/`; see `nixpkgs-pr/README.md`.
 
 `libmatti` is also published as a standalone tarball
 (`libmatti-<version>-linux-<arch>.tar.zst`) next to the AppImage, deb and rpm.
