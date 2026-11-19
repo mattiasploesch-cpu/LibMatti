@@ -20,7 +20,8 @@
 #define UI_FONT_RESOURCE \
     MATTI_SOURCE_DIR "/vendor/FancyModLoader/earlydisplay/src/main/resources/net/neoforged/fml/earlydisplay/theme/Monocraft.ttf"
 
-#define UI_FONT_PIXEL_HEIGHT 16
+#define UI_FONT_PIXEL_HEIGHT 8
+#define UI_FONT_MAX_SCALE 12
 #define UI_FONT_FIRST_CODEPOINT 32
 #define UI_FONT_LAST_CODEPOINT 126
 #define UI_FONT_GLYPH_COUNT (UI_FONT_LAST_CODEPOINT - UI_FONT_FIRST_CODEPOINT + 1)
@@ -35,16 +36,23 @@ typedef struct UiGlyph
     unsigned char *bitmap;
 } UiGlyph;
 
+typedef struct UiFontSize
+{
+    int loaded;
+    int attempted;
+    float scale;
+    int ascent;
+    int descent;
+    UiGlyph glyphs[UI_FONT_GLYPH_COUNT];
+} UiFontSize;
+
 typedef struct UiFont
 {
     int loaded;
     int attempted;
     stbtt_fontinfo info;
     unsigned char *data;
-    float scale;
-    int ascent;
-    int descent;
-    UiGlyph glyphs[UI_FONT_GLYPH_COUNT];
+    UiFontSize sizes[UI_FONT_MAX_SCALE + 1];
 } UiFont;
 
 static UiFont font;
@@ -114,57 +122,76 @@ static void font_load(void)
     }
 
     font.data = data;
-    font.scale = stbtt_ScaleForPixelHeight(&font.info, UI_FONT_PIXEL_HEIGHT);
+    font.loaded = 1;
+}
+
+/* Rasterize each requested text size at its real pixel height. Scaling the
+ * 16 px bitmap with nearest-neighbour (the old path) produced the blocky text
+ * the menu showed at larger GUI scales. */
+static UiFontSize *font_size(int scale)
+{
+    font_load();
+    if (!font.loaded)
+        return NULL;
+    if (scale < 1) scale = 1;
+    if (scale > UI_FONT_MAX_SCALE) scale = UI_FONT_MAX_SCALE;
+
+    UiFontSize *size = &font.sizes[scale];
+    if (size->loaded || size->attempted)
+        return size->loaded ? size : NULL;
+    size->attempted = 1;
+    size->scale = stbtt_ScaleForPixelHeight(&font.info, (float) UI_FONT_PIXEL_HEIGHT * (float) scale);
 
     int ascent = 0, descent = 0, line_gap = 0;
     stbtt_GetFontVMetrics(&font.info, &ascent, &descent, &line_gap);
-    font.ascent = (int) (ascent * font.scale + 0.5f);
-    font.descent = (int) (descent * font.scale - 0.5f);
+    size->ascent = (int) (ascent * size->scale + 0.5f);
+    size->descent = (int) (descent * size->scale - 0.5f);
 
     for (int i = 0; i < UI_FONT_GLYPH_COUNT; i++)
     {
         int codepoint = UI_FONT_FIRST_CODEPOINT + i;
-        UiGlyph *glyph = &font.glyphs[i];
+        UiGlyph *glyph = &size->glyphs[i];
 
         int advance = 0, left_bearing = 0;
         stbtt_GetCodepointHMetrics(&font.info, codepoint, &advance, &left_bearing);
-        glyph->advance = (int) (advance * font.scale + 0.5f);
-        glyph->bitmap = stbtt_GetCodepointBitmap(&font.info, 0, font.scale, codepoint, &glyph->width,
-                                                 &glyph->height, &glyph->x0, &glyph->y0);
+        glyph->advance = (int) (advance * size->scale + 0.5f);
+        glyph->bitmap = stbtt_GetCodepointBitmap(&font.info, 0, size->scale, codepoint,
+                                                 &glyph->width, &glyph->height, &glyph->x0,
+                                                 &glyph->y0);
     }
 
-    font.loaded = 1;
+    size->loaded = 1;
+    return size;
 }
 
-static const UiGlyph *font_glyph(int codepoint)
+static const UiGlyph *font_glyph(const UiFontSize *size, int codepoint)
 {
-    if (codepoint < UI_FONT_FIRST_CODEPOINT || codepoint > UI_FONT_LAST_CODEPOINT)
+    if (size == NULL || codepoint < UI_FONT_FIRST_CODEPOINT
+        || codepoint > UI_FONT_LAST_CODEPOINT)
         return NULL;
-    return &font.glyphs[codepoint - UI_FONT_FIRST_CODEPOINT];
+    return &size->glyphs[codepoint - UI_FONT_FIRST_CODEPOINT];
 }
 
 int LIBMATTI_UI_TextHeight(int scale)
 {
-    font_load();
-    if (scale < 1) scale = 1;
-    if (!font.loaded)
-        return UI_FONT_PIXEL_HEIGHT * scale;
-    return (font.ascent - font.descent) * scale;
+    const UiFontSize *size = font_size(scale);
+    if (size == NULL)
+        return UI_FONT_PIXEL_HEIGHT * (scale < 1 ? 1 : scale);
+    return size->ascent - size->descent;
 }
 
 int LIBMATTI_UI_TextWidth(const char *text, int scale)
 {
-    font_load();
-    if (text == NULL || !font.loaded)
+    const UiFontSize *size = font_size(scale);
+    if (text == NULL || size == NULL)
         return 0;
-    if (scale < 1) scale = 1;
 
     int width_total = 0;
     for (const unsigned char *cursor = (const unsigned char *) text; *cursor != '\0'; cursor++)
     {
-        const UiGlyph *glyph = font_glyph(*cursor);
+        const UiGlyph *glyph = font_glyph(size, *cursor);
         if (glyph != NULL)
-            width_total += glyph->advance * scale;
+            width_total += glyph->advance;
     }
     return width_total;
 }
@@ -195,14 +222,15 @@ static void blend_pixel(int x, int y, uint32_t argb, unsigned int coverage)
 
 void LIBMATTI_UI_DrawText(const char *text, int x, int y, uint32_t argb, int scale, int shadow)
 {
-    font_load();
-    if (renderer == NULL || text == NULL || !font.loaded)
+    const UiFontSize *size = font_size(scale);
+    if (renderer == NULL || text == NULL || size == NULL)
         return;
     if (scale < 1) scale = 1;
 
     int origin_x = x;
-    int baseline = y + font.ascent * scale;
-    int line_height = (font.ascent - font.descent) * scale;
+    int baseline = y + size->ascent;
+    int line_height = size->ascent - size->descent;
+    int shadow_offset = scale > 0 ? scale : 1;
 
     for (const unsigned char *cursor = (const unsigned char *) text; *cursor != '\0'; cursor++)
     {
@@ -214,30 +242,30 @@ void LIBMATTI_UI_DrawText(const char *text, int x, int y, uint32_t argb, int sca
             continue;
         }
 
-        const UiGlyph *glyph = font_glyph(codepoint);
+        const UiGlyph *glyph = font_glyph(size, codepoint);
         if (glyph == NULL)
             continue;
 
         if (glyph->bitmap != NULL)
         {
-            int glyph_x = x + glyph->x0 * scale;
-            int glyph_y = baseline + glyph->y0 * scale;
-            for (int row = 0; row < glyph->height * scale; row++)
+            int glyph_x = x + glyph->x0;
+            int glyph_y = baseline + glyph->y0;
+            for (int row = 0; row < glyph->height; row++)
             {
-                for (int column = 0; column < glyph->width * scale; column++)
+                for (int column = 0; column < glyph->width; column++)
                 {
-                    unsigned char coverage = glyph->bitmap[(row / scale) * glyph->width + (column / scale)];
+                    unsigned char coverage = glyph->bitmap[row * glyph->width + column];
                     if (coverage == 0)
                         continue;
                     if (shadow)
-                        blend_pixel(glyph_x + column + scale, glyph_y + row + scale, 0xFF000000u,
-                                    coverage / 2u);
+                        blend_pixel(glyph_x + column + shadow_offset,
+                                    glyph_y + row + shadow_offset, 0xFF000000u, coverage / 2u);
                     blend_pixel(glyph_x + column, glyph_y + row, argb, coverage);
                 }
             }
         }
 
-        x += glyph->advance * scale;
+        x += glyph->advance;
     }
 }
 

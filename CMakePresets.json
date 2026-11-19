@@ -167,42 +167,42 @@
     {
       "name": "linux-x64",
       "configurePreset": "linux-x64",
-      "targets": ["vulkancraft", "runClient", "matti_shared", "launcher"]
+      "targets": ["all"]
     },
     {
       "name": "linux-x64-debug",
       "configurePreset": "linux-x64-debug",
-      "targets": ["vulkancraft", "matti_shared"]
+      "targets": ["all"]
     },
     {
       "name": "windows-msvc-x64",
       "configurePreset": "windows-msvc-x64",
-      "targets": ["vulkancraft", "runClient", "matti_shared"]
+      "targets": ["matticraft", "vulkancraft", "runClient", "vulkanClient", "matti_shared"]
     },
     {
       "name": "windows-msvc-arm64",
       "configurePreset": "windows-msvc-arm64",
-      "targets": ["vulkancraft", "matti_shared"]
+      "targets": ["matticraft", "vulkancraft", "vulkanClient", "matti_shared"]
     },
     {
       "name": "windows-mingw-x64",
       "configurePreset": "windows-mingw-x64",
-      "targets": ["vulkancraft", "runClient", "matti_shared"]
+      "targets": ["matticraft", "vulkancraft", "runClient", "vulkanClient", "matti_shared"]
     },
     {
       "name": "windows-mingw-x86",
       "configurePreset": "windows-mingw-x86",
-      "targets": ["vulkancraft", "matti_shared"]
+      "targets": ["matticraft", "vulkancraft", "vulkanClient", "matti_shared"]
     },
     {
       "name": "macos-osxcross",
       "configurePreset": "macos-osxcross",
-      "targets": ["vulkancraft", "matti_shared"]
+      "targets": ["matticraft", "vulkancraft", "vulkanClient", "matti_shared"]
     },
     {
       "name": "macos-universal",
       "configurePreset": "macos-universal",
-      "targets": ["vulkancraft", "runClient", "matti_shared"]
+      "targets": ["matticraft", "vulkancraft", "runClient", "vulkanClient", "matti_shared"]
     },
     {
       "name": "android-arm64",
@@ -215,7 +215,7 @@
     {
       "name": "freebsd-x64",
       "configurePreset": "freebsd-x64",
-      "targets": ["vulkancraft", "runClient", "matti_shared", "launcher"]
+      "targets": ["matticraft", "vulkancraft", "runClient", "vulkanClient", "matti_shared", "launcher"]
     }
   ],
   "testPresets": [

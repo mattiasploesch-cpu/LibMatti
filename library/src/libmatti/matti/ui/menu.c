@@ -25,6 +25,7 @@
 #define GUI_BUTTON_WIDTH 200
 #define GUI_BUTTON_HEIGHT 20
 #define GUI_BUTTON_STEP 24
+#define GUI_MAX_SCALE 6
 #define GUI_TEXT_WHITE 0xFFFFFFFFu
 #define GUI_TEXT_GRAY 0xFFA0A0A0u
 #define GUI_TEXT_YELLOW 0xFFFFFF55u
@@ -40,7 +41,7 @@
 
 static LIBMATTI_UI_Screen screen = LIBMATTI_UI_SCREEN_TITLE;
 static LIBMATTI_UI_Screen options_return = LIBMATTI_UI_SCREEN_TITLE;
-static int menu_scale = 2;
+static int menu_scale = 0;
 static int should_close = 0;
 static int previous_mouse_down = 0;
 static int previous_escape = 0;
@@ -69,14 +70,15 @@ int LIBMATTI_UI_GuiScale(void)
     if (menu_scale > 0)
         return menu_scale;
     int scale = 1;
-    while (scale < 4 && width / (scale + 1) >= 320 && height / (scale + 1) >= 240)
+    while (scale < GUI_MAX_SCALE && width / (scale + 1) >= 320
+           && height / (scale + 1) >= 240)
         scale++;
     return scale;
 }
 
 void LIBMATTI_UI_SetGuiScale(int scale)
 {
-    menu_scale = scale < 0 ? 0 : scale > 4 ? 4 : scale;
+    menu_scale = scale < 0 ? 0 : scale > GUI_MAX_SCALE ? GUI_MAX_SCALE : scale;
 }
 
 int LIBMATTI_UI_GuiWidth(void)
@@ -143,14 +145,17 @@ static void ensure_assets(void)
 void LIBMATTI_UI_DrawLabel(const char *text, int x, int y, uint32_t argb, int scale, int shadow)
 {
     int gui = LIBMATTI_UI_GuiScale();
-    LIBMATTI_UI_DrawText(text, x * gui, y * gui, argb, scale, shadow);
+    int text_scale = (scale < 1 ? 1 : scale) * gui;
+    LIBMATTI_UI_DrawText(text, x * gui, y * gui, argb, text_scale, shadow);
 }
 
 void LIBMATTI_UI_DrawLabelCentered(const char *text, int y, uint32_t argb, int scale, int shadow)
 {
     int gui = LIBMATTI_UI_GuiScale();
-    int width = LIBMATTI_UI_TextWidth(text, scale);
-    LIBMATTI_UI_DrawText(text, (LIBMATTI_UI_GuiWidth() * gui - width) / 2, y * gui, argb, scale, shadow);
+    int text_scale = (scale < 1 ? 1 : scale) * gui;
+    int width = LIBMATTI_UI_TextWidth(text, text_scale);
+    LIBMATTI_UI_DrawText(text, (LIBMATTI_UI_GuiWidth() * gui - width) / 2, y * gui, argb, text_scale,
+                         shadow);
 }
 
 void LIBMATTI_UI_DrawButton(int x, int y, int width, int height, const char *label, int hovered, int enabled)
@@ -169,10 +174,11 @@ void LIBMATTI_UI_DrawButton(int x, int y, int width, int height, const char *lab
         LIBMATTI_UI_FillRect(x * gui, y * gui, width * gui, height * gui, enabled ? 0xFF6E6E6Eu : 0xFF3E3E3Eu);
     }
 
-    int text_width = LIBMATTI_UI_TextWidth(label, 1);
-    int text_height = LIBMATTI_UI_TextHeight(1);
+    int text_width = LIBMATTI_UI_TextWidth(label, gui);
+    int text_height = LIBMATTI_UI_TextHeight(gui);
     LIBMATTI_UI_DrawText(label, x * gui + (width * gui - text_width) / 2,
-                         y * gui + (height * gui - text_height) / 2, enabled ? GUI_TEXT_WHITE : GUI_TEXT_GRAY, 1, 1);
+                         y * gui + (height * gui - text_height) / 2, enabled ? GUI_TEXT_WHITE : GUI_TEXT_GRAY,
+                         gui, 1);
 }
 
 void LIBMATTI_UI_DrawButtonCentered(int y, int width, const char *label, int hovered, int enabled)
@@ -190,10 +196,7 @@ void LIBMATTI_UI_DrawMenuBackground(void)
 
     if (dirt_texture != NULL)
     {
-
-
-
-        LIBMATTI_UI_DrawTextureTiled(dirt_texture, 0, 0, width, height, 32);
+        LIBMATTI_UI_DrawTextureTiled(dirt_texture, 0, 0, width, height, 32 * gui);
     }
     else
     {
@@ -325,9 +328,9 @@ static void draw_title(double time)
                                       0xFFFFFFFFu);
     }
 
-    int splash_width = LIBMATTI_UI_TextWidth("Also try Matticraft!", 1);
+    int splash_width = LIBMATTI_UI_TextWidth("Also try Matticraft!", gui);
     LIBMATTI_UI_DrawText("Also try Matticraft!", width / 2 * gui + 104 * gui - splash_width / 2, 74 * gui,
-                         GUI_TEXT_YELLOW, 1, 1);
+                         GUI_TEXT_YELLOW, gui, 1);
 
     const char *labels[4] = {"Singleplayer", "Multiplayer", "Options...", "Quit Game"};
     int first_y = height / 4 + 48;
@@ -339,12 +342,12 @@ static void draw_title(double time)
         LIBMATTI_UI_DrawButton(x, y, w, h, labels[i], hovered, 1);
     }
 
-    LIBMATTI_UI_DrawText("Matticraft 1.21.11 (C core / Rust window)", 2 * gui, LIBMATTI_UI_WindowHeight() - 10 * gui,
-                         GUI_TEXT_WHITE, 1, 1);
+    LIBMATTI_UI_DrawText("Minecraft 1.21.11", 2 * gui, LIBMATTI_UI_WindowHeight() - 10 * gui,
+                         GUI_TEXT_WHITE, gui, 1);
     const char *copyright = "Copyright Mojang AB. Do not distribute!";
-    int copy_width = LIBMATTI_UI_TextWidth(copyright, 1);
+    int copy_width = LIBMATTI_UI_TextWidth(copyright, gui);
     LIBMATTI_UI_DrawText(copyright, LIBMATTI_UI_WindowWidth() - copy_width - 2 * gui,
-                         LIBMATTI_UI_WindowHeight() - 10 * gui, GUI_TEXT_WHITE, 1, 1);
+                         LIBMATTI_UI_WindowHeight() - 10 * gui, GUI_TEXT_WHITE, gui, 1);
 }
 
 static void draw_options(void)
@@ -354,8 +357,11 @@ static void draw_options(void)
     int height = LIBMATTI_UI_GuiHeight();
     LIBMATTI_UI_DrawLabelCentered("Options", height / 5, GUI_TEXT_WHITE, 2, 1);
 
-    char scale_label[32];
-    snprintf(scale_label, sizeof(scale_label), "GUI Scale: %d", LIBMATTI_UI_GuiScale());
+    char scale_label[48];
+    if (menu_scale == 0)
+        snprintf(scale_label, sizeof(scale_label), "GUI Scale: Auto (%d)", LIBMATTI_UI_GuiScale());
+    else
+        snprintf(scale_label, sizeof(scale_label), "GUI Scale: %d", LIBMATTI_UI_GuiScale());
     char renderer_label[80];
     snprintf(renderer_label, sizeof(renderer_label), "Renderer: %s", LIBMATTI_UI_RequestedSelection());
 
@@ -525,9 +531,9 @@ static void click_options(int x, int y)
         }
         else if (i == 1)
         {
-            int scale = LIBMATTI_UI_GuiScale() + 1;
-            if (scale > 3)
-                scale = 1;
+            int scale = menu_scale + 1;
+            if (scale > GUI_MAX_SCALE)
+                scale = 0;
             LIBMATTI_UI_SetGuiScale(scale);
         }
         else if (i == 2)

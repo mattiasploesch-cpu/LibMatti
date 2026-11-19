@@ -11,8 +11,8 @@ STAGE="${PACKAGE_STAGE:-$(mktemp -d)}"
 trap '[ -n "${PACKAGE_STAGE:-}" ] || rm -rf "$STAGE"' EXIT
 
 if ! command -v wixl >/dev/null 2>&1; then
-    echo "wixl not installed (package: msitools) - skipping MSI" >&2
-    exit 0
+    echo "wixl not installed (package: msitools) - cannot build the MSI" >&2
+    exit 1
 fi
 if [ ! -d "$BUILD_DIR" ]; then
     echo "missing $BUILD_DIR (configure with the MinGW toolchain)" >&2
@@ -33,6 +33,13 @@ fi
 if [ -f "$STAGE/Matticraft/share/matticraft/Monocraft.ttf" ]; then
     cp "$STAGE/Matticraft/share/matticraft/Monocraft.ttf" "$BIN_DIR/Monocraft.ttf"
 fi
+
+for resource in assets/gui/widgets.png assets/gui/title/minecraft.png Monocraft.ttf; do
+    if [ ! -f "$BIN_DIR/$resource" ]; then
+        echo "missing Windows UI resource: $BIN_DIR/$resource" >&2
+        exit 1
+    fi
+done
 
 # The MSI installs the launcher as the entry point. Native Windows builds get
 # it from CMake; cross builds can pass LAUNCHER_BIN (cargo --target
@@ -56,12 +63,18 @@ if [ -z "$LAUNCHER_BIN" ] || [ ! -f "$LAUNCHER_BIN" ]; then
 fi
 cp "$LAUNCHER_BIN" "$BIN_DIR/matticraft-launcher.exe"
 mkdir -p "$DIST"
+DIST="$(cd "$DIST" && pwd)"
 
-wixl -v \
-    -D "Version=$VERSION" \
-    -D "SourceDir=$BIN_DIR" \
-    -o "$DIST/Matticraft-${VERSION}-x64.msi" \
-    "$ROOT/packaging/windows/matticraft-wixl.wxs"
+# wixl resolves File Source relative to its working directory. Running from the
+# staging bin tree keeps the paths portable across wixl versions (the old
+# absolute SourceDir form produced "bin\file" paths on Ubuntu).
+(
+    cd "$BIN_DIR"
+    wixl -v \
+        -D "Version=$VERSION" \
+        -o "$DIST/Matticraft-${VERSION}-x64.msi" \
+        "$ROOT/packaging/windows/matticraft-wixl.wxs"
+)
 
 ( cd "$DIST" && sha256sum "Matticraft-${VERSION}-x64.msi" > SHA256SUMS.msi )
 echo "MSI written to $DIST"

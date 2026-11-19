@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- WiX 3 syntax so msitools' wixl can build the MSI on Linux.
+     Run wixl from the staging bin directory: all Source paths are relative,
+     which avoids the absolute-path/backslash bug in older wixl versions.
      The Windows-native v4 definition is matticraft.wxs. -->
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
   <Product Id="*"
@@ -16,22 +18,62 @@
       <Directory Id="ProgramFilesFolder">
         <Directory Id="INSTALLFOLDER" Name="Matticraft">
           <Component Id="LauncherExecutable" Guid="A1B2C3D4-1111-4A2B-9C3D-000000000004">
-            <File Id="LauncherExe" Source="$(var.SourceDir)/matticraft-launcher.exe" KeyPath="yes">
+            <File Id="LauncherExe" Source="matticraft-launcher.exe" KeyPath="yes">
               <Shortcut Id="StartMenuShortcut" Directory="ProgramMenuFolder" Name="Matticraft"
                         WorkingDirectory="INSTALLFOLDER" Advertise="yes" />
               <Shortcut Id="DesktopShortcut" Directory="DesktopFolder" Name="Matticraft"
                         WorkingDirectory="INSTALLFOLDER" Advertise="yes" />
             </File>
           </Component>
+          <Component Id="GameExecutable" Guid="A1B2C3D4-1111-4A2B-9C3D-000000000005">
+            <File Id="MatticraftExe" Source="matticraft.exe" KeyPath="yes" />
+          </Component>
           <Component Id="MainExecutable" Guid="A1B2C3D4-1111-4A2B-9C3D-000000000001">
-            <File Id="VulkancraftExe" Source="$(var.SourceDir)/vulkancraft.exe" KeyPath="yes" />
+            <File Id="VulkancraftExe" Source="vulkancraft.exe" KeyPath="yes" />
+          </Component>
+          <Component Id="VulkanClientExecutable" Guid="A1B2C3D4-1111-4A2B-9C3D-000000000006">
+            <File Id="VulkanClientExe" Source="vulkanClient.exe" KeyPath="yes" />
           </Component>
           <Component Id="RunClientExecutable" Guid="A1B2C3D4-1111-4A2B-9C3D-000000000002">
-            <File Id="RunClientExe" Source="$(var.SourceDir)/runClient.exe" KeyPath="yes" />
+            <File Id="RunClientExe" Source="runClient.exe" KeyPath="yes" />
           </Component>
           <Component Id="SharedLibrary" Guid="A1B2C3D4-1111-4A2B-9C3D-000000000003">
-            <File Id="MattiDll" Source="$(var.SourceDir)/matti.dll" KeyPath="yes" />
+            <File Id="MattiDll" Source="matti.dll" KeyPath="yes" />
           </Component>
+          <Component Id="ThemeFont" Guid="A1B2C3D4-1111-4A2B-9C3D-000000000007">
+            <File Id="MonocraftTtf" Source="Monocraft.ttf" KeyPath="yes" />
+          </Component>
+
+          <Directory Id="AssetsDir" Name="assets">
+            <Directory Id="AssetsFontDir" Name="font">
+              <Component Id="AssetFont" Guid="A1B2C3D4-1111-4A2B-9C3D-000000000008">
+                <File Id="AssetAscii" Source="assets/font/ascii.png" KeyPath="yes" />
+              </Component>
+            </Directory>
+            <Directory Id="AssetsGuiDir" Name="gui">
+              <Component Id="AssetGui" Guid="A1B2C3D4-1111-4A2B-9C3D-000000000009">
+                <File Id="AssetOptionsBackground" Source="assets/gui/options_background.png" KeyPath="yes" />
+                <File Id="AssetWidgets" Source="assets/gui/widgets.png" />
+              </Component>
+              <Directory Id="AssetsTitleDir" Name="title">
+                <Component Id="AssetTitle" Guid="A1B2C3D4-1111-4A2B-9C3D-00000000000A">
+                  <File Id="AssetMinecraftLogo" Source="assets/gui/title/minecraft.png" KeyPath="yes" />
+                  <File Id="AssetEdition" Source="assets/gui/title/edition.png" />
+                </Component>
+                <Directory Id="AssetsPanoramaDir" Name="background">
+                  <Component Id="AssetPanorama" Guid="A1B2C3D4-1111-4A2B-9C3D-00000000000B">
+                    <File Id="AssetPanorama0" Source="assets/gui/title/background/panorama_0.png" KeyPath="yes" />
+                    <File Id="AssetPanorama1" Source="assets/gui/title/background/panorama_1.png" />
+                    <File Id="AssetPanorama2" Source="assets/gui/title/background/panorama_2.png" />
+                    <File Id="AssetPanorama3" Source="assets/gui/title/background/panorama_3.png" />
+                    <File Id="AssetPanorama4" Source="assets/gui/title/background/panorama_4.png" />
+                    <File Id="AssetPanorama5" Source="assets/gui/title/background/panorama_5.png" />
+                    <File Id="AssetPanoramaOverlay" Source="assets/gui/title/background/panorama_overlay.png" />
+                  </Component>
+                </Directory>
+              </Directory>
+            </Directory>
+          </Directory>
         </Directory>
       </Directory>
       <Directory Id="ProgramMenuFolder" />
@@ -40,9 +82,16 @@
 
     <Feature Id="MainFeature" Title="Matticraft" Level="1">
       <ComponentRef Id="LauncherExecutable" />
+      <ComponentRef Id="GameExecutable" />
       <ComponentRef Id="MainExecutable" />
+      <ComponentRef Id="VulkanClientExecutable" />
       <ComponentRef Id="RunClientExecutable" />
       <ComponentRef Id="SharedLibrary" />
+      <ComponentRef Id="ThemeFont" />
+      <ComponentRef Id="AssetFont" />
+      <ComponentRef Id="AssetGui" />
+      <ComponentRef Id="AssetTitle" />
+      <ComponentRef Id="AssetPanorama" />
     </Feature>
   </Product>
 </Wix>

@@ -18,15 +18,39 @@ STAGE="${PACKAGE_STAGE:-$(mktemp -d)}"
 trap '[ -n "${PACKAGE_STAGE:-}" ] || rm -rf "$STAGE"' EXIT
 
 if ! command -v nfpm >/dev/null 2>&1; then
-    echo "nfpm not installed - skipping deb/rpm (install: go install github.com/goreleaser/nfpm/v2/cmd/nfpm@latest)" >&2
-    exit 0
+    echo "nfpm not installed - cannot build deb/rpm (install: go install github.com/goreleaser/nfpm/v2/cmd/nfpm@latest)" >&2
+    exit 1
+fi
+if [ ! -d "$BUILD_DIR" ]; then
+    echo "missing build directory: $BUILD_DIR (configure with --preset linux-x64)" >&2
+    exit 1
 fi
 
 DESTDIR="$STAGE" cmake --install "$BUILD_DIR" --prefix /usr
+
+required=(
+    usr/bin/matticraft-launcher
+    usr/bin/matticraft
+    usr/bin/runClient
+    usr/bin/vulkanClient
+    usr/bin/vulkancraft
+    usr/lib/libmatti.so
+    usr/share/matticraft/Monocraft.ttf
+)
+missing=()
+for path in "${required[@]}"; do
+    [ -e "$STAGE/$path" ] || missing+=("$path")
+done
+if [ "${#missing[@]}" -ne 0 ]; then
+    echo "refusing to package an incomplete Linux install tree:" >&2
+    printf '  missing %s\n' "${missing[@]}" >&2
+    exit 1
+fi
+
 mkdir -p "$DIST"
 
 # nfpm does not expand environment variables inside contents.src. Render the
-# staging path into a temporary config so the globs point at the install tree.
+# staging path into a temporary config so the tree points at the install tree.
 CONFIG="$STAGE/nfpm.yaml"
 sed -e "s|\${PACKAGE_STAGE}|$STAGE|g" \
     -e "s|\${ARCH}|$ARCH|g" \

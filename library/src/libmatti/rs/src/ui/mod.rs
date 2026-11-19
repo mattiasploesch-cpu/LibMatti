@@ -188,7 +188,7 @@ pub fn run(args: &[String]) -> i32 {
             options.height,
             options.fullscreen,
             &selection,
-            "Matticraft",
+            "Minecraft 1.21.11",
         ) {
             eprintln!(
                 "matti-rs: could not open the game window: {}",

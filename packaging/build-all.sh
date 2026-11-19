@@ -22,8 +22,14 @@ warn() { printf 'WARN: %s\n' "$*" >&2; }
 step "Linux (native)"
 if cmake --preset linux-x64 && cmake --build --preset linux-x64 -j "$JOBS"; then
     BUILD_DIR="$ROOT/build/linux-x64" VERSION="$VERSION" "$ROOT/packaging/linux/portable.sh" || FAILED=1
-    BUILD_DIR="$ROOT/build/linux-x64" VERSION="$VERSION" "$ROOT/packaging/linux/nfpm.sh" || true
-    BUILD_DIR="$ROOT/build/linux-x64" VERSION="$VERSION" "$ROOT/packaging/linux/appimage.sh" || true
+    BUILD_DIR="$ROOT/build/linux-x64" VERSION="$VERSION" "$ROOT/packaging/linux/nfpm.sh" || {
+        warn "deb/rpm packaging failed (nfpm missing or install tree incomplete)"
+        FAILED=1
+    }
+    BUILD_DIR="$ROOT/build/linux-x64" VERSION="$VERSION" "$ROOT/packaging/linux/appimage.sh" || {
+        warn "AppImage packaging failed (appimagetool missing or install tree incomplete)"
+        FAILED=1
+    }
 else
     warn "Linux build failed"
     FAILED=1
@@ -35,7 +41,7 @@ if command -v x86_64-w64-mingw32-gcc >/dev/null 2>&1; then
             -DCMAKE_TOOLCHAIN_FILE="$ROOT/cmake/toolchains/mingw-w64.cmake" \
             -DCMAKE_BUILD_TYPE=Release \
             -DMATTI_BUILD_LAUNCHER=OFF \
-        && cmake --build "$ROOT/build/windows-mingw-x64" --target vulkancraft runClient matti_shared -j "$JOBS"; then
+        && cmake --build "$ROOT/build/windows-mingw-x64" --target matticraft vulkancraft runClient vulkanClient matti_shared -j "$JOBS"; then
         # The launcher has to be cross-built by cargo; only pass it on when the
         # rustup GNU target is installed.
         LAUNCHER_BIN=""

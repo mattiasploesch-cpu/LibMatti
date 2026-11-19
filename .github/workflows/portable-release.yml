@@ -65,8 +65,8 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y cmake ninja-build clang libvulkan-dev \
             libglfw3-dev zlib1g-dev libgl1-mesa-dev pkg-config zstd rpm msitools \
-            genisoimage libfuse2 patchelf zip
-      - name: Install nfpm
+            genisoimage libfuse2 patchelf zip squashfs-tools
+      - name: Install release packaging tools
         run: |
           set -euo pipefail
           NFPM_VERSION=2.49.0
@@ -74,6 +74,14 @@ jobs:
             "https://github.com/goreleaser/nfpm/releases/download/v${NFPM_VERSION}/nfpm_${NFPM_VERSION}_Linux_x86_64.tar.gz" |
             sudo tar -xz -C /usr/local/bin nfpm
           nfpm --version
+          curl -fsSL --retry 5 --retry-all-errors --connect-timeout 15 --max-time 180 \
+            -o /tmp/appimagetool.AppImage \
+            "https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-x86_64.AppImage"
+          chmod +x /tmp/appimagetool.AppImage
+          ( cd /tmp && /tmp/appimagetool.AppImage --appimage-extract >/dev/null )
+          sudo install -m 0755 /tmp/squashfs-root/usr/bin/appimagetool /usr/local/bin/appimagetool
+          rm -rf /tmp/squashfs-root /tmp/appimagetool.AppImage
+          appimagetool --version
       - name: Configure and build
         run: |
           cmake --preset linux-x64
@@ -113,7 +121,7 @@ jobs:
             -DCMAKE_BUILD_TYPE=Release \
             -DMATTI_BUILD_LAUNCHER=OFF
           cmake --build build/windows-mingw-x64 \
-            --target vulkancraft runClient matti_shared -j "$(nproc)"
+            --target matticraft vulkancraft runClient vulkanClient matti_shared -j "$(nproc)"
       - name: Build the Windows launcher
         run: |
           cargo build --manifest-path launchers/Cargo.toml --release \

@@ -8,7 +8,7 @@
 #include "libmatti/net/neoforged/fml/loading/TracingPrintStream.h"
 
 #include <dlfcn.h>
-#if defined(HAVE_BACKTRACE) && HAVE_BACKTRACE
+#if defined(HAVE_BACKTRACE) && HAVE_BACKTRACE && !defined(__ANDROID__)
 #include <execinfo.h>
 #endif
 #include <stdio.h>
@@ -43,7 +43,7 @@ static const char *get_prefix(void)
 {
     static __thread char prefix[256];
 
-#if defined(HAVE_BACKTRACE) && HAVE_BACKTRACE
+#if defined(HAVE_BACKTRACE) && HAVE_BACKTRACE && !defined(__ANDROID__)
     void *frames[BASE_DEPTH + 4];
     int count = backtrace(frames, BASE_DEPTH + 4);
     int index = count - 1 < BASE_DEPTH ? count - 1 : BASE_DEPTH;// Java: elems[Math.min(BASE_DEPTH, elems.length - 1)]
