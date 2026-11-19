@@ -1,0 +1,58 @@
+# nfpm config for the Linux system packages.
+# Build after packaging/linux/portable.sh staged the install tree, or point
+# PACKAGE_STAGE at a `cmake --install --prefix /usr` staging directory.
+name: matticraft
+arch: ${ARCH}
+platform: linux
+version: ${VERSION}
+section: games
+priority: optional
+maintainer: Matticraft <matticraft@localhost>
+description: |
+  Matticraft - C port of the Minecraft client.
+  One library, runtime platform and renderer detection (native/SDL,
+  OpenGL/Vulkan/DirectX).
+vendor: Matticraft
+homepage: https://github.com/mattiasploesch-cpu/LibMatti
+license: See vendor licenses
+contents:
+  - src: ${PACKAGE_STAGE}/usr/bin/matticraft-launcher
+    dst: /usr/bin/matticraft-launcher
+    file_info:
+      mode: 0755
+  - src: ${PACKAGE_STAGE}/usr/bin/vulkancraft
+    dst: /usr/bin/vulkancraft
+    file_info:
+      mode: 0755
+  - src: ${PACKAGE_STAGE}/usr/bin/vulkanClient
+    dst: /usr/bin/vulkanClient
+    file_info:
+      mode: 0755
+  - src: ${PACKAGE_STAGE}/usr/bin/runClient
+    dst: /usr/bin/runClient
+    file_info:
+      mode: 0755
+  - src: ${PACKAGE_STAGE}/usr/lib/libmatti.so.0.1.0
+    dst: /usr/lib/libmatti.so.0.1.0
+  - src: ${PACKAGE_STAGE}/usr/lib/libmatti.so.0
+    dst: /usr/lib/libmatti.so.0
+    type: symlink
+  - src: ${PACKAGE_STAGE}/usr/lib/libmatti.so
+    dst: /usr/lib/libmatti.so
+    type: symlink
+  - src: ${PACKAGE_STAGE}/usr/share/doc/matticraft
+    dst: /usr/share/doc/matticraft
+    type: tree
+  - src: ${PACKAGE_STAGE}/usr/share/applications/org.matticraft.Matticraft.desktop
+    dst: /usr/share/applications/org.matticraft.Matticraft.desktop
+  - src: ${PACKAGE_STAGE}/usr/share/icons/hicolor/scalable/apps/org.matticraft.Matticraft.svg
+    dst: /usr/share/icons/hicolor/scalable/apps/org.matticraft.Matticraft.svg
+depends:
+  - libc6
+  - libgl1
+  - libvulkan1
+  - libx11-6
+  - libxcursor1
+  - libxrandr2
+  - libxi6
+  - libxkbcommon0

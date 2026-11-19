@@ -5,15 +5,12 @@
 
 #include "libmatti/java/lang/System.h"
 #include "libmatti/net/minecraft/client/DeltaTracker.h"
-#include "libmatti/net/minecraft/client/Minecraft.h"
 #include "libmatti/net/minecraft/client/main/GameConfig.h"
 #include "libmatti/net/minecraft/client/main/Main.h"
 
-#include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
 
 static int checks = 0;
 static int failures = 0;
@@ -29,29 +26,15 @@ static int failures = 0;
         }                                                                                            \
     } while (0)
 
-// Java: the GLFW close callback ends the loop through Minecraft.stop(); the
-// harness stands in for the user clicking X.
-static volatile int stopperHasRun = 0;
-
-static void *stopperThread(void *arg)
-{
-    (void) arg;
-    sleep(1);
-    LIBMATTI_MC_Minecraft *minecraft = LIBMATTI_MC_Minecraft_GetInstance();
-    if (minecraft != NULL)
-    {
-        LIBMATTI_MC_Minecraft_Stop(minecraft);
-        stopperHasRun = 1;
-    }
-    return NULL;
-}
-
 static void test_run_loop_full_cycle(void)
 {
     // Java: optionparser defaults - width 854, height 480, versionType release.
+    // --ui-once is the scripted close: the Rust window opens, draws and
+    // presents one frame, then returns through the same window-close path as
+    // the user clicking X.
     const char *argv[] = {"matticraft", "--width=640", "--height=360", "--version=1.21.11",
-                          "--username=Steve"};
-    LIBMATTI_MC_Client_Main_Main(5, (char *const *) argv);
+                          "--username=Steve", "--ui-once"};
+    LIBMATTI_MC_Client_Main_Main(6, (char *const *) argv);
     CHECK(1);
 }
 
@@ -149,12 +132,8 @@ int main(void)
         return failures == 0 ? 0 : 1;
     }
 
-    // The full run cycle with the real window; the stopper thread ends it.
-    pthread_t stopper;
-    pthread_create(&stopper, NULL, stopperThread, NULL);
+    // The full run cycle with the real window; --ui-once ends it.
     test_run_loop_full_cycle();
-    pthread_join(stopper, NULL);
-    CHECK(stopperHasRun == 1);
 
     printf("%d checks, %d failures\n", checks, failures);
     return failures == 0 ? 0 : 1;

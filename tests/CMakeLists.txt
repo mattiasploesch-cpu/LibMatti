@@ -19,24 +19,35 @@ set(MATTI_LIBMATTI_LIB "" CACHE PATH "the built libmatti (standalone build only)
 set(MATTI_MODS_DIR "${MATTI_ROOT}/mods" CACHE PATH "output folder for built mods")
 
 if(NOT TARGET matti)
-    # Standalone build (cmake -S tests): the library comes in as the prebuilt
-    # static archive. Inside the root project the matti target already exists.
-    if(NOT MATTI_LIBMATTI_LIB)
-        message(FATAL_ERROR "Standalone test build needs MATTI_LIBMATTI_LIB (build the root project once first)")
-    endif()
-    add_library(matti_imported STATIC IMPORTED)
-    set_target_properties(matti_imported PROPERTIES IMPORTED_LOCATION "${MATTI_LIBMATTI_LIB}")
-    add_library(matti ALIAS matti_imported)
+  # Standalone build (cmake -S tests): the library comes in as the prebuilt
+  # static archive. Inside the root project the matti target already exists.
+  if(NOT MATTI_LIBMATTI_LIB)
+    message(FATAL_ERROR "Standalone test build needs MATTI_LIBMATTI_LIB (build the root project once first)")
+  endif()
+  add_library(matti_imported STATIC IMPORTED)
+  set_target_properties(matti_imported PROPERTIES IMPORTED_LOCATION "${MATTI_LIBMATTI_LIB}")
+  add_library(matti ALIAS matti_imported)
 endif()
 
 include("${MATTI_ROOT}/mods/cmake/MattiMod.cmake")
 
+find_package(Threads REQUIRED)
+
 # Every harness links the same way: headers of library/src, the matti target.
 macro(matti_test target)
-    add_executable(${target} ${ARGN})
-    target_include_directories(${target} PRIVATE "${MATTI_LIBRARY_DIR}")
-    target_link_libraries(${target} PRIVATE matti dl)
-    target_compile_options(${target} PRIVATE -g)
+  add_executable(${target} ${ARGN})
+  target_include_directories(${target} PRIVATE "${MATTI_LIBRARY_DIR}")
+  # matti (C bridge) and matti_rust reference each other: the Rust UI calls
+  # LIBMATTI_UI_*, the C main calls matti_rs_init. RESCAN lets the linker
+  # revisit both archives; Wl,--whole-archive would pull every game object
+  # (and its mixin descriptors) into harnesses that never open a window.
+  if(TARGET matti_rust)
+    target_link_libraries(${target} PRIVATE
+            "$<LINK_GROUP:RESCAN,matti,matti_rust>" ${CMAKE_DL_LIBS})
+  else()
+    target_link_libraries(${target} PRIVATE matti ${CMAKE_DL_LIBS})
+  endif()
+  target_compile_options(${target} PRIVATE -g)
 endmacro()
 
 # ---------------------------------------------------------------------------
@@ -114,7 +125,7 @@ add_test(NAME gl COMMAND test_gl)
 # ---------------------------------------------------------------------------
 
 matti_test(test_window window/WindowHarness.c)
-target_link_libraries(test_window PRIVATE pthread)
+target_link_libraries(test_window PRIVATE Threads::Threads)
 add_test(NAME window COMMAND test_window)
 
 # ---------------------------------------------------------------------------
@@ -188,6 +199,13 @@ add_test(NAME atlastextures COMMAND test_atlastextures)
 
 matti_test(test_frustum frustum/FrustumHarness.c)
 add_test(NAME frustum COMMAND test_frustum)
+
+# ---------------------------------------------------------------------------
+# niklas: intro little tutorial
+# ---------------------------------------------------------------------------
+
+matti_test(test_niklas niklas/NiklasHarness.c)
+add_test(NAME niklas COMMAND test_niklas)
 
 # ---------------------------------------------------------------------------
 # modscan: class-file scan harness
@@ -268,5 +286,5 @@ set(MATTI_TESTS_OUTPUT_DIR "${CMAKE_CURRENT_BINARY_DIR}" CACHE PATH "unused, kep
 
 get_property(MATTI_ALL_TESTS DIRECTORY PROPERTY TESTS)
 if(MATTI_ALL_TESTS)
-    set_tests_properties(${MATTI_ALL_TESTS} PROPERTIES TIMEOUT 30)
+  set_tests_properties(${MATTI_ALL_TESTS} PROPERTIES TIMEOUT 30)
 endif()

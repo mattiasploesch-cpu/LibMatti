@@ -9,6 +9,7 @@
 
 #include <stdint.h>
 #include <stdlib.h>
+#include <string.h>
 
 // Java: private Client() {}
 LIBMATTI_FML_Client *LIBMATTI_FML_Client_New(void)
@@ -21,6 +22,21 @@ void LIBMATTI_FML_Client_Free(LIBMATTI_FML_Client *client)
     free(client);
 }
 
+// Java: startup(args, false, Dist.CLIENT, true) always starts with a window.
+// The port honours the documented --no-render switch for machines without a
+// display, and MATTI_HEADLESS for services and scripts.
+static int is_headless(int argc, char *argv[])
+{
+    for (int i = 0; i < argc; i++)
+    {
+        if (strcmp(argv[i], "--no-render") == 0)
+            return 1;
+    }
+
+    const char *env = getenv("MATTI_HEADLESS");
+    return env != NULL && (strcmp(env, "1") == 0 || strcmp(env, "true") == 0 || strcmp(env, "TRUE") == 0);
+}
+
 // Java: public static void main(String[] args)
 // The port returns the game's exit status; every error path below keeps
 // Java's "report and exit(1)" behaviour.
@@ -28,7 +44,7 @@ int LIBMATTI_FML_Client_Main(int argc, char *argv[])
 {
     // Java: try (var startupResult = startup(args, false, Dist.CLIENT, true)) {
     LIBMATTI_FML_Entrypoint_StartupResult *startupResult =
-        LIBMATTI_FML_Entrypoint_Startup(argc, argv, 0, LIBMATTI_DIST_CLIENT, 1);
+        LIBMATTI_FML_Entrypoint_Startup(argc, argv, is_headless(argc, argv), LIBMATTI_DIST_CLIENT, 1);
 
     // Java: startup(...) threw -> the catch clause below runs
     if (startupResult == NULL)

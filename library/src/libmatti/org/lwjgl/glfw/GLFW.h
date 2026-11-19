@@ -12,6 +12,7 @@
 #define LIBMATTI_GLFW_TRUE 1
 #define LIBMATTI_GLFW_NO_ERROR 0
 #define LIBMATTI_GLFW_CLIENT_API 0x00022001
+#define LIBMATTI_GLFW_NO_API 0
 #define LIBMATTI_GLFW_CONTEXT_CREATION_API 0x00022004
 #define LIBMATTI_GLFW_CONTEXT_VERSION_MAJOR 0x00022002
 #define LIBMATTI_GLFW_CONTEXT_VERSION_MINOR 0x00022003
@@ -24,6 +25,7 @@
 #define LIBMATTI_GLFW_SOFT_FULLSCREEN 0x00020010
 #define LIBMATTI_GLFW_VISIBLE 0x00020004
 #define LIBMATTI_GLFW_RESIZABLE 0x00020003
+#define LIBMATTI_GLFW_DECORATED 0x00020001
 #define LIBMATTI_GLFW_PLATFORM 0x00050003
 #define LIBMATTI_GLFW_PLATFORM_COCOA 0x00060002
 #define LIBMATTI_GLFW_PLATFORM_WAYLAND 0x00060003
@@ -121,6 +123,8 @@ int LIBMATTI_GLFW_glfwGetError(const char **description);
 int LIBMATTI_GLFW_glfwWindowShouldClose(long window);
 // Java: public static int glfwGetKey(long window, int key)
 int LIBMATTI_GLFW_glfwGetKey(long window, int key);
+// Java: public static int glfwGetMouseButton(long window, int button)
+int LIBMATTI_GLFW_glfwGetMouseButton(long window, int button);
 // Java: public static void glfwSetInputMode(long window, int mode, int value)
 void LIBMATTI_GLFW_glfwSetInputMode(long window, int mode, int value);
 // Java: public static void glfwGetCursorPos(long window, double[] xpos, double[] ypos)
@@ -135,5 +139,17 @@ void LIBMATTI_GLFW_glfwGetFramebufferSize(long window, int *width, int *height);
 void LIBMATTI_GLFW_glfwFocusWindow(long window);
 
 double LIBMATTI_GLFW_glfwGetTime(void);
+
+// Java: public static boolean glfwVulkanSupported()
+int LIBMATTI_GLFW_glfwVulkanSupported(void);
+// Java: public static PointerBuffer glfwGetRequiredInstanceExtensions()
+// Returns the instance extension names GLFW needs for surface creation; *count
+// receives the number of entries (NULL and 0 when Vulkan is unsupported).
+const char **LIBMATTI_GLFW_glfwGetRequiredInstanceExtensions(unsigned int *count);
+// Java: public static int glfwCreateWindowSurface(VkInstance, long window,
+// VkAllocationCallbacks, VkSurfaceKHR) - the port keeps the Vulkan handles as
+// void* so the GLFW binding does not depend on the Vulkan headers.
+int LIBMATTI_GLFW_glfwCreateWindowSurface(void *instance, long window, const void *allocator,
+                                          void **surface);
 
 #endif //MATTICRAFT_LWJGL_GLFW_GLFW_H

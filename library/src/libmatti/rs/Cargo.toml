@@ -1,0 +1,13 @@
+# Rust half of LibMatti (the UI). Built by CMake via cmake/MattiRust.cmake and
+# linked into libmatti as a static library.
+
+[package]
+name = "matti_rs"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[lib]
+name = "matti_rs"
+# The C side links this archive, so it has to be a staticlib with a C ABI.
+crate-type = ["staticlib"]

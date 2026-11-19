@@ -50,6 +50,9 @@ struct LIBMATTI_FML_DisplayWindow
 
     int maximized;
     int closed;
+    // The port keeps booting when the graphics system is unavailable; Java
+    // aborts in crashElegantly instead.
+    int unavailable;
     char *neoForgeVersion;
     char *minecraftVersion;
 };
@@ -99,6 +102,17 @@ static void crash_elegantly(LIBMATTI_FML_DisplayWindow *window, const char *erro
     exit(1);
 }
 
+// A machine without a display (SSH, CI, a broken driver) still boots the game,
+// it just has no splash screen. Java calls crashElegantly here and exits; the
+// port logs and continues headless so the launcher chain reaches the game main.
+static void disable_early_window(LIBMATTI_FML_DisplayWindow *window, const char *reason)
+{
+    LIBMATTI_ML_Logger_Warn(LOGGER(), NULL, "Early window unavailable ({}), continuing without it",
+                            reason != NULL ? reason : "unknown error");
+    window->unavailable = 1;
+    window->window = 0;
+}
+
 // Java: private static Optional<String> getLastGlfwError()
 static int get_last_glfw_error(char *out, size_t outSize)
 {
@@ -145,14 +159,19 @@ void LIBMATTI_FML_DisplayWindow_InitWindow(LIBMATTI_FML_DisplayWindow *window)
     if (LIBMATTI_GLFW_glfwPlatformSupported(LIBMATTI_GLFW_PLATFORM_WAYLAND) &&
         LIBMATTI_GLFW_glfwPlatformSupported(LIBMATTI_GLFW_PLATFORM_X11) && !preferWayland)
     {
-        LIBMATTI_GLFW_glfwInitHint(LIBMATTI_GLFW_PLATFORM, LIBMATTI_GLFW_PLATFORM_X11);
+        // Pin X11 only when the session offers it: a Wayland-only session has no
+        // DISPLAY, and pinning X11 there makes glfwInit fail even though GLFW
+        // could have used Wayland.
+        int haveX11 = getenv("DISPLAY") != NULL;
+        LIBMATTI_GLFW_glfwInitHint(LIBMATTI_GLFW_PLATFORM,
+                                   haveX11 ? LIBMATTI_GLFW_PLATFORM_X11 : LIBMATTI_GLFW_PLATFORM_WAYLAND);
     }
 
     // Java: Initialize GLFW with a time guard, in case something goes wrong
     long glfwInitBegin = (long) time(NULL) * 1000000000L;
     if (!LIBMATTI_GLFW_glfwInit())
     {
-        crash_elegantly(window, "We are unable to initialize the graphics system.\nglfwInit failed.\n");
+        disable_early_window(window, "glfwInit failed");
         return;
     }
     long glfwInitEnd = (long) time(NULL) * 1000000000L;
@@ -190,14 +209,14 @@ void LIBMATTI_FML_DisplayWindow_InitWindow(LIBMATTI_FML_DisplayWindow *window)
     if (primaryMonitor == 0)
     {
         LIBMATTI_ML_Logger_Error(LOGGER(), NULL, "Failed to find a primary monitor - this means LWJGL isn't working properly");
-        crash_elegantly(window, "Failed to locate a primary monitor.\nglfwGetPrimaryMonitor failed.\n");
+        disable_early_window(window, "glfwGetPrimaryMonitor failed");
         return;
     }
     int vidWidth = 0, vidHeight = 0, r = 0, g = 0, b = 0, rr = 0;
     if (!LIBMATTI_GLFW_glfwGetVideoMode(primaryMonitor, &vidWidth, &vidHeight, &r, &g, &b, &rr))
     {
         LIBMATTI_ML_Logger_Error(LOGGER(), NULL, "Failed to get the current display video mode.");
-        crash_elegantly(window, "Failed to get current display resolution.\nglfwGetVideoMode failed.\n");
+        disable_early_window(window, "glfwGetVideoMode failed");
         return;
     }
 
@@ -210,7 +229,7 @@ void LIBMATTI_FML_DisplayWindow_InitWindow(LIBMATTI_FML_DisplayWindow *window)
     if (window->window == 0L)
     {
         LIBMATTI_ML_Logger_Error(LOGGER(), NULL, "Failed to create window: {}", creationError);
-        crash_elegantly(window, creationError);
+        disable_early_window(window, creationError);
         return;
     }
 
@@ -386,6 +405,11 @@ long LIBMATTI_FML_DisplayWindow_TakeOverGlfwWindow(LIBMATTI_FML_DisplayWindow *w
 {
     // Java: wait for the renderer, stop automatic rendering, complete the progress bar
     LIBMATTI_FML_ProgressMeter_Complete(window->mainProgress);
+
+    // No usable early window: the game creates its own window (or runs
+    // headless) instead of taking over a handle that does not exist.
+    if (window->unavailable || window->window == 0)
+        return 0;
 
     LIBMATTI_GLFW_glfwMakeContextCurrent(window->window);
     // Java: Set the title to what the game wants

@@ -1,0 +1,17 @@
+[Desktop Entry]
+Type=Application
+Name=Matticraft
+GenericName=Block Sandbox Game
+Comment=Launch Matticraft profiles
+Exec=matticraft-launcher
+TryExec=matticraft-launcher
+Icon=org.matticraft.Matticraft
+Terminal=false
+Categories=Game;ActionGame;
+Keywords=minecraft;blocks;sandbox;
+StartupWMClass=Matticraft Launcher
+Actions=Play;
+
+[Desktop Action Play]
+Name=Play Default Profile
+Exec=matticraft-launcher --launch

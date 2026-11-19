@@ -256,6 +256,11 @@ static long take_over_window(LIBMATTI_FML_EarlyLoadingScreenController *earlyLoa
     // Java: long window = earlyLoadingScreen.takeOverGlfwWindow();
     long window = LIBMATTI_FML_EarlyLoadingScreenController_TakeOverGlfwWindow(earlyLoadingScreen);
 
+    // The early window degrades to headless when the graphics system is
+    // unavailable; 0 tells the caller to create the game window itself.
+    if (window == 0)
+        return 0;
+
     // Java: GLFW.glfwSetWindowTitle(window, title);
     LIBMATTI_GLFW_glfwSetWindowTitle(window, title);
 
@@ -329,9 +334,11 @@ LIBMATTI_MC_Minecraft *LIBMATTI_MC_Minecraft_New(const LIBMATTI_MC_GameConfig *c
     {
         minecraft->window = take_over_window(earlyLoadingScreen, title);
     }
-    else
+
+    // Java: this.window = this.virtualScreen.newWindow(displaydata, ..., this.createTitle());
+    // (also the fallback when the early window came up headless)
+    if (minecraft->window == 0)
     {
-        // Java: this.window = this.virtualScreen.newWindow(displaydata, ..., this.createTitle());
         minecraft->window = LIBMATTI_GLFW_glfwCreateWindow(display->width, display->height, title, 0, 0);
     }
     free(title);

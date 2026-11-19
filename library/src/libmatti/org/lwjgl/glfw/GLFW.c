@@ -4,6 +4,8 @@
 
 #include "libmatti/org/lwjgl/glfw/GLFW.h"
 
+#include "libmatti/matti/native/Library.h"
+
 #include <dlfcn.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -44,6 +46,7 @@ static void (*glfw_swap_buffers)(unsigned long) = NULL;
 static int (*glfw_get_error)(const char **) = NULL;
 static int (*glfw_window_should_close)(unsigned long) = NULL;
 static int (*glfw_get_key)(unsigned long, int) = NULL;
+static int (*glfw_get_mouse_button)(unsigned long, int) = NULL;
 static void (*glfw_set_input_mode)(unsigned long, int, int) = NULL;
 static void (*glfw_get_cursor_pos)(unsigned long, double *, double *) = NULL;
 static void (*glfw_terminate)(void) = NULL;
@@ -53,6 +56,9 @@ static void (*glfw_focus_window)(unsigned long) = NULL;
 static double (*glfw_get_time)(void) = NULL;
 static void (*glfw_wait_events_timeout)(double) = NULL;
 static void (*glfw_post_empty_event)(void) = NULL;
+static int (*glfw_vulkan_supported)(void) = NULL;
+static const char **(*glfw_get_required_instance_extensions)(unsigned int *) = NULL;
+static int (*glfw_create_window_surface)(void *, unsigned long, const void *, void **) = NULL;
 
 // Java: GLFWVidMode is a struct view over the native pointer (GLFWvidmode:
 // width, height, redBits, greenBits, blueBits, refreshRate).
@@ -66,17 +72,20 @@ struct GLFWvidmode
     int refreshRate;
 };
 
-// Java: the native libglfw. GLFW 3 ships as libglfw.so.3 on Linux.
+// Java: the native libglfw. GLFW 3 ships as libglfw.so.3 on Linux. The build
+// embeds a copy into the executable (cmake/MattiNative.cmake), which is the
+// portable path: it needs no search path and works on NixOS, where the dynamic
+// loader does not look into the profiles. A plain install falls back to the
+// normal search.
 static void ensure_library(void)
 {
     if (glfw_lib != NULL) return;
 
-    const char *names[] = {"libglfw.so.3", "libglfw.so", NULL};
-    for (int i = 0; names[i] != NULL; i++)
-    {
-        glfw_lib = dlopen(names[i], RTLD_NOW | RTLD_LOCAL);
-        if (glfw_lib != NULL) break;
-    }
+    glfw_lib = LIBMATTI_NATIVE_OpenEmbeddedLibrary(MATTI_NATIVE_GLFW_SECTION);
+    if (glfw_lib != NULL) return;
+
+    static const char *const names[] = {"libglfw.so.3", "libglfw.so.3.4", "libglfw.so", NULL};
+    glfw_lib = LIBMATTI_NATIVE_OpenLibrary(names);
 }
 
 int LIBMATTI_GLFW_glfwInit(void)
@@ -323,6 +332,15 @@ int LIBMATTI_GLFW_glfwGetKey(long window, int key)
     return glfw_get_key((unsigned long) window, key);
 }
 
+int LIBMATTI_GLFW_glfwGetMouseButton(long window, int button)
+{
+    ensure_library();
+    if (glfw_lib == NULL) return 0;
+    GLFW_DLSYM(get_mouse_button, "glfwGetMouseButton");
+    if (glfw_get_mouse_button == NULL) return 0;
+    return glfw_get_mouse_button((unsigned long) window, button);
+}
+
 void LIBMATTI_GLFW_glfwSetInputMode(long window, int mode, int value)
 {
     ensure_library();
@@ -398,4 +416,34 @@ long LIBMATTI_GLFW_glfwGetCurrentContext(void)
     GLFW_DLSYM(get_current_context, "glfwGetCurrentContext");
     if (glfw_get_current_context == NULL) return 0;
     return (long) glfw_get_current_context();
+}
+
+int LIBMATTI_GLFW_glfwVulkanSupported(void)
+{
+    ensure_library();
+    if (glfw_lib == NULL) return LIBMATTI_GLFW_FALSE;
+    GLFW_DLSYM(vulkan_supported, "glfwVulkanSupported");
+    if (glfw_vulkan_supported == NULL) return LIBMATTI_GLFW_FALSE;
+    return glfw_vulkan_supported();
+}
+
+const char **LIBMATTI_GLFW_glfwGetRequiredInstanceExtensions(unsigned int *count)
+{
+    if (count != NULL) *count = 0;
+    ensure_library();
+    if (glfw_lib == NULL) return NULL;
+    GLFW_DLSYM(get_required_instance_extensions, "glfwGetRequiredInstanceExtensions");
+    if (glfw_get_required_instance_extensions == NULL) return NULL;
+    return glfw_get_required_instance_extensions(count);
+}
+
+int LIBMATTI_GLFW_glfwCreateWindowSurface(void *instance, long window, const void *allocator,
+                                          void **surface)
+{
+    if (surface != NULL) *surface = NULL;
+    ensure_library();
+    if (glfw_lib == NULL) return -1;
+    GLFW_DLSYM(create_window_surface, "glfwCreateWindowSurface");
+    if (glfw_create_window_surface == NULL) return -1;
+    return glfw_create_window_surface(instance, (unsigned long) window, allocator, surface);
 }

@@ -1,0 +1,181 @@
+name: Portable Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Release version"
+        required: true
+        default: "0.1.0"
+      channel:
+        description: "Release channel"
+        required: true
+        default: "nightly"
+        type: choice
+        options: [nightly, beta, stable]
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+env:
+  MATTI_VERSION: ${{ inputs.version || github.ref_name }}
+  MATTI_CHANNEL: ${{ inputs.channel || 'nightly' }}
+
+# Everything is built from Linux. Windows uses MinGW-w64 + wixl; macOS uses
+# osxcross when the (non-redistributable) Apple SDK is provided; Android uses
+# the SDK/NDK. No windows-* or macos-* runner is required.
+jobs:
+  linux:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake ninja-build clang libsdl3-dev libvulkan-dev \
+            libglfw3-dev zlib1g-dev libgl1-mesa-dev pkg-config zstd rpm msitools genisoimage
+      - name: Install nfpm
+        run: |
+          if command -v go >/dev/null 2>&1; then
+            sudo env "PATH=$PATH" GOBIN=/usr/local/bin go install github.com/goreleaser/nfpm/v2/cmd/nfpm@latest
+          else
+            echo "go not installed - deb/rpm will be skipped"
+          fi
+      - name: Configure and build
+        run: |
+          cmake --preset linux-x64
+          cmake --build --preset linux-x64 -j "$(nproc)"
+      - name: Portable + system packages + AppImage
+        run: |
+          BUILD_DIR=build/linux-x64 VERSION="$MATTI_VERSION" packaging/linux/portable.sh
+          BUILD_DIR=build/linux-x64 VERSION="$MATTI_VERSION" packaging/linux/nfpm.sh
+          BUILD_DIR=build/linux-x64 VERSION="$MATTI_VERSION" packaging/linux/appimage.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: linux-packages
+          path: dist/*
+          if-no-files-found: error
+
+  windows-cross:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install MinGW-w64 and wixl
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake ninja-build mingw-w64 msitools nsis
+      - name: Configure and cross-build
+        run: |
+          cmake -S . -B build/windows-mingw-x64 \
+            -DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/mingw-w64.cmake \
+            -DCMAKE_BUILD_TYPE=Release
+          cmake --build build/windows-mingw-x64 --target vulkancraft runClient matti_shared -j "$(nproc)"
+      - name: Build MSI on Linux
+        run: BUILD_DIR=build/windows-mingw-x64 VERSION="$MATTI_VERSION" packaging/windows/build-msi-linux.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows-packages
+          path: dist/*
+          if-no-files-found: warn
+
+  macos-cross:
+    runs-on: ubuntu-24.04
+    env:
+      OSXCROSS_ROOT: ${{ secrets.OSXCROSS_ROOT }}
+      OSXCROSS_TARGET: ${{ secrets.OSXCROSS_TARGET }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check osxcross
+        run: |
+          if [ -z "$OSXCROSS_ROOT" ]; then
+            echo "OSXCROSS_ROOT secret not set - macOS artifacts are skipped."
+            echo "Provide a prepared osxcross tree and the Apple SDK (not redistributable)."
+            exit 0
+          fi
+      - name: Cross-build macOS
+        if: env.OSXCROSS_ROOT != ''
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake ninja-build genisoimage
+          cmake -S . -B build/macos-osxcross \
+            -DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/osxcross.cmake \
+            -DCMAKE_BUILD_TYPE=Release
+          cmake --build build/macos-osxcross --target vulkancraft matti_shared -j "$(nproc)"
+          BUILD_DIR=build/macos-osxcross VERSION="$MATTI_VERSION" packaging/macos/dmg-linux.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: macos-packages
+          path: dist/*
+          if-no-files-found: warn
+
+  android:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - uses: android-actions/setup-android@v3
+      - name: Install NDK
+        run: sdkmanager "ndk;27.0.12077973" "platforms;android-35" "build-tools;35.0.0"
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.10.2"
+      - name: Build APK and AAB
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          gradle -p library/src/mobile :mobile_client:assembleRelease
+          gradle -p library/src/mobile :mobile_client:bundleRelease
+          mkdir -p dist
+          cp library/src/mobile/mobile_client/build/outputs/apk/release/*.apk dist/ 2>/dev/null || true
+          cp library/src/mobile/mobile_client/build/outputs/bundle/release/*.aab dist/ 2>/dev/null || true
+      - uses: actions/upload-artifact@v4
+        with:
+          name: android-packages
+          path: dist/*
+          if-no-files-found: warn
+
+  rust:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Test and lint the window crate
+        run: |
+          cargo fmt --manifest-path library/src/libmatti/rs/Cargo.toml -- --check
+          cargo clippy --manifest-path library/src/libmatti/rs/Cargo.toml -- -D warnings
+          cargo test --manifest-path library/src/libmatti/rs/Cargo.toml
+
+  release:
+    needs: [linux, windows-cross, macos-cross, android, rust]
+    if: always()
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+      - name: Checksums and manifest
+        run: |
+          RELEASE_VERSION="${MATTI_VERSION#v}"
+          echo "RELEASE_VERSION=$RELEASE_VERSION" >> "$GITHUB_ENV"
+          mkdir -p dist
+          find artifacts -type f -exec cp {} dist/ \;
+          (cd dist && sha256sum * > SHA256SUMS)
+          cat > dist/latest.json <<EOF
+          {"version":"$RELEASE_VERSION","channel":"$MATTI_CHANNEL","commit":"$GITHUB_SHA","artifacts":[]}
+          EOF
+      - uses: softprops/action-gh-release@v2
+        with:
+          draft: true
+          generate_release_notes: true
+          files: dist/*
+          tag_name: v${{ env.RELEASE_VERSION }}

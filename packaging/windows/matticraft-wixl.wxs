@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- WiX 3 syntax so msitools' wixl can build the MSI on Linux.
+     The Windows-native v4 definition is matticraft.wxs. -->
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <Product Id="*"
+           Name="Matticraft"
+           Language="1033"
+           Version="$(var.Version)"
+           Manufacturer="Matticraft"
+           UpgradeCode="6f1f6f7e-6a1c-4f0e-9f2a-2b7c5d9e4a11">
+    <Package InstallerVersion="500" Compressed="yes" InstallScope="perMachine" />
+    <MajorUpgrade DowngradeErrorMessage="A newer Matticraft is already installed." />
+    <Media Id="1" Cabinet="matticraft.cab" EmbedCab="yes" />
+
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="ProgramFilesFolder">
+        <Directory Id="INSTALLFOLDER" Name="Matticraft">
+          <Component Id="LauncherExecutable" Guid="A1B2C3D4-1111-4A2B-9C3D-000000000004">
+            <File Id="LauncherExe" Source="$(var.SourceDir)\matticraft-launcher.exe" KeyPath="yes">
+              <Shortcut Id="StartMenuShortcut" Directory="ProgramMenuFolder" Name="Matticraft"
+                        WorkingDirectory="INSTALLFOLDER" Advertise="yes" />
+              <Shortcut Id="DesktopShortcut" Directory="DesktopFolder" Name="Matticraft"
+                        WorkingDirectory="INSTALLFOLDER" Advertise="yes" />
+            </File>
+          </Component>
+          <Component Id="MainExecutable" Guid="A1B2C3D4-1111-4A2B-9C3D-000000000001">
+            <File Id="VulkancraftExe" Source="$(var.SourceDir)\vulkancraft.exe" KeyPath="yes" />
+          </Component>
+          <Component Id="RunClientExecutable" Guid="A1B2C3D4-1111-4A2B-9C3D-000000000002">
+            <File Id="RunClientExe" Source="$(var.SourceDir)\runClient.exe" KeyPath="yes" />
+          </Component>
+          <Component Id="SharedLibrary" Guid="A1B2C3D4-1111-4A2B-9C3D-000000000003">
+            <File Id="MattiDll" Source="$(var.SourceDir)\matti.dll" KeyPath="yes" />
+          </Component>
+        </Directory>
+      </Directory>
+      <Directory Id="ProgramMenuFolder" />
+      <Directory Id="DesktopFolder" />
+    </Directory>
+
+    <Feature Id="MainFeature" Title="Matticraft" Level="1">
+      <ComponentRef Id="LauncherExecutable" />
+      <ComponentRef Id="MainExecutable" />
+      <ComponentRef Id="RunClientExecutable" />
+      <ComponentRef Id="SharedLibrary" />
+    </Feature>
+  </Product>
+</Wix>

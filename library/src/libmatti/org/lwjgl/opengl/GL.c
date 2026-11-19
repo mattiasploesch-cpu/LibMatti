@@ -9,6 +9,8 @@
 #include "libmatti/org/lwjgl/opengl/GL.h"
 #include "libmatti/org/lwjgl/opengl/Constants.h"
 
+#include "libmatti/matti/native/Library.h"
+
 #include <dlfcn.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -194,11 +196,14 @@ int LIBMATTI_GL_Load(void)
 {
     if (gl_lib == NULL)
     {
-        const char *names[] = {"libGL.so.1", "libGL.so", "libEGL.so.1", "libOSMesa.so.8", NULL};
-        for (int i = 0; names[i] != NULL; i++)
+        // Only glibc comes from the host: the GL library travels inside the
+        // executable (cmake/MattiNative.cmake). A plain install falls back to
+        // the normal search, which also covers the Nix profiles.
+        gl_lib = LIBMATTI_NATIVE_OpenEmbeddedLibrary(MATTI_NATIVE_GL_SECTION);
+        if (gl_lib == NULL)
         {
-            gl_lib = dlopen(names[i], RTLD_NOW | RTLD_LOCAL);
-            if (gl_lib != NULL) break;
+            static const char *const names[] = {"libGL.so.1", "libGL.so", "libEGL.so.1", "libOSMesa.so.8", NULL};
+            gl_lib = LIBMATTI_NATIVE_OpenLibrary(names);
         }
         if (gl_lib == NULL) return 0;
         // Java: GLCapabilities.create() resolves the GetProcAddress entry
