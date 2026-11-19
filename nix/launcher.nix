@@ -5,7 +5,12 @@
 , libxkbcommon
 , wayland
 , libGL
-, xorg
+, libxi
+, libxext
+, libxcb
+, libx11
+, libxcursor
+, libxrandr
 , src ? ../.
 }:
 
@@ -27,12 +32,12 @@ rustPlatform.buildRustPackage {
     libxkbcommon
     wayland
     libGL
-    xorg.libX11
-    xorg.libXcursor
-    xorg.libXrandr
-    xorg.libXi
-    xorg.libXext
-    xorg.libxcb
+    libxi
+    libxext
+    libxcb
+    libx11
+    libxcursor
+    libxrandr
   ];
 
   postInstall = ''
@@ -42,12 +47,12 @@ rustPlatform.buildRustPackage {
           libGL
           libxkbcommon
           wayland
-          xorg.libX11
-          xorg.libXcursor
-          xorg.libXrandr
-          xorg.libXi
-          xorg.libXext
-          xorg.libxcb
+          libx11
+          libxcursor
+          libxrandr
+          libxi
+          libxext
+          libxcb
         ]
       }"
   '';

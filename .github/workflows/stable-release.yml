@@ -11,6 +11,11 @@ on:
         description: 'Mark as pre-release'
         type: boolean
         required: false
+      update_nixpkgs:
+        description: 'Update the nixpkgs package branch/PR'
+        type: boolean
+        required: false
+        default: false
         default: false
 
 permissions:
@@ -24,4 +29,5 @@ jobs:
       channel: stable
       draft: false
       prerelease: ${{ inputs.prerelease }}
+      update_nixpkgs: ${{ inputs.update_nixpkgs }}
     secrets: inherit

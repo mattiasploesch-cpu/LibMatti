@@ -23,6 +23,14 @@ on:
         required: false
         default: false
         type: boolean
+      update_nixpkgs:
+        description: "Update the nixpkgs package branch/PR"
+        required: false
+        default: false
+        type: boolean
+    secrets:
+      NIXPKGS_TOKEN:
+        required: false
   workflow_dispatch:
     inputs:
       version:
@@ -42,6 +50,11 @@ on:
         type: boolean
       prerelease:
         description: "Mark the release as a pre-release"
+        required: false
+        default: false
+        type: boolean
+      update_nixpkgs:
+        description: "Update the nixpkgs package branch/PR (requires NIXPKGS_TOKEN and NIXPKGS_FORK)"
         required: false
         default: false
         type: boolean
@@ -324,3 +337,42 @@ jobs:
           files: dist/*
           tag_name: v${{ env.RELEASE_VERSION }}
           name: Matticraft ${{ env.RELEASE_VERSION }}
+
+  nixpkgs:
+    if: ${{ inputs.update_nixpkgs || vars.NIXPKGS_AUTO_UPDATE == 'true' }}
+    needs: [release]
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: cachix/install-nix-action@v27
+      - name: Resolve source hash
+        id: source
+        run: |
+          URL="https://codeload.github.com/${GITHUB_REPOSITORY}/legacy.tar.gz/${GITHUB_SHA}"
+          HASH="$(nix hash convert --hash-algo sha256 --to sri \
+            "$(nix-prefetch-url "$URL")")"
+          echo "url=$URL" >> "$GITHUB_OUTPUT"
+          echo "hash=$HASH" >> "$GITHUB_OUTPUT"
+      - name: Check out the nixpkgs fork
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ vars.NIXPKGS_FORK }}
+          token: ${{ secrets.NIXPKGS_TOKEN }}
+          path: nixpkgs
+          fetch-depth: 0
+      - name: Update the nixpkgs branch and PR
+        env:
+          GH_TOKEN: ${{ secrets.NIXPKGS_TOKEN }}
+          NIXPKGS_FORK: ${{ vars.NIXPKGS_FORK }}
+        run: |
+          if [ -z "${NIXPKGS_FORK:-}" ]; then
+            echo "set the repository variable NIXPKGS_FORK to <owner>/nixpkgs" >&2
+            exit 1
+          fi
+          tools/update-nixpkgs.sh --nixpkgs nixpkgs \
+            --version "${MATTI_VERSION#v}" \
+            --rev "$GITHUB_SHA" \
+            --source-url "${{ steps.source.outputs.url }}" \
+            --hash "${{ steps.source.outputs.hash }}" \
+            --branch "matticraft-${MATTI_VERSION#v}" \
+            --fork "$NIXPKGS_FORK" --push --pr

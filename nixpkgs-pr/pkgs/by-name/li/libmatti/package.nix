@@ -1,6 +1,6 @@
 { lib
 , stdenv
-, fetchFromGitHub
+, fetchurl
 , cmake
 , ninja
 , pkg-config
@@ -16,11 +16,12 @@ stdenv.mkDerivation (finalAttrs: {
   pname = "libmatti";
   version = "0.1.0";
 
-  src = fetchFromGitHub {
-    owner = "mattiasploesch-cpu";
-    repo = "LibMatti";
-    rev = "a0459d3a678b3ff2465a85cb54b972cad5e9fad6";
-    hash = "sha256-4GcSy4pMpb2mqU/ndnY4IvVkiiMNUFw60NLjEyOKPUM=";
+  # The normal GitHub archive URL currently returns 404 for this commit.
+  # codeload's legacy tarball is the same tree and stays fetchable.
+  src = fetchurl {
+    name = "libmatti-source.tar.gz";
+    url = "https://codeload.github.com/mattiasploesch-cpu/LibMatti/legacy.tar.gz/74a383170f50d81b159a78d3cc91533348dc4362";
+    hash = "sha256-f9H7g0/jzKROcHnd9XuL2sVJZHXhsBv2YyBrfQVYCys=";
   };
 
   outputs = [ "out" "dev" ];

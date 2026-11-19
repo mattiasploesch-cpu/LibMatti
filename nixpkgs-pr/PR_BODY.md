@@ -18,8 +18,8 @@ and are compiled into the binary; the nixpkgs build needs no extra downloads.
 
 - `libmatti-dev` in the upstream flake is a convenience alias for
   `libmatti.dev`; nixpkgs should use the standard `dev` output.
-- The launcher frontend is not included in this PR; it has additional Rust
-  dependencies and will follow separately.
+- The launcher is the existing Rust/egui desktop application; the Android
+  Compose frontend is shipped separately in the Android package.
 - Tested locally with `nix-build -A libmatti`, `nix-build -A matticraft` and
   `nix-build -A libmatti.dev`.
 
