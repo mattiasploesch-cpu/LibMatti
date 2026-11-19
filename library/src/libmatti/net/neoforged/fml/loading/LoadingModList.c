@@ -23,32 +23,32 @@ LIBMATTI_FML_LoadingModList *LIBMATTI_FML_LoadingModList_Of(
 {
     LIBMATTI_FML_LoadingModList *list = calloc(1, sizeof(LIBMATTI_FML_LoadingModList));
 
-    // Java: this.plugins = plugins.stream().map(ModFile::getModFileInfo).collect(toList());
+// Java: this.plugins = plugins.stream().map(ModFile::getModFileInfo).collect(toList());
     list->plugins = calloc(pluginCount > 0 ? pluginCount : 1, sizeof(LIBMATTI_NEOFORGESPI_IModFileInfo *));
     for (size_t i = 0; i < pluginCount; i++)
         list->plugins[list->pluginCount++] = plugins[i]->modFileInfo;
 
-    // Java: this.gameLibraries = List.copyOf(gameLibraries);
+// Java: this.gameLibraries = List.copyOf(gameLibraries);
     list->gameLibraries = calloc(gameLibraryCount > 0 ? gameLibraryCount : 1, sizeof(LIBMATTI_NEOFORGESPI_IModFile *));
     for (size_t i = 0; i < gameLibraryCount; i++)
         list->gameLibraries[list->gameLibraryCount++] = LIBMATTI_FML_ModFile_AsModFile(gameLibraries[i]);
 
-    // Java: this.modFiles = modFiles.stream().map(ModFile::getModFileInfo).map(ModFileInfo.class::cast).collect(toList());
+// Java: this.modFiles = modFiles.stream().map(ModFile::getModFileInfo).map(ModFileInfo.class::cast).collect(toList());
     // Java: modFiles.stream().map(ModFile::getModFileInfo).map(ModFileInfo.class::cast)
     list->modFiles = calloc(modFileCount > 0 ? modFileCount : 1, sizeof(LIBMATTI_FML_ModFileInfo *));
     for (size_t i = 0; i < modFileCount; i++)
         list->modFiles[list->modFileCount++] = (LIBMATTI_FML_ModFileInfo *) modFiles[i]->modFileInfo;
 
-    // Java: this.sortedList = new ArrayList<>(sortedList);
+// Java: this.sortedList = new ArrayList<>(sortedList);
     list->sortedList = calloc(sortedCount > 0 ? sortedCount : 1, sizeof(LIBMATTI_FML_ModInfo *));
     memcpy(list->sortedList, sortedList, sizeof(LIBMATTI_FML_ModInfo *) * sortedCount);
     list->sortedCount = sortedCount;
 
-    // Java: this.modDependencies = modDependencies;
+// Java: this.modDependencies = modDependencies;
     if (modDependencies != NULL)
         list->modDependencies = *modDependencies;
 
-    // Java: this.fileById = this.modFiles.stream().map(ModFileInfo::getMods).flatMap(Collection::stream).map(ModInfo.class::cast).collect(toMap(ModInfo::getModId, ModInfo::getOwningFile));
+// Java: this.fileById = this.modFiles.stream().map(ModFileInfo::getMods).flatMap(Collection::stream).map(ModInfo.class::cast).collect(toMap(ModInfo::getModId, ModInfo::getOwningFile));
     for (size_t i = 0; i < list->modFileCount; i++)
     {
         size_t modCount = 0;
@@ -64,12 +64,12 @@ LIBMATTI_FML_LoadingModList *LIBMATTI_FML_LoadingModList_Of(
         }
     }
 
-    // Java: this.modLoadingIssues = new ArrayList<>(); list.modLoadingIssues.addAll(issues);
+// Java: this.modLoadingIssues = new ArrayList<>(); list.modLoadingIssues.addAll(issues);
     list->modLoadingIssues = calloc(issueCount > 0 ? issueCount : 1, sizeof(LIBMATTI_FML_ModLoadingIssue *));
     memcpy(list->modLoadingIssues, issues, sizeof(LIBMATTI_FML_ModLoadingIssue *) * issueCount);
     list->modLoadingIssueCount = issueCount;
 
-    // Java: this.allModFiles.addAll(this.gameLibraries); addAll(modFiles); addAll(plugins);
+// Java: this.allModFiles.addAll(this.gameLibraries); addAll(modFiles); addAll(plugins);
     size_t allCount = list->gameLibraryCount + list->modFileCount + pluginCount;
     list->allModFiles = calloc(allCount > 0 ? allCount : 1, sizeof(LIBMATTI_NEOFORGESPI_IModFile *));
     for (size_t i = 0; i < list->gameLibraryCount; i++)
@@ -182,7 +182,7 @@ LIBMATTI_FML_ModInfo **LIBMATTI_FML_LoadingModList_GetDependencies(const LIBMATT
 // Java: public boolean hasErrors()
 int LIBMATTI_FML_LoadingModList_HasErrors(const LIBMATTI_FML_LoadingModList *list)
 {
-    // Java: return !modLoadingIssues.isEmpty() && modLoadingIssues.stream().anyMatch(issue -> issue.severity() == ERROR);
+// Java: return !modLoadingIssues.isEmpty() && modLoadingIssues.stream().anyMatch(issue -> issue.severity() == ERROR);
     if (list->modLoadingIssueCount == 0)
         return 0;
 

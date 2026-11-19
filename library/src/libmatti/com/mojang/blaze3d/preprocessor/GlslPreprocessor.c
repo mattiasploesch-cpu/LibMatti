@@ -7,9 +7,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-// The import grammar: #moj_import "path" or #moj_import <path>, with optional
-// whitespace (Java's regex also allows comments inside the directive; the port
-// handles the plain whitespace cases the vanilla shaders use).
+
+
+
+
 static const char *find_import(const char *cursor, const char **outPath, size_t *outPathLength,
                                int *outQuoted, const char **outStart, const char **outEnd)
 {
@@ -74,7 +75,8 @@ static void process_versions(char *line, size_t length, PreprocessContext *conte
     char *cursor = strstr(line, "version");
     if (cursor == NULL)
         return;
-    // Walk back to the '#'.
+
+
     char *hash = NULL;
     for (char *p = cursor; p >= line; p--)
     {
@@ -96,13 +98,15 @@ static void process_versions(char *line, size_t length, PreprocessContext *conte
     int version = atoi(digits);
     if (version > context->glslVersion)
         context->glslVersion = version;
-    // Comment the directive out in place: "#version 330" -> "/*#version 330*/".
+
+
     memmove(digits + strlen(digits) + 2, digits + strlen(digits), 0);
     char *end = digits;
     while (isdigit((unsigned char) *end))
         end++;
     size_t directiveLength = (size_t) (end - hash);
-    // Shift the rest right by 3 ("/*" before, "*/" after).
+
+
     memmove(end + 2, end, strlen(end) + 1);
     memmove(hash + 2, hash, directiveLength);
     hash[0] = '/';
@@ -120,7 +124,8 @@ static char *process_imports(const char *source, const char *prefix, PreprocessC
 typedef struct Chunk
 {
     char *text;
-    int owned;  // 1 when this frame malloc'ed the text and must free it
+    int owned;
+
     struct Chunk *next;
 } Chunk;
 
@@ -153,7 +158,8 @@ static char *process_imports(const char *source, const char *prefix, PreprocessC
     int quoted;
     while (find_import(cursor, &path, &pathLength, &quoted, &importStart, &importEnd) != NULL)
     {
-        // The text before the directive stays in the output.
+
+
         if (importStart > cursor)
         {
             size_t length = (size_t) (importStart - cursor);
@@ -166,21 +172,22 @@ static char *process_imports(const char *source, const char *prefix, PreprocessC
 
         char *location = malloc(pathLength + strlen(prefix) + 1);
         sprintf(location, "%s%.*s", prefix, (int) pathLength, path);
-        // Java: applyImport(quoted, prefix + location) - quoted imports get the
+// Java: applyImport(quoted, prefix + location) - quoted imports get the
         // containing file's directory as prefix.
         char *imported = applyImport(userdata, quoted ? prefix : "", location);
         free(location);
 
         if (imported != NULL && imported[0] != '\0')
         {
-            // Java: sourceId++ and a "#line 0 <sourceId>" before the import body.
+// Java: sourceId++ and a "#line 0 <sourceId>" before the import body.
             context->sourceId++;
             int importedId = context->sourceId;
             size_t importedSize = 0;
             char *expanded = process_imports(imported, quoted ? "" : prefix, context, applyImport, userdata,
                                              &importedSize);
-            // The import body is fully inlined into the expanded copy now;
-            // imported is released after the if/else through the shared free.
+
+
+
             imported = NULL;
             char *lineHeader = malloc(48);
             sprintf(lineHeader, "#line 0 %d\n", importedId);
@@ -188,16 +195,17 @@ static char *process_imports(const char *source, const char *prefix, PreprocessC
             total += strlen(lineHeader);
             if (expanded != NULL)
             {
-                // The recursion result stays owned by the child frame; the
-                // child tracks it through its own chunk list, so the parent
-                // only borrows it for the join (owned = 0).
+
+
+
+
                 chunks_append(&head, &tail, expanded, 0);
                 total += importedSize;
             }
         }
         else
         {
-            // Java: keeps the directive as a comment so GLSL ignores it.
+// Java: keeps the directive as a comment so GLSL ignores it.
             const char *template2 = quoted ? "/*#moj_import \"%.*s\"*/" : "/*#moj_import <%.*s>*/";
             char *comment = malloc(pathLength + 32);
             sprintf(comment, template2, (int) pathLength, path);
@@ -207,7 +215,7 @@ static char *process_imports(const char *source, const char *prefix, PreprocessC
         if (imported != NULL)
             free(imported);
 
-        // Java: a "#line <line> <sourceId>" resets the line counter afterwards.
+// Java: a "#line <line> <sourceId>" resets the line counter afterwards.
         sprintf(lineDirective, "#line %d %d\n", 1, sourceId);
         cursor = importEnd;
     }
@@ -221,11 +229,12 @@ static char *process_imports(const char *source, const char *prefix, PreprocessC
         total += length;
     }
 
-    // Join the chunks into one buffer. Ownership: this frame frees exactly
-    // the texts it malloc'ed itself; the recursion frees its own result
-    // before returning a fresh join to the caller. To keep that rule simple
-    // the frame copies everything and frees only the texts it created
-    // (before/comment/lineHeader), never the recursion results.
+
+
+
+
+
+
     char *result = malloc(total + 1);
     size_t offset = 0;
     for (Chunk *chunk = head; chunk != NULL; chunk = chunk->next)
@@ -240,13 +249,14 @@ static char *process_imports(const char *source, const char *prefix, PreprocessC
     result[offset] = '\0';
     for (Chunk *chunk = head; chunk != NULL; chunk = chunk->next)
     {
-        // chunk->owned != 0 marks texts this frame malloc'ed.
+
+
         if (chunk->owned && chunk->text != NULL)
             free(chunk->text);
         free(chunk);
     }
 
-    // Java: setVersion - lift the remaining (uncommented) #version to max.
+// Java: setVersion - lift the remaining (uncommented) #version to max.
     {
         char *versionLine = strstr(result, "#version");
         if (versionLine != NULL)
@@ -274,7 +284,7 @@ char *LIBMATTI_B3D_GlslPreprocessor_Process(const char *source,
 {
     PreprocessContext context = {0, 0};
     char *expanded = process_imports(source, "", &context, applyImport, applyImportUserdata, outSize);
-    // Java: setVersion runs over the first output line; the port lifts any
+// Java: setVersion runs over the first output line; the port lifts any
     // uncommented #version in the final buffer to the context maximum.
     char *versionLine = strstr(expanded, "#version ");
     if (versionLine != NULL && context.glslVersion > 0)
@@ -302,7 +312,7 @@ char *LIBMATTI_B3D_GlslPreprocessor_Process(const char *source,
 
 char *LIBMATTI_B3D_GlslPreprocessor_InjectDefines(const char *source, const char *const *defines)
 {
-    // Java: if (defines.isEmpty()) return source.
+// Java: if (defines.isEmpty()) return source.
     if (defines == NULL || defines[0] == NULL)
         return strdup(source);
 
@@ -312,7 +322,8 @@ char *LIBMATTI_B3D_GlslPreprocessor_InjectDefines(const char *source, const char
     size_t definesLength = 0;
     for (const char *const *define = defines; *define != NULL; define++)
         definesLength += strlen(*define) + 1;
-    // "#line 1 0\n"
+
+
     definesLength += 11;
 
     char *result = malloc(headLength + definesLength + strlen(source) - headLength + 1);

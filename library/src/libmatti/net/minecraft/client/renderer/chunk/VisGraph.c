@@ -25,15 +25,15 @@
 
 struct LIBMATTI_MC_VisGraph
 {
-    // Java: private final BitSet bitSet = new BitSet(4096) - 1 = opaque/visited
+// Java: private final BitSet bitSet = new BitSet(4096) - 1 = opaque/visited
     uint8_t bitSet[SIZE / 8];
-    // Java: private int empty = 4096
+// Java: private int empty = 4096
     int empty;
-    // The flood-fill queue (Java: IntArrayFIFOQueue) as a plain ring buffer.
+// The flood-fill queue (Java: IntArrayFIFOQueue) as a plain ring buffer.
     int *queue;
     int queueHead;
     int queueTail;
-    // Java: private static final int[] INDEX_OF_EDGES - built once.
+// Java: private static final int[] INDEX_OF_EDGES - built once.
     int indexOfEdges[1352];
 };
 
@@ -82,7 +82,7 @@ LIBMATTI_MC_VisGraph *LIBMATTI_MC_VisGraph_New(void)
     graph->queueHead = 0;
     graph->queueTail = 0;
 
-    // Java: Util.make(new int[1352], ...) - every index with at least one
+// Java: Util.make(new int[1352], ...) - every index with at least one
     // coordinate at 0 or 15, walked l (y) outer, i1 (x), j1 (z).
     int k = 0;
     for (int l = 0; l < LEN; l++)
@@ -218,12 +218,12 @@ LIBMATTI_MC_VisibilitySet *LIBMATTI_MC_VisGraph_Resolve(LIBMATTI_MC_VisGraph *gr
     LIBMATTI_MC_VisibilitySet *visibilitySet = LIBMATTI_MC_VisibilitySet_New();
     if (SIZE - graph->empty < 256)
     {
-        // Java: the section is almost empty - every face pair visible.
+// Java: the section is almost empty - every face pair visible.
         LIBMATTI_MC_VisibilitySet_SetAll(visibilitySet, 1);
     }
     else if (graph->empty == 0)
     {
-        // Java: the section is full - nothing visible.
+// Java: the section is full - nothing visible.
         LIBMATTI_MC_VisibilitySet_SetAll(visibilitySet, 0);
     }
     else

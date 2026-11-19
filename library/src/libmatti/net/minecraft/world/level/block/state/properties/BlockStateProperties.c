@@ -1,4 +1,5 @@
-// Port of net.minecraft.world.level.block.state.properties.BlockStateProperties.
+
+
 
 #include "libmatti/net/minecraft/world/level/block/state/properties/BlockStateProperties.h"
 
@@ -60,7 +61,8 @@ static char *lowercase_name(const char *upper)
         return p_##name;                                                   \
     }
 
-// ---------------------------------------------------------------- booleans
+
+
 BOOL(ATTACHED)
 BOOL(BERRIES)
 BOOL(BLOOM)
@@ -183,7 +185,8 @@ ENUM(TEST_BLOCK_MODE, "start", "log", "fail", "accept")
 // Java: CopperGolemStatueBlock.Pose
 ENUM(COPPER_GOLEM_POSE, "standing", "sitting", "running", "star")
 
-// ---------------------------------------------------------------- integers
+
+
 INT(FLOWER_AMOUNT, 1, 4)
 INT(SEGMENT_AMOUNT, 1, 4)
 INT(AGE_1, 0, 1)
@@ -217,7 +220,8 @@ INT(DRIED_GHAST_HYDRATION_LEVELS, 0, 3)
 INT(ROTATION_16, 0, 15)
 INT(DUSTED, 0, 3)
 
-// ---------------------------------------------------------------- booleans (II)
+
+
 static LIBMATTI_MC_Property *p_SLOT_0_OCCUPIED_BOOL;
 const LIBMATTI_MC_Property *LIBMATTI_MC_BlockStateProperties_SLOT_0_OCCUPIED(void)
 {

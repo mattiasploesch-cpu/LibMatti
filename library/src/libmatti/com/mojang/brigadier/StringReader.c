@@ -1,4 +1,5 @@
-// Port of com.mojang.brigadier.StringReader.
+
+
 
 #include "libmatti/com/mojang/brigadier/StringReader.h"
 
@@ -103,7 +104,7 @@ int LIBMATTI_BR_StringReader_IsQuotedStringStart(char c)
 
 void LIBMATTI_BR_StringReader_SkipWhitespace(LIBMATTI_BR_StringReader *reader)
 {
-    // Java: Character.isWhitespace(peek())
+// Java: Character.isWhitespace(peek())
     while (LIBMATTI_BR_StringReader_CanRead(reader) &&
            isspace((unsigned char) LIBMATTI_BR_StringReader_Peek(reader)))
     {
@@ -141,7 +142,7 @@ int LIBMATTI_BR_StringReader_ReadInt(LIBMATTI_BR_StringReader *reader,
             LIBMATTI_BR_BuiltInExceptions_ReaderExpectedInt(), reader->string, reader->cursor);
         return 0;
     }
-    // Java: Integer.parseInt - the port validates the int range explicitly
+// Java: Integer.parseInt - the port validates the int range explicitly
     errno = 0;
     char *end = NULL;
     long long value = strtoll(number, &end, 10);
@@ -283,7 +284,7 @@ char *LIBMATTI_BR_StringReader_ReadStringUntil(LIBMATTI_BR_StringReader *reader,
                                                LIBMATTI_BR_CommandSyntaxException **outException)
 {
     *outException = NULL;
-    // Java: StringBuilder result
+// Java: StringBuilder result
     size_t capacity = 16;
     char *result = malloc(capacity);
     size_t length = 0;

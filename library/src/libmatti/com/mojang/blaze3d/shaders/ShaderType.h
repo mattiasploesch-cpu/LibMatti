@@ -1,4 +1,5 @@
-// Port of com.mojang.blaze3d.shaders.ShaderType.
+
+
 
 #ifndef MATTICRAFT_BLAZE3D_SHADERS_SHADERTYPE_H
 #define MATTICRAFT_BLAZE3D_SHADERS_SHADERTYPE_H

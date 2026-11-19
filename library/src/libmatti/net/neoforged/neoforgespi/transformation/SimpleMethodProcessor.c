@@ -1,4 +1,5 @@
-// Port of net.neoforged.neoforgespi.transformation.SimpleMethodProcessor.
+
+
 
 #include "libmatti/net/neoforged/neoforgespi/transformation/SimpleMethodProcessor.h"
 
@@ -42,7 +43,7 @@ int LIBMATTI_NEOFORGESPI_SimpleMethodProcessor_HandlesClass(
     LIBMATTI_NEOFORGESPI_SimpleMethodProcessor *self,
     const LIBMATTI_NEOFORGESPI_ClassProcessor_SelectionContext *context)
 {
-    // Java: return targetsByClass().containsKey(context.type().getClassName())
+// Java: return targetsByClass().containsKey(context.type().getClassName())
     initialise_targets(self);
 
     char *className = LIBMATTI_ASM_Type_GetClassName(context->type);
@@ -55,13 +56,13 @@ LIBMATTI_NEOFORGESPI_ClassProcessor_ComputeFlags LIBMATTI_NEOFORGESPI_SimpleMeth
     LIBMATTI_NEOFORGESPI_SimpleMethodProcessor *self,
     LIBMATTI_NEOFORGESPI_ClassProcessor_TransformationContext *context)
 {
-    // Java: var targetMethods = this.targetsByClass().get(context.type().getClassName()); if (targetMethods == null) return NO_REWRITE
+// Java: var targetMethods = this.targetsByClass().get(context.type().getClassName()); if (targetMethods == null) return NO_REWRITE
     char *className = LIBMATTI_ASM_Type_GetClassName(context->type);
     int hasTargetClass = targets_by_class_contains(self, className);
     free(className);
     if (!hasTargetClass) return LIBMATTI_NEOFORGESPI_ClassProcessor_ComputeFlags_NO_REWRITE;
 
-    // Java: for (var method : context.node().methods) if (targetMethods.contains(method.name + method.desc)) { transform(method, context); transformed = true; }
+// Java: for (var method : context.node().methods) if (targetMethods.contains(method.name + method.desc)) { transform(method, context); transformed = true; }
     char *nodeClassName = LIBMATTI_ASM_Type_GetClassName(context->type);
     LIBMATTI_ASMT_ClassNode *node = LIBMATTI_NEOFORGESPI_ClassProcessor_TransformationContext_Node(context);
     int transformed = 0;
@@ -83,7 +84,7 @@ LIBMATTI_NEOFORGESPI_ClassProcessor_ComputeFlags LIBMATTI_NEOFORGESPI_SimpleMeth
     }
     free(nodeClassName);
 
-    // Java: return transformed ? ComputeFlags.COMPUTE_FRAMES : ComputeFlags.NO_REWRITE
+// Java: return transformed ? ComputeFlags.COMPUTE_FRAMES : ComputeFlags.NO_REWRITE
     return transformed ? LIBMATTI_NEOFORGESPI_ClassProcessor_ComputeFlags_COMPUTE_FRAMES
                        : LIBMATTI_NEOFORGESPI_ClassProcessor_ComputeFlags_NO_REWRITE;
 }

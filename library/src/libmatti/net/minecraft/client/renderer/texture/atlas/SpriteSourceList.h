@@ -1,7 +1,8 @@
-// Port of net.minecraft.client.renderer.texture.atlas.SpriteSourceList,
-// SpriteSource, SpriteResourceLoader and the sources DirectoryLister,
-// SingleFile and SourceFilter. The atlas definition JSON (atlases/*.json)
-// drives which resources become sprites.
+
+
+
+
+
 
 #ifndef MATTICRAFT_MC_CLIENT_RENDERER_TEXTURE_ATLAS_SPRITESOURCELIST_H
 #define MATTICRAFT_MC_CLIENT_RENDERER_TEXTURE_ATLAS_SPRITESOURCELIST_H
@@ -28,13 +29,16 @@ typedef enum LIBMATTI_MC_SpriteSource_Kind
 typedef struct LIBMATTI_MC_SpriteSource
 {
     LIBMATTI_MC_SpriteSource_Kind kind;
-    // SingleFile: the resource id + optional sprite id
+
+
     LIBMATTI_MC_Identifier *resourceId;
-    LIBMATTI_MC_Identifier *spriteId; // NULL = use resourceId
-    // DirectoryLister: sourcePath + prefix
+    LIBMATTI_MC_Identifier *spriteId;
+
+
     char *sourcePath;
     char *idPrefix;
-    // SourceFilter: the pattern the sprite ids must match (ns:path glob)
+
+
     char *filterPattern;
 } LIBMATTI_MC_SpriteSource;
 
@@ -53,7 +57,8 @@ void LIBMATTI_MC_SpriteSourceList_Free(LIBMATTI_MC_SpriteSource **sources, size_
 typedef struct LIBMATTI_MC_SpriteResourceEntry
 {
     LIBMATTI_MC_Identifier *spriteId;
-    LIBMATTI_MC_Resource *resource; // owned by the entry
+    LIBMATTI_MC_Resource *resource;
+
 } LIBMATTI_MC_SpriteResourceEntry;
 
 LIBMATTI_MC_SpriteResourceEntry *LIBMATTI_MC_SpriteSourceList_Run(
@@ -71,4 +76,4 @@ LIBMATTI_MC_SpriteContents *LIBMATTI_MC_SpriteResourceLoader_LoadSprite(const LI
 }
 #endif
 
-#endif //MATTICRAFT_MC_CLIENT_RENDERER_TEXTURE_ATLAS_SPRITESOURCELIST_H
+#endif

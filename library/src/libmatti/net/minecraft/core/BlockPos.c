@@ -1,4 +1,5 @@
-// Port of net.minecraft.core.BlockPos.
+
+
 
 #include "libmatti/net/minecraft/core/BlockPos.h"
 
@@ -310,9 +311,10 @@ LIBMATTI_MC_BlockPos *LIBMATTI_MC_BlockPos_Mutable(const LIBMATTI_MC_BlockPos *p
     return LIBMATTI_MC_BlockPos_MutableNew3(pos->base.x, pos->base.y, pos->base.z);
 }
 
-// -----------------------------------------------------------------------
-// MutableBlockPos
-// -----------------------------------------------------------------------
+
+
+
+
 
 LIBMATTI_MC_BlockPos *LIBMATTI_MC_BlockPos_MutableNew(void)
 {

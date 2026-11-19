@@ -1,4 +1,5 @@
-// Port of net.minecraft.server.packs.CompositePackResources.
+
+
 
 #ifndef MATTICRAFT_MC_PACKS_COMPOSITEPACKRESOURCES_H
 #define MATTICRAFT_MC_PACKS_COMPOSITEPACKRESOURCES_H
@@ -9,7 +10,7 @@ typedef struct LIBMATTI_MC_CompositePackResources
 {
     const LIBMATTI_MC_PackResources_VTable *vtable;
     LIBMATTI_MC_PackLocationInfo *location;
-    // Java: private final List<PackResources> stacks
+// Java: private final List<PackResources> stacks
     LIBMATTI_MC_PackResources **stacks;
     size_t stackCount;
 } LIBMATTI_MC_CompositePackResources;

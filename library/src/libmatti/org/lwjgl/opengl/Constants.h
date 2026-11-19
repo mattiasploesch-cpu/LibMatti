@@ -1,6 +1,7 @@
-// Port of org.lwjgl.opengl.GLCapabilities-adjacent constants. The values come
-// from com.mojang.blaze3d.opengl.GlConst (the game names every GL constant it
-// uses there); every entry matches the GL specification value.
+
+
+
+
 
 #ifndef MATTICRAFT_LWJGL_OPENGL_CONSTANTS_H
 #define MATTICRAFT_LWJGL_OPENGL_CONSTANTS_H
@@ -67,6 +68,7 @@
 #define LIBMATTI_GL_GL_RGBA 6408
 #define LIBMATTI_GL_GL_TEXTURE_WIDTH 4096
 #define LIBMATTI_GL_GL_BGR 32992
+#define LIBMATTI_GL_GL_BGRA 32993
 #define LIBMATTI_GL_GL_FUNC_ADD 32774
 #define LIBMATTI_GL_GL_MIN 32775
 #define LIBMATTI_GL_GL_MAX 32776
@@ -114,7 +116,8 @@
 #define LIBMATTI_GL_GL_TEXTURE0 33984
 #define LIBMATTI_GL_GL_TEXTURE1 33985
 #define LIBMATTI_GL_GL_TEXTURE2 33986
-// Capability toggles used by GlStateManager's BooleanStates.
+
+
 #define LIBMATTI_GL_GL_DEPTH_TEST 2929
 #define LIBMATTI_GL_GL_BLEND 3042
 #define LIBMATTI_GL_GL_CULL_FACE 2884
@@ -161,4 +164,4 @@
 #define LIBMATTI_GL_GL_TEXTURE_MAX_ANISOTROPY_EXT 34047
 #define LIBMATTI_GL_GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT 34047
 
-#endif // MATTICRAFT_LWJGL_OPENGL_CONSTANTS_H
+#endif

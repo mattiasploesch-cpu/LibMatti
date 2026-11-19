@@ -1,7 +1,8 @@
-// Port of net.neoforged.neoforgespi.language.IModInfo.
-// The update/mod/referral URLs stay opaque handles (the port keeps java.net.URL as
-// its string form); ArtifactVersion / VersionRange resolve through MavenVersionAdapter
-// and IConfigurable is implemented by ModInfo.
+
+
+
+
+
 
 #ifndef MATTICRAFT_NEOFORGESPI_LANGUAGE_IMODINFO_H
 #define MATTICRAFT_NEOFORGESPI_LANGUAGE_IMODINFO_H
@@ -47,23 +48,23 @@ struct LIBMATTI_NEOFORGESPI_IModInfo_ModVersion
 {
     void *self;
 
-    // Java: String getModId()
+// Java: String getModId()
     const char *(*getModId)(void *self);
-    // Java: VersionRange getVersionRange()
+// Java: VersionRange getVersionRange()
     const LIBMATTI_NEOFORGESPI_VersionRange *(*getVersionRange)(void *self);
-    // Java: DependencyType getType()
+// Java: DependencyType getType()
     LIBMATTI_NEOFORGESPI_IModInfo_DependencyType (*getType)(void *self);
-    // Java: Optional<String> getReason() - 1 if present
+// Java: Optional<String> getReason() - 1 if present
     int (*getReason)(void *self, const char **out);
-    // Java: Ordering getOrdering()
+// Java: Ordering getOrdering()
     LIBMATTI_NEOFORGESPI_IModInfo_Ordering (*getOrdering)(void *self);
-    // Java: DependencySide getSide()
+// Java: DependencySide getSide()
     LIBMATTI_NEOFORGESPI_IModInfo_DependencySide (*getSide)(void *self);
-    // Java: void setOwner(IModInfo owner)
+// Java: void setOwner(IModInfo owner)
     void (*setOwner)(void *self, LIBMATTI_NEOFORGESPI_IModInfo *owner);
-    // Java: IModInfo getOwner()
+// Java: IModInfo getOwner()
     LIBMATTI_NEOFORGESPI_IModInfo *(*getOwner)(void *self);
-    // Java: Optional<URL> getReferralURL() - 1 if present, opaque handle
+// Java: Optional<URL> getReferralURL() - 1 if present, opaque handle
     int (*getReferralURL)(void *self, void **out);
 };
 
@@ -72,35 +73,35 @@ struct LIBMATTI_NEOFORGESPI_IModInfo
 {
     void *self;
 
-    // Java: IModFileInfo getOwningFile()
+// Java: IModFileInfo getOwningFile()
     LIBMATTI_NEOFORGESPI_IModFileInfo *(*getOwningFile)(void *self);
-    // Java: IModLanguageLoader getLoader()
+// Java: IModLanguageLoader getLoader()
     void *(*getLoader)(void *self);
-    // Java: String getModId()
+// Java: String getModId()
     const char *(*getModId)(void *self);
-    // Java: String getDisplayName()
+// Java: String getDisplayName()
     const char *(*getDisplayName)(void *self);
-    // Java: String getDescription()
+// Java: String getDescription()
     const char *(*getDescription)(void *self);
-    // Java: ArtifactVersion getVersion()
+// Java: ArtifactVersion getVersion()
     const LIBMATTI_NEOFORGESPI_ArtifactVersion *(*getVersion)(void *self);
-    // Java: List<? extends ModVersion> getDependencies()
+// Java: List<? extends ModVersion> getDependencies()
     LIBMATTI_NEOFORGESPI_IModInfo_ModVersion **(*getDependencies)(void *self, size_t *count);
-    // Java: List<? extends ForgeFeature.Bound> getForgeFeatures()
+// Java: List<? extends ForgeFeature.Bound> getForgeFeatures()
     void **(*getForgeFeatures)(void *self, size_t *count);
-    // Java: String getNamespace()
+// Java: String getNamespace()
     const char *(*getNamespace)(void *self);
-    // Java: Map<String, Object> getModProperties()
+// Java: Map<String, Object> getModProperties()
     void *(*getModProperties)(void *self);
-    // Java: Optional<URL> getUpdateURL() - 1 if present, opaque handle
+// Java: Optional<URL> getUpdateURL() - 1 if present, opaque handle
     int (*getUpdateURL)(void *self, void **out);
-    // Java: Optional<URL> getModURL() - 1 if present, opaque handle
+// Java: Optional<URL> getModURL() - 1 if present, opaque handle
     int (*getModURL)(void *self, void **out);
-    // Java: Optional<String> getLogoFile() - 1 if present
+// Java: Optional<String> getLogoFile() - 1 if present
     int (*getLogoFile)(void *self, const char **out);
-    // Java: boolean getLogoBlur()
+// Java: boolean getLogoBlur()
     int (*getLogoBlur)(void *self);
-    // Java: IConfigurable getConfig()
+// Java: IConfigurable getConfig()
     void *(*getConfig)(void *self);
 };
 
@@ -175,4 +176,4 @@ LIBMATTI_NEOFORGESPI_IModInfo *LIBMATTI_NEOFORGESPI_IModInfo_ModVersion_GetOwner
 int LIBMATTI_NEOFORGESPI_IModInfo_ModVersion_GetReferralURL(
     const LIBMATTI_NEOFORGESPI_IModInfo_ModVersion *modVersion, void **out);
 
-#endif //MATTICRAFT_NEOFORGESPI_LANGUAGE_IMODINFO_H
+#endif

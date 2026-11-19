@@ -23,7 +23,7 @@ struct LIBMATTI_FML_VersionSupportMatrix
 void LIBMATTI_FML_VersionSupportMatrix_Add(LIBMATTI_FML_VersionSupportMatrix *matrix, const char *key,
                                            const char *value)
 {
-    // Java: overrideVersions.computeIfAbsent(key, k -> new ArrayList<>()).add(new DefaultArtifactVersion(value));
+// Java: overrideVersions.computeIfAbsent(key, k -> new ArrayList<>()).add(new DefaultArtifactVersion(value));
     (void) matrix;
 
     overrideVersions = realloc(overrideVersions, sizeof(*overrideVersions) * (overrideVersionCount + 1));
@@ -37,7 +37,7 @@ LIBMATTI_FML_VersionSupportMatrix *LIBMATTI_FML_VersionSupportMatrix_New(const L
 {
     LIBMATTI_FML_VersionSupportMatrix *matrix = calloc(1, sizeof(LIBMATTI_FML_VersionSupportMatrix));
 
-    // Java: var mcVersion = new DefaultArtifactVersion(versionInfo.mcVersion());
+// Java: var mcVersion = new DefaultArtifactVersion(versionInfo.mcVersion());
     //       if (MavenVersionAdapter.createFromVersionSpec("[1.21.8]").containsVersion(mcVersion)) { add("mod.minecraft", "1.21.7"); add("mod.neoforge", "21.7.26-beta"); }
     LIBMATTI_NEOFORGESPI_VersionRange *range =
         LIBMATTI_NEOFORGESPI_MavenVersionAdapter_CreateFromVersionSpec("[1.21.8]");
@@ -66,16 +66,16 @@ int LIBMATTI_FML_VersionSupportMatrix_TestVersionSupportMatrix(
     const char *lookupId, const char *type, LIBMATTI_FML_VersionSupportMatrix_StandardLookup standardLookup,
     void *userdata)
 {
-    // Java: if (standardLookup.test(lookupId, declaredRange)) return true;
+// Java: if (standardLookup.test(lookupId, declaredRange)) return true;
     if (standardLookup != NULL && standardLookup(lookupId, declaredRange, userdata)) return 1;
 
-    // Java: var custom = overrideVersions.get(type + "." + lookupId);
+// Java: var custom = overrideVersions.get(type + "." + lookupId);
     (void) matrix;
     size_t length = strlen(type) + strlen(lookupId) + 2;
     char *compositeKey = malloc(length);
     snprintf(compositeKey, length, "%s.%s", type, lookupId);
 
-    // Java: return custom != null && custom.stream().anyMatch(declaredRange::containsVersion);
+// Java: return custom != null && custom.stream().anyMatch(declaredRange::containsVersion);
     for (size_t i = 0; i < overrideVersionCount; i++)
     {
         if (strcmp(overrideVersions[i].key, compositeKey) != 0) continue;

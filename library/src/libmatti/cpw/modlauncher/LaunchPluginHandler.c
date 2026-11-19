@@ -1,4 +1,5 @@
-// Port of cpw.mods.modlauncher.LaunchPluginHandler.
+
+
 
 #include "libmatti/cpw/modlauncher/LaunchPluginHandler.h"
 
@@ -24,13 +25,13 @@ LIBMATTI_ML_LaunchPluginHandler *LIBMATTI_ML_LaunchPluginHandler_New(LIBMATTI_ML
 {
     LIBMATTI_ML_LaunchPluginHandler *handler = calloc(1, sizeof(LIBMATTI_ML_LaunchPluginHandler));
 
-    // Java: ServiceLoaderUtils.streamServiceLoader(() -> ServiceLoader.load(layerHandler.getLayer(Layer.BOOT)
+// Java: ServiceLoaderUtils.streamServiceLoader(() -> ServiceLoader.load(layerHandler.getLayer(Layer.BOOT)
     //          .orElseThrow(), ILaunchPluginService.class), e -> LOGGER.fatal(...))
     LIBMATTI_JL_ModuleLayer *bootLayer = LIBMATTI_ML_ModuleLayerHandler_GetLayer(layerHandler,
                                                                                  LIBMATTI_MLA_LAYER_BOOT);
     if (bootLayer == NULL)
     {
-        // Java: orElseThrow() -> NoSuchElementException
+// Java: orElseThrow() -> NoSuchElementException
         LIBMATTI_ML_Logger_Error(LIBMATTI_ML_LogManager_GetLogger(), &LIBMATTI_ML_MARKER_MODLAUNCHER,
                                  "No BOOT layer available, cannot load launch plugins");
         return handler;
@@ -53,7 +54,7 @@ LIBMATTI_ML_LaunchPluginHandler *LIBMATTI_ML_LaunchPluginHandler_New(LIBMATTI_ML
     }
     free(plugins);
 
-    // Java: final var modlist = plugins.entrySet().stream().map(e -> Map.of("name", e.getKey(),
+// Java: final var modlist = plugins.entrySet().stream().map(e -> Map.of("name", e.getKey(),
     //              "type", "PLUGINSERVICE", "file", ServiceLoaderUtils.fileNameFor(e.getValue().getClass()))).toList()
     if (LIBMATTI_ML_Launcher_INSTANCE != NULL)
     {
@@ -72,13 +73,13 @@ LIBMATTI_ML_LaunchPluginHandler *LIBMATTI_ML_LaunchPluginHandler_New(LIBMATTI_ML
         }
         else
         {
-            // Java: () -> { throw new RuntimeException("The MODLIST isn't set, huh?"); }
+// Java: () -> { throw new RuntimeException("The MODLIST isn't set, huh?"); }
             LIBMATTI_ML_Logger_Error(LIBMATTI_ML_LogManager_GetLogger(), &LIBMATTI_ML_MARKER_MODLAUNCHER,
                                      "The MODLIST isn't set, huh?");
         }
     }
 
-    // Java: () -> String.join(",", this.plugins.keySet())
+// Java: () -> String.join(",", this.plugins.keySet())
     size_t namesLength = 1;
     for (size_t i = 0; i < handler->count; i++) namesLength += strlen(handler->names[i]) + 1;
     char *names = malloc(namesLength);
@@ -133,7 +134,7 @@ LIBMATTI_ML_LaunchPluginTransformerSet LIBMATTI_ML_LaunchPluginHandler_ComputeLa
 {
     LIBMATTI_ML_LaunchPluginTransformerSet set = {0};
 
-    // Java: Set<ILaunchPluginService> uniqueValues = new HashSet<>()
+// Java: Set<ILaunchPluginService> uniqueValues = new HashSet<>()
     LIBMATTI_MLS_ILaunchPluginService **unique = NULL;
     size_t uniqueCount = 0;
 
@@ -162,7 +163,7 @@ LIBMATTI_ML_LaunchPluginTransformerSet LIBMATTI_ML_LaunchPluginHandler_ComputeLa
         unique = realloc(unique, sizeof(*unique) * (uniqueCount + 1));
         unique[uniqueCount++] = plugin;
 
-        // Java: plugin.customAuditConsumer(className.getClassName(), strings -> auditTrail.addPluginCustomAuditTrail(...))
+// Java: plugin.customAuditConsumer(className.getClassName(), strings -> auditTrail.addPluginCustomAuditTrail(...))
         char *classNameString = LIBMATTI_ASM_Type_GetClassName(className);
         CustomAuditContext context = {auditTrail, classNameString, plugin};
         LIBMATTI_MLS_ILaunchPluginService_CustomAuditConsumer(plugin, classNameString, custom_audit_acceptor, &context);
@@ -170,7 +171,7 @@ LIBMATTI_ML_LaunchPluginTransformerSet LIBMATTI_ML_LaunchPluginHandler_ComputeLa
     }
     free(unique);
 
-    // Java: LOGGER.debug(LAUNCHPLUGIN, "LaunchPluginService {}", () -> phaseObjectEnumMap)
+// Java: LOGGER.debug(LAUNCHPLUGIN, "LaunchPluginService {}", () -> phaseObjectEnumMap)
     LIBMATTI_ML_Logger_Debug(LIBMATTI_ML_LogManager_GetLogger(), &LIBMATTI_ML_MARKER_LAUNCHPLUGIN,
                              "LaunchPluginService {}", "");
 
@@ -181,7 +182,7 @@ void LIBMATTI_ML_LaunchPluginHandler_OfferScanResultsToPlugins(LIBMATTI_ML_Launc
                                                                LIBMATTI_JH_SecureJar **scanResults,
                                                                size_t scanResultCount)
 {
-    // Java: plugins.forEach((n, p) -> p.addResources(scanResults))
+// Java: plugins.forEach((n, p) -> p.addResources(scanResults))
     for (size_t i = 0; i < handler->count; i++)
         LIBMATTI_MLS_ILaunchPluginService_AddResources(handler->plugins[i], scanResults, scanResultCount);
 }
@@ -203,7 +204,7 @@ int LIBMATTI_ML_LaunchPluginHandler_OfferClassNodeToPlugins(LIBMATTI_ML_LaunchPl
 
         char *classNameString = LIBMATTI_ASM_Type_GetClassName(className);
         LIBMATTI_ML_Logger_Debug(LIBMATTI_ML_LogManager_GetLogger(), &LIBMATTI_ML_MARKER_LAUNCHPLUGIN,
-                                 "LauncherPluginService {} offering transform {}", 
+                                 "LauncherPluginService {} offering transform {}",
                                  LIBMATTI_MLS_ILaunchPluginService_Name(plugin), classNameString);
 
         int pluginFlags = LIBMATTI_MLS_ILaunchPluginService_ProcessClassWithFlags(plugin, phase, node, className, reason);
@@ -240,7 +241,7 @@ void LIBMATTI_ML_LaunchPluginHandler_AnnounceLaunch(LIBMATTI_ML_LaunchPluginHand
                                                     LIBMATTI_ML_TransformingClassLoader *transformerLoader,
                                                     LIBMATTI_MLA_NamedPath *specialPaths, size_t specialPathCount)
 {
-    // Java: plugins.forEach((k, p) -> p.initializeLaunch(s -> transformerLoader.buildTransformedClassNodeFor(s, k), specialPaths))
+// Java: plugins.forEach((k, p) -> p.initializeLaunch(s -> transformerLoader.buildTransformedClassNodeFor(s, k), specialPaths))
     for (size_t i = 0; i < handler->count; i++)
     {
         TransformerLoaderAdapter adapter = {transformerLoader, handler->names[i]};

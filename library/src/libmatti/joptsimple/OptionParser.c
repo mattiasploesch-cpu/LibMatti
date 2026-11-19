@@ -1,4 +1,5 @@
-// Port of joptsimple.OptionParser and joptsimple.OptionSet.
+
+
 
 #include "libmatti/joptsimple/OptionParser.h"
 #include "libmatti/joptsimple/OptionSet.h"
@@ -78,7 +79,7 @@ LIBMATTI_JOPT_OptionSet *LIBMATTI_JOPT_OptionParser_Parse(LIBMATTI_JOPT_OptionPa
             }
             else if (parser->allowsUnrecognized)
             {
-                // Java: allowsUnrecognizedOptions() keeps the unrecognized option as a non-option argument,
+// Java: allowsUnrecognizedOptions() keeps the unrecognized option as a non-option argument,
                 // so it is handed back through nonOptionArguments() (this is how --fml.* reach FMLLoader).
                 set->nonOptions = realloc(set->nonOptions, sizeof(*set->nonOptions) * (set->nonOptionCount + 1));
                 set->nonOptions[set->nonOptionCount++] = argv[i];

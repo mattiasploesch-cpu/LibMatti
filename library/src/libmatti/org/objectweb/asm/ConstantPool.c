@@ -1,11 +1,13 @@
-// ASM constant pool (ClassReader/ClassWriter internal representation).
+
+
 
 #include "libmatti/org/objectweb/asm/ConstantPool.h"
 
 #include <stdlib.h>
 #include <string.h>
 
-// the JVM constant pool tags
+
+
 #define CP_UTF8 1
 #define CP_INTEGER 3
 #define CP_FLOAT 4
@@ -21,7 +23,7 @@
 LIBMATTI_ASM_ConstantPool *LIBMATTI_ASM_ConstantPool_New(void)
 {
     LIBMATTI_ASM_ConstantPool *pool = calloc(1, sizeof(LIBMATTI_ASM_ConstantPool));
-    // Java: index 0 is unused
+// Java: index 0 is unused
     pool->count = 1;
     pool->entries = calloc(1, sizeof(LIBMATTI_ASM_ConstantPoolEntry));
     return pool;
@@ -76,7 +78,7 @@ static int pool_append(LIBMATTI_ASM_ConstantPool *pool, LIBMATTI_ASM_ConstantPoo
     int index = (int)pool->count;
     pool->count++;
 
-    // Java: a Long/Double constant occupies two pool slots
+// Java: a Long/Double constant occupies two pool slots
     if (entry.tag == CP_LONG || entry.tag == CP_DOUBLE)
     {
         pool->entries[pool->count] = (LIBMATTI_ASM_ConstantPoolEntry){0};

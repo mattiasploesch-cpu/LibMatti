@@ -1,4 +1,5 @@
-// Port of cpw.mods.modlauncher.TransformationServiceDecorator.
+
+
 
 #include "libmatti/cpw/modlauncher/TransformationServiceDecorator.h"
 
@@ -28,7 +29,7 @@ void LIBMATTI_ML_TransformationServiceDecorator_OnLoad(LIBMATTI_ML_Transformatio
                                                        LIBMATTI_ML_Environment *env, char **otherServices,
                                                        size_t otherServiceCount)
 {
-    // Java: try { service.onLoad(env, otherServices); isValid = true; }
+// Java: try { service.onLoad(env, otherServices); isValid = true; }
     //       catch (IncompatibleEnvironmentException e) { LOGGER.error(...); isValid = false; }
     LIBMATTI_ML_Logger_Debug(LIBMATTI_ML_LogManager_GetLogger(), &LIBMATTI_ML_MARKER_MODLAUNCHER, "Loading service {}",
                              LIBMATTI_MLA_ITransformationService_Name(decorator->service));
@@ -81,7 +82,7 @@ void LIBMATTI_ML_TransformationServiceDecorator_GatherTransformers(
     {
         LIBMATTI_MLA_ITransformer *xform = transformers[i];
 
-        // Java: final TargetType<?> targetType = xform.getTargetType()
+// Java: final TargetType<?> targetType = xform.getTargetType()
         const LIBMATTI_MLA_TargetType *targetType = LIBMATTI_MLA_ITransformer_GetTargetType(xform);
 
         size_t targetCount = 0;
@@ -89,7 +90,7 @@ void LIBMATTI_ML_TransformationServiceDecorator_GatherTransformers(
 
         if (targetCount == 0) continue;
 
-        // Java: targets.stream().map(TransformTargetLabel::new).collect(Collectors.groupingBy(TransformTargetLabel::getTargetType))
+// Java: targets.stream().map(TransformTargetLabel::new).collect(Collectors.groupingBy(TransformTargetLabel::getTargetType))
         LIBMATTI_ML_TransformTargetLabel **labels = malloc(sizeof(*labels) * targetCount);
         for (size_t t = 0; t < targetCount; t++) labels[t] = LIBMATTI_ML_TransformTargetLabel_NewFromTarget(&targets[t]);
 
@@ -108,7 +109,7 @@ void LIBMATTI_ML_TransformationServiceDecorator_GatherTransformers(
             }
         }
 
-        // Java: if (targetTypeListMap.keySet().size() > 1 || !targetTypeListMap.containsKey(targetType))
+// Java: if (targetTypeListMap.keySet().size() > 1 || !targetTypeListMap.containsKey(targetType))
         int hasTargetType = 0;
         for (size_t g = 0; g < groupCount; g++) if (groupTypes[g] == targetType) hasTargetType = 1;
 
@@ -117,14 +118,14 @@ void LIBMATTI_ML_TransformationServiceDecorator_GatherTransformers(
             LIBMATTI_ML_Logger_Error(LIBMATTI_ML_LogManager_GetLogger(), &LIBMATTI_ML_MARKER_MODLAUNCHER,
                                      "Invalid target {} for transformer {}", targetType != NULL ? targetType->name : "",
                                      "");
-            // Java: throw new IllegalArgumentException("The transformer contains invalid targets")
+// Java: throw new IllegalArgumentException("The transformer contains invalid targets")
             for (size_t t = 0; t < targetCount; t++) LIBMATTI_ML_TransformTargetLabel_Free(labels[t]);
             free(labels);
             free(groupTypes);
             continue;
         }
 
-        // Java: targetTypeListMap.values().stream().flatMap(Collection::stream).forEach(target -> transformStore.addTransformer(target, xform, service))
+// Java: targetTypeListMap.values().stream().flatMap(Collection::stream).forEach(target -> transformStore.addTransformer(target, xform, service))
         for (size_t t = 0; t < targetCount; t++)
             LIBMATTI_ML_TransformStore_AddTransformer(transformStore, labels[t], xform, decorator->service);
 

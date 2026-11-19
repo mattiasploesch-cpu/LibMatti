@@ -1,4 +1,5 @@
-// Port of joptsimple.OptionSet.
+
+
 
 #ifndef MATTICRAFT_JOPTSIMPLE_OPTIONSET_H
 #define MATTICRAFT_JOPTSIMPLE_OPTIONSET_H
@@ -27,4 +28,4 @@ char **LIBMATTI_JOPT_OptionSet_NonOptionArguments(const LIBMATTI_JOPT_OptionSet 
 
 void LIBMATTI_JOPT_OptionSet_Free(LIBMATTI_JOPT_OptionSet *set);
 
-#endif //MATTICRAFT_JOPTSIMPLE_OPTIONSET_H
+#endif

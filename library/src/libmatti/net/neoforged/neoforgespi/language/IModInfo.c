@@ -185,7 +185,7 @@ static LIBMATTI_NEOFORGESPI_VersionRange *unbounded = NULL;
 // Java: VersionRange UNBOUNDED = MavenVersionAdapter.createFromVersionSpec(" ")
 LIBMATTI_NEOFORGESPI_VersionRange *LIBMATTI_NEOFORGESPI_IModInfo_Unbounded(void)
 {
-    // Java: " " will just be the preferred version for Maven, but it will accept anything
+// Java: " " will just be the preferred version for Maven, but it will accept anything
     if (unbounded == NULL)
         unbounded = LIBMATTI_NEOFORGESPI_MavenVersionAdapter_CreateFromVersionSpec(" ");
     return unbounded;

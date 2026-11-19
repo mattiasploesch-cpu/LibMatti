@@ -23,4 +23,4 @@ LIBMATTI_JL_Class *LIBMATTI_NEOFORGE_Registries_NewRegistryEvent_Class(void);
 LIBMATTI_NEOFORGE_Registries_NewRegistryEvent *LIBMATTI_NEOFORGE_Registries_NewRegistryEvent_New(void);
 void LIBMATTI_NEOFORGE_Registries_NewRegistryEvent_Free(LIBMATTI_NEOFORGE_Registries_NewRegistryEvent *event);
 
-#endif //MATTICRAFT_NEOFORGE_REGISTRIES_NEWREGISTRYEVENT_H
+#endif

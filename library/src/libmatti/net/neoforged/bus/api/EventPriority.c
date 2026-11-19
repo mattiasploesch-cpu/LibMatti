@@ -1,4 +1,5 @@
-// Port of net.neoforged.bus.api.EventPriority.
+
+
 
 #include "libmatti/net/neoforged/bus/api/EventPriority.h"
 

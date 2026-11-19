@@ -1,4 +1,5 @@
-// Port of org.objectweb.asm.Label.
+
+
 
 #include "libmatti/org/objectweb/asm/Label.h"
 

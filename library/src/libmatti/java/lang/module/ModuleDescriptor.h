@@ -1,7 +1,8 @@
-//
-// Created by administrator on 09.09.26.
-//
-// Port of java.lang.module.ModuleDescriptor.
+
+
+
+
+
 
 #ifndef MATTICRAFT_MODULEDESCRIPTOR_H
 #define MATTICRAFT_MODULEDESCRIPTOR_H
@@ -11,8 +12,9 @@
 // Java: class ModuleDescriptor.Version implements Comparable<Version>
 typedef struct
 {
-    char *raw; // Java: Version.toString()
-    char **parts; // components split on '.', '-', '+'
+    char *raw;// Java: Version.toString()
+    char **parts;
+
     size_t partCount;
 } LIBMATTI_JL_ModuleDescriptor_Version;
 
@@ -38,15 +40,18 @@ typedef enum
 typedef struct
 {
     char *name;
-    int modifiers; // LIBMATTI_JL_RequiresModifier bitmask
-    LIBMATTI_JL_ModuleDescriptor_Version *version; // Optional<Version> (NULL = empty)
+    int modifiers;
+
+    LIBMATTI_JL_ModuleDescriptor_Version *version;
+
 } LIBMATTI_JL_ModuleDescriptor_Requires;
 
 // Java: class ModuleDescriptor.Exports
 typedef struct
 {
     char *source;
-    char **targets; // Set<String> (NULL/0 = unqualified)
+    char **targets;
+
     size_t targetCount;
 } LIBMATTI_JL_ModuleDescriptor_Exports;
 
@@ -54,7 +59,8 @@ typedef struct
 typedef struct
 {
     char *source;
-    char **targets; // Set<String> (NULL/0 = unqualified)
+    char **targets;
+
     size_t targetCount;
 } LIBMATTI_JL_ModuleDescriptor_Opens;
 
@@ -62,7 +68,8 @@ typedef struct
 typedef struct
 {
     char *service;
-    char **providers; // List<String>
+    char **providers;
+
     size_t providerCount;
 } LIBMATTI_JL_ModuleDescriptor_Provides;
 
@@ -70,20 +77,29 @@ typedef struct
 typedef struct
 {
     char *name;
-    char *mainClass; // Optional<String> (NULL = empty)
-    LIBMATTI_JL_ModuleDescriptor_Version *version; // Optional<Version> (NULL = empty)
-    int modifiers; // LIBMATTI_JL_Modifier bitmask
-    char **packages; // Set<String>
+    char *mainClass;
+
+    LIBMATTI_JL_ModuleDescriptor_Version *version;
+
+    int modifiers;
+
+    char **packages;
+
     size_t packageCount;
-    LIBMATTI_JL_ModuleDescriptor_Requires **requires; // Set<Requires>
+    LIBMATTI_JL_ModuleDescriptor_Requires **requires;
+
     size_t requiresCount;
-    LIBMATTI_JL_ModuleDescriptor_Exports **exports; // Set<Exports>
+    LIBMATTI_JL_ModuleDescriptor_Exports **exports;
+
     size_t exportsCount;
-    LIBMATTI_JL_ModuleDescriptor_Opens **opens; // Set<Opens>
+    LIBMATTI_JL_ModuleDescriptor_Opens **opens;
+
     size_t opensCount;
-    char **uses; // Set<String> (service types)
+    char **uses;
+
     size_t usesCount;
-    LIBMATTI_JL_ModuleDescriptor_Provides **provides; // Set<Provides>
+    LIBMATTI_JL_ModuleDescriptor_Provides **provides;
+
     size_t providesCount;
 } LIBMATTI_JL_ModuleDescriptor;
 
@@ -104,7 +120,8 @@ int LIBMATTI_JL_ModuleDescriptor_Modifiers(const LIBMATTI_JL_ModuleDescriptor *d
 // Java: boolean isOpen() / isAutomatic()
 int LIBMATTI_JL_ModuleDescriptor_IsOpen(const LIBMATTI_JL_ModuleDescriptor *descriptor);
 int LIBMATTI_JL_ModuleDescriptor_IsAutomatic(const LIBMATTI_JL_ModuleDescriptor *descriptor);
-// the following return the internal arrays, do not free
+
+
 char **LIBMATTI_JL_ModuleDescriptor_Packages(const LIBMATTI_JL_ModuleDescriptor *descriptor, size_t *count);
 LIBMATTI_JL_ModuleDescriptor_Requires **LIBMATTI_JL_ModuleDescriptor_GetRequires(const LIBMATTI_JL_ModuleDescriptor *descriptor, size_t *count);
 LIBMATTI_JL_ModuleDescriptor_Exports **LIBMATTI_JL_ModuleDescriptor_GetExports(const LIBMATTI_JL_ModuleDescriptor *descriptor, size_t *count);
@@ -123,4 +140,4 @@ void LIBMATTI_JL_ModuleDescriptor_AddOpens(LIBMATTI_JL_ModuleDescriptor *descrip
 void LIBMATTI_JL_ModuleDescriptor_AddUses(LIBMATTI_JL_ModuleDescriptor *descriptor, const char *service);
 void LIBMATTI_JL_ModuleDescriptor_AddProvides(LIBMATTI_JL_ModuleDescriptor *descriptor, const char *service, char **providers, size_t providerCount);
 
-#endif //MATTICRAFT_MODULEDESCRIPTOR_H
+#endif

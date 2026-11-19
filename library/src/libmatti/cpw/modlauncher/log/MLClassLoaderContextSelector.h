@@ -8,4 +8,4 @@ char *LIBMATTI_ML_MLClassLoaderContextSelector_ToContextMapKey(
 char *LIBMATTI_ML_MLClassLoaderContextSelector_ToContextMapKeyForClassLoader(
     const LIBMATTI_CL_ClassLoader *classLoader);
 
-#endif //MATTICRAFT_MODLAUNCHER_MLCLASSLOADERCONTEXTSELECTOR_H
+#endif

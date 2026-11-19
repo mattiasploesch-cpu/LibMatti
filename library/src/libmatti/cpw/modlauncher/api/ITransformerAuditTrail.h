@@ -1,4 +1,5 @@
-// Port of cpw.mods.modlauncher.api.ITransformerAuditTrail.
+
+
 
 #ifndef MATTICRAFT_MODLAUNCHER_ITRANSFORMERAUDITTRAIL_H
 #define MATTICRAFT_MODLAUNCHER_ITRANSFORMERAUDITTRAIL_H
@@ -17,4 +18,4 @@ LIBMATTI_MLA_ITransformerActivity *LIBMATTI_MLA_ITransformerAuditTrail_GetActivi
 char *LIBMATTI_MLA_ITransformerAuditTrail_GetAuditString(LIBMATTI_MLA_ITransformerAuditTrail *trail,
                                                          const char *clazz);
 
-#endif //MATTICRAFT_MODLAUNCHER_ITRANSFORMERAUDITTRAIL_H
+#endif

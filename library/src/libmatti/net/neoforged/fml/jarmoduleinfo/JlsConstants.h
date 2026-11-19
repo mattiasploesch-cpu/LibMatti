@@ -1,6 +1,7 @@
-// Port of net.neoforged.fml.jarmoduleinfo.JlsConstants.
-// Java uses Character.isJavaIdentifierStart/Part, which is defined over the full
-// Unicode tables. The port implements the ASCII rules.
+
+
+
+
 
 #ifndef MATTICRAFT_FML_JARMODULEINFO_JLSCONSTANTS_H
 #define MATTICRAFT_FML_JARMODULEINFO_JLSCONSTANTS_H
@@ -18,4 +19,4 @@ char *LIBMATTI_FML_JlsConstants_GetPackageName(const char *typeName);
 // Java: public static boolean isTypeName(String name)
 int LIBMATTI_FML_JlsConstants_IsTypeName(const char *name);
 
-#endif //MATTICRAFT_FML_JARMODULEINFO_JLSCONSTANTS_H
+#endif

@@ -1,8 +1,9 @@
-// Port of com.mojang.brigadier.arguments.*: ArgumentType and the built-in
-// Bool/Integer/Long/Float/Double/String argument types.
-//
-// Java's generics collapse to an enum discriminator + a union result; parse
-// reports CommandSyntaxException through the out-parameter like the StringReader.
+
+
+
+
+
+
 
 #ifndef MATTICRAFT_BR_ARGUMENTS_ARGUMENTTYPE_H
 #define MATTICRAFT_BR_ARGUMENTS_ARGUMENTTYPE_H
@@ -36,20 +37,21 @@ typedef union
     long long longValue;
     float floatValue;
     double doubleValue;
-    char *stringValue; // owned by the ParsedArgument
+    char *stringValue;
+
 } LIBMATTI_BR_ArgumentValue;
 
 typedef struct LIBMATTI_BR_ArgumentType
 {
     LIBMATTI_BR_ArgumentKind kind;
-    // Java: the numeric bounds (unused for bool/string)
+// Java: the numeric bounds (unused for bool/string)
     int minimum;
     int maximum;
     long long minimumLong;
     long long maximumLong;
     double minimumDouble;
     double maximumDouble;
-    // Java: StringArgumentType.type
+// Java: StringArgumentType.type
     LIBMATTI_BR_StringType stringType;
 } LIBMATTI_BR_ArgumentType;
 
@@ -88,7 +90,8 @@ float LIBMATTI_BR_ArgumentType_ParseFloat(const LIBMATTI_BR_ArgumentType *type, 
                                           LIBMATTI_BR_CommandSyntaxException **outException);
 double LIBMATTI_BR_ArgumentType_ParseDouble(const LIBMATTI_BR_ArgumentType *type, LIBMATTI_BR_StringReader *reader,
                                             LIBMATTI_BR_CommandSyntaxException **outException);
-// The caller frees the string (the union owns nothing afterwards)
+
+
 char *LIBMATTI_BR_ArgumentType_ParseString(const LIBMATTI_BR_ArgumentType *type, LIBMATTI_BR_StringReader *reader,
                                            LIBMATTI_BR_CommandSyntaxException **outException);
 

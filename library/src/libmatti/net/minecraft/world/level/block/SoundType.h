@@ -1,6 +1,7 @@
-// Port of net.minecraft.world.level.block.SoundType.
-// Java stores one SoundEvent per action (break/step/place/hit/fall); the port keeps the
-// SoundEvents constant names and resolves them lazily through the SoundEvents port.
+
+
+
+
 
 #ifndef MATTICRAFT_MC_WORLD_LEVEL_BLOCK_SOUNDTYPE_H
 #define MATTICRAFT_MC_WORLD_LEVEL_BLOCK_SOUNDTYPE_H
@@ -12,10 +13,10 @@ extern "C" {
 // Java: public class SoundType
 typedef struct LIBMATTI_MC_SoundType
 {
-    // Java: public final float volume / pitch
+// Java: public final float volume / pitch
     float volume;
     float pitch;
-    // Java: private final SoundEvent breakSound, stepSound, placeSound, hitSound, fallSound
+// Java: private final SoundEvent breakSound, stepSound, placeSound, hitSound, fallSound
     const char *breakSound;
     const char *stepSound;
     const char *placeSound;
@@ -33,7 +34,8 @@ const char *LIBMATTI_MC_SoundType_GetPlaceSound(const LIBMATTI_MC_SoundType *typ
 const char *LIBMATTI_MC_SoundType_GetHitSound(const LIBMATTI_MC_SoundType *type);
 const char *LIBMATTI_MC_SoundType_GetFallSound(const LIBMATTI_MC_SoundType *type);
 
-// One accessor per Java constant, in declaration order.
+
+
 const LIBMATTI_MC_SoundType *LIBMATTI_MC_SoundType_EMPTY(void);
 const LIBMATTI_MC_SoundType *LIBMATTI_MC_SoundType_WOOD(void);
 const LIBMATTI_MC_SoundType *LIBMATTI_MC_SoundType_GRAVEL(void);
@@ -162,4 +164,4 @@ const LIBMATTI_MC_SoundType *LIBMATTI_MC_SoundType_DRIED_GHAST(void);
 }
 #endif
 
-#endif //MATTICRAFT_MC_WORLD_LEVEL_BLOCK_SOUNDTYPE_H
+#endif

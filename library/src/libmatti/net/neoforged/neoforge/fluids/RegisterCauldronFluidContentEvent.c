@@ -1,4 +1,5 @@
-// Port of net.neoforged.neoforge.fluids.RegisterCauldronFluidContentEvent.
+
+
 
 #include "libmatti/net/neoforged/neoforge/fluids/RegisterCauldronFluidContentEvent.h"
 

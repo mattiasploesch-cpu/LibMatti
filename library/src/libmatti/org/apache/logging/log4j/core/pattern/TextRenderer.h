@@ -11,4 +11,4 @@ typedef struct LIBMATTI_L4J_TextRenderer
                          LIBMATTI_JL_StringBuilder *output);
 } LIBMATTI_L4J_TextRenderer;
 
-#endif //MATTICRAFT_L4J_TEXTRENDERER_H
+#endif

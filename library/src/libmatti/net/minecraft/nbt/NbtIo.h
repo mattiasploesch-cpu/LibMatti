@@ -1,7 +1,8 @@
-// Port of net.minecraft.nbt.NbtIo - the binary named-root format. Java streams
-// through DataInput/DataOutput (big-endian, modified UTF-8); the port reads from
-// and writes to memory buffers, the gzip layer comes from zlib like Java's
-// GZIPInputStream/GZIPOutputStream.
+
+
+
+
+
 
 #ifndef MATTICRAFT_NET_MINECRAFT_NBT_NBTIO_H
 #define MATTICRAFT_NET_MINECRAFT_NBT_NBTIO_H
@@ -37,4 +38,4 @@ int LIBMATTI_MC_Nbt_NbtIo_WriteCompressedFile(LIBMATTI_MC_Nbt_CompoundTag *compo
 // Java: public static void write(CompoundTag, Path)
 int LIBMATTI_MC_Nbt_NbtIo_WriteFile(LIBMATTI_MC_Nbt_CompoundTag *compound, const char *path);
 
-#endif //MATTICRAFT_NET_MINECRAFT_NBT_NBTIO_H
+#endif

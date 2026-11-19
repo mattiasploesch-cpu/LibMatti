@@ -1,6 +1,7 @@
-// Port of net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent.
-// The capability maps (Block/Entity/Item -> provider) live with the game port; the port keeps
-// the event shell and the registrations the mods hand in (the capability string keys).
+
+
+
+
 
 #ifndef MATTICRAFT_NEOFORGE_CAPABILITIES_REGISTERCAPABILITIESEVENT_H
 #define MATTICRAFT_NEOFORGE_CAPABILITIES_REGISTERCAPABILITIESEVENT_H
@@ -14,11 +15,11 @@ typedef struct LIBMATTI_NEOFORGE_Capabilities_RegisterCapabilitiesEvent
 struct LIBMATTI_NEOFORGE_Capabilities_RegisterCapabilitiesEvent
 {
     LIBMATTI_BUS_Event base;
-    // Java: the registered (capability, target) pairs - the port keeps the names
+// Java: the registered (capability, target) pairs - the port keeps the names
     char **capabilities;
     size_t capabilityCount;
     size_t capabilityCapacity;
-    // Java: setProxyable(...) - the proxyable capability names
+// Java: setProxyable(...) - the proxyable capability names
     char **proxyable;
     size_t proxyableCount;
     size_t proxyableCapacity;
@@ -40,4 +41,4 @@ void LIBMATTI_NEOFORGE_Capabilities_RegisterCapabilitiesEvent_Register(
 void LIBMATTI_NEOFORGE_Capabilities_RegisterCapabilitiesEvent_SetProxyable(
     LIBMATTI_NEOFORGE_Capabilities_RegisterCapabilitiesEvent *event, const char *capability);
 
-#endif //MATTICRAFT_NEOFORGE_CAPABILITIES_REGISTERCAPABILITIESEVENT_H
+#endif

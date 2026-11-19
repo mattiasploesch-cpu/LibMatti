@@ -1,9 +1,10 @@
-// Port of com.mojang.brigadier.tree.* (CommandNode, LiteralCommandNode,
-// ArgumentCommandNode, RootCommandNode) and com.mojang.brigadier.builder.*
-// (ArgumentBuilder, LiteralArgumentBuilder, RequiredArgumentBuilder).
-//
-// Java's class hierarchy becomes one struct with a kind discriminator; the
-// builder mirrors it 1:1 (then/execute/requires/forward/suggests).
+
+
+
+
+
+
+
 
 #ifndef MATTICRAFT_BR_TREE_COMMANDNODE_H
 #define MATTICRAFT_BR_TREE_COMMANDNODE_H
@@ -38,33 +39,35 @@ typedef struct LIBMATTI_BR_CommandNodeChild
 // Java: public abstract class CommandNode<S>
 typedef struct LIBMATTI_BR_CommandNode
 {
-    // Java: the runtime type (LiteralCommandNode / ArgumentCommandNode / RootCommandNode)
+// Java: the runtime type (LiteralCommandNode / ArgumentCommandNode / RootCommandNode)
     int isLiteral;
     int isArgument;
     int isRoot;
 
-    // Java: private final Map<String, CommandNode<S>> children (insertion order kept)
+// Java: private final Map<String, CommandNode<S>> children (insertion order kept)
     LIBMATTI_BR_CommandNodeChild *childrenHead;
     LIBMATTI_BR_CommandNodeChild *childrenTail;
     size_t childCount;
 
-    // Java: private final Predicate<S> requirement (NULL = s -> true)
+// Java: private final Predicate<S> requirement (NULL = s -> true)
     LIBMATTI_BR_Requirement requirement;
     void *requirementUserdata;
-    // Java: private final CommandNode<S> redirect
+// Java: private final CommandNode<S> redirect
     LIBMATTI_BR_CommandNode *redirect;
-    // Java: private final RedirectModifier<S> modifier
+// Java: private final RedirectModifier<S> modifier
     LIBMATTI_BR_RedirectModifier modifier;
     void *modifierUserdata;
-    // Java: private final boolean forks
+// Java: private final boolean forks
     int forks;
-    // Java: private Command<S> command
+// Java: private Command<S> command
     LIBMATTI_BR_Command command;
     void *commandUserdata;
 
-    // LiteralCommandNode: private final String literal
+
+
     char *literal;
-    // ArgumentCommandNode: private final String name / ArgumentType<T> type
+
+
     char *name;
     LIBMATTI_BR_ArgumentType type;
 } LIBMATTI_BR_CommandNode;
@@ -114,18 +117,22 @@ void LIBMATTI_BR_CommandNode_Free(LIBMATTI_BR_CommandNode *node);
 
 typedef struct LIBMATTI_BR_ArgumentBuilder LIBMATTI_BR_ArgumentBuilder;
 
-// The builder accumulates children in a temporary RootCommandNode, like Java's
-// `private final RootCommandNode<S> arguments = new RootCommandNode<>()`.
+
+
+
 struct LIBMATTI_BR_ArgumentBuilder
 {
     int isLiteral;
-    // LiteralArgumentBuilder: private final String literal
+
+
     char *literal;
-    // RequiredArgumentBuilder: private final String name / ArgumentType<T> type
+
+
     char *name;
     LIBMATTI_BR_ArgumentType type;
 
-    LIBMATTI_BR_CommandNode *arguments; // a RootCommandNode holding the built children
+    LIBMATTI_BR_CommandNode *arguments;
+
     LIBMATTI_BR_Command command;
     void *commandUserdata;
     LIBMATTI_BR_Requirement requirement;

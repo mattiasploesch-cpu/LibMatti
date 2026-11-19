@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.classloading.transformation.ClassTransformer.
+
+
 
 #ifndef MATTICRAFT_FML_CLASSLOADING_TRANSFORMATION_CLASSTRANSFORMER_H
 #define MATTICRAFT_FML_CLASSLOADING_TRANSFORMATION_CLASSTRANSFORMER_H
@@ -29,4 +30,4 @@ unsigned char *LIBMATTI_FML_ClassTransformer_Transform(LIBMATTI_FML_ClassTransfo
                                                        LIBMATTI_FML_ClassHierarchyRecomputationContext *locator,
                                                        size_t *outLength);
 
-#endif //MATTICRAFT_FML_CLASSLOADING_TRANSFORMATION_CLASSTRANSFORMER_H
+#endif

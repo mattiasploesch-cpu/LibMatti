@@ -1,5 +1,6 @@
-// Port of net.neoforged.fml.classloading.transformation.ClassProcessorAuditLog.
-// Java's ConcurrentHashMap maps to plain arrays here: the ported launcher transforms on one thread.
+
+
+
 
 #ifndef MATTICRAFT_FML_CLASSLOADING_TRANSFORMATION_CLASSPROCESSORAUDITLOG_H
 #define MATTICRAFT_FML_CLASSLOADING_TRANSFORMATION_CLASSPROCESSORAUDITLOG_H
@@ -13,10 +14,10 @@
 typedef struct LIBMATTI_FML_TransformerActivity
 {
     LIBMATTI_NEOFORGESPI_ProcessorName *processorName;
-    // Java: private final List<String> activities
+// Java: private final List<String> activities
     char **activities;
     size_t activityCount;
-    // Java: private boolean include = false
+// Java: private boolean include = false
     int include;
 } LIBMATTI_FML_TransformerActivity;
 
@@ -29,10 +30,10 @@ void LIBMATTI_FML_TransformerActivity_Rewrites(LIBMATTI_FML_TransformerActivity 
 // Java: public class ClassProcessorAuditLog implements ClassProcessorAuditSource
 typedef struct LIBMATTI_FML_ClassProcessorAuditLog
 {
-    // Java: implements ClassProcessorAuditSource
+// Java: implements ClassProcessorAuditSource
     LIBMATTI_FML_ClassProcessorAuditSource source;
 
-    // Java: Map<String, List<TransformerActivity>> audit
+// Java: Map<String, List<TransformerActivity>> audit
     char **classes;
     LIBMATTI_FML_TransformerActivity ***activities;
     size_t *activityCounts;
@@ -52,4 +53,4 @@ LIBMATTI_FML_TransformerActivity *LIBMATTI_FML_ClassProcessorAuditLog_ForClassPr
 // Java: public String getAuditString(String clazz); caller frees
 char *LIBMATTI_FML_ClassProcessorAuditLog_GetAuditString(LIBMATTI_FML_ClassProcessorAuditLog *log, const char *clazz);
 
-#endif //MATTICRAFT_FML_CLASSLOADING_TRANSFORMATION_CLASSPROCESSORAUDITLOG_H
+#endif

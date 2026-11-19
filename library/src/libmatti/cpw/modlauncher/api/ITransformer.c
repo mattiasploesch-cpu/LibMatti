@@ -1,4 +1,5 @@
-// Port of cpw.mods.modlauncher.api.ITransformer.
+
+
 
 #include "libmatti/cpw/modlauncher/api/ITransformer.h"
 
@@ -80,7 +81,7 @@ const LIBMATTI_MLA_TargetType *LIBMATTI_MLA_ITransformer_GetTargetType(LIBMATTI_
 
 char **LIBMATTI_MLA_ITransformer_Labels(LIBMATTI_MLA_ITransformer *transformer, size_t *count)
 {
-    // Java: default String[] labels() { return DEFAULT_LABEL; }
+// Java: default String[] labels() { return DEFAULT_LABEL; }
     if (transformer->labels == NULL) return LIBMATTI_MLA_ITransformer_DefaultLabel(count);
     return transformer->labels(transformer, count);
 }

@@ -1,6 +1,7 @@
-// Port of net.minecraft.world.food.FoodData (implementation). The tick() body
-// needs the ServerPlayer/difficulty/gamerule surface - it rides the P6 health
-// work; the port keeps the state machine the eat/exhaustion paths share.
+
+
+
+
 
 #include "libmatti/net/minecraft/world/food/FoodData.h"
 
@@ -13,9 +14,9 @@ void LIBMATTI_MC_FoodData_Add(LIBMATTI_MC_FoodData *foodData, int food, float sa
 {
     if (foodData == NULL)
         return;
-    // Java: this.foodLevel = Mth.clamp(p_335153_ + this.foodLevel, 0, 20)
+// Java: this.foodLevel = Mth.clamp(p_335153_ + this.foodLevel, 0, 20)
     foodData->foodLevel = LIBMATTI_MC_Mth_ClampI(food + foodData->foodLevel, 0, LIBMATTI_MC_FoodConstants_MAX_FOOD);
-    // Java: this.saturationLevel = Mth.clamp(p_332105_ + this.saturationLevel, 0.0F, this.foodLevel)
+// Java: this.saturationLevel = Mth.clamp(p_332105_ + this.saturationLevel, 0.0F, this.foodLevel)
     foodData->saturationLevel = LIBMATTI_MC_Mth_Clamp(saturation + foodData->saturationLevel, 0.0f, (float) foodData->foodLevel);
 }
 
@@ -37,22 +38,23 @@ void LIBMATTI_MC_FoodData_AddExhaustion(LIBMATTI_MC_FoodData *foodData, float ex
 {
     if (foodData == NULL)
         return;
-    // Java: this.exhaustionLevel = Math.min(this.exhaustionLevel + p_38704_, 40.0F)
+// Java: this.exhaustionLevel = Math.min(this.exhaustionLevel + p_38704_, 40.0F)
     float next = foodData->exhaustionLevel + exhaustion;
     foodData->exhaustionLevel = next > 40.0f ? 40.0f : next;
 }
 
-// The tick() exhaustion head: Java drains exhaustion in 4-steps, saturation
-// first, then the food level (the peaceful check rides the difficulty port).
+
+
+
 void LIBMATTI_MC_FoodData_DrainExhaustion(LIBMATTI_MC_FoodData *foodData)
 {
     if (foodData == NULL)
         return;
-    // Java: if (this.exhaustionLevel > 4.0F) { this.exhaustionLevel -= 4.0F; ... }
+// Java: if (this.exhaustionLevel > 4.0F) { this.exhaustionLevel -= 4.0F; ... }
     if (foodData->exhaustionLevel > LIBMATTI_MC_FoodConstants_EXHAUSTION_DROP)
     {
         foodData->exhaustionLevel -= LIBMATTI_MC_FoodConstants_EXHAUSTION_DROP;
-        // Java: if (this.saturationLevel > 0) saturation = max(saturation - 1, 0)
+// Java: if (this.saturationLevel > 0) saturation = max(saturation - 1, 0)
         //       else foodLevel = max(foodLevel - 1, 0) (non-peaceful only)
         if (foodData->saturationLevel > 0.0f)
             foodData->saturationLevel = foodData->saturationLevel - 1.0f > 0.0f ? foodData->saturationLevel - 1.0f : 0.0f;

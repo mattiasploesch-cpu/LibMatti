@@ -20,4 +20,4 @@ LIBMATTI_JLI_MethodHandle *LIBMATTI_JLI_MethodHandles_Lookup_FindStatic(LIBMATTI
                                                                        LIBMATTI_JL_Class *refc, const char *name,
                                                                        LIBMATTI_JLI_MethodType *type);
 
-#endif //MATTICRAFT_JAVA_LANG_INVOKE_METHODHANDLES_H
+#endif

@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.classloading.transformation.TransformingClassLoader.
+
+
 
 #include "libmatti/net/neoforged/fml/classloading/transformation/TransformingClassLoader.h"
 
@@ -57,11 +58,11 @@ static unsigned char *transforming_maybe_transform(LIBMATTI_FML_ModuleClassLoade
 {
     LIBMATTI_FML_TransformingClassLoader *classLoader = (LIBMATTI_FML_TransformingClassLoader *) self;
 
-    // Java: var upToTransformerName = upToTransformer == null ? null : ProcessorName.parse(upToTransformer);
+// Java: var upToTransformerName = upToTransformer == null ? null : ProcessorName.parse(upToTransformer);
     LIBMATTI_NEOFORGESPI_ProcessorName *upToTransformerName =
         upToTransformer == NULL ? NULL : LIBMATTI_NEOFORGESPI_ProcessorName_Parse(upToTransformer);
 
-    // Java: classTransformer.transform(bytes, name, upToTransformerName, new ClassHierarchyRecomputationContext() {...})
+// Java: classTransformer.transform(bytes, name, upToTransformerName, new ClassHierarchyRecomputationContext() {...})
     unsigned char *result = LIBMATTI_FML_ClassTransformer_Transform(
         classLoader->classTransformer, bytes, length, name, upToTransformerName, &classLoader->recomputationContext,
         outLength);
@@ -77,7 +78,7 @@ LIBMATTI_FML_TransformingClassLoader *LIBMATTI_FML_TransformingClassLoader_New(
 {
     LIBMATTI_FML_TransformingClassLoader *classLoader = calloc(1, sizeof(LIBMATTI_FML_TransformingClassLoader));
 
-    // Java: super("TRANSFORMER", configuration, parentLayers, parentClassLoader)
+// Java: super("TRANSFORMER", configuration, parentLayers, parentClassLoader)
     LIBMATTI_FML_ModuleClassLoader *base = LIBMATTI_FML_ModuleClassLoader_NewWithParent(
         "TRANSFORMER", configuration, parentLayers, parentLayerCount, parentClassLoader);
     classLoader->base = *base;
@@ -90,7 +91,7 @@ LIBMATTI_FML_TransformingClassLoader *LIBMATTI_FML_TransformingClassLoader_New(
     classLoader->recomputationContext.upToFrames = recomputation_up_to_frames;
     classLoader->recomputationContext.locateParentClass = recomputation_locate_parent_class;
 
-    // Java: classProcessorSet.link(processorName -> className -> buildTransformedClassNodeFor(className, processorName))
+// Java: classProcessorSet.link(processorName -> className -> buildTransformedClassNodeFor(className, processorName))
     LIBMATTI_FML_ClassProcessorSet_Link(classProcessorSet, bytecode_provider_lookup, classLoader);
     return classLoader;
 }
@@ -113,7 +114,7 @@ unsigned char *LIBMATTI_FML_TransformingClassLoader_MaybeTransformClassBytes(
 void *LIBMATTI_FML_TransformingClassLoader_GetLoadedClass(const LIBMATTI_FML_TransformingClassLoader *classLoader,
                                                           const char *name)
 {
-    // Java: return findLoadedClass(name); // JVM-backed (external)
+// Java: return findLoadedClass(name); // JVM-backed (external)
     (void) classLoader;
     (void) name;
     return NULL;
@@ -123,7 +124,7 @@ unsigned char *LIBMATTI_FML_TransformingClassLoader_BuildTransformedClassNodeFor
     LIBMATTI_FML_TransformingClassLoader *classLoader, const char *className,
     const LIBMATTI_NEOFORGESPI_ProcessorName *upToTransformer, size_t *outLength)
 {
-    // Java: return super.getMaybeTransformedClassBytes(className, upToTransformer.toString());
+// Java: return super.getMaybeTransformedClassBytes(className, upToTransformer.toString());
     char *upToTransformerString = LIBMATTI_NEOFORGESPI_ProcessorName_ToString(upToTransformer);
     unsigned char *result = LIBMATTI_FML_ModuleClassLoader_GetMaybeTransformedClassBytes(
         &classLoader->base, className, upToTransformerString, outLength);
@@ -141,14 +142,14 @@ static LIBMATTI_FML_TransformingClassLoader *recomputation_owner(LIBMATTI_FML_Cl
 static void *recomputation_find_loaded_class(LIBMATTI_FML_ClassHierarchyRecomputationContext *self,
                                              const char *className)
 {
-    // Java: return TransformingClassLoader.this.getLoadedClass(name);
+// Java: return TransformingClassLoader.this.getLoadedClass(name);
     return LIBMATTI_FML_TransformingClassLoader_GetLoadedClass(recomputation_owner(self), className);
 }
 
 static unsigned char *recomputation_up_to_frames(LIBMATTI_FML_ClassHierarchyRecomputationContext *self,
                                                  const char *className, size_t *length)
 {
-    // Java: return TransformingClassLoader.this.buildTransformedClassNodeFor(className, ClassProcessorIds.COMPUTING_FRAMES);
+// Java: return TransformingClassLoader.this.buildTransformedClassNodeFor(className, ClassProcessorIds.COMPUTING_FRAMES);
     return LIBMATTI_FML_TransformingClassLoader_BuildTransformedClassNodeFor(
         recomputation_owner(self), className, LIBMATTI_NEOFORGESPI_ClassProcessorIds_COMPUTING_FRAMES(), length);
 }
@@ -156,7 +157,7 @@ static unsigned char *recomputation_up_to_frames(LIBMATTI_FML_ClassHierarchyReco
 static void *recomputation_locate_parent_class(LIBMATTI_FML_ClassHierarchyRecomputationContext *self,
                                                const char *className)
 {
-    // Java: return Class.forName(className, false, TransformingClassLoader.this.getParent());
+// Java: return Class.forName(className, false, TransformingClassLoader.this.getParent());
     LIBMATTI_FML_TransformingClassLoader *classLoader = recomputation_owner(self);
     return LIBMATTI_JL_Class_ForName(className, 0, classLoader->base.base.parent);
 }

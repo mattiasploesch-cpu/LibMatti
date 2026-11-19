@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.common.asm.enumextension.EnumParameters.
+
+
 
 #include "libmatti/net/neoforged/fml/common/asm/enumextension/EnumParameters.h"
 
@@ -11,7 +12,7 @@ LIBMATTI_FML_EnumParameters *LIBMATTI_FML_EnumParameters_NewConstant(
 {
     LIBMATTI_FML_EnumParameters *parameters = calloc(1, sizeof(LIBMATTI_FML_EnumParameters));
     parameters->kind = LIBMATTI_FML_ENUMPARAMETERS_CONSTANT;
-    // Java: records are immutable; the port takes the parsed array over
+// Java: records are immutable; the port takes the parsed array over
     parameters->params = params;
     parameters->paramCount = paramCount;
     return parameters;

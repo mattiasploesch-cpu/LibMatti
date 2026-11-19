@@ -1,4 +1,5 @@
-// Port of the java.lang.annotation model (see Annotation.h).
+
+
 
 #include "libmatti/java/lang/annotation/Annotation.h"
 

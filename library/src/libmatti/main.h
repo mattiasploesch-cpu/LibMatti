@@ -1,6 +1,7 @@
-//
-// Created by administrator on 08.09.26.
-//
+
+
+
+
 
 #ifndef MINECRAFT_CLONE_MAIN_H
 #define MINECRAFT_CLONE_MAIN_H
@@ -9,4 +10,4 @@
 // uncaught exception out of the launcher).
 int start_from_bsl(int argc, char *argv[], char *envp[]);
 
-#endif //MINECRAFT_CLONE_MAIN_H
+#endif

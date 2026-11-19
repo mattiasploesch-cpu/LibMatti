@@ -1,5 +1,6 @@
-// Port of net.minecraft.client.renderer.texture.MissingTextureAtlasSprite -
-// the SpriteContents.create() factory the SpriteSourceList appends.
+
+
+
 
 #ifndef MATTICRAFT_MC_CLIENT_RENDERER_TEXTURE_MISSINGTEXTUREATLASSPRITE_H
 #define MATTICRAFT_MC_CLIENT_RENDERER_TEXTURE_MISSINGTEXTUREATLASSPRITE_H
@@ -19,4 +20,4 @@ LIBMATTI_MC_SpriteContents *LIBMATTI_MC_MissingTextureAtlasSprite_Create(void);
 }
 #endif
 
-#endif //MATTICRAFT_MC_CLIENT_RENDERER_TEXTURE_MISSINGTEXTUREATLASSPRITE_H
+#endif

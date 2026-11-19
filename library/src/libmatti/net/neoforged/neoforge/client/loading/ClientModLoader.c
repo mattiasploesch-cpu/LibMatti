@@ -1,4 +1,5 @@
-// Port of net.neoforged.neoforge.client.loading.ClientModLoader.
+
+
 
 #include "libmatti/net/neoforged/neoforge/client/loading/ClientModLoader.h"
 
@@ -28,7 +29,7 @@ static int hasError = 0;
 // records loading issues instead of throwing, so the error state comes from ModLoader.hasErrors().
 static void catch_loading_exception(void (*run)(void *userdata), void *userdata)
 {
-    // Java: if (loadingComplete) return; if (ModLoader.hasErrors()) return;
+// Java: if (loadingComplete) return; if (ModLoader.hasErrors()) return;
     if (loadingComplete) return;
     if (LIBMATTI_FML_ModLoader_HasErrors())
     {
@@ -43,14 +44,14 @@ static void catch_loading_exception(void (*run)(void *userdata), void *userdata)
 static void run_load(void *userdata)
 {
     (void) userdata;
-    // Java: load(syncExecutor, parallelExecutor) - CommonModLoader's protected load
+// Java: load(syncExecutor, parallelExecutor) - CommonModLoader's protected load
     LIBMATTI_NEOFORGE_CommonModLoader_Load();
 }
 
 static void run_finish_and_network(void *userdata)
 {
     (void) userdata;
-    // Java: finish(syncExecutor, parallelExecutor); ModLoader.runInitTask("Client network registry lock",
+// Java: finish(syncExecutor, parallelExecutor); ModLoader.runInitTask("Client network registry lock",
     //       syncExecutor, periodicTask, ClientNetworkRegistry::setup)
     LIBMATTI_NEOFORGE_CommonModLoader_Finish();
     LIBMATTI_NEOFORGE_ClientNetworkRegistry_Setup();
@@ -59,10 +60,10 @@ static void run_finish_and_network(void *userdata)
 // Java: public static void begin()
 void LIBMATTI_NEOFORGE_ClientModLoader_Begin(void)
 {
-    // Java: Runtime.getRuntime().addShutdownHook(new Thread(LogManager::shutdown)) - the port's
+// Java: Runtime.getRuntime().addShutdownHook(new Thread(LogManager::shutdown)) - the port's
     // logger writes to stdout/stderr and needs no shutdown hook.
 
-    // Java: var earlyLoadingScreen = EarlyLoadingScreenController.current();
+// Java: var earlyLoadingScreen = EarlyLoadingScreenController.current();
     LIBMATTI_FML_EarlyLoadingScreenController *earlyLoadingScreen =
         LIBMATTI_FML_EarlyLoadingScreenController_Current();
     if (earlyLoadingScreen != NULL)
@@ -70,10 +71,10 @@ void LIBMATTI_NEOFORGE_ClientModLoader_Begin(void)
 
     loading = 1;
 
-    // Java: LanguageHook.loadBuiltinLanguages();
+// Java: LanguageHook.loadBuiltinLanguages();
     LIBMATTI_NEOFORGE_LanguageHook_LoadBuiltinLanguages();
 
-    // Java: Runnable periodicTick = earlyLoadingScreen != null ? earlyLoadingScreen::periodicTick : () -> {};
+// Java: Runnable periodicTick = earlyLoadingScreen != null ? earlyLoadingScreen::periodicTick : () -> {};
     void (*periodicTick)(void *userdata) = NULL;
     void *tickUserdata = NULL;
     if (earlyLoadingScreen != NULL)
@@ -82,7 +83,7 @@ void LIBMATTI_NEOFORGE_ClientModLoader_Begin(void)
         tickUserdata = earlyLoadingScreen;
     }
 
-    // Java: try { begin(periodicTick, false); } catch (ModLoadingException e) { error = e; }
+// Java: try { begin(periodicTick, false); } catch (ModLoadingException e) { error = e; }
     LIBMATTI_NEOFORGE_CommonModLoader_Begin(periodicTick, tickUserdata, 0);
     if (LIBMATTI_FML_ModLoader_HasErrors()) hasError = 1;
 }
@@ -91,15 +92,15 @@ void LIBMATTI_NEOFORGE_ClientModLoader_Begin(void)
 void LIBMATTI_NEOFORGE_ClientModLoader_Finish(void *defaultResourcePacks, void *mcResourceManager)
 {
     (void) mcResourceManager;
-    // Java: if (error == null) { ResourcePackLoader.populatePackRepository(defaultResourcePacks, PackType.CLIENT_RESOURCES, false); DataPackConfig.DEFAULT.addModPacks(...); }
+// Java: if (error == null) { ResourcePackLoader.populatePackRepository(defaultResourcePacks, PackType.CLIENT_RESOURCES, false); DataPackConfig.DEFAULT.addModPacks(...); }
     if (hasError) return;
-    LIBMATTI_NEOFORGE_ResourcePackLoader_PopulatePackRepository(defaultResourcePacks, 0 /* PackType.CLIENT_RESOURCES */, 0);
+    LIBMATTI_NEOFORGE_ResourcePackLoader_PopulatePackRepository(defaultResourcePacks, 0  , 0);
 }
 
 // Java: private static void finishModLoading(Executor syncExecutor, Executor parallelExecutor)
 static void finish_mod_loading(void)
 {
-    // Java: catchLoadingException(() -> { finish(...); ModLoader.runInitTask("Client network registry lock", ...); })
+// Java: catchLoadingException(() -> { finish(...); ModLoader.runInitTask("Client network registry lock", ...); })
     catch_loading_exception(run_finish_and_network, NULL);
     loading = 0;
     loadingComplete = 1;
@@ -118,7 +119,7 @@ static void start_mod_loading(void)
 void LIBMATTI_NEOFORGE_ClientModLoader_OnResourceReload(void)
 {
     start_mod_loading();
-    // Java: .thenCompose(stage::wait) - the barrier hands the background stage over to the sync
+// Java: .thenCompose(stage::wait) - the barrier hands the background stage over to the sync
     // thread; the port's stages run on the caller's thread, so the wait is the sequencing point
     // between startModLoading and finishModLoading (PreparationBarrier is the game port's type).
     finish_mod_loading();
@@ -128,22 +129,22 @@ void LIBMATTI_NEOFORGE_ClientModLoader_OnResourceReload(void)
 void (*LIBMATTI_NEOFORGE_ClientModLoader_CompleteModLoading(void (*initialScreensTask)(void *userdata)))(
     void *userdata)
 {
-    // Java: List<ModLoadingIssue> warnings = ModLoader.getLoadingIssues();
+// Java: List<ModLoadingIssue> warnings = ModLoader.getLoadingIssues();
     size_t issueCount = 0;
     LIBMATTI_FML_ModLoadingIssue **issues = LIBMATTI_FML_ModLoader_GetLoadingIssues(&issueCount);
 
-    // Java: showWarnings = NeoForgeClientConfig.INSTANCE.showLoadWarnings.get(), catch -> assume true
+// Java: showWarnings = NeoForgeClientConfig.INSTANCE.showLoadWarnings.get(), catch -> assume true
     int showWarnings = 1;
 
     if (hasError)
     {
-        // Java: LanguageHook.loadBuiltinLanguages();
+// Java: LanguageHook.loadBuiltinLanguages();
         LIBMATTI_NEOFORGE_LanguageHook_LoadBuiltinLanguages();
-        // Java: dumpLocation = CrashReportExtender.dumpModLoadingCrashReport(LOGGER, error.getIssues(),
+// Java: dumpLocation = CrashReportExtender.dumpModLoadingCrashReport(LOGGER, error.getIssues(),
         //       Minecraft.getInstance().gameDirectory)
         char *dumpLocation = LIBMATTI_NEOFORGE_CrashReportExtender_DumpModLoadingCrashReport(LOGGER(), issues,
                                                                                              issueCount, ".");
-        // Java: return () -> Minecraft.setScreen(new LoadingErrorScreen(error.getIssues(), dumpedLocation, () -> {}))
+// Java: return () -> Minecraft.setScreen(new LoadingErrorScreen(error.getIssues(), dumpedLocation, () -> {}))
         // - the screen is the game port's part; the report path is reported instead
         LIBMATTI_ML_Logger_Error(LOGGER(), NULL, "Client mod loading failed; the game shows the error screen");
         free(dumpLocation);
@@ -157,12 +158,12 @@ void (*LIBMATTI_NEOFORGE_ClientModLoader_CompleteModLoading(void (*initialScreen
     {
         if (showWarnings)
         {
-            // Java: return () -> Minecraft.setScreen(new LoadingErrorScreen(warnings, null, initialScreensTask))
+// Java: return () -> Minecraft.setScreen(new LoadingErrorScreen(warnings, null, initialScreensTask))
             // The port has no screen yet, so the initial task runs and the warnings were already logged.
         }
         else
         {
-            // Java: LOGGER.warn(LOADING, "Mods loaded with {} warning(s)", warnings.size()); per warning: key [args]
+// Java: LOGGER.warn(LOADING, "Mods loaded with {} warning(s)", warnings.size()); per warning: key [args]
             LIBMATTI_ML_Logger_Warn(LOGGER(), &LIBMATTI_FML_Logging_LOADING, "Mods loaded with {} warning(s)",
                                     issueCount == 1 ? "1" : "many");
         }
@@ -172,7 +173,7 @@ void (*LIBMATTI_NEOFORGE_ClientModLoader_CompleteModLoading(void (*initialScreen
         LIBMATTI_FML_ModLoadingIssue_Free(issues[i]);
     free(issues);
 
-    // Java: return initialScreensTask - the runnable the caller passed runs unchanged
+// Java: return initialScreensTask - the runnable the caller passed runs unchanged
     return initialScreensTask;
 }
 

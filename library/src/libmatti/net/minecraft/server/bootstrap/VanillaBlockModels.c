@@ -1,10 +1,11 @@
-// Port of the vanilla block model bootstrap slice (implementation).
-//
-// The bake needs two lookups the ModelManager's file path cannot answer for
-// the embedded models: the model JSON (VanillaModels carries it) and the
-// sprite rect (the atlas carries it once the block textures are stitched).
-// The bootstrap resolves the parent chain over the embedded JSONs and bakes
-// each model through the ModelBaker.
+
+
+
+
+
+
+
+
 
 #include "libmatti/net/minecraft/server/bootstrap/VanillaBlockModels.h"
 
@@ -15,7 +16,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-// (ModelManager_RegisterBaked comes from ModelManager.h via the include.)
+
+
 
 // Java: TextureSlots.Data - the child's textures override the parent's map
 // entries by slot name; new slots append.
@@ -67,7 +69,7 @@ static LIBMATTI_MC_BlockModel *resolve_model(const char *modelId)
     if (model->elementsPresent)
         return model;
 
-    // Java: the parent walk - merge the child textures over the parent's.
+// Java: the parent walk - merge the child textures over the parent's.
     const char *parentJson = model->parent != NULL ? LIBMATTI_MC_VanillaModels_ModelById(model->parent) : NULL;
     if (parentJson == NULL)
     {
@@ -97,7 +99,7 @@ int LIBMATTI_MC_VanillaBlockModels_Bootstrap(LIBMATTI_MC_ModelManager *manager)
     if (manager == NULL || manager->blockAtlas == NULL)
         return 0;
 
-    // Java: the ids are compile-time constants; C needs the literal array
+// Java: the ids are compile-time constants; C needs the literal array
     // inline (the extern const char* variables are not constant initializers).
     const char *ids[2];
     ids[0] = LIBMATTI_MC_VanillaModels_STONE_ID;

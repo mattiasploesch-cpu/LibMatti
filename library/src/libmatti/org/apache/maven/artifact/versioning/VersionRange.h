@@ -1,6 +1,7 @@
-// Port of org.apache.maven.artifact.versioning.VersionRange.
-// Java caches the ranges in a WeakHashMap keyed by the spec string and hands out the same instance;
-// the port returns a fresh range so the caller can release it.
+
+
+
+
 
 #ifndef MATTICRAFT_MAVEN_ARTIFACT_VERSIONING_VERSIONRANGE_H
 #define MATTICRAFT_MAVEN_ARTIFACT_VERSIONING_VERSIONRANGE_H
@@ -14,13 +15,14 @@ typedef struct LIBMATTI_MAVEN_VersionRange LIBMATTI_MAVEN_VersionRange;
 
 struct LIBMATTI_MAVEN_VersionRange
 {
-    // Java: private final ArtifactVersion recommendedVersion
+// Java: private final ArtifactVersion recommendedVersion
     LIBMATTI_MAVEN_ArtifactVersion *recommendedVersion;
-    // Java: private final List<Restriction> restrictions
+// Java: private final List<Restriction> restrictions
     LIBMATTI_MAVEN_Restriction **restrictions;
     size_t restrictionCount;
-    // Java has no such field; the C port keeps the spec the range was created from for the callers
-    // that log the range
+
+
+
     char *spec;
 };
 
@@ -76,4 +78,4 @@ char *LIBMATTI_MAVEN_VersionRange_ToString(const LIBMATTI_MAVEN_VersionRange *ra
 
 void LIBMATTI_MAVEN_VersionRange_Free(LIBMATTI_MAVEN_VersionRange *range);
 
-#endif //MATTICRAFT_MAVEN_ARTIFACT_VERSIONING_VERSIONRANGE_H
+#endif

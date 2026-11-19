@@ -87,7 +87,7 @@ LIBMATTI_JL_ClassLoader *LIBMATTI_JL_ClassLoader_GetSystemClassLoader(void)
     static LIBMATTI_JL_ClassLoader *systemClassLoader = NULL;
     if (systemClassLoader != NULL) return systemClassLoader;
 
-    // Java: the VM builds the application class loader from the class path property
+// Java: the VM builds the application class loader from the class path property
     systemClassLoader = LIBMATTI_JL_ClassLoader_New("app", NULL);
 
     const char *classPath = getenv("legacyClassPath");
@@ -141,8 +141,9 @@ static char *find_resource_path(const LIBMATTI_JL_ClassLoader *classLoader, cons
             continue;
         }
 
-        // Java reads the entry as a jar (URLClassPath$JarLoader); the port looks
-        // the resource up through the parsed JarContents of the archive.
+
+
+
         if (LIBMATTI_JNF_Files_IsRegularFile(classLoader->classPath[i]))
         {
             LIBMATTI_JH_JarContents *contents = archive_contents(classLoader->classPath[i]);
@@ -165,7 +166,7 @@ static char *find_resource_path(const LIBMATTI_JL_ClassLoader *classLoader, cons
 // Java: public URL getResource(String name)
 LIBMATTI_JN_URL *LIBMATTI_JL_ClassLoader_GetResource(const LIBMATTI_JL_ClassLoader *classLoader, const char *name)
 {
-    // Java: the parent-first delegation, then findResource
+// Java: the parent-first delegation, then findResource
     if (classLoader->parent != NULL)
     {
         LIBMATTI_JN_URL *parentResource = LIBMATTI_JL_ClassLoader_GetResource(classLoader->parent, name);
@@ -181,7 +182,7 @@ char *LIBMATTI_JL_ClassLoader_GetResourceAsStream(const LIBMATTI_JL_ClassLoader 
 {
     *length = 0;
 
-    // Java: getResource(name) walks the parent chain first
+// Java: getResource(name) walks the parent chain first
     char *path = NULL;
     for (const LIBMATTI_JL_ClassLoader *current = classLoader; current != NULL && path == NULL; current = current->parent)
         path = find_resource_path(current, name);

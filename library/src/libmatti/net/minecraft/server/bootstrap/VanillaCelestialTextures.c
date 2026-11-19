@@ -1,11 +1,12 @@
-// The vanilla celestial textures, generated at runtime. Java ships them in
-// assets/minecraft/textures/environment/*.png stitched into the CELESTIALS
-// atlas (AtlasIds.CELESTIALS); the port generates the sun and the eight moon
-// phases procedurally into NativeImages and uploads the stitched page like
-// VanillaBlockTextures does for the block atlas.
-//
-// Java equivalent: Minecraft's CELESTIALS atlas loading step
-// (SpriteSourceList over assets/minecraft/atlases/celestials.json).
+
+
+
+
+
+
+
+
+
 
 #include "libmatti/net/minecraft/server/bootstrap/VanillaCelestialTextures.h"
 
@@ -18,8 +19,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-// The grid slot for the sprite at (column, row) on the 3x3 page of 32x32
-// sprites (the sun and the eight moon phases fit the same cell size).
+
+
+
 #define CELL 32
 
 static const char *const MOON_NAMES[LIBMATTI_MC_MoonPhase_COUNT] = {
@@ -37,7 +39,8 @@ static void fill_sun(LIBMATTI_B3D_NativeImage *image)
         {
             float dx = (float) x - cx, dy = (float) y - cy;
             float distSq = dx * dx + dy * dy;
-            // The core stays white, the rim falls off to the yellow edge.
+
+
             float t = distSq / (13.0f * 13.0f);
             if (t > 1.0f)
             {
@@ -61,8 +64,9 @@ static void fill_moon_phase(LIBMATTI_B3D_NativeImage *image, int phase)
 {
     const float cx = 15.5f, cy = 15.5f;
     const float radius = 13.0f;
-    // The terminator offset: phase 0 (full) shows the full disc, phase 4
-    // (new) nothing; the quarters split the disc at the centre.
+
+
+
     double lit;
     switch (phase)
     {
@@ -86,9 +90,10 @@ static void fill_moon_phase(LIBMATTI_B3D_NativeImage *image, int phase)
                 LIBMATTI_B3D_NativeImage_SetPixel(image, x, y, 0);
                 continue;
             }
-            // The lit half: waning phases light the left side, waxing the
-            // right; gibbous/crescent widen or shrink the lit sliver through
-            // the ellipse term (|dx| <= halfWidth).
+
+
+
+
             int litSide = phase < LIBMATTI_MC_MoonPhase_NEW_MOON ? -1 : 1;
             float halfWidth = 0.0f;
             if (lit >= 1.0f)
@@ -111,7 +116,8 @@ static void fill_moon_phase(LIBMATTI_B3D_NativeImage *image, int phase)
                 LIBMATTI_B3D_NativeImage_SetPixel(image, x, y, 0);
                 continue;
             }
-            // The pale grey disc with a slight edge falloff.
+
+
             float t = distSq / (radius * radius);
             int shade = 232 - (int) (t * 24.0f);
             unsigned int argb = 0xFF000000u | (unsigned int) (shade << 16) | (unsigned int) (shade << 8)
@@ -144,7 +150,7 @@ LIBMATTI_MC_TextureAtlas *LIBMATTI_MC_VanillaCelestialTextures_Bootstrap(int max
     if (atlas == NULL)
         return NULL;
 
-    // Java: the sun sprite (minecraft:sun) plus one sprite per moon phase
+// Java: the sun sprite (minecraft:sun) plus one sprite per moon phase
     // (minecraft:moon/<phase name>), 9 sprites on a 96x96 page.
     LIBMATTI_B3D_NativeImage *sun = LIBMATTI_B3D_NativeImage_New(CELL, CELL, 1);
     fill_sun(sun);
@@ -157,8 +163,9 @@ LIBMATTI_MC_TextureAtlas *LIBMATTI_MC_VanillaCelestialTextures_Bootstrap(int max
         fill_moon_phase(moon, p);
         char path[64];
         snprintf(path, sizeof(path), "environment/moon/%s", MOON_NAMES[p]);
-        // The grid: the sun in (0,0), the phases running left-to-right,
-        // top-to-bottom from (1,0).
+
+
+
         int column = (p + 1) % 3;
         int row = (p + 1) / 3;
         moonSprites[p] = make_sprite(atlasId, path, moon, column, row);
@@ -174,7 +181,7 @@ LIBMATTI_MC_TextureAtlas *LIBMATTI_MC_VanillaCelestialTextures_Bootstrap(int max
         return NULL;
     }
 
-    // Java: the atlas takes the sprites over (texturesByName).
+// Java: the atlas takes the sprites over (texturesByName).
     atlas->spriteCount = 1 + LIBMATTI_MC_MoonPhase_COUNT;
     atlas->sprites = calloc(atlas->spriteCount, sizeof(LIBMATTI_MC_TextureAtlasSprite *));
     atlas->sprites[0] = sunSprite;
@@ -183,7 +190,7 @@ LIBMATTI_MC_TextureAtlas *LIBMATTI_MC_VanillaCelestialTextures_Bootstrap(int max
     atlas->width = 3 * CELL;
     atlas->height = 3 * CELL;
 
-    // Java: the GL upload of the stitched page (the port composes the page
+// Java: the GL upload of the stitched page (the port composes the page
     // from the sprite images and pushes it through the DynamicTexture path).
     LIBMATTI_B3D_NativeImage *page = LIBMATTI_B3D_NativeImage_New(3 * CELL, 3 * CELL, 1);
     memset(page->pixels, 0, (size_t) (3 * CELL * 3 * CELL) * sizeof(uint32_t));
@@ -197,7 +204,8 @@ LIBMATTI_MC_TextureAtlas *LIBMATTI_MC_VanillaCelestialTextures_Bootstrap(int max
                 page->pixels[(sprite->y + y) * 3 * CELL + sprite->x + x] = image->pixels[y * image->width + x];
         }
     }
-    atlas->base.pixels = page; // the DynamicTexture upload path owns it
+    atlas->base.pixels = page;
+
     atlas->base.kind = LIBMATTI_MC_TextureKind_ATLAS;
 
     return atlas;

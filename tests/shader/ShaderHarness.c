@@ -1,6 +1,7 @@
-// Shader harness: the GlslPreprocessor import/version passes over real GLSL
-// fixtures, the ShaderManager source loading and the compile fallbacks (no GL
-// context here - the harness checks the no-driver path like the GL harness).
+
+
+
+
 
 #include "libmatti/com/mojang/blaze3d/opengl/GlProgram.h"
 #include "libmatti/com/mojang/blaze3d/opengl/GlShaderModule.h"
@@ -27,8 +28,9 @@ static int failures = 0;
         }                                                      \
     } while (0)
 
-// A file-backed import resolver for the preprocessor checks. The harness
-// runs with the tests/ directory as the working directory (see add_test).
+
+
+
 static const char *SHADER_ROOT = "shader/";
 
 static char *read_file(const char *relativePath)
@@ -63,14 +65,16 @@ static char *file_import(void *userdata, const char *prefix, const char *locatio
 
 int main(void)
 {
-    // ---- ShaderType ---------------------------------------------------------
+
+
     CHECK(LIBMATTI_B3D_ShaderType_ByPath("shaders/core/position.vsh") == LIBMATTI_B3D_ShaderType_VERTEX);
     CHECK(LIBMATTI_B3D_ShaderType_ByPath("shaders/core/position.fsh") == LIBMATTI_B3D_ShaderType_FRAGMENT);
     CHECK(LIBMATTI_B3D_ShaderType_ByPath("shaders/include/fog.glsl") == -1);
     CHECK(LIBMATTI_B3D_ShaderType_ToGl(LIBMATTI_B3D_ShaderType_VERTEX) == 35633);
     CHECK(strcmp(LIBMATTI_B3D_ShaderType_GetName(LIBMATTI_B3D_ShaderType_FRAGMENT), "fragment") == 0);
 
-    // ---- GlslPreprocessor: imports resolve, directive is replaced -----------
+
+
     char *source = read_file("shaders/position.vsh");
     CHECK(source != NULL);
     if (source == NULL)
@@ -82,15 +86,18 @@ int main(void)
     size_t processedSize = 0;
     char *processed = LIBMATTI_B3D_GlslPreprocessor_Process(source, file_import, NULL, &processedSize);
     CHECK(processed != NULL);
-    // The fog.glsl body is inlined, the import directive is gone.
+
+
     CHECK(strstr(processed, "fog_distance") != NULL);
     CHECK(strstr(processed, "#moj_import") == NULL);
-    // The version stays.
+
+
     CHECK(strstr(processed, "#version 150") != NULL);
     free(processed);
     free(source);
 
-    // ---- injectDefines ------------------------------------------------------
+
+
     const char *plain = "#version 150\nin vec3 Position;\n";
     char *noDefines = LIBMATTI_B3D_GlslPreprocessor_InjectDefines(plain, NULL);
     CHECK(strcmp(noDefines, plain) == 0);
@@ -100,7 +107,8 @@ int main(void)
     CHECK(strstr(withDefines, "#define ALPHA_CUT 0.5\n#line 1 0\nin vec3 Position;") != NULL);
     free(withDefines);
 
-    // ---- ShaderManager: invalid source/module paths --------------------------
+
+
     LIBMATTI_MC_ShaderManager *manager = LIBMATTI_MC_ShaderManager_New(NULL);
     CHECK(manager != NULL);
     CHECK(LIBMATTI_MC_ShaderManager_GetShader(manager, "core/position", LIBMATTI_B3D_ShaderType_VERTEX) == NULL);
@@ -113,13 +121,15 @@ int main(void)
     CHECK(LIBMATTI_B3D_GlProgram_IsInvalid(missingProgram));
     LIBMATTI_MC_ShaderManager_Free(manager);
 
-    // ---- GlProgram invalid singleton ----------------------------------------
+
+
     CHECK(LIBMATTI_B3D_GlProgram_IsInvalid(LIBMATTI_B3D_GlProgram_Invalid()));
     CHECK(LIBMATTI_B3D_GlProgram_GetProgramId(LIBMATTI_B3D_GlProgram_Invalid()) == -1);
     CHECK(LIBMATTI_B3D_GlProgram_BUILT_IN_UNIFORMS[0] != NULL &&
           strcmp(LIBMATTI_B3D_GlProgram_BUILT_IN_UNIFORMS[0], "Projection") == 0);
 
-    // ---- Uniform records -----------------------------------------------------
+
+
     LIBMATTI_B3D_Uniform *sampler = LIBMATTI_B3D_Uniform_Sampler(3, 0);
     CHECK(sampler->kind == LIBMATTI_B3D_UniformKind_SAMPLER && sampler->sampler.location == 3);
     LIBMATTI_B3D_Uniform *ubo = LIBMATTI_B3D_Uniform_Ubo(2);

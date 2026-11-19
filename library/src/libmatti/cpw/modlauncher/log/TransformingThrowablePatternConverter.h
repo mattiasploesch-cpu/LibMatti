@@ -27,4 +27,4 @@ LIBMATTI_ML_TransformingThrowablePatternConverter *LIBMATTI_ML_TransformingThrow
 char *LIBMATTI_ML_TransformingThrowablePatternConverter_GenerateEnhancedStackTrace(
     const LIBMATTI_JL_Throwable *throwable);
 
-#endif //MATTICRAFT_MODLAUNCHER_TRANSFORMINGTHROWABLEPATTERNCONVERTER_H
+#endif

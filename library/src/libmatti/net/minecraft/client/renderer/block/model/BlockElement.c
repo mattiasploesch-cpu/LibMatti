@@ -1,4 +1,5 @@
-// Port of net.minecraft.client.renderer.block.model.BlockElement (implementation).
+
+
 
 #include "libmatti/net/minecraft/client/renderer/block/model/BlockElement.h"
 
@@ -97,7 +98,7 @@ static int deserialize_faces(const LIBMATTI_GSON_JsonElement *object, LIBMATTI_M
         }
 
         LIBMATTI_MC_BlockElementFace *face = calloc(1, sizeof(LIBMATTI_MC_BlockElementFace));
-        // Java: the face deserializer - tintIndex defaults to -1, rotation to 0.
+// Java: the face deserializer - tintIndex defaults to -1, rotation to 0.
         face->tintIndex = LIBMATTI_MC_BlockElementFace_NO_TINT;
         const LIBMATTI_GSON_JsonElement *texture = LIBMATTI_GSON_JsonElement_GetMember(faceJson, "texture");
         if (texture != NULL)
@@ -112,7 +113,7 @@ static int deserialize_faces(const LIBMATTI_GSON_JsonElement *object, LIBMATTI_M
         const LIBMATTI_GSON_JsonElement *tint = LIBMATTI_GSON_JsonElement_GetMember(faceJson, "tintindex");
         if (tint != NULL)
             face->tintIndex = (int) LIBMATTI_GSON_JsonElement_GetAsFloat((LIBMATTI_GSON_JsonElement *) tint);
-        // Java: parseNullDirection(json, "cullface") - a missing/null member
+// Java: parseNullDirection(json, "cullface") - a missing/null member
         // means never culled, a name resolves through Direction.byName.
         const LIBMATTI_GSON_JsonElement *cull = LIBMATTI_GSON_JsonElement_GetMember(faceJson, "cullface");
         if (cull != NULL && !LIBMATTI_GSON_JsonElement_IsJsonNull((LIBMATTI_GSON_JsonElement *) cull))
@@ -163,13 +164,13 @@ int LIBMATTI_MC_BlockElement_Deserialize(const LIBMATTI_GSON_JsonElement *object
     LIBMATTI_MC_BlockElement_ReadPosition(object, "from", &out->fromX);
     LIBMATTI_MC_BlockElement_ReadPosition(object, "to", &out->toX);
 
-    // Java: public boolean isShade(...) - the "shade" member defaults to true.
+// Java: public boolean isShade(...) - the "shade" member defaults to true.
     out->shade = true;
     const LIBMATTI_GSON_JsonElement *shade = LIBMATTI_GSON_JsonElement_GetMember(object, "shade");
     if (shade != NULL)
         out->shade = LIBMATTI_GSON_JsonElement_GetAsFloat((LIBMATTI_GSON_JsonElement *) shade) != 0.0f;
 
-    // Java: this.getLightEmission(jsonobject) - defaults to 0.
+// Java: this.getLightEmission(jsonobject) - defaults to 0.
     const LIBMATTI_GSON_JsonElement *light = LIBMATTI_GSON_JsonElement_GetMember(object, "light");
     if (light != NULL)
         out->lightEmission = (int) LIBMATTI_GSON_JsonElement_GetAsFloat((LIBMATTI_GSON_JsonElement *) light);

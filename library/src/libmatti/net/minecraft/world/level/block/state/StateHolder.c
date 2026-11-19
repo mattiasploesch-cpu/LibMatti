@@ -1,4 +1,5 @@
-// Port of net.minecraft.world.level.block.state.StateHolder.
+
+
 
 #include "libmatti/net/minecraft/world/level/block/state/StateHolder.h"
 
@@ -43,7 +44,7 @@ LIBMATTI_MC_Property_Value LIBMATTI_MC_StateHolder_GetValue(const LIBMATTI_MC_St
     int index = find_value_index(state, property);
     if (index < 0)
     {
-        // Java: throw new IllegalArgumentException("Cannot get property " + p + " as it does not exist in " + owner)
+// Java: throw new IllegalArgumentException("Cannot get property " + p + " as it does not exist in " + owner)
         LIBMATTI_ML_Logger *logger = LIBMATTI_ML_LogManager_GetLogger();
         LIBMATTI_ML_Logger_Error(logger, NULL, "Cannot get property {} as it does not exist",
                                  property->name);
@@ -76,7 +77,7 @@ LIBMATTI_MC_StateHolder *LIBMATTI_MC_StateHolder_SetValue(LIBMATTI_MC_StateHolde
     int index = find_value_index(state, property);
     if (index < 0)
     {
-        // Java: throw new IllegalArgumentException("Cannot set property " + p + " as it does not exist in " + owner)
+// Java: throw new IllegalArgumentException("Cannot set property " + p + " as it does not exist in " + owner)
         LIBMATTI_ML_Logger *logger = LIBMATTI_ML_LogManager_GetLogger();
         LIBMATTI_ML_Logger_Error(logger, NULL, "Cannot set property {} as it does not exist",
                                  property->name);
@@ -91,7 +92,7 @@ LIBMATTI_MC_StateHolder *LIBMATTI_MC_StateHolder_SetValue(LIBMATTI_MC_StateHolde
     int internal = LIBMATTI_MC_Property_InternalIndex(property, value);
     if (internal < 0)
     {
-        // Java: throw new IllegalArgumentException("Cannot set property " + p + " to " + v + " ... not an allowed value")
+// Java: throw new IllegalArgumentException("Cannot set property " + p + " to " + v + " ... not an allowed value")
         LIBMATTI_ML_Logger *logger = LIBMATTI_ML_LogManager_GetLogger();
         LIBMATTI_ML_Logger_Error(logger, NULL, "Cannot set property {} to {}, it is not an allowed value",
                                  property->name, LIBMATTI_MC_Property_ValueName(property, value));
@@ -155,7 +156,7 @@ void LIBMATTI_MC_StateHolder_PopulateNeighbours(LIBMATTI_MC_StateHolder *state,
         state->neighbours[p] = malloc(sizeof(LIBMATTI_MC_StateHolder *) * property->valueCount);
         for (int v = 0; v < property->valueCount; v++)
         {
-            // Java: makeNeighbourValues(property, value) - the same values but this property
+// Java: makeNeighbourValues(property, value) - the same values but this property
             // changed; the port scans the state table for the match
             LIBMATTI_MC_StateHolder *match = state;
             for (int s = 0; s < stateCount; s++)

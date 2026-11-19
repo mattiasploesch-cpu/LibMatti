@@ -9,9 +9,9 @@
 
 typedef struct LIBMATTI_MC_RegistrationInfo
 {
-    // Java: Optional<KnownPack> knownPackInfo - empty in the port until packs exist
+// Java: Optional<KnownPack> knownPackInfo - empty in the port until packs exist
     int hasKnownPackInfo;
-    // Java: Lifecycle lifecycle
+// Java: Lifecycle lifecycle
     LIBMATTI_MJS_Lifecycle lifecycle;
 } LIBMATTI_MC_RegistrationInfo;
 
@@ -21,4 +21,4 @@ LIBMATTI_MC_RegistrationInfo LIBMATTI_MC_RegistrationInfo_BuiltIn(void);
 // Java: the record constructor
 LIBMATTI_MC_RegistrationInfo LIBMATTI_MC_RegistrationInfo_New(int hasKnownPackInfo, LIBMATTI_MJS_Lifecycle lifecycle);
 
-#endif //MATTICRAFT_NET_MINECRAFT_CORE_REGISTRATIONINFO_H
+#endif

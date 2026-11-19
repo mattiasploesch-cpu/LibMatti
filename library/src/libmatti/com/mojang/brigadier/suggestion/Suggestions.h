@@ -1,5 +1,6 @@
-// Port of com.mojang.brigadier.suggestion.Suggestion, IntegerSuggestion and
-// SuggestionsBuilder. Java's CompletableFuture becomes a synchronous value.
+
+
+
 
 #ifndef MATTICRAFT_BR_SUGGESTION_SUGGESTIONS_H
 #define MATTICRAFT_BR_SUGGESTION_SUGGESTIONS_H
@@ -14,7 +15,7 @@ typedef struct LIBMATTI_BR_Suggestion
 {
     LIBMATTI_BR_StringRange range;
     char *text;
-    LIBMATTI_BR_Message *tooltip; // NULL when absent
+    LIBMATTI_BR_Message *tooltip;// NULL when absent
     // Java: IntegerSuggestion - the suggestion carries an int value
     int isInteger;
     int intValue;

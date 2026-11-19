@@ -1,5 +1,6 @@
-// Port of the it.unimi.dsi.fastutil.ints collections (open addressing like the
-// originals, linear probing).
+
+
+
 
 #include "libmatti/it/unimi/dsi/fastutil/ints/IntCollections.h"
 
@@ -18,9 +19,10 @@ static size_t mix(int32_t key)
     return h;
 }
 
-// ---------------------------------------------------------------------------
-// Int2ObjectMap
-// ---------------------------------------------------------------------------
+
+
+
+
 
 LIBMATTI_FU_Int2ObjectMap *LIBMATTI_FU_Int2ObjectMap_New(void)
 {
@@ -138,9 +140,10 @@ void LIBMATTI_FU_Int2ObjectMap_ForEach(const LIBMATTI_FU_Int2ObjectMap *map,
             action(map->entries[i].key, map->entries[i].value, self);
 }
 
-// ---------------------------------------------------------------------------
-// IntOpenHashSet
-// ---------------------------------------------------------------------------
+
+
+
+
 
 LIBMATTI_FU_IntOpenHashSet *LIBMATTI_FU_IntOpenHashSet_New(void)
 {
@@ -230,9 +233,10 @@ size_t LIBMATTI_FU_IntOpenHashSet_Size(const LIBMATTI_FU_IntOpenHashSet *set)
     return set->size;
 }
 
-// ---------------------------------------------------------------------------
-// IntArrayList
-// ---------------------------------------------------------------------------
+
+
+
+
 
 LIBMATTI_FU_IntArrayList *LIBMATTI_FU_IntArrayList_New(void)
 {

@@ -1,4 +1,5 @@
-// Port of com.mojang.brigadier.context.CommandContextBuilder and CommandContext.
+
+
 
 #include "libmatti/com/mojang/brigadier/context/CommandContext.h"
 
@@ -7,9 +8,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-// ---------------------------------------------------------------------------
-// CommandContextBuilder
-// ---------------------------------------------------------------------------
+
+
+
+
 
 static void add_argument(LIBMATTI_BR_CommandContextBuilder *self, const char *name, LIBMATTI_BR_ParsedArgument *value)
 {
@@ -41,7 +43,7 @@ LIBMATTI_BR_CommandContextBuilder *LIBMATTI_BR_CommandContextBuilder_New(LIBMATT
 
 LIBMATTI_BR_CommandContextBuilder *LIBMATTI_BR_CommandContextBuilder_Copy(const LIBMATTI_BR_CommandContextBuilder *self)
 {
-    // Java: copy() shares the argument map; the port deep-copies the names and moves
+// Java: copy() shares the argument map; the port deep-copies the names and moves
     // the ParsedArgument pointers (the caller frees only one of the two)
     LIBMATTI_BR_CommandContextBuilder *copy = calloc(1, sizeof(LIBMATTI_BR_CommandContextBuilder));
     copy->dispatcher = self->dispatcher;
@@ -83,7 +85,7 @@ LIBMATTI_BR_CommandContextBuilder *LIBMATTI_BR_CommandContextBuilder_WithCommand
 LIBMATTI_BR_CommandContextBuilder *LIBMATTI_BR_CommandContextBuilder_WithNode(
     LIBMATTI_BR_CommandContextBuilder *self, LIBMATTI_BR_CommandNode *node, LIBMATTI_BR_StringRange range)
 {
-    // Java: nodes.add(new ParsedCommandNode<>(node, range));
+// Java: nodes.add(new ParsedCommandNode<>(node, range));
     //       this.range = StringRange.encompassing(this.range, range);
     //       this.modifier = node.getRedirectModifier(); this.forks = node.isFork();
     LIBMATTI_BR_ParsedCommandNode parsed = {node, range};
@@ -142,7 +144,7 @@ LIBMATTI_BR_CommandContext *LIBMATTI_BR_CommandContextBuilder_Build(const LIBMAT
     context->modifier = self->modifier;
     context->modifierUserdata = self->modifierUserdata;
     context->forks = self->forks;
-    // Java: the maps are shared by reference; the port moves the arrays (the builder
+// Java: the maps are shared by reference; the port moves the arrays (the builder
     // keeps ownership of nothing afterwards)
     context->argumentNames = self->argumentNames;
     context->argumentValues = self->argumentValues;
@@ -154,14 +156,14 @@ LIBMATTI_BR_CommandContext *LIBMATTI_BR_CommandContextBuilder_Build(const LIBMAT
     ((LIBMATTI_BR_CommandContextBuilder *) self)->argumentCount = 0;
     ((LIBMATTI_BR_CommandContextBuilder *) self)->nodes = NULL;
     ((LIBMATTI_BR_CommandContextBuilder *) self)->nodeCount = 0;
-    // Java: child == null ? null : child.build(input)
+// Java: child == null ? null : child.build(input)
     context->child = self->child != NULL ? LIBMATTI_BR_CommandContextBuilder_Build(self->child, input) : NULL;
     return context;
 }
 
 void LIBMATTI_BR_CommandContextBuilder_Free(LIBMATTI_BR_CommandContextBuilder *self)
 {
-    // Java: the copies share the arguments; the port frees them once (the original owner)
+// Java: the copies share the arguments; the port frees them once (the original owner)
     for (size_t i = 0; i < self->argumentCount; i++)
     {
         free(self->argumentNames[i]);
@@ -170,25 +172,26 @@ void LIBMATTI_BR_CommandContextBuilder_Free(LIBMATTI_BR_CommandContextBuilder *s
     free(self->argumentNames);
     free(self->argumentValues);
     free(self->nodes);
-    // Java: the child is owned by the redirect chain that created it
+// Java: the child is owned by the redirect chain that created it
     free(self);
 }
 
-// ---------------------------------------------------------------------------
-// CommandContext
-// ---------------------------------------------------------------------------
+
+
+
+
 
 const LIBMATTI_BR_ParsedArgument *LIBMATTI_BR_CommandContext_GetArgument(const LIBMATTI_BR_CommandContext *self,
                                                                          const char *name,
                                                                          LIBMATTI_BR_ArgumentKind kind)
 {
-    // Java: final ParsedArgument<S, ?> argument = arguments.get(name);
+// Java: final ParsedArgument<S, ?> argument = arguments.get(name);
     //       if (argument == null) throw new IllegalArgumentException("No such argument ...")
     for (size_t i = 0; i < self->argumentCount; i++)
     {
         if (strcmp(self->argumentNames[i], name) == 0)
         {
-            // Java: the class check; the port compares the kind
+// Java: the class check; the port compares the kind
             if (self->argumentValues[i]->kind != kind) return NULL;
             return self->argumentValues[i];
         }
@@ -213,7 +216,7 @@ LIBMATTI_BR_CommandContext *LIBMATTI_BR_CommandContext_GetLastChild(LIBMATTI_BR_
 
 LIBMATTI_BR_CommandContext *LIBMATTI_BR_CommandContext_CopyFor(LIBMATTI_BR_CommandContext *self, const void *source)
 {
-    // Java: copyFor returns a new context with the given source; the port's contexts
+// Java: copyFor returns a new context with the given source; the port's contexts
     // own their parsed data, so the source pointer swap happens on the same context
     // (the C sources are immutable values).
     (void) source;

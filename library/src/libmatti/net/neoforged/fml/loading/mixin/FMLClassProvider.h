@@ -1,6 +1,7 @@
-// Ports of net.neoforged.fml.loading.mixin.FMLClassProvider,
-// net.neoforged.fml.loading.mixin.FMLMixinFeatureValidator and
-// net.neoforged.fml.loading.mixin.FMLMixinAdviceProvider.
+
+
+
+
 
 #ifndef MATTICRAFT_FML_LOADING_MIXIN_FMLCLASSPROVIDER_H
 #define MATTICRAFT_FML_LOADING_MIXIN_FMLCLASSPROVIDER_H
@@ -14,4 +15,4 @@ LIBMATTI_SP_IFeatureValidator *LIBMATTI_FML_FMLMixinFeatureValidator_Instance(vo
 // Java: class FMLMixinAdviceProvider implements IAdviceProvider
 LIBMATTI_SP_IAdviceProvider *LIBMATTI_FML_FMLMixinAdviceProvider_Instance(void);
 
-#endif //MATTICRAFT_FML_LOADING_MIXIN_FMLCLASSPROVIDER_H
+#endif

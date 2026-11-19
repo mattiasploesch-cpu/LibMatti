@@ -94,7 +94,7 @@ static void closeJarContents(LIBMATTI_FML_JarContents *jarContents)
 //      -> java.util.zip.ZipException
 static int causeChainContainsZipException(void *cause)
 {
-    // Java: while (e != null) { if (exceptionClass.isInstance(e)) return true; e = e.getCause(); }
+// Java: while (e != null) { if (exceptionClass.isInstance(e)) return true; e = e.getCause(); }
     const LIBMATTI_JL_Throwable *throwable = cause;
     while (throwable != NULL)
     {
@@ -110,7 +110,7 @@ static int pipeline_addModFile(void *self, LIBMATTI_NEOFORGESPI_IModFile *mf)
 {
     DiscoveryPipeline *pipeline = self;
 
-    // Java: Objects.requireNonNull(mf, "mf"); if (!(mf instanceof ModFile modFile)) { ... return false; }
+// Java: Objects.requireNonNull(mf, "mf"); if (!(mf instanceof ModFile modFile)) { ... return false; }
     if (mf == NULL)
     {
         LIBMATTI_ML_Logger_Error(LOGGER(), NULL, "mf");
@@ -125,13 +125,13 @@ static int pipeline_addModFile(void *self, LIBMATTI_NEOFORGESPI_IModFile *mf)
         return 0;
     }
 
-    // Java: modFile.setDiscoveryAttributes(defaultAttributes.merge(mf.getDiscoveryAttributes()));
+// Java: modFile.setDiscoveryAttributes(defaultAttributes.merge(mf.getDiscoveryAttributes()));
     LIBMATTI_NEOFORGESPI_ModFileDiscoveryAttributes attributes =
         LIBMATTI_NEOFORGESPI_ModFileDiscoveryAttributes_Merge(&pipeline->defaultAttributes,
                                                               LIBMATTI_FML_ModFile_GetDiscoveryAttributes(modFile));
     LIBMATTI_FML_ModFile_SetDiscoveryAttributes(modFile, &attributes);
 
-    // Java: LOGGER.info(LogMarkers.SCAN, "Found {} file \"{}\" {}", mf.getType().name().toLowerCase(ROOT), mf.getFileName(), discoveryAttributes);
+// Java: LOGGER.info(LogMarkers.SCAN, "Found {} file \"{}\" {}", mf.getType().name().toLowerCase(ROOT), mf.getFileName(), discoveryAttributes);
     char *attributesText = LIBMATTI_NEOFORGESPI_ModFileDiscoveryAttributes_ToString(&attributes);
     LIBMATTI_ML_Logger_Info(LOGGER(), &LIBMATTI_FML_MARKER_SCAN, "Found {} file \"{}\" {}",
                             LIBMATTI_NEOFORGESPI_IModFile_GetType(mf) == LIBMATTI_NEOFORGESPI_IModFile_Type_MOD
@@ -158,7 +158,7 @@ static void pipeline_addIssue(void *self, LIBMATTI_FML_ModLoadingIssue *issue)
                                      sizeof(LIBMATTI_FML_ModLoadingIssue *) * (pipeline->issues->count + 1));
     pipeline->issues->items[pipeline->issues->count++] = issue;
 
-    // Java: switch (issue.severity()) { case WARNING -> warningCount++; case ERROR -> errorCount++; }
+// Java: switch (issue.severity()) { case WARNING -> warningCount++; case ERROR -> errorCount++; }
     if (issue->severity == LIBMATTI_FML_ModLoadingIssue_SEVERITY_WARNING) pipeline->warningCount++;
     if (issue->severity == LIBMATTI_FML_ModLoadingIssue_SEVERITY_ERROR) pipeline->errorCount++;
 }
@@ -172,14 +172,14 @@ static int pipeline_addJarContent(void *self, LIBMATTI_FML_JarContents *jarConte
     DiscoveryPipeline *pipeline = self;
     *out = NULL;
 
-    // Java: attributes = defaultAttributes.merge(attributes);
+// Java: attributes = defaultAttributes.merge(attributes);
     LIBMATTI_NEOFORGESPI_ModFileDiscoveryAttributes merged =
         LIBMATTI_NEOFORGESPI_ModFileDiscoveryAttributes_Merge(&pipeline->defaultAttributes, attributes);
 
     LIBMATTI_FML_ModLoadingIssue **incompatibilityIssues = NULL;
     size_t incompatibilityIssueCount = 0;
 
-    // Java: for (var reader : modFileReaders) { try { var provided = reader.read(jarContents, attributes); ... } }
+// Java: for (var reader : modFileReaders) { try { var provided = reader.read(jarContents, attributes); ... } }
     for (size_t i = 0; i < pipeline->modFileReaderCount; i++)
     {
         LIBMATTI_NEOFORGESPI_IModFile *provided = LIBMATTI_NEOFORGESPI_IModFileReader_Read(
@@ -192,7 +192,7 @@ static int pipeline_addJarContent(void *self, LIBMATTI_FML_JarContents *jarConte
                 return 1;
             }
 
-            // Java: the reader might have returned something other than a ModFile
+// Java: the reader might have returned something other than a ModFile
             LIBMATTI_FML_ModFile *modFile = LIBMATTI_FML_ModFile_AsConcrete(provided);
             if (modFile != NULL)
                 LIBMATTI_FML_ModFile_Close(modFile);
@@ -204,7 +204,7 @@ static int pipeline_addJarContent(void *self, LIBMATTI_FML_JarContents *jarConte
             return 0;
         }
 
-        // Java: catch (ModLoadingException e) { incompatibilityIssues.addAll(e.getIssues()); }
+// Java: catch (ModLoadingException e) { incompatibilityIssues.addAll(e.getIssues()); }
         // The reader channel: a reader that "threw" registered its issues with ModLoader
         // (ModLoadingException_New registers them), so the take hands them over to the
         // incompatibility stash exactly like the Java catch clause.
@@ -221,7 +221,7 @@ static int pipeline_addJarContent(void *self, LIBMATTI_FML_JarContents *jarConte
         free(readerIssues);
     }
 
-    // Java: if (reporting != IncompatibleFileReporting.IGNORE) { ... }
+// Java: if (reporting != IncompatibleFileReporting.IGNORE) { ... }
     if (reporting != LIBMATTI_NEOFORGESPI_IncompatibleFileReporting_IGNORE)
     {
         LIBMATTI_FML_IncompatibleModReason reason;
@@ -245,13 +245,13 @@ static int pipeline_addJarContent(void *self, LIBMATTI_FML_JarContents *jarConte
 
         for (size_t i = 0; i < incompatibilityIssueCount; i++)
         {
-            // Java: issue = issue.withSeverity(reporting.getIssueSeverity());
+// Java: issue = issue.withSeverity(reporting.getIssueSeverity());
             LIBMATTI_FML_ModLoadingIssue *issue = LIBMATTI_FML_ModLoadingIssue_WithSeverity(
                 incompatibilityIssues[i], LIBMATTI_NEOFORGESPI_IncompatibleFileReporting_GetIssueSeverity(reporting));
             LIBMATTI_FML_ModLoadingIssue *withPath = LIBMATTI_FML_ModLoadingIssue_WithAffectedPath(
                 issue, LIBMATTI_FML_JarContents_GetPrimaryPath(jarContents));
 
-            // Java: LOGGER.atLevel(reporting.getLogLevel()).addMarker(SCAN).log("Skipping jar. {}", FMLTranslations.translateIssueEnglish(issue));
+// Java: LOGGER.atLevel(reporting.getLogLevel()).addMarker(SCAN).log("Skipping jar. {}", FMLTranslations.translateIssueEnglish(issue));
             char *translated = LIBMATTI_FML_FMLTranslations_TranslateIssueEnglish(withPath);
             LIBMATTI_ML_Logger_Log(LOGGER(), &LIBMATTI_FML_MARKER_SCAN,
                                    LIBMATTI_NEOFORGESPI_IncompatibleFileReporting_GetLogLevel(reporting),
@@ -264,7 +264,7 @@ static int pipeline_addJarContent(void *self, LIBMATTI_FML_JarContents *jarConte
 
     free(incompatibilityIssues);
 
-    // Java: closeJarContents(jarContents); return Optional.empty();
+// Java: closeJarContents(jarContents); return Optional.empty();
     closeJarContents(jarContents);
     return 0;
 }
@@ -278,10 +278,10 @@ static int pipeline_addPath(void *self, const char **groupedPaths, size_t groupe
     DiscoveryPipeline *pipeline = self;
     *out = NULL;
 
-    // Java: var primaryPath = groupedPaths.getFirst();
+// Java: var primaryPath = groupedPaths.getFirst();
     const char *primaryPath = groupedPaths[0];
 
-    // Java: if (!launchContext.addLocated(primaryPath)) { LOGGER.debug(...); skipCount++; return Optional.empty(); }
+// Java: if (!launchContext.addLocated(primaryPath)) { LOGGER.debug(...); skipCount++; return Optional.empty(); }
     if (!LIBMATTI_NEOFORGESPI_ILaunchContext_AddLocated(pipeline->launchContext, primaryPath))
     {
         LIBMATTI_ML_Logger_Debug(LOGGER(), NULL, "Skipping {} because it was already located earlier", primaryPath);
@@ -289,7 +289,7 @@ static int pipeline_addPath(void *self, const char **groupedPaths, size_t groupe
         return 0;
     }
 
-    // Java: jarContents = JarContents.ofPaths(groupedPaths);
+// Java: jarContents = JarContents.ofPaths(groupedPaths);
     LIBMATTI_FML_JarContents *jarContents = LIBMATTI_FML_JarContents_OfPaths(groupedPaths, groupedPathCount);
     if (jarContents == NULL)
     {
@@ -318,7 +318,7 @@ static LIBMATTI_NEOFORGESPI_IModFile *pipeline_readModFile(void *self, LIBMATTI_
         if (provided != NULL) return provided;
     }
 
-    // Java: throw new RuntimeException("No mod reader felt responsible for " + jarContents.getPrimaryPath());
+// Java: throw new RuntimeException("No mod reader felt responsible for " + jarContents.getPrimaryPath());
     LIBMATTI_ML_Logger_Error(LOGGER(), NULL, "No mod reader felt responsible for {}",
                              LIBMATTI_FML_JarContents_GetPrimaryPath(jarContents));
     return NULL;
@@ -348,7 +348,7 @@ LIBMATTI_FML_ModDiscoverer *LIBMATTI_FML_ModDiscoverer_NewWithLocators(
     LIBMATTI_FML_ModDiscoverer *discoverer = calloc(1, sizeof(LIBMATTI_FML_ModDiscoverer));
     discoverer->launchContext = launchContext;
 
-    // Java: modFileLocators = ServiceLoaderUtil.loadEarlyServices(launchContext, IModFileCandidateLocator.class, additionalModFileLocators);
+// Java: modFileLocators = ServiceLoaderUtil.loadEarlyServices(launchContext, IModFileCandidateLocator.class, additionalModFileLocators);
     LIBMATTI_FML_ServiceLoaderUtil_Hooks locatorHooks = {0};
     locatorHooks.applyPriority = 1;
     locatorHooks.getPriority = orderedPriority;
@@ -369,7 +369,7 @@ LIBMATTI_FML_ModDiscoverer *LIBMATTI_FML_ModDiscoverer_NewWithLocators(
     free(additionalLocators);
     LIBMATTI_FML_ServiceLoaderUtil_FreeServiceList(locators);
 
-    // Java: modFileReaders = ServiceLoaderUtil.loadEarlyServices(launchContext, IModFileReader.class, List.of());
+// Java: modFileReaders = ServiceLoaderUtil.loadEarlyServices(launchContext, IModFileReader.class, List.of());
     LIBMATTI_FML_ServiceLoaderUtil_Hooks readerHooks = {0};
     readerHooks.applyPriority = 1;
     readerHooks.getPriority = orderedPriority;
@@ -383,7 +383,7 @@ LIBMATTI_FML_ModDiscoverer *LIBMATTI_FML_ModDiscoverer_NewWithLocators(
         discoverer->modFileReaders[i] = readers->services[i].service;
     LIBMATTI_FML_ServiceLoaderUtil_FreeServiceList(readers);
 
-    // Java: dependencyLocators = ServiceLoaderUtil.loadEarlyServices(launchContext, IDependencyLocator.class, List.of());
+// Java: dependencyLocators = ServiceLoaderUtil.loadEarlyServices(launchContext, IDependencyLocator.class, List.of());
     LIBMATTI_FML_ServiceLoaderUtil_Hooks dependencyHooks = {0};
     dependencyHooks.applyPriority = 1;
     dependencyHooks.getPriority = orderedPriority;
@@ -400,7 +400,8 @@ LIBMATTI_FML_ModDiscoverer *LIBMATTI_FML_ModDiscoverer_NewWithLocators(
     return discoverer;
 }
 
-// Java has no destructor; the C port releases what the constructor allocated.
+
+
 void LIBMATTI_FML_ModDiscoverer_Free(LIBMATTI_FML_ModDiscoverer *discoverer)
 {
     if (discoverer == NULL) return;
@@ -410,7 +411,8 @@ void LIBMATTI_FML_ModDiscoverer_Free(LIBMATTI_FML_ModDiscoverer *discoverer)
     free(discoverer);
 }
 
-// Java has no destructor; the port releases the Result lists once the caller is done with them.
+
+
 void LIBMATTI_FML_ModDiscoverer_Result_Free(LIBMATTI_FML_ModDiscoverer_Result *result)
 {
     if (result == NULL) return;
@@ -422,7 +424,7 @@ void LIBMATTI_FML_ModDiscoverer_Result_Free(LIBMATTI_FML_ModDiscoverer_Result *r
 // Java: private String fileToLine(IModFile mf)
 static char *fileToLine(LIBMATTI_NEOFORGESPI_IModFile *mf)
 {
-    // Java: String.format(Locale.ENGLISH, "%s %s (%s)", name, version, modId)
+// Java: String.format(Locale.ENGLISH, "%s %s (%s)", name, version, modId)
     size_t modInfoCount = 0;
     LIBMATTI_NEOFORGESPI_IModInfo **modInfos = LIBMATTI_NEOFORGESPI_IModFile_GetModInfos(mf, &modInfoCount);
     if (modInfoCount == 0) return strdup("");
@@ -441,7 +443,7 @@ static char *fileToLine(LIBMATTI_NEOFORGESPI_IModFile *mf)
 // Java: private String logReport(Collection<List<ModFile>> modFiles)
 char *LIBMATTI_FML_ModDiscoverer_LogReport(LIBMATTI_FML_ModFile **modFiles, size_t modFileCount)
 {
-    // Java: .filter(modFile -> !modFile.getModInfos().isEmpty()).sorted(comparing(displayName, CASE_INSENSITIVE_ORDER)).map(this::fileToLine).collect(joining("\n\t\t", "\t\t", ""))
+// Java: .filter(modFile -> !modFile.getModInfos().isEmpty()).sorted(comparing(displayName, CASE_INSENSITIVE_ORDER)).map(this::fileToLine).collect(joining("\n\t\t", "\t\t", ""))
     LIBMATTI_NEOFORGESPI_IModFile **withMods = malloc(sizeof(LIBMATTI_NEOFORGESPI_IModFile *) *
                                                       (modFileCount > 0 ? modFileCount : 1));
     size_t withModCount = 0;
@@ -502,7 +504,7 @@ LIBMATTI_FML_ModDiscoverer_Result *LIBMATTI_FML_ModDiscoverer_DiscoverMods(
     int successfullyLoadedMods = 1;
     LIBMATTI_FML_ImmediateWindowHandler_UpdateProgress("Discovering mod files");
 
-    // Java: for (var locator : modFileLocators) { ... locator.findCandidates(launchContext, pipeline); ... }
+// Java: for (var locator : modFileLocators) { ... locator.findCandidates(launchContext, pipeline); ... }
     for (size_t i = 0; i < discoverer->modFileLocatorCount; i++)
     {
         char *locatorName = LIBMATTI_NEOFORGESPI_IModFileCandidateLocator_ToString(
@@ -522,7 +524,7 @@ LIBMATTI_FML_ModDiscoverer_Result *LIBMATTI_FML_ModDiscoverer_DiscoverMods(
         pipeline.modFileReaderCount = discoverer->modFileReaderCount;
         pipeline.launchContext = discoverer->launchContext;
 
-        // Java: catch (ModLoadingException e) { discoveryIssues.addAll(e.getIssues()); }
+// Java: catch (ModLoadingException e) { discoveryIssues.addAll(e.getIssues()); }
         //       catch (Exception e) { discoveryIssues.add(ModLoadingIssue.error("fml.modloadingissue.technical_error", locator + " failed").withCause(e)); }
         LIBMATTI_NEOFORGESPI_IModFileCandidateLocator_FindCandidates(discoverer->modFileLocators[i],
                                                                     discoverer->launchContext, &pipeline.pipeline);
@@ -535,7 +537,7 @@ LIBMATTI_FML_ModDiscoverer_Result *LIBMATTI_FML_ModDiscoverer_DiscoverMods(
         free(locatorName);
     }
 
-    // Java: First processing run of the mod list.
+// Java: First processing run of the mod list.
     LIBMATTI_FML_ModFile **modFilesMap = NULL;
     size_t modFilesMapCount = 0;
     int hasModFilesMap = 0;
@@ -558,7 +560,8 @@ LIBMATTI_FML_ModDiscoverer_Result *LIBMATTI_FML_ModDiscoverer_DiscoverMods(
             loadedFiles.items = uniqueModsData->modFiles;
             loadedFiles.count = uniqueModsData->modFileCount;
 
-            // the mod file array is handed to the caller; release the rest of the builder data
+
+
             uniqueModsData->modFiles = NULL;
         }
         else
@@ -590,7 +593,7 @@ LIBMATTI_FML_ModDiscoverer_Result *LIBMATTI_FML_ModDiscoverer_DiscoverMods(
                                  "Successfully Loaded {} mods. Attempting to load dependencies...",
                                  formatNumber((long long) loadedFiles.count));
 
-        // Java: List<IModFile> dependencySources = new ArrayList<>(loadedFiles); dependencySources.addAll(additionalDependencySources);
+// Java: List<IModFile> dependencySources = new ArrayList<>(loadedFiles); dependencySources.addAll(additionalDependencySources);
         LIBMATTI_NEOFORGESPI_IModFile **dependencySources = malloc(
             sizeof(LIBMATTI_NEOFORGESPI_IModFile *) * (loadedFiles.count + count > 0
                                                           ? loadedFiles.count + count
@@ -604,7 +607,7 @@ LIBMATTI_FML_ModDiscoverer_Result *LIBMATTI_FML_ModDiscoverer_DiscoverMods(
 
         for (size_t i = 0; i < discoverer->dependencyLocatorCount; i++)
         {
-            // Java: LOGGER.debug(LogMarkers.SCAN, "Trying locator {}", locator) - Object.toString() is "class@hash"
+// Java: LOGGER.debug(LogMarkers.SCAN, "Trying locator {}", locator) - Object.toString() is "class@hash"
             char locatorName[64];
             snprintf(locatorName, sizeof(locatorName), "dependencylocator@%zx",
                      (size_t) (uintptr_t) discoverer->dependencyLocators[i]->ordered.self);
@@ -626,7 +629,7 @@ LIBMATTI_FML_ModDiscoverer_Result *LIBMATTI_FML_ModDiscoverer_DiscoverMods(
         }
         free(dependencySources);
 
-        // Java: Second processing run of the mod list.
+// Java: Second processing run of the mod list.
         LIBMATTI_FML_UniqueModListBuilder *uniqueListBuilder =
             LIBMATTI_FML_UniqueModListBuilder_New(loadedFiles.items, loadedFiles.count);
         LIBMATTI_FML_ModLoadingIssue **uniqueIssues = NULL;
@@ -671,7 +674,7 @@ LIBMATTI_FML_ModDiscoverer_Result *LIBMATTI_FML_ModDiscoverer_DiscoverMods(
                                  "Mod Discovery failed. Skipping dependency discovery.");
     }
 
-    // Java: LOGGER.info("\n     Mod List:\n\t\tName Version (Mod Id)\n\n{}", logReport(modFilesMap.values()));
+// Java: LOGGER.info("\n     Mod List:\n\t\tName Version (Mod Id)\n\n{}", logReport(modFilesMap.values()));
     if (hasModFilesMap)
     {
         char *report = LIBMATTI_FML_ModDiscoverer_LogReport(modFilesMap, modFilesMapCount);

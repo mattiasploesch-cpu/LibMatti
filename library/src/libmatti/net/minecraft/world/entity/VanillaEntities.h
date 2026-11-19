@@ -20,7 +20,7 @@ extern "C" {
 typedef struct LIBMATTI_MC_LivingEntity
 {
     LIBMATTI_MC_Entity base;
-    // Java: private float absorptionAmount / protected int hurtTime ...
+// Java: private float absorptionAmount / protected int hurtTime ...
     float health;
     float maxHealth;
     int hurtTime;
@@ -32,15 +32,15 @@ typedef struct LIBMATTI_MC_LivingEntity
 typedef struct LIBMATTI_MC_Player
 {
     LIBMATTI_MC_LivingEntity base;
-    // Java: private float oAttackPower / the inventory lands with P6
+// Java: private float oAttackPower / the inventory lands with P6
     float attackPower;
-    // Java: the game profile name (the display name)
+// Java: the game profile name (the display name)
     char *name;
-    // Java: public final Abilities abilities = new Abilities()
+// Java: public final Abilities abilities = new Abilities()
     LIBMATTI_MC_Abilities abilities;
-    // Java: public final FoodData foodData = new FoodData()
+// Java: public final FoodData foodData = new FoodData()
     LIBMATTI_MC_FoodData foodData;
-    // Java: the experience/score fields the save writes (XpP/XpLevel/XpTotal/Score)
+// Java: the experience/score fields the save writes (XpP/XpLevel/XpTotal/Score)
     float experienceProgress;
     int experienceLevel;
     int totalExperience;
@@ -51,7 +51,7 @@ typedef struct LIBMATTI_MC_Player
 typedef struct LIBMATTI_MC_ItemEntity
 {
     LIBMATTI_MC_Entity base;
-    // Java: private static final ItemStack ITEM - the dropped stack (the
+// Java: private static final ItemStack ITEM - the dropped stack (the
     // ItemStack port carries the data components)
     void *item;
     int pickupDelay;
@@ -85,9 +85,9 @@ typedef struct LIBMATTI_MC_ExperienceOrb
 typedef struct LIBMATTI_MC_Mob
 {
     LIBMATTI_MC_LivingEntity base;
-    // Java: private boolean persistenceRequired
+// Java: private boolean persistenceRequired
     bool persistenceRequired;
-    // Java: private final BlockPos pickupCandidate - the leash/angry bookkeeping
+// Java: private final BlockPos pickupCandidate - the leash/angry bookkeeping
     int angerTime;
 } LIBMATTI_MC_Mob;
 
@@ -129,10 +129,12 @@ LIBMATTI_MC_Entity *LIBMATTI_MC_Player_New(const LIBMATTI_MC_EntityType *type, s
 // public Player(Level, GameProfile) - the port takes the profile name; the
 // abilities/food defaults init, the position stays at origin
 LIBMATTI_MC_Player *LIBMATTI_MC_Player_Create(struct LIBMATTI_MC_Level *level, const char *name);
-// the constructor tail (the LocalPlayer embeds the Player struct and runs the
-// same init over it - C has no constructor chaining)
+
+
+
 void LIBMATTI_MC_Player_Init(LIBMATTI_MC_Player *player, struct LIBMATTI_MC_Level *level, const char *name);
-// the typed free (the name string rides the struct)
+
+
 void LIBMATTI_MC_Player_Free(LIBMATTI_MC_Player *player);
 // Java: public String getGameProfile().getName() - the display name
 const char *LIBMATTI_MC_Player_GetName(const LIBMATTI_MC_Player *player);
@@ -168,4 +170,4 @@ LIBMATTI_MC_Entity *LIBMATTI_MC_Chicken_New(const LIBMATTI_MC_EntityType *type, 
 }
 #endif
 
-#endif //MATTICRAFT_MC_WORLD_ENTITY_VANILLAENTITIES_H
+#endif

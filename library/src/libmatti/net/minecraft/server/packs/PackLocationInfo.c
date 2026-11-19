@@ -1,5 +1,6 @@
-// Port of net.minecraft.server.packs.PackLocationInfo and
-// net.minecraft.server.packs.repository.PackSource.
+
+
+
 
 #include "libmatti/net/minecraft/server/packs/PackLocationInfo.h"
 

@@ -1,4 +1,5 @@
-// Port of net.minecraft.world.phys.Vec2 (implementation).
+
+
 
 #include "libmatti/net/minecraft/world/phys/Vec2.h"
 
@@ -58,7 +59,7 @@ LIBMATTI_MC_Vec2 LIBMATTI_MC_Vec2_Add(LIBMATTI_MC_Vec2 a, LIBMATTI_MC_Vec2 b)
 // Java: public Vec2 normalized() - f < 1.0E-4F returns ZERO
 LIBMATTI_MC_Vec2 LIBMATTI_MC_Vec2_Normalized(LIBMATTI_MC_Vec2 v)
 {
-    // Java: float f = Mth.sqrt(this.x * this.x + this.y * this.y)
+// Java: float f = Mth.sqrt(this.x * this.x + this.y * this.y)
     float f = LIBMATTI_MC_Mth_Sqrt(v.x * v.x + v.y * v.y);
     if (f < 1.0e-4f)
         return LIBMATTI_MC_Vec2_Zero();

@@ -18,7 +18,8 @@
 static int tickBodyRan = 0;
 static int runtimeHookRan = 0;
 
-// The target the example mod mixes into (client/src/main.c declares the same name)
+
+
 static void game_tick(void)
 {
     tickBodyRan = 1;
@@ -33,10 +34,12 @@ static void unused_handler(MattiMixinCallbackInfo *info, void *userdata)
     (void) userdata;
 }
 
-// Fills the executable's own descriptor section alongside the target entry
+
+
 MATTI_MIXIN("host", "unused.target", unused_handler, NULL, MATTI_MIXIN_AT_HEAD, 1)
 
-// Runtime-registered hook, lower priority than DEFAULT: runs before the mod hook and cancels
+
+
 static void cancelling_hook(MattiMixinCallbackInfo *info, void *userdata)
 {
     (void) userdata;
@@ -44,8 +47,9 @@ static void cancelling_hook(MattiMixinCallbackInfo *info, void *userdata)
     info->result = MATTI_MIXIN_CANCEL;
 }
 
-// The libc call the executable imports; M2 rewrites its GOT slot to this handler, which
-// re-invokes the original (the documented M2 re-invocation path) and flags the rewrite.
+
+
+
 static int m2Patched = 0;
 static void puts_handler(MattiMixinCallbackInfo *info, void *userdata)
 {
@@ -81,7 +85,8 @@ int main(int argc, char *argv[])
 
     LIBMATTI_MIXIN_HookTable *table = LIBMATTI_MIXIN_HookTable_New();
 
-    // MixinFacade's collection order: the game binary first, then every mod file
+
+
     size_t gameTargets = LIBMATTI_MIXIN_HookTable_AddObject(table, NULL, NULL);
     size_t modHooks = LIBMATTI_MIXIN_HookTable_AddObject(table, argv[1], "classmod");
     printf("collected %zu game target(s), %zu mod hook(s)\n", gameTargets, modHooks);
@@ -93,7 +98,7 @@ int main(int argc, char *argv[])
               chain->hooks[0].modId != NULL && strcmp(chain->hooks[0].modId, "classmod") == 0,
           "chain resolved: original bound, hook attributed to classmod");
 
-    // 1) plain dispatch: the mod hook runs, nothing cancels; the OWNER runs the body when Invoke
+// 1) plain dispatch: the mod hook runs, nothing cancels; the OWNER runs the body when Invoke
 //    reports 1 (Java: the woven method continues after the callback chain)
     MattiMixinResult result = MATTI_MIXIN_PASS;
     void *args[1] = {NULL};
@@ -104,7 +109,8 @@ int main(int argc, char *argv[])
     CHECK(runBody == 1 && result == MATTI_MIXIN_PASS && tickBodyRan,
           "mod hook ran without cancelling, target body ran");
 
-    // 2) runtime hook at lower priority cancels at HEAD: body skipped
+
+
     tickBodyRan = 0;
     LIBMATTI_MIXIN_HookTable_AddHook(table, "matticraft::demo::tick", cancelling_hook, NULL,
                                      MATTI_MIXIN_AT_HEAD, MATTI_MIXIN_PRIORITY_DEFAULT - 1, "host");
@@ -115,11 +121,13 @@ int main(int argc, char *argv[])
     CHECK(runtimeHookRan && result == MATTI_MIXIN_CANCEL && runBody == 0 && !tickBodyRan,
           "runtime hook cancelled at HEAD, target body skipped");
 
-    // 3) M2: patch the executable's own GOT and let a libc call prove the rewrite
+
+
     const char *symbols[] = {"puts"};
     size_t rewritten = LIBMATTI_MIXIN_GotPatch("/proc/self/exe", symbols, 1, puts_handler, NULL, "host");
     CHECK(rewritten == 1, "GOT slot rewritten");
-    // The call must go through the PLT (jmp *GOT) - dlsym would bypass the patched slot.
+
+
     puts("this line must come back through the original puts");
     CHECK(m2Patched, "libc call landed on the mixin handler");
 

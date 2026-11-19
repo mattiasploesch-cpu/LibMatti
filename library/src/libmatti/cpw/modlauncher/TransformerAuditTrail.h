@@ -1,6 +1,7 @@
-// Port of cpw.mods.modlauncher.TransformerAuditTrail.
-// Java's TransformerAuditTrail implements ITransformerAuditTrail; in C the
-// concrete type completes the interface struct.
+
+
+
+
 
 #ifndef MATTICRAFT_MODLAUNCHER_TRANSFORMERAUDITTRAIL_H
 #define MATTICRAFT_MODLAUNCHER_TRANSFORMERAUDITTRAIL_H
@@ -49,4 +50,4 @@ void LIBMATTI_ML_TransformerAuditTrail_AddTransformerAuditTrail(LIBMATTI_ML_Tran
                                                                LIBMATTI_MLA_ITransformationService *transformService,
                                                                LIBMATTI_MLA_ITransformer *transformer);
 
-#endif //MATTICRAFT_MODLAUNCHER_TRANSFORMERAUDITTRAIL_H
+#endif

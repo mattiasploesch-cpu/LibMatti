@@ -37,7 +37,7 @@ void LIBMATTI_B3D_GlShaderModule_Free(LIBMATTI_B3D_GlShaderModule *module)
 {
     if (module == NULL)
         return;
-    // Java: public void close() - delete the shader, mark NOT_ALLOCATED.
+// Java: public void close() - delete the shader, mark NOT_ALLOCATED.
     if (module->shaderId != -1)
     {
         LIBMATTI_B3D_RenderSystem_AssertOnRenderThread();
@@ -60,7 +60,7 @@ int LIBMATTI_B3D_GlShaderModule_GetShaderId(const LIBMATTI_B3D_GlShaderModule *m
 
 char *LIBMATTI_B3D_GlShaderModule_GetDebugLabel(const LIBMATTI_B3D_GlShaderModule *module)
 {
-    // Java: idConverter().idToFile(id) -> "shaders/" + id + extension.
+// Java: idConverter().idToFile(id) -> "shaders/" + id + extension.
     const char *extension = LIBMATTI_B3D_ShaderType_GetExtension(module->type);
     char *label = malloc(strlen(module->id) + strlen(extension) + 9);
     sprintf(label, "shaders/%s%s", module->id, extension);

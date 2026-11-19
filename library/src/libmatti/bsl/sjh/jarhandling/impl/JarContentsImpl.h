@@ -1,7 +1,8 @@
-//
-// Created by administrator on 09.09.26.
-//
-// Port of cpw.mods.jarhandling.impl.JarContentsImpl.
+
+
+
+
+
 
 #ifndef MATTICRAFT_JARCONTENTSIMPL_H
 #define MATTICRAFT_JARCONTENTSIMPL_H
@@ -16,13 +17,16 @@
 typedef struct
 {
     LIBMATTI_UNION_UnionFileSystem *filesystem;
-    char **validPaths; // existing input paths
+    char **validPaths;
+
     size_t validPathCount;
     LIBMATTI_JU_Manifest *manifest;
-    // TODO: signingData (JarSigningData) and nameOverrides (multi-release jars)
-    char **packages; // cache for repeated getPackages calls
+// TODO: signingData (JarSigningData) and nameOverrides (multi-release jars)
+    char **packages;
+
     size_t packageCount;
-    LIBMATTI_JH_Provider *providers; // cache for repeated getMetaInfServices calls
+    LIBMATTI_JH_Provider *providers;
+
     size_t providerCount;
 } LIBMATTI_JH_JarContentsImpl;
 
@@ -32,4 +36,4 @@ LIBMATTI_JH_JarContentsImpl *LIBMATTI_JH_JarContentsImpl_New(const char **paths,
                                                              LIBMATTI_JU_Manifest *defaultManifest,
                                                              LIBMATTI_UNION_UnionPathFilter *pathFilter);
 
-#endif //MATTICRAFT_JARCONTENTSIMPL_H
+#endif

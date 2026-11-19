@@ -1,6 +1,7 @@
-// Port of net.minecraft.world.entity.player.Input (the movement key-press
-// record the KeyboardInput ticks into the player; Java's byte flags become the
-// plain bools the C struct carries).
+
+
+
+
 
 #ifndef MATTICRAFT_MC_WORLD_ENTITY_PLAYER_INPUT_H
 #define MATTICRAFT_MC_WORLD_ENTITY_PLAYER_INPUT_H
@@ -31,4 +32,4 @@ LIBMATTI_MC_Input LIBMATTI_MC_Input_Empty(void);
 }
 #endif
 
-#endif //MATTICRAFT_MC_WORLD_ENTITY_PLAYER_INPUT_H
+#endif

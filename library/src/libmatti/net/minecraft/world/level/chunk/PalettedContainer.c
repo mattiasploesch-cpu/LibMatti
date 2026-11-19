@@ -1,4 +1,5 @@
-// Port of net.minecraft.world.level.chunk.PalettedContainer (implementation).
+
+
 
 #include "libmatti/net/minecraft/world/level/chunk/PalettedContainer.h"
 
@@ -17,7 +18,7 @@
 static void bitstorage_compute_magic(LIBMATTI_MC_BitStorage *storage)
 {
     size_t each = storage->valuesPerLong;
-    // Java: MathUtil.log2 declarative magic - the port stores a direct mask
+// Java: MathUtil.log2 declarative magic - the port stores a direct mask
     storage->divideMultiply = each;
     storage->divideAdd = 0;
     storage->divideShift = 0;
@@ -99,13 +100,14 @@ void LIBMATTI_MC_BitStorage_GetAll(const LIBMATTI_MC_BitStorage *storage, void (
         consumer(LIBMATTI_MC_BitStorage_Get(storage, i), self);
 }
 
-// ---------------------------------------------------------------------------
-// PalettedContainer
-// ---------------------------------------------------------------------------
+
+
+
+
 
 int LIBMATTI_MC_PalettedContainer_Index(int x, int y, int z)
 {
-    // Java: y * 256 + z * 16 + x
+// Java: y * 256 + z * 16 + x
     return y * 256 + z * 16 + x;
 }
 
@@ -152,7 +154,8 @@ static int palette_id_for(LIBMATTI_MC_PalettedContainer *container, LIBMATTI_MC_
             return (int) i;
     }
     if (container->paletteSize >= LIBMATTI_MC_PalettedContainer_MAX_LINEAR_ENTRIES)
-        return -1; // full - the caller must switch to GLOBAL mode
+        return -1;
+
     if (container->paletteSize >= container->paletteCapacity)
     {
         size_t next = container->paletteCapacity > 0 ? container->paletteCapacity * 2 : 4;
@@ -182,10 +185,11 @@ static bool ensure_bits(LIBMATTI_MC_PalettedContainer *container, int bits)
     return true;
 }
 
-// The GLOBAL read path: the port's global palette is the linear palette kept
-// unbounded (the vanilla global palette would need the state registry ids,
-// which the port's registry does not expose yet). The mode records the
-// strategy so the save/load port can map it 1:1.
+
+
+
+
+
 static int global_id_for(LIBMATTI_MC_PalettedContainer *container, LIBMATTI_MC_BlockState *state)
 {
     for (size_t i = 0; i < container->paletteSize; i++)
@@ -227,12 +231,13 @@ void LIBMATTI_MC_PalettedContainer_Set(LIBMATTI_MC_PalettedContainer *container,
         return;
     int index = LIBMATTI_MC_PalettedContainer_Index(x, y, z);
 
-    // Java: SINGLE_VALUE - set data(value) only when the written state differs
+// Java: SINGLE_VALUE - set data(value) only when the written state differs
     if (container->mode == LIBMATTI_MC_PalettedContainer_Mode_SINGLE_VALUE)
     {
         if (container->singleValue == state)
             return;
-        // the transition into the packed strategies
+
+
         container->mode = LIBMATTI_MC_PalettedContainer_Mode_LINEAR;
         LIBMATTI_MC_PalettedContainer_Reserve(container, 4);
         container->palette[0] = container->singleValue;
@@ -246,11 +251,12 @@ void LIBMATTI_MC_PalettedContainer_Set(LIBMATTI_MC_PalettedContainer *container,
         return;
     }
 
-    // Java: LINEAR - palette id, grow bits when the palette outgrows them
+// Java: LINEAR - palette id, grow bits when the palette outgrows them
     int id = palette_id_for(container, state);
     if (id < 0)
     {
-        // the linear palette is full: switch to the unbounded (global) mode
+
+
         container->mode = LIBMATTI_MC_PalettedContainer_Mode_GLOBAL;
         id = global_id_for(container, state);
         if (id < 0)
@@ -276,7 +282,7 @@ int LIBMATTI_MC_PalettedContainer_Count(const LIBMATTI_MC_PalettedContainer *con
 {
     if (container == NULL)
         return 0;
-    // Java: count(Predicate<T>) with the air predicate over all 4096
+// Java: count(Predicate<T>) with the air predicate over all 4096
     LIBMATTI_MC_BlockState *air = LIBMATTI_MC_VanillaBlocks_AIR() != NULL
                                       ? LIBMATTI_MC_Block_DefaultBlockState(LIBMATTI_MC_VanillaBlocks_AIR())
                                       : NULL;

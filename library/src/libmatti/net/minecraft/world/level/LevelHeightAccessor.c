@@ -1,4 +1,5 @@
-// Port of net.minecraft.world.level.LevelHeightAccessor.
+
+
 
 #include "libmatti/net/minecraft/world/level/LevelHeightAccessor.h"
 

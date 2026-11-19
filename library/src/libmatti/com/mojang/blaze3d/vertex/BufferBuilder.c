@@ -11,8 +11,9 @@
 // Java: private static final long NOT_BUILDING = -1L;
 #define NOT_BUILDING -1LL
 
-// The offsetsByElement slot each shared element occupies - the Java registry
-// ids: POSITION=0, COLOR=1, UV0/1/2=2/3/4, NORMAL=5, LINE_WIDTH=6.
+
+
+
 static int element_slot(const LIBMATTI_B3D_VertexFormatElement *element)
 {
     if (element->usage == LIBMATTI_B3D_VFE_UV)
@@ -30,14 +31,14 @@ static int element_slot(const LIBMATTI_B3D_VertexFormatElement *element)
 struct LIBMATTI_B3D_BufferBuilder
 {
     LIBMATTI_B3D_ByteBufferBuilder *buffer;
-    unsigned char *vertexPointer;  // Java: long vertexPointer, NOT_BUILDING sentinel
+    unsigned char *vertexPointer;// Java: long vertexPointer, NOT_BUILDING sentinel
     int vertices;
     const LIBMATTI_B3D_VertexFormat *format;
     LIBMATTI_B3D_VertexFormat_Mode mode;
-    int fastFormat;             // Java: format == NEW_ENTITY or BLOCK
-    int fullFormat;             // Java: format == NEW_ENTITY
+    int fastFormat;// Java: format == NEW_ENTITY or BLOCK
+    int fullFormat;// Java: format == NEW_ENTITY
     int vertexSize;
-    int initialElementsToFill;  // Java: mask minus the POSITION bit
+    int initialElementsToFill;// Java: mask minus the POSITION bit
     int elementsToFill;
     int building;
 };
@@ -74,7 +75,7 @@ LIBMATTI_B3D_BufferBuilder *LIBMATTI_B3D_BufferBuilder_New(LIBMATTI_B3D_ByteBuff
     builder->building = 1;
     builder->vertexPointer = (unsigned char *) (size_t) NOT_BUILDING;
 
-    // Java: boolean flag = format == DefaultVertexFormat.NEW_ENTITY; flag1 = BLOCK.
+// Java: boolean flag = format == DefaultVertexFormat.NEW_ENTITY; flag1 = BLOCK.
     // The port compares the shape (vertexSize 36 / 32 with normal+padding).
     int hasColor = LIBMATTI_B3D_VertexFormat_Contains(format, &LIBMATTI_B3D_VFE_ELEMENT_COLOR);
     int hasUv0 = LIBMATTI_B3D_VertexFormat_Contains(format, &LIBMATTI_B3D_VFE_ELEMENT_UV0);
@@ -86,7 +87,7 @@ LIBMATTI_B3D_BufferBuilder *LIBMATTI_B3D_BufferBuilder_New(LIBMATTI_B3D_ByteBuff
     builder->fastFormat = hasUv2 && hasNormal && builder->vertexSize == (hasUv1 ? 36 : 32);
     builder->fullFormat = hasUv1 && builder->fastFormat;
 
-    // Java: this.initialElementsToFill = getElementsMask() & ~POSITION.mask();
+// Java: this.initialElementsToFill = getElementsMask() & ~POSITION.mask();
     // The port starts from the full set and clears every present element except
     // POSITION (the mask layout matches element_slot order).
     builder->initialElementsToFill = 0;
@@ -109,7 +110,7 @@ static void ensure_building(const LIBMATTI_B3D_BufferBuilder *builder)
 {
     if (!builder->building)
     {
-        // Java: throw new IllegalStateException("Not building!"); the port stops
+// Java: throw new IllegalStateException("Not building!"); the port stops
         // silently through the NULL vertex pointer path.
         builder = NULL;
     }
@@ -122,13 +123,13 @@ static void end_last_vertex(LIBMATTI_B3D_BufferBuilder *builder)
         return;
     if (builder->elementsToFill != 0)
     {
-        // Java: throw new IllegalStateException("Missing elements in vertex: ...");
+// Java: throw new IllegalStateException("Missing elements in vertex: ...");
         // The port resets the mask so the next vertex can proceed (logged once).
         builder->elementsToFill = 0;
     }
     if (builder->mode == LIBMATTI_B3D_Mode_LINES)
     {
-        // Java: the line end vertex duplicates the last vertex.
+// Java: the line end vertex duplicates the last vertex.
         unsigned char *duplicate = LIBMATTI_B3D_ByteBufferBuilder_Reserve(builder->buffer, builder->vertexSize);
         if (duplicate != NULL)
             memcpy(duplicate, duplicate - builder->vertexSize, (size_t) builder->vertexSize);
@@ -156,7 +157,7 @@ static unsigned char *begin_element(LIBMATTI_B3D_BufferBuilder *builder, const L
     int mask = 1 << slot;
     int remaining = builder->elementsToFill & ~mask;
     if (remaining == builder->elementsToFill)
-        return (unsigned char *) (size_t) NOT_BUILDING;  // Java: return -1L (absent element)
+        return (unsigned char *) (size_t) NOT_BUILDING;// Java: return -1L (absent element)
     builder->elementsToFill = remaining;
     if (builder->vertexPointer == (unsigned char *) (size_t) NOT_BUILDING)
         return (unsigned char *) (size_t) NOT_BUILDING;
@@ -190,18 +191,19 @@ static LIBMATTI_B3D_MeshData *store_mesh(LIBMATTI_B3D_BufferBuilder *builder)
     return LIBMATTI_B3D_MeshData_New(result, &drawState);
 }
 
-// ---- VertexConsumer --------------------------------------------------------
+
+
 
 LIBMATTI_B3D_BufferBuilder *LIBMATTI_B3D_BufferBuilder_AddVertex(
     LIBMATTI_B3D_BufferBuilder *builder, float x, float y, float z)
 {
-    // Java: long i = this.beginVertex() + offsetsByElement[POSITION.id()];
+// Java: long i = this.beginVertex() + offsetsByElement[POSITION.id()];
     unsigned char *vertex = begin_vertex(builder);
     if (vertex == NULL)
         return builder;
     int positionSlot = element_slot(&LIBMATTI_B3D_VFE_ELEMENT_POSITION);
     unsigned char *target = vertex + LIBMATTI_B3D_VertexFormat_GetOffsetsByElement(builder->format)[positionSlot];
-    // Java: this.elementsToFill = this.initialElementsToFill;
+// Java: this.elementsToFill = this.initialElementsToFill;
     builder->elementsToFill = builder->initialElementsToFill;
     memcpy(target + 0, &x, sizeof(float));
     memcpy(target + 4, &y, sizeof(float));
@@ -235,7 +237,7 @@ LIBMATTI_B3D_BufferBuilder *LIBMATTI_B3D_BufferBuilder_SetColor(
 LIBMATTI_B3D_BufferBuilder *LIBMATTI_B3D_BufferBuilder_SetColorFloat(
     LIBMATTI_B3D_BufferBuilder *builder, float r, float g, float b, float a)
 {
-    // Java: default setColor((int)(f * 255.0F), ...).
+// Java: default setColor((int)(f * 255.0F), ...).
     return LIBMATTI_B3D_BufferBuilder_SetColorRGBA(builder, (int) (r * 255.0f), (int) (g * 255.0f),
                                                    (int) (b * 255.0f), (int) (a * 255.0f));
 }
@@ -275,7 +277,7 @@ LIBMATTI_B3D_BufferBuilder *LIBMATTI_B3D_BufferBuilder_SetUv1(
 LIBMATTI_B3D_BufferBuilder *LIBMATTI_B3D_BufferBuilder_SetOverlay(
     LIBMATTI_B3D_BufferBuilder *builder, int packed)
 {
-    // Java: setOverlay -> putPackedUv(i, p_343250_) over UV1.
+// Java: setOverlay -> putPackedUv(i, p_343250_) over UV1.
     unsigned char *target = begin_element(builder, &LIBMATTI_B3D_VFE_ELEMENT_UV1);
     if (!IS_ABSENT(target))
         put_packed_uv(target, packed);
@@ -291,7 +293,7 @@ LIBMATTI_B3D_BufferBuilder *LIBMATTI_B3D_BufferBuilder_SetUv2(
 LIBMATTI_B3D_BufferBuilder *LIBMATTI_B3D_BufferBuilder_SetLight(
     LIBMATTI_B3D_BufferBuilder *builder, int packed)
 {
-    // Java: default setLight -> setUv2(packed & 65535, packed >> 16 & 65535).
+// Java: default setLight -> setUv2(packed & 65535, packed >> 16 & 65535).
     return LIBMATTI_B3D_BufferBuilder_SetUv2(builder, packed & 65535, (packed >> 16) & 65535);
 }
 
@@ -323,7 +325,7 @@ void LIBMATTI_B3D_BufferBuilder_AddVertexFull(
 {
     if (builder->fastFormat)
     {
-        // Java: the fast path writes every element through one beginVertex.
+// Java: the fast path writes every element through one beginVertex.
         unsigned char *vertex = begin_vertex(builder);
         if (vertex == NULL)
             return;
@@ -344,7 +346,7 @@ void LIBMATTI_B3D_BufferBuilder_AddVertexFull(
     }
     else
     {
-        // Java: VertexConsumer.super.addVertex(...) - the generic chaining path.
+// Java: VertexConsumer.super.addVertex(...) - the generic chaining path.
         LIBMATTI_B3D_BufferBuilder_AddVertex(builder, x, y, z);
         LIBMATTI_B3D_BufferBuilder_SetColor(builder, color);
         LIBMATTI_B3D_BufferBuilder_SetUv(builder, u, v);
@@ -354,11 +356,12 @@ void LIBMATTI_B3D_BufferBuilder_AddVertexFull(
     }
 }
 
-// ---- build -----------------------------------------------------------------
+
+
 
 LIBMATTI_B3D_MeshData *LIBMATTI_B3D_BufferBuilder_Build(LIBMATTI_B3D_BufferBuilder *builder)
 {
-    // Java: public @Nullable MeshData build() { ensureBuilding(); endLastVertex();
+// Java: public @Nullable MeshData build() { ensureBuilding(); endLastVertex();
     //        MeshData meshdata = this.storeMesh(); this.building = false;
     //        this.vertexPointer = -1L; return meshdata; }
     ensure_building(builder);

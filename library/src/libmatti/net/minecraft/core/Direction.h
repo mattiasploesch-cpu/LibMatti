@@ -1,6 +1,7 @@
-// Port of net.minecraft.core.Direction (the enum with Axis, AxisDirection and Plane).
-// Java's enum constants become one struct per direction plus the shared constants table
-// in declaration order; the getClockWise/rotate machinery follows the Java switches 1:1.
+
+
+
+
 
 #ifndef MATTICRAFT_NET_MINECRAFT_CORE_DIRECTION_H
 #define MATTICRAFT_NET_MINECRAFT_CORE_DIRECTION_H
@@ -130,4 +131,4 @@ const LIBMATTI_MC_Direction *LIBMATTI_MC_Direction_Plane_Faces(LIBMATTI_MC_Direc
 }
 #endif
 
-#endif //MATTICRAFT_NET_MINECRAFT_CORE_DIRECTION_H
+#endif

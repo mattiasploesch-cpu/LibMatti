@@ -1,6 +1,7 @@
-// Port of com.mojang.blaze3d.buffers.GpuBuffer - the abstract GPU buffer.
-// Java keeps usage flags, a size and a slice type; the C port adds the GL
-// handle and the VBO/index-flag the render path needs.
+
+
+
+
 
 #ifndef MATTICRAFT_BLAZE3D_BUFFERS_GPUBUFFER_H
 #define MATTICRAFT_BLAZE3D_BUFFERS_GPUBUFFER_H
@@ -28,10 +29,10 @@ typedef struct LIBMATTI_B3D_GpuBuffer
 {
     int usage;
     long size;
-    // GlBuffer subclass state (Java: GlBuffer.handle).
+// GlBuffer subclass state (Java: GlBuffer.handle).
     unsigned int handle;
     int closed;
-    // Java: persistentBuffer - the mapped storage for USAGE_MAP_READ buffers.
+// Java: persistentBuffer - the mapped storage for USAGE_MAP_READ buffers.
     void *persistentBuffer;
 } LIBMATTI_B3D_GpuBuffer;
 

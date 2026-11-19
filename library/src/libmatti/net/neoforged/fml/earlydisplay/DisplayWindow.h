@@ -1,8 +1,9 @@
-// Port of net.neoforged.fml.earlydisplay.DisplayWindow (the "fmlearlywindow"
-// ImmediateWindowProvider). Java renders the theme'd loading screen with a
-// scheduled renderer thread; the port owns the same window lifecycle (init,
-// hand-off, tick, crash) and reports progress through the StartupNotification
-// meters until the game port takes the window over.
+
+
+
+
+
+
 
 #ifndef MATTICRAFT_FML_EARLYDISPLAY_DISPLAYWINDOW_H
 #define MATTICRAFT_FML_EARLYDISPLAY_DISPLAYWINDOW_H
@@ -37,4 +38,4 @@ int LIBMATTI_FML_DisplayWindow_GetFramebufferTextureId(LIBMATTI_FML_DisplayWindo
 // Java: public void close()
 void LIBMATTI_FML_DisplayWindow_Close(LIBMATTI_FML_DisplayWindow *window);
 
-#endif //MATTICRAFT_FML_EARLYDISPLAY_DISPLAYWINDOW_H
+#endif

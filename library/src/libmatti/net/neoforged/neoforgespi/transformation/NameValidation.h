@@ -1,4 +1,5 @@
-// Port of net.neoforged.neoforgespi.transformation.NameValidation (package-private in Java).
+
+
 
 #ifndef MATTICRAFT_NEOFORGESPI_TRANSFORMATION_NAMEVALIDATION_H
 #define MATTICRAFT_NEOFORGESPI_TRANSFORMATION_NAMEVALIDATION_H
@@ -11,4 +12,4 @@ int LIBMATTI_NEOFORGESPI_NameValidation_ValidateUnqualified(const char *name);
 // Java: static void validateMethod(String name, String descriptor)
 int LIBMATTI_NEOFORGESPI_NameValidation_ValidateMethod(const char *name, const char *descriptor);
 
-#endif //MATTICRAFT_NEOFORGESPI_TRANSFORMATION_NAMEVALIDATION_H
+#endif

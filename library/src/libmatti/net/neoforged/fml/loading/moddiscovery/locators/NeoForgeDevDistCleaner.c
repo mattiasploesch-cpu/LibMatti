@@ -14,7 +14,7 @@
 // Java: public static boolean supportsDistCleaning(JarContents minecraftModFile)
 int LIBMATTI_FML_NeoForgeDevDistCleaner_SupportsDistCleaning(LIBMATTI_FML_JarContents *minecraftModFile)
 {
-    // Java: return minecraftModFile.getManifest().getMainAttributes().containsKey(NAME_DISTS);
+// Java: return minecraftModFile.getManifest().getMainAttributes().containsKey(NAME_DISTS);
     LIBMATTI_JU_Manifest *manifest = LIBMATTI_FML_JarContents_GetManifest(minecraftModFile);
     return manifest != NULL && LIBMATTI_JU_Manifest_GetMainValue(manifest, LIBMATTI_FML_DIST_CLEANER_NAME_DISTS) != NULL;
 }
@@ -37,7 +37,7 @@ char **LIBMATTI_FML_NeoForgeDevDistCleaner_GetMaskedFiles(LIBMATTI_FML_JarConten
                             : NULL;
     if (dists == NULL)
     {
-        // Java: throw new ModLoadingException(error("fml.modloadingissue.neodev_missing_dists_attribute", NAME_DISTS));
+// Java: throw new ModLoadingException(error("fml.modloadingissue.neodev_missing_dists_attribute", NAME_DISTS));
         LIBMATTI_FML_ModLoadingIssue *issue =
             LIBMATTI_FML_ModLoadingIssue_Error("fml.modloadingissue.neodev_missing_dists_attribute",
                                                (const char *[]){LIBMATTI_FML_DIST_CLEANER_NAME_DISTS}, 1);
@@ -47,7 +47,7 @@ char **LIBMATTI_FML_NeoForgeDevDistCleaner_GetMaskedFiles(LIBMATTI_FML_JarConten
         return NULL;
     }
 
-    // Java: dists.split("\\s+") - the tokens, compared against the current dist
+// Java: dists.split("\\s+") - the tokens, compared against the current dist
     const char *dist = distName(currentDist);
     size_t tokenCount = 0;
     int allMatch = 1;
@@ -66,9 +66,9 @@ char **LIBMATTI_FML_NeoForgeDevDistCleaner_GetMaskedFiles(LIBMATTI_FML_JarConten
         token += tokenLength;
     }
 
-    // Java: if (dists.split("\\s+").allMatch(s -> s.equals(dist))) return Stream.empty();
+// Java: if (dists.split("\\s+").allMatch(s -> s.equals(dist))) return Stream.empty();
     if (tokenCount > 0 && allMatch) return NULL;
-    // Java: if (dists.split("\\s+").noneMatch(s -> s.equals(dist))) throw new ModLoadingException(ModLoadingIssue.error("fml.modloadingissue.neodev_missing_appropriate_dist", dist, NAME_DISTS));
+// Java: if (dists.split("\\s+").noneMatch(s -> s.equals(dist))) throw new ModLoadingException(ModLoadingIssue.error("fml.modloadingissue.neodev_missing_appropriate_dist", dist, NAME_DISTS));
     if (!hasMatch)
     {
         LIBMATTI_ML_Logger_Error(LIBMATTI_ML_LogManager_GetLogger(), NULL,
@@ -76,7 +76,7 @@ char **LIBMATTI_FML_NeoForgeDevDistCleaner_GetMaskedFiles(LIBMATTI_FML_JarConten
         return NULL;
     }
 
-    // Java: return manifest.getEntries().entrySet().stream().filter(entry -> { var fileDist = entry.getValue().getValue(NAME_DIST); return fileDist != null && !fileDist.equals(dist); }).map(Map.Entry::getKey);
+// Java: return manifest.getEntries().entrySet().stream().filter(entry -> { var fileDist = entry.getValue().getValue(NAME_DIST); return fileDist != null && !fileDist.equals(dist); }).map(Map.Entry::getKey);
     char **maskedFiles = NULL;
     for (size_t i = 0; i < manifest->sectionCount; i++)
     {
@@ -137,7 +137,7 @@ static int handles_class(LIBMATTI_NEOFORGESPI_ClassProcessor *self,
 {
     LIBMATTI_FML_NeoForgeDevDistCleaner *cleaner = (LIBMATTI_FML_NeoForgeDevDistCleaner *) self;
 
-    // Java: if (maskedClasses.contains(context.type().getClassName())) { ... }
+// Java: if (maskedClasses.contains(context.type().getClassName())) { ... }
     char *className = LIBMATTI_ASM_Type_GetClassName(context->type);
     int masked = 0;
     for (size_t i = 0; i < cleaner->maskedClassCount; i++)
@@ -151,13 +151,13 @@ static int handles_class(LIBMATTI_NEOFORGESPI_ClassProcessor *self,
 
     if (masked)
     {
-        // Java: String message = String.format("Attempted to load class %s which is not present on the %s", context.type().getClassName(), switch (dist) { ... });
+// Java: String message = String.format("Attempted to load class %s which is not present on the %s", context.type().getClassName(), switch (dist) { ... });
         const char *distText = cleaner->dist == LIBMATTI_DIST_CLIENT ? "client" : "dedicated server";
         size_t length = strlen(className) + strlen(distText) + 64;
         char *message = malloc(length);
         snprintf(message, length, "Attempted to load class %s which is not present on the %s", className, distText);
 
-        // Java: LOGGER.error(DISTXFORM, message); throwUnchecked(new ClassNotFoundException(message));
+// Java: LOGGER.error(DISTXFORM, message); throwUnchecked(new ClassNotFoundException(message));
         LIBMATTI_ML_Logger_Error(LIBMATTI_ML_LogManager_GetLogger(), NULL, "{}", message);
         free(message);
     }
@@ -173,13 +173,14 @@ LIBMATTI_FML_NeoForgeDevDistCleaner *LIBMATTI_FML_NeoForgeDevDistCleaner_New(
     LIBMATTI_FML_NeoForgeDevDistCleaner *cleaner = calloc(1, sizeof(LIBMATTI_FML_NeoForgeDevDistCleaner));
     cleaner->dist = requestedDist;
 
-    // Java: this.maskedClasses = getMaskedFiles(minecraftModFile, requestedDist).map(path -> path.endsWith(".class") ? path.substring(0, path.length() - ".class".length()).replace('/', '.') : null).filter(Objects::nonNull).collect(Collectors.toSet());
+// Java: this.maskedClasses = getMaskedFiles(minecraftModFile, requestedDist).map(path -> path.endsWith(".class") ? path.substring(0, path.length() - ".class".length()).replace('/', '.') : null).filter(Objects::nonNull).collect(Collectors.toSet());
     size_t maskedFileCount = 0;
     char **maskedFiles = LIBMATTI_FML_NeoForgeDevDistCleaner_GetMaskedFiles(minecraftModFile, requestedDist,
                                                                           &maskedFileCount);
     for (size_t i = 0; i < maskedFileCount; i++)
     {
-        // Classes are kept, but set to be filtered out at runtime; resources are removed entirely.
+
+
         size_t length = strlen(maskedFiles[i]);
         if (length < 6 || strcmp(maskedFiles[i] + length - 6, ".class") != 0)
         {

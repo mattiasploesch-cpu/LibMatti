@@ -19,13 +19,13 @@ struct LIBMATTI_NEOFORGESPI_ForgeFeature_IFeatureTest
 {
     void *self;
 
-    // Java: IModInfo.DependencySide applicableSides()
+// Java: IModInfo.DependencySide applicableSides()
     LIBMATTI_NEOFORGESPI_IModInfo_DependencySide (*applicableSides)(void *self);
-    // Java: F convertFromString(String value) - the C port keeps the converted value as a handle
+// Java: F convertFromString(String value) - the C port keeps the converted value as a handle
     void *(*convertFromString)(void *self, const char *value);
-    // Java: String featureValue()
+// Java: String featureValue()
     const char *(*featureValue)(void *self);
-    // Java: boolean test(F f)
+// Java: boolean test(F f)
     int (*test)(void *self, void *value);
 };
 
@@ -60,4 +60,4 @@ LIBMATTI_NEOFORGESPI_ForgeFeature_IFeatureTest *LIBMATTI_NEOFORGESPI_ForgeFeatur
 LIBMATTI_NEOFORGESPI_ForgeFeature_IFeatureTest *LIBMATTI_NEOFORGESPI_ForgeFeature_BooleanFeatureTest_New(
     LIBMATTI_NEOFORGESPI_IModInfo_DependencySide applicableSides, int value);
 
-#endif //MATTICRAFT_NEOFORGESPI_LOCATING_FORGEFEATURE_H
+#endif

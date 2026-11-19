@@ -68,4 +68,4 @@ void LIBMATTI_MC_SkyRenderer_DrawSunriseSunset(LIBMATTI_MC_SkyRenderer *renderer
 }
 #endif
 
-#endif //MATTICRAFT_MC_CLIENT_RENDERER_SKYRENDERER_H
+#endif

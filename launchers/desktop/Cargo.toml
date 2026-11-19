@@ -1,0 +1,27 @@
+[package]
+name = "launcher-desktop"
+description = "Matticraft launcher for Linux and Windows"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[lib]
+name = "launcher_desktop"
+path = "src/lib.rs"
+
+[[bin]]
+name = "matticraft-launcher"
+path = "src/main.rs"
+
+[features]
+default = ["upload"]
+upload = ["launcher-core/upload"]
+
+[dependencies]
+launcher-core.workspace = true
+egui.workspace = true
+eframe = { version = "0.31.1", default-features = false, features = ["glow", "default_fonts", "accesskit"] }
+
+[target.'cfg(any(target_os = "linux", target_os = "freebsd"))'.dependencies]
+eframe = { version = "0.31.1", default-features = false, features = ["glow", "default_fonts", "accesskit", "x11", "wayland"] }

@@ -1,4 +1,5 @@
-// Port of com.mojang.brigadier.CommandDispatcher.
+
+
 
 #include "libmatti/com/mojang/brigadier/CommandDispatcher.h"
 
@@ -32,7 +33,7 @@ LIBMATTI_BR_CommandDispatcher *LIBMATTI_BR_CommandDispatcher_New(void)
 LIBMATTI_BR_CommandNode *LIBMATTI_BR_CommandDispatcher_Register(LIBMATTI_BR_CommandDispatcher *self,
                                                                 LIBMATTI_BR_ArgumentBuilder *command)
 {
-    // Java: final LiteralCommandNode<S> build = command.build(); root.addChild(build);
+// Java: final LiteralCommandNode<S> build = command.build(); root.addChild(build);
     LIBMATTI_BR_CommandNode *build = LIBMATTI_BR_ArgumentBuilder_Build(command);
     LIBMATTI_BR_CommandNode_AddChild(self->root, build);
     LIBMATTI_BR_ArgumentBuilder_Free(command);
@@ -61,12 +62,12 @@ static LIBMATTI_BR_ParseResults *parse_nodes(LIBMATTI_BR_CommandDispatcher *self
     LIBMATTI_BR_CommandSyntaxException **errors = NULL;
     size_t errorCount = 0;
 
-    // Java: List<ParseResults<S>> potentials = null
+// Java: List<ParseResults<S>> potentials = null
     LIBMATTI_BR_ParseResults *potentials[64];
     size_t potentialCount = 0;
     const int cursor = LIBMATTI_BR_StringReader_GetCursor(originalReader);
 
-    // Java: for (final CommandNode<S> child : node.getRelevantNodes(originalReader))
+// Java: for (final CommandNode<S> child : node.getRelevantNodes(originalReader))
     for (LIBMATTI_BR_CommandNodeChild *childEntry =
              LIBMATTI_BR_CommandNode_GetRelevantNodes(node, originalReader);
          childEntry != NULL; childEntry = childEntry->next)
@@ -78,10 +79,11 @@ static LIBMATTI_BR_ParseResults *parse_nodes(LIBMATTI_BR_CommandDispatcher *self
         LIBMATTI_BR_StringReader reader = LIBMATTI_BR_StringReader_Copy(originalReader);
         LIBMATTI_BR_CommandSyntaxException *exception = NULL;
 
-        // Java: child.parse(reader, context) wrapped in the RuntimeException guard
+// Java: child.parse(reader, context) wrapped in the RuntimeException guard
         if (child->isLiteral)
         {
-            // LiteralCommandNode.parse
+
+
             int start = LIBMATTI_BR_StringReader_GetCursor(&reader);
             int matched = -1;
             int literalLength = (int) strlen(child->literal);
@@ -117,7 +119,8 @@ static LIBMATTI_BR_ParseResults *parse_nodes(LIBMATTI_BR_CommandDispatcher *self
         }
         else
         {
-            // ArgumentCommandNode.parse
+
+
             int start = LIBMATTI_BR_StringReader_GetCursor(&reader);
             LIBMATTI_BR_ArgumentKind kind = child->type.kind;
             LIBMATTI_BR_ArgumentValue value;
@@ -160,7 +163,8 @@ static LIBMATTI_BR_ParseResults *parse_nodes(LIBMATTI_BR_CommandDispatcher *self
                 parseOk = 0;
                 if (kind == LIBMATTI_BR_ARG_STRING && value.stringValue != NULL)
                 {
-                    // the parse partially consumed an owned string
+
+
                     free(value.stringValue);
                 }
             }
@@ -178,15 +182,16 @@ static LIBMATTI_BR_ParseResults *parse_nodes(LIBMATTI_BR_CommandDispatcher *self
 
         if (exception != NULL)
         {
-            // Java: errors.put(child, ex); reader.setCursor(cursor); continue;
+// Java: errors.put(child, ex); reader.setCursor(cursor); continue;
             errorNodes = realloc(errorNodes, (errorCount + 1) * sizeof(LIBMATTI_BR_CommandNode *));
             errors = realloc(errors, (errorCount + 1) * sizeof(LIBMATTI_BR_CommandSyntaxException *));
             errorNodes[errorCount] = child;
             errors[errorCount] = exception;
             errorCount++;
             LIBMATTI_BR_StringReader_SetCursor(&reader, cursor);
-            // the copied context is dropped (Java lets it go out of scope)
-            // the moved parsed arguments belong to the copy; free it
+
+
+
             for (size_t i = 0; i < context->argumentCount; i++)
             {
                 free(context->argumentNames[i]);
@@ -207,7 +212,7 @@ static LIBMATTI_BR_ParseResults *parse_nodes(LIBMATTI_BR_CommandDispatcher *self
         LIBMATTI_BR_CommandContextBuilder_WithCommand(context, LIBMATTI_BR_CommandNode_GetCommand(child),
                                                       child->commandUserdata);
 
-        // Java: if (reader.canRead(child.getRedirect() == null ? 2 : 1))
+// Java: if (reader.canRead(child.getRedirect() == null ? 2 : 1))
         if (LIBMATTI_BR_StringReader_CanReadLength(&reader, child->redirect == NULL ? 2 : 1))
         {
             LIBMATTI_BR_StringReader_Skip(&reader);
@@ -217,7 +222,8 @@ static LIBMATTI_BR_ParseResults *parse_nodes(LIBMATTI_BR_CommandDispatcher *self
                     self, source, child->redirect, LIBMATTI_BR_StringReader_GetCursor(&reader));
                 LIBMATTI_BR_ParseResults *parse = parse_nodes(self, child->redirect, &reader, childContext);
                 LIBMATTI_BR_CommandContextBuilder_WithChild(context, parse->context);
-                // the port moves the parse's context into this one and returns
+
+
                 parse->context = context;
                 LIBMATTI_BR_ParseResults_Free(parse);
                 LIBMATTI_BR_ParseResults *result = calloc(1, sizeof(LIBMATTI_BR_ParseResults));
@@ -243,12 +249,12 @@ static LIBMATTI_BR_ParseResults *parse_nodes(LIBMATTI_BR_CommandDispatcher *self
         }
     }
 
-    // Java: if (potentials != null) { sort; return potentials.get(0); }
+// Java: if (potentials != null) { sort; return potentials.get(0); }
     if (potentialCount > 0)
     {
         if (potentialCount > 1)
         {
-            // Java: the comparator - complete parses first, then exception-free parses
+// Java: the comparator - complete parses first, then exception-free parses
             for (size_t i = 0; i + 1 < potentialCount; i++)
             {
                 for (size_t j = 0; j + 1 < potentialCount - i; j++)
@@ -276,7 +282,8 @@ static LIBMATTI_BR_ParseResults *parse_nodes(LIBMATTI_BR_CommandDispatcher *self
         {
             LIBMATTI_BR_ParseResults_Free(potentials[i]);
         }
-        // free the error arrays the winning parse does not carry
+
+
         for (size_t i = 0; i < errorCount; i++)
         {
             LIBMATTI_BR_CommandSyntaxException_Free(errors[i]);
@@ -314,7 +321,7 @@ int LIBMATTI_BR_CommandDispatcher_Execute(LIBMATTI_BR_CommandDispatcher *self, L
                                           LIBMATTI_BR_CommandSyntaxException **outException)
 {
     *outException = NULL;
-    // Java: if (parse.getReader().canRead()) { ... }
+// Java: if (parse.getReader().canRead()) { ... }
     if (LIBMATTI_BR_StringReader_CanRead(&parse->reader))
     {
         if (parse->errorCount == 1)
@@ -339,15 +346,16 @@ int LIBMATTI_BR_CommandDispatcher_Execute(LIBMATTI_BR_CommandDispatcher *self, L
         return 0;
     }
 
-    // Java: final String command = parse.getReader().getString();
+// Java: final String command = parse.getReader().getString();
     //       final CommandContext<S> original = parse.getContext().build(command);
     LIBMATTI_BR_CommandContext *original =
         LIBMATTI_BR_CommandContextBuilder_Build(parse->context, LIBMATTI_BR_StringReader_GetString(&parse->reader));
 
-    // Java: ContextChain.tryFlatten(original) - walk the child chain; the last entry
+// Java: ContextChain.tryFlatten(original) - walk the child chain; the last entry
     // must be executable
     int result = 0;
-    // collect the modifiers (contexts with a child) and the executable
+
+
     LIBMATTI_BR_CommandContext *modifiers[64];
     size_t modifierCount = 0;
     LIBMATTI_BR_CommandContext *current = original;
@@ -379,7 +387,7 @@ int LIBMATTI_BR_CommandDispatcher_Execute(LIBMATTI_BR_CommandDispatcher *self, L
         return 0;
     }
 
-    // Java: executeAll - the port runs the executable (the modifier stages carry no
+// Java: executeAll - the port runs the executable (the modifier stages carry no
     // source lists in the C port, so a redirect without modifier just propagates)
     (void) modifiers;
     (void) modifierCount;
@@ -429,7 +437,7 @@ static void get_all_usage(LIBMATTI_BR_CommandDispatcher *self, LIBMATTI_BR_Comma
 
     if (node->redirect != NULL)
     {
-        // Java: node.getRedirect() == root ? "..." : "-> " + node.getRedirect().getUsageText()
+// Java: node.getRedirect() == root ? "..." : "-> " + node.getRedirect().getUsageText()
         char *redirect;
         if (node->redirect == self->root)
         {
@@ -541,7 +549,8 @@ static char *get_smart_usage(LIBMATTI_BR_CommandDispatcher *self, LIBMATTI_BR_Co
             return result;
         }
 
-        // count the usable children
+
+
         size_t usableCount = 0;
         for (LIBMATTI_BR_CommandNodeChild *child = LIBMATTI_BR_CommandNode_GetChildren(node); child != NULL;
              child = child->next)
@@ -570,7 +579,7 @@ static char *get_smart_usage(LIBMATTI_BR_CommandDispatcher *self, LIBMATTI_BR_Co
         }
         else if (usableCount > 1)
         {
-            // Java: collect the child usages; equal usages collapse into one entry
+// Java: collect the child usages; equal usages collapse into one entry
             char **childUsages = NULL;
             size_t childUsageCount = 0;
             for (LIBMATTI_BR_CommandNodeChild *child = LIBMATTI_BR_CommandNode_GetChildren(node); child != NULL;
@@ -655,7 +664,7 @@ static char *get_smart_usage(LIBMATTI_BR_CommandDispatcher *self, LIBMATTI_BR_Co
 char *LIBMATTI_BR_CommandDispatcher_GetSmartUsage(LIBMATTI_BR_CommandDispatcher *self, LIBMATTI_BR_CommandNode *node,
                                                   const void *source)
 {
-    // Java: public Map<CommandNode<S>, String> getSmartUsage - the port exposes one
+// Java: public Map<CommandNode<S>, String> getSmartUsage - the port exposes one
     // entry; the game port iterates children itself
     int optional = LIBMATTI_BR_CommandNode_GetCommand(node) != NULL;
     for (LIBMATTI_BR_CommandNodeChild *child = LIBMATTI_BR_CommandNode_GetChildren(node); child != NULL;

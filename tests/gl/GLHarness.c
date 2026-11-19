@@ -1,7 +1,8 @@
-// GL binding harness: checks the constant set against the GL specification
-// values, the dlopen availability path (with and without a driver present)
-// and the no-driver fallbacks. No display is needed - every call degrades to
-// the documented fallback value like LWJGL's generated calls.
+
+
+
+
+
 
 #include "libmatti/org/lwjgl/opengl/GL.h"
 #include "libmatti/org/lwjgl/opengl/Constants.h"
@@ -78,7 +79,8 @@ static void test_no_driver_fallbacks(void)
     CHECK(id == 0);
 
     CHECK(LIBMATTI_GL_glGetError() == LIBMATTI_GL_GL_NO_ERROR);
-    CHECK(LIBMATTI_GL_glGetString(7937) == NULL); // GL_RENDERER
+    CHECK(LIBMATTI_GL_glGetString(7937) == NULL);
+
     CHECK(LIBMATTI_GL_glGetInteger(LIBMATTI_GL_GL_MAX_TEXTURE_SIZE) == 0);
     CHECK(LIBMATTI_GL_glGetUniformLocation(1, "projection") == -1);
     CHECK(LIBMATTI_GL_glGetUniformBlockIndex(1, "RenderGlobals") == -1);
@@ -91,7 +93,8 @@ static void test_no_driver_fallbacks(void)
     CHECK(LIBMATTI_GL_glGetShaderInfoLog(1)[0] == '\0');
     CHECK(LIBMATTI_GL_glGetProgramInfoLog(1)[0] == '\0');
 
-    // The description is only available after the game made glGetString calls.
+
+
     CHECK(LIBMATTI_GL_Describe() == NULL);
     LIBMATTI_GL_Unload();
 }
@@ -107,7 +110,7 @@ static void test_load(void)
 
     CHECK(LIBMATTI_GL_IsAvailable() == 1);
 
-    // Java: GL functions without a made-current context crash in the Mesa
+// Java: GL functions without a made-current context crash in the Mesa
     // dispatch stubs (LWJGL documents a current context as required for every
     // GL call), so the harness only verifies that the entry points resolved.
     CHECK(LIBMATTI_GL_Describe() == NULL);

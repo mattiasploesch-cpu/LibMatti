@@ -1,4 +1,5 @@
-// Port of java.util.Comparator<T> and the java.util.Collections helpers.
+
+
 
 #ifndef MATTICRAFT_JAVA_UTIL_COMPARATOR_H
 #define MATTICRAFT_JAVA_UTIL_COMPARATOR_H
@@ -25,7 +26,8 @@ typedef struct
     LIBMATTI_JU_Comparator wrapped;
 } LIBMATTI_JU_ComparatorHolder;
 LIBMATTI_JU_ComparatorHolder *LIBMATTI_JU_Comparator_Reverse(LIBMATTI_JU_Comparator comparator);
-int LIBMATTI_JU_Comparator_ReverseFn(const void *a, const void *b); // holder in a/b
+int LIBMATTI_JU_Comparator_ReverseFn(const void *a, const void *b);
+
 
 // Java: Comparator.nullsFirst / nullsLast (NULL pointers sort first/last)
 LIBMATTI_JU_ComparatorHolder *LIBMATTI_JU_Comparator_NullsFirst(LIBMATTI_JU_Comparator comparator);
@@ -40,4 +42,4 @@ void LIBMATTI_JU_Collections_Reverse(struct LIBMATTI_JU_ArrayList *list);
 // Java: Collections.swap(List<T>, i, j) - exposed because the sorter uses it
 void LIBMATTI_JU_Collections_Swap(struct LIBMATTI_JU_ArrayList *list, size_t i, size_t j);
 
-#endif //MATTICRAFT_JAVA_UTIL_COMPARATOR_H
+#endif

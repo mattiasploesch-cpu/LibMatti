@@ -1,4 +1,5 @@
-// Port of cpw.mods.modlauncher.api.ServiceRunner.
+
+
 
 #include "libmatti/cpw/modlauncher/api/ServiceRunner.h"
 

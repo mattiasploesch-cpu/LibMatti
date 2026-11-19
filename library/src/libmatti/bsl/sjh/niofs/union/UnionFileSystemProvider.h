@@ -1,7 +1,8 @@
-//
-// Created by administrator on 09.09.26.
-//
-// Port of cpw.mods.niofs.union.UnionFileSystemProvider.
+
+
+
+
+
 
 #ifndef MATTICRAFT_UNIONFILESYSTEMPROVIDER_H
 #define MATTICRAFT_UNIONFILESYSTEMPROVIDER_H
@@ -14,7 +15,7 @@
 // Java: class UnionFileSystemProvider extends FileSystemProvider
 typedef struct LIBMATTI_UNION_UnionFileSystemProvider
 {
-    // Java: Map<String, UnionFileSystem> fileSystems
+// Java: Map<String, UnionFileSystem> fileSystems
     char **keys;
     LIBMATTI_UNION_UnionFileSystem **fileSystems;
     size_t count;
@@ -36,4 +37,4 @@ void LIBMATTI_UNION_UnionFileSystemProvider_RemoveFileSystem(LIBMATTI_UNION_Unio
 // Java: getScheme()
 const char *LIBMATTI_UNION_UnionFileSystemProvider_GetScheme(void);
 
-#endif //MATTICRAFT_UNIONFILESYSTEMPROVIDER_H
+#endif

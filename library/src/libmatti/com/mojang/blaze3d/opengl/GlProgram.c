@@ -36,12 +36,12 @@ LIBMATTI_B3D_GlProgram *LIBMATTI_B3D_GlProgram_Link(const LIBMATTI_B3D_GlShaderM
                                                     const LIBMATTI_B3D_VertexFormat *format,
                                                     const char *debugLabel)
 {
-    // Java: int i = GlStateManager.glCreateProgram();
+// Java: int i = GlStateManager.glCreateProgram();
     int programId = (int) LIBMATTI_B3D_GlStateManager_CreateProgram();
     if (programId <= 0)
         return NULL;
 
-    // Java: for every attribute name, _glBindAttribLocation(i, j, s).
+// Java: for every attribute name, _glBindAttribLocation(i, j, s).
     int attributeIndex = 0;
     for (int i = 0; i < LIBMATTI_B3D_VertexFormat_GetElementCount(format); i++)
     {
@@ -56,7 +56,7 @@ LIBMATTI_B3D_GlProgram *LIBMATTI_B3D_GlProgram_Link(const LIBMATTI_B3D_GlShaderM
     LIBMATTI_B3D_GlStateManager_AttachShader(programId, LIBMATTI_B3D_GlShaderModule_GetShaderId(fragmentShader));
     LIBMATTI_B3D_GlStateManager_LinkProgram(programId);
 
-    // Java: int k = glGetProgrami(i, 35714) - GL_LINK_STATUS.
+// Java: int k = glGetProgrami(i, 35714) - GL_LINK_STATUS.
     int linkStatus = LIBMATTI_B3D_GlStateManager_GetProgrami(programId, 35714);
     char infoLog[32768];
     int logLength = 0;
@@ -88,7 +88,7 @@ void LIBMATTI_B3D_GlProgram_SetupUniforms(
         LIBMATTI_B3D_Uniform *uniform = NULL;
         if (uniformKinds[i] == LIBMATTI_B3D_UniformKind_UBO)
         {
-            // Java: GL31.glGetUniformBlockIndex + glUniformBlockBinding.
+// Java: GL31.glGetUniformBlockIndex + glUniformBlockBinding.
             int blockIndex = LIBMATTI_GL_glGetUniformBlockIndex((unsigned int) program->programId, name);
             if (blockIndex != -1)
             {
@@ -98,7 +98,8 @@ void LIBMATTI_B3D_GlProgram_SetupUniforms(
                 uniform = LIBMATTI_B3D_Uniform_Ubo(binding);
             }
         }
-        else // UNIFORM_BUFFER's sibling TEXEL_BUFFER.
+        else
+
         {
             int location = LIBMATTI_B3D_GlStateManager_GetUniformLocation(program->programId, name);
             if (location == -1)
@@ -139,14 +140,14 @@ void LIBMATTI_B3D_GlProgram_SetupUniforms(
         }
     }
 
-    // Java: walk the active uniform blocks and bind the built-in ones.
+// Java: walk the active uniform blocks and bind the built-in ones.
     int blockCount = LIBMATTI_B3D_GlStateManager_GetProgrami(program->programId, 35382);
     for (int i = 0; i < blockCount; i++)
     {
         char blockName[256];
         unsigned int index = (unsigned int) i;
         (void) index;
-        // Java: GL31.glGetActiveUniformBlockName; the port keeps the name in the
+// Java: GL31.glGetActiveUniformBlockName; the port keeps the name in the
         // uniformsByName check below through the entry list scan.
         LIBMATTI_GL_glGetActiveUniformBlockName((unsigned int) program->programId, index, blockName);
         if (LIBMATTI_B3D_GlProgram_GetUniform(program, blockName) != NULL)
@@ -190,7 +191,7 @@ void LIBMATTI_B3D_GlProgram_SetupUniforms(
 
 LIBMATTI_B3D_Uniform *LIBMATTI_B3D_GlProgram_GetUniform(const LIBMATTI_B3D_GlProgram *program, const char *name)
 {
-    // Java: RenderSystem.assertOnRenderThread() inside getUniform.
+// Java: RenderSystem.assertOnRenderThread() inside getUniform.
     LIBMATTI_B3D_RenderSystem_AssertOnRenderThread();
     for (LIBMATTI_B3D_GlProgramUniformEntry *entry = program->uniforms; entry != NULL; entry = entry->next)
     {
@@ -209,7 +210,7 @@ void LIBMATTI_B3D_GlProgram_Free(LIBMATTI_B3D_GlProgram *program)
 {
     if (program == NULL || program == &invalidProgram)
         return;
-    // Java: public void close() - uniforms close, then delete the program.
+// Java: public void close() - uniforms close, then delete the program.
     LIBMATTI_B3D_GlProgramUniformEntry *entry = program->uniforms;
     while (entry != NULL)
     {

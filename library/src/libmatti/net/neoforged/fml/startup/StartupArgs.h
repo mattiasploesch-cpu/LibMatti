@@ -20,10 +20,10 @@ typedef struct
     size_t claimedFileCount;
     char **unclaimedClassPathEntries;
     size_t unclaimedClassPathEntryCount;
-    // Java: @Nullable ClassLoader parentClassLoader (the ported java.lang.ClassLoader)
+// Java: @Nullable ClassLoader parentClassLoader (the ported java.lang.ClassLoader)
     void *parentClassLoader;
 } LIBMATTI_FML_StartupArgs;
 
 void LIBMATTI_FML_StartupArgs_Free(LIBMATTI_FML_StartupArgs *startupArgs);
 
-#endif //MATTICRAFT_FML_STARTUPARGS_H
+#endif

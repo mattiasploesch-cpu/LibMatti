@@ -1,4 +1,5 @@
-// Port of cpw.mods.modlauncher.api.ITransformerActivity.
+
+
 
 #ifndef MATTICRAFT_MODLAUNCHER_ITRANSFORMERACTIVITY_H
 #define MATTICRAFT_MODLAUNCHER_ITRANSFORMERACTIVITY_H
@@ -36,4 +37,4 @@ LIBMATTI_MLA_ITransformerActivity_Type LIBMATTI_MLA_ITransformerActivity_GetType
 // Java: String getActivityString(); caller frees
 char *LIBMATTI_MLA_ITransformerActivity_GetActivityString(const LIBMATTI_MLA_ITransformerActivity *activity);
 
-#endif //MATTICRAFT_MODLAUNCHER_ITRANSFORMERACTIVITY_H
+#endif

@@ -1,4 +1,5 @@
-// Port of com.mojang.brigadier.context.ParsedArgument and ParsedCommandNode.
+
+
 
 #ifndef MATTICRAFT_BR_CONTEXT_PARSEDARGUMENT_H
 #define MATTICRAFT_BR_CONTEXT_PARSEDARGUMENT_H

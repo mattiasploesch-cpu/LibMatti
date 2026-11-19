@@ -1,6 +1,7 @@
-// Port of net.neoforged.bus.SubscribeEventListener.
-// Java creates the handler through EventListenerFactory (an ASM hidden class) and reads the
-// @SubscribeEvent values from the Method; the C port takes the handler and the values directly.
+
+
+
+
 
 #ifndef MATTICRAFT_BUS_SUBSCRIBEEVENTLISTENER_H
 #define MATTICRAFT_BUS_SUBSCRIBEEVENTLISTENER_H
@@ -13,13 +14,13 @@ typedef struct LIBMATTI_BUS_SubscribeEventListener LIBMATTI_BUS_SubscribeEventLi
 
 struct LIBMATTI_BUS_SubscribeEventListener
 {
-    // Java: extends EventListener
+// Java: extends EventListener
     LIBMATTI_BUS_EventListener base;
-    // Java: private final EventListener handler;
+// Java: private final EventListener handler;
     LIBMATTI_BUS_EventListener *handler;
-    // Java: private final SubscribeEvent subInfo;
+// Java: private final SubscribeEvent subInfo;
     LIBMATTI_BUS_SubscribeEvent subInfo;
-    // Java: private final String readable;
+// Java: private final String readable;
     char *readable;
 };
 
@@ -38,4 +39,4 @@ LIBMATTI_BUS_EventPriority LIBMATTI_BUS_SubscribeEventListener_GetPriority(
 
 void LIBMATTI_BUS_SubscribeEventListener_Free(LIBMATTI_BUS_SubscribeEventListener *listener);
 
-#endif //MATTICRAFT_BUS_SUBSCRIBEEVENTLISTENER_H
+#endif

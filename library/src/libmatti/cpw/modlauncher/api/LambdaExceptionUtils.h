@@ -1,7 +1,8 @@
-// Port of cpw.mods.modlauncher.api.LambdaExceptionUtils.
-// Java wraps lambdas that throw so an unchecked throw can escape a stream
-// pipeline. C has no checked exceptions and no lambdas: the callback is the
-// exception-carrying interface, and the wrappers are the identity.
+
+
+
+
+
 
 #ifndef MATTICRAFT_MODLAUNCHER_LAMBDAEXCEPTIONUTILS_H
 #define MATTICRAFT_MODLAUNCHER_LAMBDAEXCEPTIONUTILS_H
@@ -70,4 +71,4 @@ void *LIBMATTI_MLA_LambdaExceptionUtils_UncheckFunction(LIBMATTI_MLA_Function_Wi
 // Java: throwAsUnchecked(Exception) - cannot be expressed in C; documented only:
 //       a callback reports failure through its own contract (return value).
 
-#endif //MATTICRAFT_MODLAUNCHER_LAMBDAEXCEPTIONUTILS_H
+#endif

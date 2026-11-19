@@ -60,7 +60,7 @@ LIBMATTI_JL_Thread *LIBMATTI_JL_Thread_CurrentThread(void)
     if (thread != NULL) return thread;
 
     thread = LIBMATTI_JL_Thread_New("main");
-    // Java: the initial context class loader of the main thread is the system class loader
+// Java: the initial context class loader of the main thread is the system class loader
     thread->contextClassLoader = LIBMATTI_JL_ClassLoader_GetSystemClassLoader();
     pthread_setspecific(currentThreadKey, thread);
     return thread;

@@ -1,4 +1,5 @@
-// Port of net.minecraft.client.renderer.chunk.SectionBuffers (implementation).
+
+
 
 #include "libmatti/net/minecraft/client/renderer/chunk/SectionBuffers.h"
 
@@ -25,7 +26,7 @@ void LIBMATTI_MC_SectionBuffers_Free(LIBMATTI_MC_SectionBuffers *buffers)
 {
     if (buffers == NULL)
         return;
-    // Java: this.vertexBuffer.close(); if (this.indexBuffer != null) ...
+// Java: this.vertexBuffer.close(); if (this.indexBuffer != null) ...
     if (buffers->vertexBuffer != NULL)
         LIBMATTI_B3D_GpuBuffer_Free(buffers->vertexBuffer);
     if (buffers->indexBuffer != NULL)

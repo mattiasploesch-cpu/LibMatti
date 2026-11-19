@@ -27,4 +27,4 @@ void *LIBMATTI_FML_FMLMixinService_GetMixinTransformer(void);
 // Java: public void setBytecodeProvider(@Nullable IClassBytecodeProvider bytecodeProvider)
 void LIBMATTI_FML_FMLMixinService_SetBytecodeProvider(void *provider);
 
-#endif //MATTICRAFT_FML_LOADING_MIXIN_FMLMIXINSERVICE_H
+#endif

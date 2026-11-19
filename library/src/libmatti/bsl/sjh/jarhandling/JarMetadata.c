@@ -1,6 +1,7 @@
-//
-// Created by administrator on 09.09.26.
-//
+
+
+
+
 
 #include "JarMetadata.h"
 
@@ -38,7 +39,7 @@ static long find_dash_version(const char *s, size_t *runLength)
 
 static char *remove_dash_versions(const char *fn)
 {
-    // Java: mat.replaceAll("") - removes every "-" followed by [.\\d]+
+// Java: mat.replaceAll("") - removes every "-" followed by [.\\d]+
     size_t len = strlen(fn);
     char *out = malloc(len + 1);
     size_t o = 0;
@@ -252,7 +253,8 @@ static char *safe_parse_version(const char *ver, const char *filename)
 
 LIBMATTI_JH_NameAndVersion *LIBMATTI_JH_JarMetadata_ComputeNameAndVersion(const char *path)
 {
-    // detect Maven-like paths: .../artifact/version/artifact-version.jar
+
+
     char *copy = strdup(path);
     char *segments[64];
     size_t segmentCount = 0;
@@ -270,7 +272,7 @@ LIBMATTI_JH_NameAndVersion *LIBMATTI_JH_JarMetadata_ComputeNameAndVersion(const 
         size_t artifactLength = strlen(artifactNameMaybe);
         size_t versionLength = strlen(versionMaybe);
 
-        // Java: filename.startsWith(artifactNameMaybe + "-" + versionMaybe)
+// Java: filename.startsWith(artifactNameMaybe + "-" + versionMaybe)
         size_t filenameLength = strlen(filename);
         if (filenameLength >= artifactLength + 1 + versionLength &&
             strncmp(filename, artifactNameMaybe, artifactLength) == 0 &&
@@ -280,7 +282,7 @@ LIBMATTI_JH_NameAndVersion *LIBMATTI_JH_JarMetadata_ComputeNameAndVersion(const 
             size_t moduleVersionStart;
             if (find_module_version(versionMaybe, &moduleVersionStart))
             {
-                // Java: potential = ver.substring(mat.start())
+// Java: potential = ver.substring(mat.start())
                 char *potential = strdup(versionMaybe + moduleVersionStart);
                 char *version = safe_parse_version(potential, filename);
                 free(potential);
@@ -310,13 +312,15 @@ LIBMATTI_JH_NameAndVersion *LIBMATTI_JH_JarMetadata_ComputeNameAndVersion(const 
     }
     free(copy);
 
-    // fallback parsing
+
+
     const char *lastSlash = strrchr(path, '/');
     const char *filename = lastSlash != NULL ? lastSlash + 1 : path;
 
     char *fn = strdup(filename);
     char *lastDot = strrchr(fn, '.');
-    if (lastDot != NULL && lastDot != fn) *lastDot = '\0'; // strip extension
+    if (lastDot != NULL && lastDot != fn) *lastDot = '\0';
+
 
     size_t runLength;
     long dash = find_dash_version(fn, &runLength);
@@ -333,7 +337,7 @@ LIBMATTI_JH_NameAndVersion *LIBMATTI_JH_JarMetadata_ComputeNameAndVersion(const 
             return NULL;
         }
 
-        // Java: name = mat.replaceAll("")
+// Java: name = mat.replaceAll("")
         char *nameWithoutVersion = remove_dash_versions(fn);
         char *name = clean_module_name(nameWithoutVersion);
         free(nameWithoutVersion);
@@ -365,7 +369,7 @@ LIBMATTI_JH_JarMetadata *LIBMATTI_JH_JarMetadata_From(LIBMATTI_JH_JarContents *c
     if (LIBMATTI_JH_JarContents_FindFile(contents, "module-info.class", &moduleInfo))
     {
         LIBMATTI_JN_URI_Free(moduleInfo);
-        // Java: new ModuleJarMetadata(() -> contents.getFileBytes("module-info.class"), targets)
+// Java: new ModuleJarMetadata(() -> contents.getFileBytes("module-info.class"), targets)
         size_t descriptorByteCount = 0;
         unsigned char *descriptorBytes =
             LIBMATTI_JH_JarContents_OpenFile(contents, "module-info.class", &descriptorByteCount);
@@ -386,13 +390,14 @@ LIBMATTI_JH_JarMetadata *LIBMATTI_JH_JarMetadata_From(LIBMATTI_JH_JarContents *c
     LIBMATTI_JH_NameAndVersion *nav = LIBMATTI_JH_JarMetadata_ComputeNameAndVersion(primaryPath);
     if (nav == NULL) return NULL;
 
-    // take ownership of the name/version strings from the record
+
+
     char *name = nav->name;
     char *version = nav->version;
     nav->name = NULL;
     nav->version = NULL;
 
-    // Java: manifest Automatic-Module-Name overrides the derived name
+// Java: manifest Automatic-Module-Name overrides the derived name
     const char *automaticModuleName = LIBMATTI_JU_Manifest_GetMainValue(LIBMATTI_JH_JarContents_GetManifest(contents), "Automatic-Module-Name");
     if (automaticModuleName != NULL)
     {

@@ -1,7 +1,8 @@
-// Port of net.minecraft.client.player.{ClientInput,KeyboardInput,LocalPlayer}
-// (implementation). The KeyboardInput.tick() body reads the Options KeyMappings
-// into the Input record and normalises the move vector - 1:1 over the port's
-// KeyMapping statics.
+
+
+
+
+
 
 #include "libmatti/net/minecraft/client/player/LocalPlayer.h"
 
@@ -33,13 +34,13 @@ LIBMATTI_MC_LocalPlayer *LIBMATTI_MC_LocalPlayer_New(struct LIBMATTI_MC_Level *l
     LIBMATTI_MC_LocalPlayer *localPlayer = calloc(1, sizeof(LIBMATTI_MC_LocalPlayer));
     if (localPlayer == NULL)
         return NULL;
-    // Java: super(client, level, connection, stats, recipeBook) - the Player
+// Java: super(client, level, connection, stats, recipeBook) - the Player
     // ctor tail runs over the embedded struct (abilities/food defaults, the
     // base entity init)
     LIBMATTI_MC_Player_Init(&localPlayer->player, level, name);
     if (uuid != NULL)
         LIBMATTI_MC_Entity_SetUUID(&localPlayer->player.base.base, *uuid);
-    // Java: this.keyPresses = Input.EMPTY (the ClientInput field initializer)
+// Java: this.keyPresses = Input.EMPTY (the ClientInput field initializer)
     input_reset(&localPlayer->keyPresses);
     localPlayer->moveVector = LIBMATTI_MC_Vec2_Zero();
     return localPlayer;
@@ -59,7 +60,7 @@ void LIBMATTI_MC_LocalPlayer_TickInput(LIBMATTI_MC_LocalPlayer *localPlayer)
 {
     if (localPlayer == NULL)
         return;
-    // Java: this.keyPresses = new Input(options.keyUp.isDown(), keyDown, keyLeft,
+// Java: this.keyPresses = new Input(options.keyUp.isDown(), keyDown, keyLeft,
     //       keyRight, keyJump, keyShift, keySprint)
     localPlayer->keyPresses.forward = LIBMATTI_MC_KeyMapping_IsDown(LIBMATTI_MC_KeyMapping_Forward());
     localPlayer->keyPresses.backward = LIBMATTI_MC_KeyMapping_IsDown(LIBMATTI_MC_KeyMapping_Back());
@@ -69,11 +70,11 @@ void LIBMATTI_MC_LocalPlayer_TickInput(LIBMATTI_MC_LocalPlayer *localPlayer)
     localPlayer->keyPresses.shift = LIBMATTI_MC_KeyMapping_IsDown(LIBMATTI_MC_KeyMapping_Shift());
     localPlayer->keyPresses.sprint = LIBMATTI_MC_KeyMapping_IsDown(LIBMATTI_MC_KeyMapping_Sprint());
 
-    // Java: float f = calculateImpulse(keyPresses.forward(), keyPresses.backward())
+// Java: float f = calculateImpulse(keyPresses.forward(), keyPresses.backward())
     float f = calculate_impulse(localPlayer->keyPresses.forward, localPlayer->keyPresses.backward);
-    // Java: float f1 = calculateImpulse(keyPresses.left(), keyPresses.right())
+// Java: float f1 = calculateImpulse(keyPresses.left(), keyPresses.right())
     float f1 = calculate_impulse(localPlayer->keyPresses.left, localPlayer->keyPresses.right);
-    // Java: this.moveVector = new Vec2(f1, f).normalized()
+// Java: this.moveVector = new Vec2(f1, f).normalized()
     localPlayer->moveVector = LIBMATTI_MC_Vec2_Normalized(LIBMATTI_MC_Vec2_Of(f1, f));
 }
 

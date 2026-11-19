@@ -1,9 +1,10 @@
-// Port of net.minecraft.core.registries.BuiltInRegistries.
-// Java declares one Registry/DefaultedRegistry static per registry, created through
-// registerSimple/registerDefaulted and registered into the WRITABLE_REGISTRY; the C port
-// builds the same objects lazily on first access (no static initialisation order in C) and
-// keeps every registry in the root registry, exactly like Java. The bootstrap callbacks run
-// through bootStrap() - the contents themselves are the game port's part.
+
+
+
+
+
+
+
 
 #ifndef MATTICRAFT_NET_MINECRAFT_CORE_REGISTRIES_BUILTINREGISTRIES_H
 #define MATTICRAFT_NET_MINECRAFT_CORE_REGISTRIES_BUILTINREGISTRIES_H
@@ -125,4 +126,4 @@ LIBMATTI_MC_Identifier **LIBMATTI_MC_BuiltInRegistries_GetVanillaRegistrationOrd
 // Java: public static void bootStrap() - createContents(), freeze(), validate(REGISTRY)
 void LIBMATTI_MC_BuiltInRegistries_BootStrap(void);
 
-#endif //MATTICRAFT_NET_MINECRAFT_CORE_REGISTRIES_BUILTINREGISTRIES_H
+#endif

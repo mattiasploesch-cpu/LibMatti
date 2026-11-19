@@ -1,4 +1,5 @@
-// Port of net.minecraft.nbt.NbtAccounter.
+
+
 
 #include "libmatti/net/minecraft/nbt/NbtAccounter.h"
 

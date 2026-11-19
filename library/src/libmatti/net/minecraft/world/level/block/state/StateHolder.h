@@ -1,7 +1,8 @@
-// Port of net.minecraft.world.level.block.state.StateHolder (one state in the block's
-// state table). Java keys the values map by property identity; the C port does the same
-// with a pointer array ordered like the definition's property list, so the neighbours
-// table is a flat array of state pointers per property.
+
+
+
+
+
 
 #ifndef MATTICRAFT_MC_BLOCKSTATE_STATEHOLDER_H
 #define MATTICRAFT_MC_BLOCKSTATE_STATEHOLDER_H
@@ -16,13 +17,13 @@ extern "C" {
 // BlockState (the S) with the owner back-link
 typedef struct LIBMATTI_MC_StateHolder
 {
-    // Java: protected final O owner - the Block
+// Java: protected final O owner - the Block
     void *owner;
-    // Java: private final Reference2ObjectArrayMap<Property<?>, Comparable<?>> values
+// Java: private final Reference2ObjectArrayMap<Property<?>, Comparable<?>> values
     LIBMATTI_MC_Property **properties;
     LIBMATTI_MC_Property_Value *values;
     int valueCount;
-    // Java: private Map<Property<?>, S[]> neighbours - populated by populateNeighbours;
+// Java: private Map<Property<?>, S[]> neighbours - populated by populateNeighbours;
     // neighbourIndex[property][valueIndex] -> the state with that property changed
     struct LIBMATTI_MC_StateHolder ***neighbours;
 } LIBMATTI_MC_StateHolder;
@@ -69,4 +70,4 @@ void LIBMATTI_MC_StateHolder_ToString(const LIBMATTI_MC_StateHolder *state, char
 }
 #endif
 
-#endif //MATTICRAFT_MC_BLOCKSTATE_STATEHOLDER_H
+#endif

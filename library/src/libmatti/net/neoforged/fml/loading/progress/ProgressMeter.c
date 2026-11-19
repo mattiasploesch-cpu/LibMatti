@@ -10,7 +10,7 @@ struct LIBMATTI_FML_ProgressMeter
 {
     char *name;
     int steps;
-    // Java: AtomicInteger current
+// Java: AtomicInteger current
     int current;
     LIBMATTI_FML_Message *label;
 };

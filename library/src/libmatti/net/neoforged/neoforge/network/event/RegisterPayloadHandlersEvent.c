@@ -1,4 +1,5 @@
-// Port of net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent.
+
+
 
 #include "libmatti/net/neoforged/neoforge/network/event/RegisterPayloadHandlersEvent.h"
 

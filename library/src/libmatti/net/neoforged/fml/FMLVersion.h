@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.FMLVersion.
+
+
 
 #ifndef MATTICRAFT_FML_FMLVERSION_H
 #define MATTICRAFT_FML_FMLVERSION_H
@@ -12,4 +13,4 @@ typedef struct LIBMATTI_FML_FMLVersion
 // Java: public static String getVersion()
 const char *LIBMATTI_FML_FMLVersion_GetVersion(void);
 
-#endif //MATTICRAFT_FML_FMLVERSION_H
+#endif

@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.loading.modscan.ModAnnotationVisitor.
+
+
 
 #include "libmatti/net/neoforged/fml/loading/modscan/ModAnnotationVisitor.h"
 

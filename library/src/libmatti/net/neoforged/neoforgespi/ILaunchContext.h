@@ -1,4 +1,5 @@
-// Port of net.neoforged.neoforgespi.ILaunchContext.
+
+
 
 #ifndef MATTICRAFT_NEOFORGESPI_ILAUNCHCONTEXT_H
 #define MATTICRAFT_NEOFORGESPI_ILAUNCHCONTEXT_H
@@ -17,17 +18,17 @@ struct LIBMATTI_NEOFORGESPI_ILaunchContext
 {
     void *self;
 
-    // Java: Dist getRequiredDistribution()
+// Java: Dist getRequiredDistribution()
     LIBMATTI_DIST_Dist (*getRequiredDistribution)(void *self);
-    // Java: Path gameDirectory()
+// Java: Path gameDirectory()
     const char *(*gameDirectory)(void *self);
-    // Java: <T> Stream<ServiceLoader.Provider<T>> loadServices(Class<T> serviceClass)
+// Java: <T> Stream<ServiceLoader.Provider<T>> loadServices(Class<T> serviceClass)
     LIBMATTI_JU_ServiceLoader *(*loadServices)(void *self, const char *serviceClass);
-    // Java: boolean isLocated(Path path)
+// Java: boolean isLocated(Path path)
     int (*isLocated)(void *self, const char *path);
-    // Java: boolean addLocated(Path path)
+// Java: boolean addLocated(Path path)
     int (*addLocated)(void *self, const char *path);
-    // Java: VersionInfo getVersions()
+// Java: VersionInfo getVersions()
     LIBMATTI_FML_VersionInfo *(*getVersions)(void *self);
 };
 
@@ -47,4 +48,4 @@ int LIBMATTI_NEOFORGESPI_ILaunchContext_AddLocated(const LIBMATTI_NEOFORGESPI_IL
 LIBMATTI_FML_VersionInfo *LIBMATTI_NEOFORGESPI_ILaunchContext_GetVersions(
     const LIBMATTI_NEOFORGESPI_ILaunchContext *context);
 
-#endif //MATTICRAFT_NEOFORGESPI_ILAUNCHCONTEXT_H
+#endif

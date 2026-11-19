@@ -1,6 +1,7 @@
-// Port of org.objectweb.asm.ClassReader.
-// Java accepts into a ClassVisitor; ModLauncher (and therefore this port) only
-// ever accepts into a ClassNode, so the C port accepts a ClassNode directly.
+
+
+
+
 
 #ifndef MATTICRAFT_ASM_CLASSREADER_H
 #define MATTICRAFT_ASM_CLASSREADER_H
@@ -24,4 +25,4 @@ void LIBMATTI_ASM_ClassReader_Free(LIBMATTI_ASM_ClassReader *reader);
 // Java: public void accept(ClassVisitor classVisitor, int parsingOptions)
 void LIBMATTI_ASM_ClassReader_Accept(LIBMATTI_ASM_ClassReader *reader, LIBMATTI_ASMT_ClassNode *node);
 
-#endif //MATTICRAFT_ASM_CLASSREADER_H
+#endif

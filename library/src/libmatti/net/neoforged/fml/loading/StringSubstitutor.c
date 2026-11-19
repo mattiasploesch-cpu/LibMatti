@@ -8,20 +8,20 @@
 // Java: private static StrLookup<String> getStringLookup(ModFile file)
 static char *lookup(const char *key, LIBMATTI_FML_ModFile *file)
 {
-    // Java: String[] parts = key.split("\\."); if (parts.length == 1) return key;
+// Java: String[] parts = key.split("\\."); if (parts.length == 1) return key;
     const char *dot = strchr(key, '.');
     if (dot == NULL)
         return strdup(key);
 
-    // Java: String pfx = parts[0];
+// Java: String pfx = parts[0];
     size_t pfxLength = (size_t) (dot - key);
     if (pfxLength == 4 && strncmp(key, "file", 4) == 0 && file != NULL)
     {
-        // Java: return String.valueOf(file.getSubstitutionMap().get().get(parts[1]));
+// Java: return String.valueOf(file.getSubstitutionMap().get().get(parts[1]));
         char *name = strndup(key + 5, strcspn(key + 5, "."));
         const char *value = LIBMATTI_FML_ModFile_GetSubstitutionValue(file, name);
         free(name);
-        // Java: String.valueOf(null) is the literal "null"
+// Java: String.valueOf(null) is the literal "null"
         return strdup(value != NULL ? value : "null");
     }
 

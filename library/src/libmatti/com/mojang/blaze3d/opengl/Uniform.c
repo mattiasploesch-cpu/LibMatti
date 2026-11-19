@@ -36,7 +36,7 @@ void LIBMATTI_B3D_Uniform_Free(LIBMATTI_B3D_Uniform *uniform)
 {
     if (uniform == NULL)
         return;
-    // Java: the Utb close() deletes the bound texture when set.
+// Java: the Utb close() deletes the bound texture when set.
     if (uniform->kind == LIBMATTI_B3D_UniformKind_UTB && uniform->utb.texture != 0)
         LIBMATTI_B3D_GlStateManager_DeleteTexture(uniform->utb.texture);
     free(uniform);

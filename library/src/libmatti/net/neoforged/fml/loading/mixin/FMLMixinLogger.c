@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.loading.mixin.FMLMixinLogger.
+
+
 
 #include "libmatti/net/neoforged/fml/loading/mixin/FMLMixinLogger.h"
 
@@ -10,9 +11,9 @@
 
 typedef struct
 {
-    // Java: private final Logger logger
+// Java: private final Logger logger
     LIBMATTI_ML_Logger *logger;
-    // Java: the logger name is the ILogger id
+// Java: the logger name is the ILogger id
     char *name;
 } FMLMixinLogger;
 
@@ -39,7 +40,7 @@ static const char *get_id(void *self)
 static const char *get_type(void *self)
 {
     (void) self;
-    // Java: return "Log4j2 (via FML)";
+// Java: return "Log4j2 (via FML)";
     return "Log4j2 (via FML)";
 }
 
@@ -70,7 +71,7 @@ static LIBMATTI_JL_Throwable *throwing(void *self, LIBMATTI_JL_Throwable *t)
 // Java: public FMLMixinLogger(String name)
 LIBMATTI_SP_ILogger *LIBMATTI_FML_FMLMixinLogger_Instance(const char *name)
 {
-    // Java: the loggers map caches by name (FMLMixinService.loggers)
+// Java: the loggers map caches by name (FMLMixinService.loggers)
     static struct
     {
         char *name;

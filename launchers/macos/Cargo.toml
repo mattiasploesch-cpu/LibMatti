@@ -1,0 +1,15 @@
+[package]
+name = "launcher-macos"
+description = "Matticraft launcher app bundle for macOS"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[[bin]]
+name = "matticraft-launcher-macos"
+path = "src/main.rs"
+
+[dependencies]
+launcher-core.workspace = true
+launcher-desktop = { path = "../desktop" }

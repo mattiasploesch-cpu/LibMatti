@@ -23,9 +23,12 @@ typedef enum
 typedef struct
 {
     LIBMATTI_AT_TargetKind kind;
-    char *className;   // internal name (slashes), owned
-    char *memberName;  // field/method name or NULL for class targets, owned
-    char *descriptor;  // method descriptor or NULL, owned
+    char *className;
+
+    char *memberName;
+
+    char *descriptor;
+
 } LIBMATTI_AT_Target;
 
 // Java: new Target.ClassTarget(className) - className in dot form, stored internal
@@ -38,6 +41,7 @@ void LIBMATTI_AT_Target_Free(LIBMATTI_AT_Target *target);
 
 // Java: the map key the AccessTransformerList uses
 // class targets: internal class name; fields: name; methods: name+descriptor
-char *LIBMATTI_AT_Target_ToString(const LIBMATTI_AT_Target *target); // caller frees
+char *LIBMATTI_AT_Target_ToString(const LIBMATTI_AT_Target *target);
 
-#endif //MATTICRAFT_AT_TARGET_H
+
+#endif

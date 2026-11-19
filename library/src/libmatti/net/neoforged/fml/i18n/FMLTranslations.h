@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.i18n.FMLTranslations.
+
+
 
 #ifndef MATTICRAFT_FML_FMLTRANSLATIONS_H
 #define MATTICRAFT_FML_FMLTRANSLATIONS_H
@@ -47,4 +48,4 @@ void LIBMATTI_FML_FMLTranslations_FormatOrNull(LIBMATTI_JL_StringBuilder *string
 void LIBMATTI_FML_FMLTranslations_FormatOptional(LIBMATTI_JL_StringBuilder *stringBuffer, const char *value,
                                                  const char *args);
 
-#endif //MATTICRAFT_FML_FMLTRANSLATIONS_H
+#endif

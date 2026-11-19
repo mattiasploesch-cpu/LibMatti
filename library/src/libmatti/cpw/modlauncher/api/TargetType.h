@@ -1,4 +1,5 @@
-// Port of cpw.mods.modlauncher.api.TargetType.
+
+
 
 #ifndef MATTICRAFT_MODLAUNCHER_TARGETTYPE_H
 #define MATTICRAFT_MODLAUNCHER_TARGETTYPE_H
@@ -28,4 +29,4 @@ const LIBMATTI_MLA_TargetType *LIBMATTI_MLA_TargetType_ByName(const char *name);
 // Java: Class<T> getNodeType()
 const char *LIBMATTI_MLA_TargetType_GetNodeType(const LIBMATTI_MLA_TargetType *type);
 
-#endif //MATTICRAFT_MODLAUNCHER_TARGETTYPE_H
+#endif

@@ -1,4 +1,5 @@
-// Port of java.util.UUID (implementation).
+
+
 
 #include "libmatti/java/util/UUID.h"
 
@@ -37,7 +38,8 @@ static void md5(const uint8_t *data, size_t length, uint8_t digest[16])
 
     uint32_t h0 = 0x67452301, h1 = 0xefcdab89, h2 = 0x98badcfe, h3 = 0x10325476;
 
-    // one-shot: the port pads to a single message (lengths stay small)
+
+
     size_t total = ((length + 8) / 64 + 1) * 64;
     uint8_t *msg = calloc(total, 1);
     if (msg == NULL)
@@ -106,10 +108,14 @@ LIBMATTI_JU_UUID LIBMATTI_JU_UUID_NameUUIDFromBytes(const uint8_t *bytes, size_t
     uint64_t most = 0, least = 0;
     memcpy(&most, digest, 8);
     memcpy(&least, digest + 8, 8);
-    most &= 0xFFFFFFFFFFFF0FFFULL; // clear the version nibble
-    most |= 0x0000000000003000ULL; // version 3
-    least &= 0x3FFFFFFFFFFFFFFFULL; // clear the variant bits
-    least |= 0x8000000000000000ULL; // IETF variant
+    most &= 0xFFFFFFFFFFFF0FFFULL;
+
+    most |= 0x0000000000003000ULL;
+
+    least &= 0x3FFFFFFFFFFFFFFFULL;
+
+    least |= 0x8000000000000000ULL;
+
     return LIBMATTI_JU_UUID_FromBits(most, least);
 }
 
@@ -124,7 +130,8 @@ LIBMATTI_JU_UUID LIBMATTI_JU_UUID_RandomUUID(void)
     uint64_t most = (uint64_t) LIBMATTI_JU_Random_NextLong(rng);
     uint64_t least = (uint64_t) LIBMATTI_JU_Random_NextLong(rng);
     most &= 0xFFFFFFFFFFFF0FFFULL;
-    most |= 0x0000000000004000ULL; // version 4
+    most |= 0x0000000000004000ULL;
+
     least &= 0x3FFFFFFFFFFFFFFFULL;
     least |= 0x8000000000000000ULL;
     uuid.mostSigBits = most;
@@ -139,21 +146,25 @@ LIBMATTI_JU_UUID LIBMATTI_JU_UUID_Zero(void)
 
 int LIBMATTI_JU_UUID_Version(const LIBMATTI_JU_UUID *uuid)
 {
-    // Java: (int)((mostSigBits >> 12) & 0x0f)
+// Java: (int)((mostSigBits >> 12) & 0x0f)
     return (int) ((uuid->mostSigBits >> 12) & 0x0fULL);
 }
 
 int LIBMATTI_JU_UUID_Variant(const LIBMATTI_JU_UUID *uuid)
 {
-    // Java: the variant table over the top bits of leastSigBits
+// Java: the variant table over the top bits of leastSigBits
     uint64_t least = uuid->leastSigBits;
     if ((least & 0x8000000000000000ULL) == 0)
-        return 0; // NCS backward compatibility
+        return 0;
+
     if ((least & 0x4000000000000000ULL) == 0)
-        return 2; // IETF RFC 4122
+        return 2;
+
     if ((least & 0x2000000000000000ULL) == 0)
-        return 6; // Microsoft
-    return 7;     // reserved
+        return 6;
+
+    return 7;
+
 }
 
 uint64_t LIBMATTI_JU_UUID_GetMostSignificantBits(const LIBMATTI_JU_UUID *uuid)
@@ -176,7 +187,7 @@ uint64_t LIBMATTI_JU_UUID_Timestamp(const LIBMATTI_JU_UUID *uuid)
 
 int LIBMATTI_JU_UUID_ClockSequence(const LIBMATTI_JU_UUID *uuid)
 {
-    // Java: (int)((leastSigBits & 0x3FFF000000000000L) >>> 48)
+// Java: (int)((leastSigBits & 0x3FFF000000000000L) >>> 48)
     return (int) ((uuid->leastSigBits & 0x3FFF000000000000ULL) >> 48);
 }
 
@@ -234,7 +245,7 @@ bool LIBMATTI_JU_UUID_FromString(const char *input, LIBMATTI_JU_UUID *out)
         char ch = *p;
         if (ch == '-')
         {
-            // Java: the parse uses Long.parseLong(group, 16) - a short group is
+// Java: the parse uses Long.parseLong(group, 16) - a short group is
             // right-padded semantics through parseLong, so digits count must match
             if (pos != lengths[group] || group >= 4)
                 return false;

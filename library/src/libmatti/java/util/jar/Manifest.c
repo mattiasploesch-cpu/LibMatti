@@ -1,6 +1,7 @@
-//
-// Created by administrator on 09.09.26.
-//
+
+
+
+
 
 #include "Manifest.h"
 
@@ -88,7 +89,8 @@ LIBMATTI_JU_Manifest *LIBMATTI_JU_Manifest_Parse(const char *bytes, size_t lengt
     LIBMATTI_JU_Manifest *manifest = calloc(1, sizeof(LIBMATTI_JU_Manifest));
     if (manifest == NULL) return NULL;
 
-    // Split into lines (handle \r\n, \n and \r)
+
+
     char *copy = malloc(length + 1);
     memcpy(copy, bytes, length);
     copy[length] = '\0';
@@ -110,7 +112,7 @@ LIBMATTI_JU_Manifest *LIBMATTI_JU_Manifest_Parse(const char *bytes, size_t lengt
     }
     free(copy);
 
-    // Java: java.util.jar.Attributes.read - "Name: " starts a new section,
+// Java: java.util.jar.Attributes.read - "Name: " starts a new section,
     // lines starting with a space are continuations of the previous value
     LIBMATTI_JU_Attributes *current = &manifest->mainAttributes;
     int inSection = 0;
@@ -121,7 +123,8 @@ LIBMATTI_JU_Manifest *LIBMATTI_JU_Manifest_Parse(const char *bytes, size_t lengt
 
         if (l[0] == ' ')
         {
-            // Continuation line: append to the previous value
+
+
             const char *content = l + 1;
             if (current->count > 0)
             {
@@ -139,7 +142,8 @@ LIBMATTI_JU_Manifest *LIBMATTI_JU_Manifest_Parse(const char *bytes, size_t lengt
 
         if (l[0] == '\0')
         {
-            // Blank line: end of the current section, next section starts after
+
+
             inSection = 0;
             continue;
         }
@@ -149,13 +153,14 @@ LIBMATTI_JU_Manifest *LIBMATTI_JU_Manifest_Parse(const char *bytes, size_t lengt
 
         size_t keyLen = (size_t)(colon - l);
         const char *value = colon + 1;
-        if (value[0] == ' ') value++; // strip the single space after the colon
+        if (value[0] == ' ') value++;
+
 
         char *key = malloc(keyLen + 1);
         memcpy(key, l, keyLen);
         key[keyLen] = '\0';
 
-        // Java: !in && line.startsWith("Name: ") starts a new section
+// Java: !in && line.startsWith("Name: ") starts a new section
         if (!inSection && strcmp(key, "Name") == 0)
         {
             manifest->sections = realloc(manifest->sections, sizeof(LIBMATTI_JU_ManifestSection) * (manifest->sectionCount + 1));

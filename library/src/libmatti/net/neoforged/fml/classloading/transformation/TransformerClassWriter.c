@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.classloading.transformation.TransformerClassWriter.
+
+
 
 #include "libmatti/net/neoforged/fml/classloading/transformation/TransformerClassWriter.h"
 
@@ -122,7 +123,7 @@ static void compute_hierarchy_from_names(const char *name, const char *superName
 void LIBMATTI_FML_TransformerClassWriter_ComputeHierarchyForClassNode(LIBMATTI_FML_TransformerClassWriter *writer,
                                                                      LIBMATTI_ASMT_ClassNode *clazzNode)
 {
-    // Java: if (!CLASS_HIERARCHIES.containsKey(clazzNode.name)) clazzNode.accept(new SuperCollectingVisitor())
+// Java: if (!CLASS_HIERARCHIES.containsKey(clazzNode.name)) clazzNode.accept(new SuperCollectingVisitor())
     if (hierarchy_for(clazzNode->name) != NULL) return;
     (void) writer;
 
@@ -143,7 +144,7 @@ static void compute_hierarchy_from_file(LIBMATTI_FML_TransformerClassWriter *wri
 
     if (classData == NULL)
     {
-        // Java: catch (ClassNotFoundException e) -> computeHierarchyFromClass on the parent loader's class
+// Java: catch (ClassNotFoundException e) -> computeHierarchyFromClass on the parent loader's class
         LIBMATTI_JL_Class *parentClass = LIBMATTI_FML_ClassHierarchyRecomputationContext_LocateParentClass(
             writer->recomputationContext, dotted);
         if (parentClass != NULL)
@@ -157,7 +158,7 @@ static void compute_hierarchy_from_file(LIBMATTI_FML_TransformerClassWriter *wri
         return;
     }
 
-    // Java: classReader.accept(new SuperCollectingVisitor(), SKIP_CODE | SKIP_DEBUG | SKIP_FRAMES)
+// Java: classReader.accept(new SuperCollectingVisitor(), SKIP_CODE | SKIP_DEBUG | SKIP_FRAMES)
     LIBMATTI_ASM_ClassReader *reader = LIBMATTI_ASM_ClassReader_New(
         classData, length, LIBMATTI_ASM_SKIP_CODE | LIBMATTI_ASM_SKIP_DEBUG | LIBMATTI_ASM_SKIP_FRAMES);
     LIBMATTI_ASMT_ClassNode *node = LIBMATTI_ASMT_ClassNode_New();
@@ -176,7 +177,7 @@ static void compute_hierarchy_from_file(LIBMATTI_FML_TransformerClassWriter *wri
 static void compute_hierarchy_from_class(const char *className, LIBMATTI_JL_Class *clazz)
 {
     HierarchyEntry *entry = hierarchy_add(className);
-    // Java: Class<?> superClass = clazz.getSuperclass(); if (superClass != null) { ... }
+// Java: Class<?> superClass = clazz.getSuperclass(); if (superClass != null) { ... }
     LIBMATTI_JL_Class *superClass = LIBMATTI_JL_Class_GetSuperclass(clazz);
     if (superClass != NULL)
     {
@@ -199,7 +200,7 @@ static void compute_hierarchy_from_class(const char *className, LIBMATTI_JL_Clas
 
     entry->isInterface = LIBMATTI_JL_Class_IsInterface(clazz);
 
-    // Java: Arrays.stream(clazz.getInterfaces()).forEach(c -> { ... })
+// Java: Arrays.stream(clazz.getInterfaces()).forEach(c -> { ... })
     size_t interfaceCount = 0;
     LIBMATTI_JL_Class **interfaces = LIBMATTI_JL_Class_GetInterfaces(clazz, &interfaceCount);
     for (size_t i = 0; i < interfaceCount; i++)
@@ -220,11 +221,11 @@ static void compute_hierarchy_from_class(const char *className, LIBMATTI_JL_Clas
 void LIBMATTI_FML_TransformerClassWriter_ComputeHierarchy(LIBMATTI_FML_TransformerClassWriter *writer,
                                                          const char *className)
 {
-    // Java: if (CLASS_HIERARCHIES.containsKey(className)) return;
+// Java: if (CLASS_HIERARCHIES.containsKey(className)) return;
     if (hierarchy_for(className) != NULL) return;
     if (writer == NULL) return;
 
-    // Java: Class<?> clz = recomputationContext.findLoadedClass(className.replace('/', '.'));
+// Java: Class<?> clz = recomputationContext.findLoadedClass(className.replace('/', '.'));
     //       if (clz != null) computeHierarchyFromClass(className, clz); else computeHierarchyFromFile(className);
     char *dotted = strdup(className);
     for (char *c = dotted; *c != '\0'; c++) if (*c == '/') *c = '.';
@@ -259,7 +260,7 @@ static int contains(char **items, size_t count, const char *value)
 char *LIBMATTI_FML_TransformerClassWriter_GetCommonSuperClass(LIBMATTI_FML_TransformerClassWriter *writer,
                                                              const char *type1, const char *type2)
 {
-    // Java: if (!computedThis) { computeHierarchy(clazzAccessor); computedThis = true; }
+// Java: if (!computedThis) { computeHierarchy(clazzAccessor); computedThis = true; }
     if (!writer->computedThis)
     {
         LIBMATTI_FML_TransformerClassWriter_ComputeHierarchyForClassNode(writer, writer->clazzAccessor);
@@ -274,17 +275,17 @@ char *LIBMATTI_FML_TransformerClassWriter_GetCommonSuperClass(LIBMATTI_FML_Trans
     char **supers1 = get_supers(type1, &count1);
     char **supers2 = get_supers(type2, &count2);
 
-    // Java: if (getSupers(type2).contains(type1)) return type1; if (getSupers(type1).contains(type2)) return type2;
+// Java: if (getSupers(type2).contains(type1)) return type1; if (getSupers(type1).contains(type2)) return type2;
     if (contains(supers2, count2, type1)) return strdup(type1);
     if (contains(supers1, count1, type2)) return strdup(type2);
 
     HierarchyEntry *entry1 = hierarchy_for(type1);
     HierarchyEntry *entry2 = hierarchy_for(type2);
-    // Java: if (isIntf(type1) || isIntf(type2)) return "java/lang/Object"
+// Java: if (isIntf(type1) || isIntf(type2)) return "java/lang/Object"
     if ((entry1 != NULL && entry1->isInterface) || (entry2 != NULL && entry2->isInterface))
         return strdup("java/lang/Object");
 
-    // Java: String type = type1; do { type = getSuper(type); } while (!getSupers(type2).contains(type));
+// Java: String type = type1; do { type = getSuper(type); } while (!getSupers(type2).contains(type));
     const char *current = type1;
     do
     {

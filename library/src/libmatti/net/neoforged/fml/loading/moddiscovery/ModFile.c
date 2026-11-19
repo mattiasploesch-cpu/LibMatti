@@ -30,7 +30,7 @@ static LIBMATTI_FML_JarContents *modFile_getContents(void *self)
 // Java: public Supplier<Map<String, Object>> getSubstitutionMap()
 static void *modFile_getSubstitutionMap(void *self)
 {
-    // Java: () -> ImmutableMap.<String, Object>builder().put("jarVersion", jarVersion).putAll(fileProperties).build()
+// Java: () -> ImmutableMap.<String, Object>builder().put("jarVersion", jarVersion).putAll(fileProperties).build()
     return LIBMATTI_FML_ModFile_GetSubstitutionMap(self);
 }
 
@@ -54,7 +54,7 @@ static LIBMATTI_NEOFORGESPI_IModInfo **modFile_getModInfos(void *self, size_t *c
 
 static LIBMATTI_NEOFORGESPI_ModFileScanData *modFile_getScanResult(void *self)
 {
-    // Java: return futureScanResult.get() - the port reads the completed value
+// Java: return futureScanResult.get() - the port reads the completed value
     LIBMATTI_FML_ModFile *modFile = self;
     return modFile->scanResult;
 }
@@ -80,7 +80,7 @@ static LIBMATTI_NEOFORGESPI_IModFileInfo *modFile_getModFileInfo(void *self)
 // Java: private static Type parseType(JarContents contents)
 static LIBMATTI_NEOFORGESPI_IModFile_Type parse_type(LIBMATTI_FML_JarContents *contents)
 {
-    // Java: var value = contents.getManifest().getMainAttributes().getValue(TYPE); return value != null ? Type.valueOf(value) : Type.MOD;
+// Java: var value = contents.getManifest().getMainAttributes().getValue(TYPE); return value != null ? Type.valueOf(value) : Type.MOD;
     LIBMATTI_JU_Manifest *manifest = LIBMATTI_FML_JarContents_GetManifest(contents);
     const char *value = manifest != NULL ? LIBMATTI_JU_Manifest_GetMainValue(manifest, LIBMATTI_FML_MODFILE_TYPE)
                                          : NULL;
@@ -115,14 +115,14 @@ LIBMATTI_FML_ModFile *LIBMATTI_FML_ModFile_NewWithMetadataAndType(
     modFile->discoveryAttributes = *discoveryAttributes;
     modFile->modFileType = type;
 
-    // Java: jarVersion = Optional.ofNullable(getContents().getManifest().getMainAttributes().getValue(Attributes.Name.IMPLEMENTATION_VERSION)).orElse("0.0NONE");
+// Java: jarVersion = Optional.ofNullable(getContents().getManifest().getMainAttributes().getValue(Attributes.Name.IMPLEMENTATION_VERSION)).orElse("0.0NONE");
     LIBMATTI_JU_Manifest *manifest = LIBMATTI_FML_JarContents_GetManifest(contents);
     const char *jarVersion = manifest != NULL
                                  ? LIBMATTI_JU_Manifest_GetMainValue(manifest, "Implementation-Version")
                                  : NULL;
     modFile->jarVersion = strdup(jarVersion != NULL ? jarVersion : "0.0NONE");
 
-    // Java: this.modFileInfo = ModFileParser.readModList(this, Objects.requireNonNull(parser, "parser"));
+// Java: this.modFileInfo = ModFileParser.readModList(this, Objects.requireNonNull(parser, "parser"));
     //       Java throws a ModLoadingException when the mod metadata cannot be read; the port has no
     //       exception channel, so it refuses the file instead of keeping a file without metadata.
     modFile->modFileInfo = LIBMATTI_FML_ModFileParser_ReadModList(modFile, parser, parserUserdata);
@@ -130,7 +130,7 @@ LIBMATTI_FML_ModFile *LIBMATTI_FML_ModFile_NewWithMetadataAndType(
     {
         LIBMATTI_ML_Logger_Error(LOGGER(), &LIBMATTI_FML_MARKER_LOADING, "Failed to read the mod metadata of {}",
                                  modFile_getFilePath(modFile));
-        // Java: the GC - only what this constructor has allocated so far; the caller (and the
+// Java: the GC - only what this constructor has allocated so far; the caller (and the
         //       discovery pipeline) still owns the contents and the module info.
         free(modFile->id);
         free(modFile->jarVersion);
@@ -138,10 +138,10 @@ LIBMATTI_FML_ModFile *LIBMATTI_FML_ModFile_NewWithMetadataAndType(
         return NULL;
     }
 
-    // Java: jarModuleInfo = metadata != null ? metadata : JarModuleInfo.from(contents);
+// Java: jarModuleInfo = metadata != null ? metadata : JarModuleInfo.from(contents);
     modFile->jarModuleInfo = metadata != NULL ? metadata : LIBMATTI_FML_JarModuleInfo_From(contents);
 
-    // Java: if (modFileInfo != null && !modFileInfo.getMods().isEmpty()) id = modFileInfo.getMods().getFirst().getModId();
+// Java: if (modFileInfo != null && !modFileInfo.getMods().isEmpty()) id = modFileInfo.getMods().getFirst().getModId();
     //       else id = jarModuleInfo.name();
     size_t modCount = 0;
     LIBMATTI_NEOFORGESPI_IModInfo **mods =
@@ -159,15 +159,15 @@ LIBMATTI_FML_ModFile *LIBMATTI_FML_ModFile_NewWithMetadataAndType(
 
     if (modFile->modFileInfo != NULL)
     {
-        // Java: LOGGER.debug(LogMarkers.LOADING, "Loading mod file {} with languages {}", ...)
+// Java: LOGGER.debug(LogMarkers.LOADING, "Loading mod file {} with languages {}", ...)
         LIBMATTI_ML_Logger_Debug(LOGGER(), &LIBMATTI_FML_MARKER_LOADING, "Loading mod file {} with languages",
                                  modFile_getFilePath(modFile));
 
-        // Java: this.mixinConfigs = ModFileParser.getMixinConfigs(this.modFileInfo);
+// Java: this.mixinConfigs = ModFileParser.getMixinConfigs(this.modFileInfo);
         modFile->mixinConfigs = LIBMATTI_FML_ModFileParser_GetMixinConfigs(modFile->modFileInfo,
                                                                           &modFile->mixinConfigCount);
 
-        // Java: this.accessTransformers = ModFileParser.getAccessTransformers(this.modFileInfo)
+// Java: this.accessTransformers = ModFileParser.getAccessTransformers(this.modFileInfo)
         //         .map(list -> list.stream().filter(path -> { if (!getContents().containsFile(path)) { LOGGER.error(...); return false; } return true; }))
         //         .orElseGet(() -> getContents().containsFile(DEFAULT_ACCESS_TRANSFORMER) ? Stream.of(DEFAULT_ACCESS_TRANSFORMER) : Stream.empty())
         //         .toList();
@@ -206,7 +206,7 @@ LIBMATTI_FML_ModFile *LIBMATTI_FML_ModFile_New(LIBMATTI_FML_JarContents *content
                                                LIBMATTI_NEOFORGESPI_ModFileInfoParser parser, void *parserUserdata,
                                                const LIBMATTI_NEOFORGESPI_ModFileDiscoveryAttributes *attributes)
 {
-    // Java: this(contents, null, parser, parseType(contents), attributes);
+// Java: this(contents, null, parser, parseType(contents), attributes);
     return LIBMATTI_FML_ModFile_NewWithMetadataAndType(contents, NULL, parser, parserUserdata, parse_type(contents),
                                                        attributes);
 }
@@ -217,7 +217,7 @@ LIBMATTI_FML_ModFile *LIBMATTI_FML_ModFile_NewWithMetadata(
     LIBMATTI_NEOFORGESPI_ModFileInfoParser parser, void *parserUserdata,
     const LIBMATTI_NEOFORGESPI_ModFileDiscoveryAttributes *attributes)
 {
-    // Java: this(contents, metadata, parser, parseType(contents), attributes);
+// Java: this(contents, metadata, parser, parseType(contents), attributes);
     return LIBMATTI_FML_ModFile_NewWithMetadataAndType(contents, metadata, parser, parserUserdata,
                                                        parse_type(contents), attributes);
 }
@@ -233,7 +233,7 @@ void LIBMATTI_FML_ModFile_Free(LIBMATTI_FML_ModFile *modFile)
     free(modFile->loaders);
     LIBMATTI_JUC_CompletableFuture_Free(modFile->futureScanResult);
     LIBMATTI_NEOFORGESPI_ModFileScanData_Free(modFile->scanResult);
-    // Java: the GC - the module info, JarContents and IModFileInfo are owned by the mod file
+// Java: the GC - the module info, JarContents and IModFileInfo are owned by the mod file
     LIBMATTI_FML_JarModuleInfo_Free(modFile->jarModuleInfo);
     LIBMATTI_FML_JarContents_Close(modFile->contents);
     LIBMATTI_NEOFORGESPI_IModFileInfo_Free(modFile->modFileInfo);
@@ -277,7 +277,7 @@ static void *run_scan(void *userdata)
     LIBMATTI_FML_Scanner *scanner = LIBMATTI_FML_Scanner_New(supplier->modFile);
     LIBMATTI_NEOFORGESPI_ModFileScanData *result = LIBMATTI_FML_Scanner_Scan(scanner);
     LIBMATTI_FML_Scanner_Free(scanner);
-    // Java: the CompletableFuture carries the value; the port keeps the owned copy on the file
+// Java: the CompletableFuture carries the value; the port keeps the owned copy on the file
     supplier->modFile->scanResult = result;
     return result;
 }
@@ -286,14 +286,14 @@ static void *run_scan(void *userdata)
 LIBMATTI_JUC_CompletableFuture *LIBMATTI_FML_ModFile_StartScan(LIBMATTI_FML_ModFile *modFile,
                                                                LIBMATTI_JUC_Executor *executor)
 {
-    // Java: if (this.futureScanResult != null) throw new IllegalStateException("The mod file scan was already started.");
+// Java: if (this.futureScanResult != null) throw new IllegalStateException("The mod file scan was already started.");
     if (modFile->futureScanResult != NULL)
     {
         LIBMATTI_ML_Logger_Error(LOGGER(), NULL, "The mod file scan was already started.");
         return NULL;
     }
 
-    // Java: this.futureScanResult = CompletableFuture.supplyAsync(() -> new Scanner(this).scan(), executor);
+// Java: this.futureScanResult = CompletableFuture.supplyAsync(() -> new Scanner(this).scan(), executor);
     // The port's executors have no thread: the direct executor runs the scan inline (the same
     // result the old synchronous port had), a queued executor stores the command for DrainQueued.
     modFile->futureScanResult = LIBMATTI_JUC_CompletableFuture_New();
@@ -314,7 +314,7 @@ LIBMATTI_JUC_CompletableFuture *LIBMATTI_FML_ModFile_StartScan(LIBMATTI_FML_ModF
 // Java: public ModFileScanData getScanResult()
 LIBMATTI_NEOFORGESPI_ModFileScanData *LIBMATTI_FML_ModFile_GetScanResult(const LIBMATTI_FML_ModFile *modFile)
 {
-    // Java: if (this.futureScanResult == null) throw new IllegalStateException("Scanning of this mod file has not started yet.");
+// Java: if (this.futureScanResult == null) throw new IllegalStateException("Scanning of this mod file has not started yet.");
     //       try { return this.futureScanResult.get(); } catch (ExecutionException e) { throw new RuntimeException(e.getCause()); }
     if (modFile->futureScanResult == NULL)
     {
@@ -345,7 +345,7 @@ static void put_all(const char *key, void *value, void *userdata)
 // Java: public Supplier<Map<String, Object>> getSubstitutionMap() - the supplier's value
 LIBMATTI_JU_HashMap *LIBMATTI_FML_ModFile_GetSubstitutionMap(const LIBMATTI_FML_ModFile *modFile)
 {
-    // Java: ImmutableMap.<String, Object>builder().put("jarVersion", jarVersion).putAll(fileProperties).build()
+// Java: ImmutableMap.<String, Object>builder().put("jarVersion", jarVersion).putAll(fileProperties).build()
     LIBMATTI_JU_HashMap *map = LIBMATTI_JU_HashMap_New();
     LIBMATTI_JU_HashMap_Put(map, "jarVersion", (void *) modFile->jarVersion);
     if (modFile->fileProperties != NULL)
@@ -374,7 +374,7 @@ LIBMATTI_FML_ModFileParser_MixinConfig *LIBMATTI_FML_ModFile_GetMixinConfigs(con
 // Java: public void identifyLanguage()
 void LIBMATTI_FML_ModFile_IdentifyLanguage(LIBMATTI_FML_ModFile *modFile)
 {
-    // Java: this.loaders = this.modFileInfo.requiredLanguageLoaders().stream()
+// Java: this.loaders = this.modFileInfo.requiredLanguageLoaders().stream()
     //         .map(spec -> FMLLoader.getLanguageLoadingProvider().findLanguage(this, spec.languageName(), spec.acceptedVersions())).toList();
     size_t specCount = 0;
     LIBMATTI_NEOFORGESPI_IModFileInfo_LanguageSpec *specs =
@@ -395,7 +395,7 @@ void LIBMATTI_FML_ModFile_IdentifyLanguage(LIBMATTI_FML_ModFile *modFile)
 // Java: public ModuleDescriptor getModuleDescriptor()
 LIBMATTI_JL_ModuleDescriptor *LIBMATTI_FML_ModFile_GetModuleDescriptor(LIBMATTI_FML_ModFile *modFile)
 {
-    // Java: this should be called once in parallel for all content, hence the double-checked lock
+// Java: this should be called once in parallel for all content, hence the double-checked lock
     if (modFile->moduleDescriptor == NULL)
         modFile->moduleDescriptor = LIBMATTI_FML_JarModuleInfo_CreateDescriptor(modFile->jarModuleInfo,
                                                                                modFile->contents);
@@ -405,7 +405,7 @@ LIBMATTI_JL_ModuleDescriptor *LIBMATTI_FML_ModFile_GetModuleDescriptor(LIBMATTI_
 // Java: public ArtifactVersion getJarVersion()
 LIBMATTI_NEOFORGESPI_ArtifactVersion *LIBMATTI_FML_ModFile_GetJarVersion(const LIBMATTI_FML_ModFile *modFile)
 {
-    // Java: return new DefaultArtifactVersion(this.jarVersion);
+// Java: return new DefaultArtifactVersion(this.jarVersion);
     return LIBMATTI_NEOFORGESPI_MavenVersionAdapter_CreateFromVersion(modFile->jarVersion);
 }
 
@@ -432,9 +432,9 @@ void LIBMATTI_FML_ModFile_SetDiscoveryAttributes(LIBMATTI_FML_ModFile *modFile,
 // Java: getSubstitutionMap().get().get(key)
 const char *LIBMATTI_FML_ModFile_GetSubstitutionValue(const LIBMATTI_FML_ModFile *modFile, const char *key)
 {
-    // Java: put("jarVersion", jarVersion).putAll(fileProperties)
+// Java: put("jarVersion", jarVersion).putAll(fileProperties)
     if (strcmp(key, "jarVersion") == 0) return modFile->jarVersion;
-    // Java: the fileProperties map (manifest + mod-file properties); the port
+// Java: the fileProperties map (manifest + mod-file properties); the port
     // resolves the id (the file name) the loader hands to SecureJar substitutions
     if (strcmp(key, "file") == 0) return modFile->id;
     return NULL;
@@ -443,13 +443,13 @@ const char *LIBMATTI_FML_ModFile_GetSubstitutionValue(const LIBMATTI_FML_ModFile
 // Java: public void close()
 void LIBMATTI_FML_ModFile_Close(LIBMATTI_FML_ModFile *modFile)
 {
-    // Java: if (futureScanResult != null) { futureScanResult.cancel(true); futureScanResult = null; }
+// Java: if (futureScanResult != null) { futureScanResult.cancel(true); futureScanResult = null; }
     LIBMATTI_JUC_CompletableFuture_Free(modFile->futureScanResult);
     modFile->futureScanResult = NULL;
     LIBMATTI_NEOFORGESPI_ModFileScanData_Free(modFile->scanResult);
     modFile->scanResult = NULL;
 
-    // Java: contents.close()
+// Java: contents.close()
     LIBMATTI_FML_JarContents_Close(modFile->contents);
     modFile->contents = NULL;
 }

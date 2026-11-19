@@ -1,4 +1,5 @@
-// Port of org.apache.maven.artifact.versioning.DefaultArtifactVersion.
+
+
 
 #include "libmatti/org/apache/maven/artifact/versioning/ArtifactVersion.h"
 
@@ -22,7 +23,7 @@ static int try_parse_int(const char *s, int *out)
 {
     if (!is_digits(s)) return 0;
 
-    // Java: long longValue = Long.parseLong(s)
+// Java: long longValue = Long.parseLong(s)
     char *end = NULL;
     long long value = strtoll(s, &end, 10);
     if (end == s || *end != '\0') return 0;
@@ -67,7 +68,7 @@ static char **split_on_dots(const char *value, size_t *count)
         start = end + 1;
     }
 
-    // Java: trailing empty strings are not included
+// Java: trailing empty strings are not included
     while (tokenCount > 1 && tokens[tokenCount - 1][0] == '\0')
         free(tokens[--tokenCount]);
 
@@ -79,7 +80,7 @@ static char **split_on_dots(const char *value, size_t *count)
 static void parse_version(LIBMATTI_MAVEN_ArtifactVersion *artifactVersion, const char *version)
 {
     artifactVersion->comparable = LIBMATTI_MAVEN_ComparableVersion_New(version);
-    // Java: toString() returns comparable.toString()
+// Java: toString() returns comparable.toString()
     artifactVersion->version = strdup(LIBMATTI_MAVEN_ComparableVersion_ToString(artifactVersion->comparable));
 
     const char *dash = strchr(version, '-');
@@ -120,7 +121,7 @@ static void parse_version(LIBMATTI_MAVEN_ArtifactVersion *artifactVersion, const
         }
         else
         {
-            // Java: qualifier is the whole version, including "-"
+// Java: qualifier is the whole version, including "-"
             free(artifactVersion->qualifier);
             artifactVersion->qualifier = strdup(version);
             artifactVersion->buildNumberPresent = 0;
@@ -169,7 +170,7 @@ static void parse_version(LIBMATTI_MAVEN_ArtifactVersion *artifactVersion, const
             fallback = is_digits(artifactVersion->qualifier);
         }
 
-        // Java: string tokenizer won't detect these and ignores them
+// Java: string tokenizer won't detect these and ignores them
         part1Length = strlen(part1);
         if (strstr(part1, "..") != NULL || part1[0] == '.' ||
             (part1Length > 0 && part1[part1Length - 1] == '.'))
@@ -177,7 +178,7 @@ static void parse_version(LIBMATTI_MAVEN_ArtifactVersion *artifactVersion, const
 
         if (fallback)
         {
-            // Java: qualifier is the whole version, including "-"
+// Java: qualifier is the whole version, including "-"
             free(artifactVersion->qualifier);
             artifactVersion->qualifier = strdup(version);
             artifactVersion->majorVersionPresent = 0;

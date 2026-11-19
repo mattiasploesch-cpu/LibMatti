@@ -1,4 +1,5 @@
-// Port of net.neoforged.bus.api.ICancellableEvent.
+
+
 
 #include "libmatti/net/neoforged/bus/api/ICancellableEvent.h"
 

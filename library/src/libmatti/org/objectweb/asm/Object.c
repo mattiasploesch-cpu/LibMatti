@@ -1,4 +1,5 @@
-// Port of the ASM "Object" values (Integer/Float/Long/Double/String/Type/Label).
+
+
 
 #include "libmatti/org/objectweb/asm/Object.h"
 

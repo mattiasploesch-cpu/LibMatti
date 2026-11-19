@@ -1,4 +1,5 @@
-// Port of joptsimple.util.PathProperties.
+
+
 
 #ifndef MATTICRAFT_JOPTSIMPLE_PATHPROPERTIES_H
 #define MATTICRAFT_JOPTSIMPLE_PATHPROPERTIES_H
@@ -13,4 +14,4 @@ typedef enum
     LIBMATTI_JOPT_PATH_WRITABLE
 } LIBMATTI_JOPT_PathProperties;
 
-#endif //MATTICRAFT_JOPTSIMPLE_PATHPROPERTIES_H
+#endif

@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.classloading.transformation.ClassProcessorSet.
+
+
 
 #ifndef MATTICRAFT_FML_CLASSLOADING_TRANSFORMATION_CLASSPROCESSORSET_H
 #define MATTICRAFT_FML_CLASSLOADING_TRANSFORMATION_CLASSPROCESSORSET_H
@@ -13,25 +14,25 @@
 // Java: public final class ClassProcessorSet
 typedef struct LIBMATTI_FML_ClassProcessorSet
 {
-    // Java: private final List<ClassProcessor> sortedProcessors
+// Java: private final List<ClassProcessor> sortedProcessors
     LIBMATTI_NEOFORGESPI_ClassProcessor **sortedProcessors;
     size_t sortedCount;
-    // Java: private final Set<ProcessorName> markerProcessors
+// Java: private final Set<ProcessorName> markerProcessors
     const LIBMATTI_NEOFORGESPI_ProcessorName **markerProcessors;
     size_t markerCount;
-    // Java: private final Set<String> generatedPackages
+// Java: private final Set<String> generatedPackages
     const char **generatedPackages;
     size_t generatedPackageCount;
-    // Java: private final SequencedMap<ProcessorName, ClassProcessor> processors
+// Java: private final SequencedMap<ProcessorName, ClassProcessor> processors
     const LIBMATTI_NEOFORGESPI_ProcessorName **processorNames;
     LIBMATTI_NEOFORGESPI_ClassProcessor **processors;
     size_t processorCount;
-    // Java: private final Set<ProcessorName> allowedToRecomputeFrames
+// Java: private final Set<ProcessorName> allowedToRecomputeFrames
     const LIBMATTI_NEOFORGESPI_ProcessorName **allowedToRecomputeFrames;
     size_t allowedToRecomputeFramesCount;
-    // Java: private boolean linked
+// Java: private boolean linked
     int linked;
-    // Java: the BytecodeProvider lambdas created by link(bytecodeProviderLookup) are handed to the
+// Java: the BytecodeProvider lambdas created by link(bytecodeProviderLookup) are handed to the
     //       processors, which keep them for the lifetime of the set.
     LIBMATTI_NEOFORGESPI_BytecodeProvider **bytecodeProviders;
     size_t bytecodeProviderCount;
@@ -94,4 +95,4 @@ void LIBMATTI_FML_ClassProcessorSet_Builder_AddProcessorProviders(
 LIBMATTI_FML_ClassProcessorSet *LIBMATTI_FML_ClassProcessorSet_Builder_Build(
     LIBMATTI_FML_ClassProcessorSet_Builder *builder);
 
-#endif //MATTICRAFT_FML_CLASSLOADING_TRANSFORMATION_CLASSPROCESSORSET_H
+#endif

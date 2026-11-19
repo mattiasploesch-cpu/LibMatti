@@ -1,8 +1,9 @@
-// Port of net.neoforged.fml.loading.ImmediateWindowHandler.
-//
-// Java discovers the provider through the ServiceLoader; the C port registers
-// the built-in fmlearlywindow provider (DisplayWindow) directly, since the C
-// port has no META-INF/services to read.
+
+
+
+
+
+
 
 #include "libmatti/net/neoforged/fml/loading/ImmediateWindowHandler.h"
 
@@ -34,14 +35,14 @@ void *LIBMATTI_FML_ImmediateWindowHandler_GetProvider(void)
 void LIBMATTI_FML_ImmediateWindowHandler_Load(LIBMATTI_NEOFORGESPI_ILaunchContext *context, int headless,
                                               LIBMATTI_FML_ProgramArgs *arguments)
 {
-    // Java: ServiceLoaderUtil.loadEarlyServices(context, GraphicsBootstrapper.class, List.of()).forEach(bootstrap -> {
+// Java: ServiceLoaderUtil.loadEarlyServices(context, GraphicsBootstrapper.class, List.of()).forEach(bootstrap -> {
     //           LOGGER.info("Running graphics bootstrap plugin {}", bootstrap.name());
     //           bootstrap.bootstrap(arguments.getArguments()); });
     (void) context;
 
     if (headless)
     {
-        // Java: provider = null; LOGGER.info("Not loading early display in headless mode.");
+// Java: provider = null; LOGGER.info("Not loading early display in headless mode.");
         provider = NULL;
         LIBMATTI_ML_Logger_Info(LOGGER(), NULL, "Not loading early display in headless mode.");
         return;
@@ -49,17 +50,17 @@ void LIBMATTI_FML_ImmediateWindowHandler_Load(LIBMATTI_NEOFORGESPI_ILaunchContex
 
     if (!LIBMATTI_FML_FMLConfig_GetBoolConfigValue(LIBMATTI_FML_FMLConfig_EARLY_WINDOW_CONTROL))
     {
-        // Java: provider = null; LOGGER.info("ImmediateWindowProvider not loading because splash screen is disabled");
+// Java: provider = null; LOGGER.info("ImmediateWindowProvider not loading because splash screen is disabled");
         provider = NULL;
         LIBMATTI_ML_Logger_Info(LOGGER(), NULL, "ImmediateWindowProvider not loading because splash screen is disabled");
     }
     else
     {
-        // Java: var providername = FMLConfig.getConfigValue(FMLConfig.ConfigValue.EARLY_WINDOW_PROVIDER);
+// Java: var providername = FMLConfig.getConfigValue(FMLConfig.ConfigValue.EARLY_WINDOW_PROVIDER);
         const char *providername = LIBMATTI_FML_FMLConfig_GetConfigValue(LIBMATTI_FML_FMLConfig_EARLY_WINDOW_PROVIDER);
         LIBMATTI_ML_Logger_Info(LOGGER(), NULL, "Loading ImmediateWindowProvider {}", providername);
 
-        // Java: var maybeProvider = ServiceLoaderUtil.loadEarlyServices(context, ImmediateWindowProvider.class, List.of())
+// Java: var maybeProvider = ServiceLoaderUtil.loadEarlyServices(context, ImmediateWindowProvider.class, List.of())
         //           .stream().filter(p -> Objects.equals(p.name(), providername)).findFirst();
         // The C port has no ServiceLoader; the built-in fmlearlywindow provider is the candidate.
         displayWindow = LIBMATTI_FML_DisplayWindow_New();
@@ -78,17 +79,17 @@ void LIBMATTI_FML_ImmediateWindowHandler_Load(LIBMATTI_NEOFORGESPI_ILaunchContex
 
         if (provider == NULL)
         {
-            // Java: LOGGER.info("Failed to find ImmediateWindowProvider {}, disabling", providername);
+// Java: LOGGER.info("Failed to find ImmediateWindowProvider {}, disabling", providername);
             LIBMATTI_ML_Logger_Info(LOGGER(), NULL, "Failed to find ImmediateWindowProvider {}, disabling", providername);
         }
         else
         {
-            // Java: try { provider.initialize(arguments); } catch (Exception e) { LOGGER.error(...); provider = null; }
+// Java: try { provider.initialize(arguments); } catch (Exception e) { LOGGER.error(...); provider = null; }
             provider->initialize(provider->controller.self, arguments);
         }
     }
 
-    // Java: if (provider != null) { FMLConfig.updateConfig(FMLConfig.ConfigValue.EARLY_WINDOW_PROVIDER, provider.name()); }
+// Java: if (provider != null) { FMLConfig.updateConfig(FMLConfig.ConfigValue.EARLY_WINDOW_PROVIDER, provider.name()); }
     if (provider != NULL)
     {
         LIBMATTI_FML_FMLConfig_UpdateConfigString(LIBMATTI_FML_FMLConfig_EARLY_WINDOW_PROVIDER,
@@ -101,7 +102,7 @@ void LIBMATTI_FML_ImmediateWindowHandler_SetNeoForgeVersion(const char *version)
 {
     if (provider == NULL) return;
 
-    // Java: provider.setNeoForgeVersion(version);
+// Java: provider.setNeoForgeVersion(version);
     provider->setNeoForgeVersion(provider->controller.self, version);
 }
 
@@ -110,7 +111,7 @@ void LIBMATTI_FML_ImmediateWindowHandler_SetMinecraftVersion(const char *version
 {
     if (provider == NULL) return;
 
-    // Java: provider.setMinecraftVersion(version);
+// Java: provider.setMinecraftVersion(version);
     provider->setMinecraftVersion(provider->controller.self, version);
 }
 
@@ -119,7 +120,7 @@ void LIBMATTI_FML_ImmediateWindowHandler_RenderTick(void)
 {
     if (provider == NULL) return;
 
-    // Java: provider.periodicTick();
+// Java: provider.periodicTick();
     provider->controller.periodicTick(provider->controller.self);
 }
 
@@ -128,7 +129,7 @@ void LIBMATTI_FML_ImmediateWindowHandler_UpdateProgress(const char *message)
 {
     if (provider == NULL) return;
 
-    // Java: provider.updateProgress(message);
+// Java: provider.updateProgress(message);
     provider->controller.updateProgress(provider->controller.self, message);
 }
 
@@ -137,7 +138,7 @@ void LIBMATTI_FML_ImmediateWindowHandler_Crash(const char *message)
 {
     if (provider == NULL) return;
 
-    // Java: provider.crash(message);
+// Java: provider.crash(message);
     provider->crash(provider->controller.self, message);
 }
 
@@ -148,7 +149,7 @@ void LIBMATTI_FML_ImmediateWindowHandler_DisplayFatalErrorAndExit(LIBMATTI_FML_M
 {
     if (provider == NULL) return;
 
-    // Java: provider.displayFatalErrorAndExit(issues, modsFolder, logFile, crashReportFile);
+// Java: provider.displayFatalErrorAndExit(issues, modsFolder, logFile, crashReportFile);
     provider->displayFatalErrorAndExit(provider->controller.self, issues, issueCount, modsFolder, logFile,
                                        crashReportFile);
 }

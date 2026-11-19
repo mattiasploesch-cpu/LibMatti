@@ -1,5 +1,6 @@
-// Port of com.mojang.blaze3d.vertex.MeshData - one built mesh: vertex bytes,
-// optional sorted index bytes and the DrawState record.
+
+
+
 
 #ifndef MATTICRAFT_BLAZE3D_VERTEX_MESHDATA_H
 #define MATTICRAFT_BLAZE3D_VERTEX_MESHDATA_H
@@ -37,7 +38,7 @@ typedef struct LIBMATTI_B3D_MeshData_SortState
 typedef struct LIBMATTI_B3D_MeshData
 {
     LIBMATTI_B3D_ByteBufferBuilder_Result *vertexBuffer;
-    LIBMATTI_B3D_ByteBufferBuilder_Result *indexBuffer;  // Java: @Nullable
+    LIBMATTI_B3D_ByteBufferBuilder_Result *indexBuffer;// Java: @Nullable
     LIBMATTI_B3D_MeshData_DrawState drawState;
 } LIBMATTI_B3D_MeshData;
 

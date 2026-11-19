@@ -1,5 +1,6 @@
-// Port of net.minecraft.core.SectionPos - the section coordinate triple with
-// the packed long form and the block <-> section conversions.
+
+
+
 
 #ifndef MATTICRAFT_NET_MINECRAFT_CORE_SECTIONPOS_H
 #define MATTICRAFT_NET_MINECRAFT_CORE_SECTIONPOS_H
@@ -92,4 +93,4 @@ LIBMATTI_MC_SectionPos *LIBMATTI_MC_SectionPos_BetweenClosedGet(const LIBMATTI_M
 }
 #endif
 
-#endif //MATTICRAFT_NET_MINECRAFT_CORE_SECTIONPOS_H
+#endif

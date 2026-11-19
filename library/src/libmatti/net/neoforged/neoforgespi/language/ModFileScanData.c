@@ -1,4 +1,5 @@
-// Port of net.neoforged.neoforgespi.language.ModFileScanData.
+
+
 
 #include "libmatti/net/neoforged/neoforgespi/language/ModFileScanData.h"
 

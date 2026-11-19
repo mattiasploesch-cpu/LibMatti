@@ -12,4 +12,4 @@
 // Java: Type.getType(IExtensibleEnum.class).getDescriptor()
 #define LIBMATTI_FML_IExtensibleEnum_DESCRIPTOR "Lnet/neoforged/fml/common/asm/enumextension/IExtensibleEnum;"
 
-#endif //MATTICRAFT_FML_COMMON_ASM_ENUMEXTENSION_IEXTENSIBLEENUM_H
+#endif

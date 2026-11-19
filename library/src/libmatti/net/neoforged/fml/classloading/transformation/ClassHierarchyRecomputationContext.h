@@ -1,5 +1,6 @@
-// Port of net.neoforged.fml.classloading.transformation.ClassHierarchyRecomputationContext.
-// Every class name passed to these methods is in dot-separated form.
+
+
+
 
 #ifndef MATTICRAFT_FML_CLASSLOADING_TRANSFORMATION_CLASSHIERARCHYRECOMPUTATIONCONTEXT_H
 #define MATTICRAFT_FML_CLASSLOADING_TRANSFORMATION_CLASSHIERARCHYRECOMPUTATIONCONTEXT_H
@@ -9,12 +10,12 @@
 // Java: public interface ClassHierarchyRecomputationContext
 typedef struct LIBMATTI_FML_ClassHierarchyRecomputationContext
 {
-    // Java: @Nullable Class<?> findLoadedClass(String className); NULL when not loaded
+// Java: @Nullable Class<?> findLoadedClass(String className); NULL when not loaded
     void *(*findLoadedClass)(struct LIBMATTI_FML_ClassHierarchyRecomputationContext *self, const char *className);
-    // Java: byte[] upToFrames(String className) throws ClassNotFoundException; caller frees, NULL = not found
+// Java: byte[] upToFrames(String className) throws ClassNotFoundException; caller frees, NULL = not found
     unsigned char *(*upToFrames)(struct LIBMATTI_FML_ClassHierarchyRecomputationContext *self, const char *className,
                                  size_t *length);
-    // Java: Class<?> locateParentClass(String className) throws ClassNotFoundException; NULL = not found
+// Java: Class<?> locateParentClass(String className) throws ClassNotFoundException; NULL = not found
     void *(*locateParentClass)(struct LIBMATTI_FML_ClassHierarchyRecomputationContext *self, const char *className);
 } LIBMATTI_FML_ClassHierarchyRecomputationContext;
 
@@ -26,4 +27,4 @@ unsigned char *LIBMATTI_FML_ClassHierarchyRecomputationContext_UpToFrames(
 void *LIBMATTI_FML_ClassHierarchyRecomputationContext_LocateParentClass(
     LIBMATTI_FML_ClassHierarchyRecomputationContext *context, const char *className);
 
-#endif //MATTICRAFT_FML_CLASSLOADING_TRANSFORMATION_CLASSHIERARCHYRECOMPUTATIONCONTEXT_H
+#endif

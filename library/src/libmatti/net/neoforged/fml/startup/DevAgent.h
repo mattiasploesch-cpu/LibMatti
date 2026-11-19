@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.startup.DevAgent.
+
+
 
 #ifndef MATTICRAFT_FML_DEVAGENT_H
 #define MATTICRAFT_FML_DEVAGENT_H
@@ -19,4 +20,4 @@ void LIBMATTI_FML_DevAgent_Premain(const char *arguments, LIBMATTI_JLI_Instrumen
 // Java: public static void agentmain(String arguments, Instrumentation instrumentation)
 void LIBMATTI_FML_DevAgent_Agentmain(const char *arguments, LIBMATTI_JLI_Instrumentation *instrumentation);
 
-#endif //MATTICRAFT_FML_DEVAGENT_H
+#endif

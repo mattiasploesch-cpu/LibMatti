@@ -1,4 +1,5 @@
-// Port of java.lang.Runtime (the surface the loader uses).
+
+
 
 #ifndef MATTICRAFT_JAVA_LANG_RUNTIME_H
 #define MATTICRAFT_JAVA_LANG_RUNTIME_H
@@ -22,4 +23,4 @@ long LIBMATTI_JL_Runtime_FreeMemory(void);
 // Java: public static int version() - the JVM's feature release
 int LIBMATTI_JL_Runtime_Version(void);
 
-#endif //MATTICRAFT_JAVA_LANG_RUNTIME_H
+#endif

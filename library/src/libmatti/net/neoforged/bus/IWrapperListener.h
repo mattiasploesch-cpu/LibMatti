@@ -9,4 +9,4 @@
 
 #include "libmatti/net/neoforged/bus/api/EventListener.h"
 
-#endif //MATTICRAFT_BUS_IWRAPPERLISTENER_H
+#endif

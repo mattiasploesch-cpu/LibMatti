@@ -1,6 +1,7 @@
-// Port of the io.netty surface the game uses: ByteBuf, EventLoopGroup stubs,
-// Bootstrap/Channel for the client's network stack.
-// MC's packets ride on top; the port wraps plain sockets.
+
+
+
+
 
 #ifndef MATTICRAFT_NETTY_BOOTSTRAP_H
 #define MATTICRAFT_NETTY_BOOTSTRAP_H
@@ -40,7 +41,8 @@ typedef void (*LIBMATTI_NT_ChannelInactiveHandler)(void *self, LIBMATTI_NT_Chann
 
 typedef struct LIBMATTI_NT_Channel
 {
-    int fd; // the socket, -1 when closed
+    int fd;
+
     LIBMATTI_NT_ChannelReadHandler readHandler;
     void *readHandlerSelf;
     LIBMATTI_NT_ChannelInactiveHandler inactiveHandler;
@@ -65,4 +67,4 @@ void LIBMATTI_NT_Channel_Close(LIBMATTI_NT_Channel *channel);
 // Java: the event loop's read pass - drains the socket into the handler
 void LIBMATTI_NT_Channel_FlushInbound(LIBMATTI_NT_Channel *channel);
 
-#endif //MATTICRAFT_NETTY_BOOTSTRAP_H
+#endif

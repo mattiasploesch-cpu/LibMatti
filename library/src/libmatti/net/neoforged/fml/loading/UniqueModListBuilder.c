@@ -101,13 +101,13 @@ LIBMATTI_FML_UniqueModListBuilder *LIBMATTI_FML_UniqueModListBuilder_New(LIBMATT
 // Java: private ModFile selectNewestModInfo(Map.Entry<String, List<ModFile>> fullList)
 static LIBMATTI_FML_ModFile *selectNewestModInfo(ModFileGroups *groups, size_t index)
 {
-    // Java: if (modInfoList.size() > 1) { modInfoList.sort(Comparator.comparing(this::getVersion).reversed()); ... }
+// Java: if (modInfoList.size() > 1) { modInfoList.sort(Comparator.comparing(this::getVersion).reversed()); ... }
     for (size_t i = 0; i + 1 < groups->valueCounts[index]; i++)
         for (size_t j = i + 1; j < groups->valueCounts[index]; j++)
         {
             int order = LIBMATTI_NEOFORGESPI_MavenVersionAdapter_Compare(getVersion(groups->values[index][i]),
                                                                          getVersion(groups->values[index][j]));
-            if (order < 0) // Java: reversed()
+            if (order < 0)// Java: reversed()
             {
                 LIBMATTI_FML_ModFile *swap = groups->values[index][i];
                 groups->values[index][i] = groups->values[index][j];
@@ -131,7 +131,7 @@ LIBMATTI_FML_UniqueModListData *LIBMATTI_FML_UniqueModListBuilder_BuildUniqueLis
     *issues = NULL;
     *issueCount = 0;
 
-    // Java: collect(Collections.groupingBy(...)) split by whether the file has mod file info
+// Java: collect(Collections.groupingBy(...)) split by whether the file has mod file info
     ModFileGroups modGroups = {0};
     ModFileGroups libGroups = {0};
     for (size_t i = 0; i < builder->modFileCount; i++)
@@ -143,14 +143,14 @@ LIBMATTI_FML_UniqueModListData *LIBMATTI_FML_UniqueModListBuilder_BuildUniqueLis
             groupAdd(&libGroups, getModId(modFile), modFile);
     }
 
-    // Java: uniqueModList = modFilesByFirstId.entrySet().stream().map(this::selectNewestModInfo).toList();
+// Java: uniqueModList = modFilesByFirstId.entrySet().stream().map(this::selectNewestModInfo).toList();
     LIBMATTI_FML_ModFile **uniqueModList = malloc(sizeof(LIBMATTI_FML_ModFile *) * (modGroups.count > 0 ? modGroups.count : 1));
     size_t uniqueModCount = 0;
-    // Java: uniqueLibListWithVersion = libFilesWithVersionByModuleName.entrySet().stream().map(this::selectNewestModInfo).toList();
+// Java: uniqueLibListWithVersion = libFilesWithVersionByModuleName.entrySet().stream().map(this::selectNewestModInfo).toList();
     LIBMATTI_FML_ModFile **uniqueLibList = malloc(sizeof(LIBMATTI_FML_ModFile *) * (libGroups.count > 0 ? libGroups.count : 1));
     size_t uniqueLibCount = 0;
 
-    // Java: Map<String, List<IModInfo>> modIds = uniqueModList.stream().map(ModFile::getModInfos).flatMap(...).collect(groupingBy(IModInfo::getModId));
+// Java: Map<String, List<IModInfo>> modIds = uniqueModList.stream().map(ModFile::getModInfos).flatMap(...).collect(groupingBy(IModInfo::getModId));
     char **modIdKeys = NULL;
     LIBMATTI_NEOFORGESPI_IModInfo ***modIdValues = NULL;
     size_t *modIdValueCounts = NULL;
@@ -190,7 +190,7 @@ LIBMATTI_FML_UniqueModListData *LIBMATTI_FML_UniqueModListBuilder_BuildUniqueLis
     for (size_t i = 0; i < libGroups.count; i++)
         uniqueLibList[uniqueLibCount++] = selectNewestModInfo(&libGroups, i);
 
-    // Java: List<ModLoadingIssue> dupedModErrors = modIds.values().stream().filter(modInfos -> modInfos.size() > 1).map(...)
+// Java: List<ModLoadingIssue> dupedModErrors = modIds.values().stream().filter(modInfos -> modInfos.size() > 1).map(...)
     for (size_t i = 0; i < modIdCount; i++)
     {
         if (modIdValueCounts[i] <= 1) continue;
@@ -200,7 +200,7 @@ LIBMATTI_FML_UniqueModListData *LIBMATTI_FML_UniqueModListBuilder_BuildUniqueLis
             files[j] = LIBMATTI_FML_ModFileInfo_GetFile(
                 LIBMATTI_FML_ModInfo_GetOwningFile(LIBMATTI_FML_ModInfo_AsConcrete(modIdValues[i][j])));
 
-        // Java: mods.stream().map(modInfo -> modInfo.getOwningFile().getFile().getFileName()).collect(joining(", "))
+// Java: mods.stream().map(modInfo -> modInfo.getOwningFile().getFile().getFileName()).collect(joining(", "))
         char *fileNames = strdup("");
         size_t namesLength = 0;
         for (size_t j = 0; j < modIdValueCounts[i]; j++)
@@ -220,7 +220,7 @@ LIBMATTI_FML_UniqueModListData *LIBMATTI_FML_UniqueModListBuilder_BuildUniqueLis
         free(files);
     }
 
-    // Java: List<ModLoadingIssue> dupedLibErrors = versionedLibIds.values().stream().filter(modFiles -> modFiles.size() > 1).map(...)
+// Java: List<ModLoadingIssue> dupedLibErrors = versionedLibIds.values().stream().filter(modFiles -> modFiles.size() > 1).map(...)
     for (size_t i = 0; i < libGroups.count; i++)
     {
         if (libGroups.valueCounts[i] <= 1) continue;
@@ -262,16 +262,16 @@ LIBMATTI_FML_UniqueModListData *LIBMATTI_FML_UniqueModListBuilder_BuildUniqueLis
         return NULL;
     }
 
-    // Java: Map<String, List<ModFile>> uniqueModFilesByFirstId = uniqueModList.stream().collect(groupingBy(UniqueModListBuilder::getModId));
+// Java: Map<String, List<ModFile>> uniqueModFilesByFirstId = uniqueModList.stream().collect(groupingBy(UniqueModListBuilder::getModId));
     LIBMATTI_FML_UniqueModListData *data = calloc(1, sizeof(LIBMATTI_FML_UniqueModListData));
 
-    // Java: List<ModFile> loadedList = new ArrayList<>(); loadedList.addAll(uniqueModList); loadedList.addAll(uniqueLibListWithVersion);
+// Java: List<ModFile> loadedList = new ArrayList<>(); loadedList.addAll(uniqueModList); loadedList.addAll(uniqueLibListWithVersion);
     data->modFileCount = uniqueModCount + uniqueLibCount;
     data->modFiles = malloc(sizeof(LIBMATTI_FML_ModFile *) * (data->modFileCount > 0 ? data->modFileCount : 1));
     memcpy(data->modFiles, uniqueModList, sizeof(LIBMATTI_FML_ModFile *) * uniqueModCount);
     memcpy(data->modFiles + uniqueModCount, uniqueLibList, sizeof(LIBMATTI_FML_ModFile *) * uniqueLibCount);
 
-    // Java: Set<ModFile> discardedModFiles = Collections.newSetFromMap(new IdentityHashMap<>()); discardedModFiles.addAll(this.modFiles); loadedList.forEach(discardedModFiles::remove);
+// Java: Set<ModFile> discardedModFiles = Collections.newSetFromMap(new IdentityHashMap<>()); discardedModFiles.addAll(this.modFiles); loadedList.forEach(discardedModFiles::remove);
     data->discardedFiles = malloc(sizeof(LIBMATTI_FML_ModFile *) * (builder->modFileCount > 0 ? builder->modFileCount : 1));
     for (size_t i = 0; i < builder->modFileCount; i++)
     {
@@ -282,7 +282,7 @@ LIBMATTI_FML_UniqueModListData *LIBMATTI_FML_UniqueModListBuilder_BuildUniqueLis
         if (!loaded) data->discardedFiles[data->discardedFileCount++] = builder->modFiles[i];
     }
 
-    // Java: group the unique mod files by their first mod id
+// Java: group the unique mod files by their first mod id
     ModFileGroups byFirstId = {0};
     for (size_t i = 0; i < uniqueModCount; i++)
         groupAdd(&byFirstId, getModId(uniqueModList[i]), uniqueModList[i]);

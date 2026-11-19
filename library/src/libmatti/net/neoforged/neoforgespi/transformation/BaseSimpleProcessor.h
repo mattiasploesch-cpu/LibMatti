@@ -1,6 +1,7 @@
-// Port of net.neoforged.neoforgespi.transformation.BaseSimpleProcessor (package-private in Java).
-// The Java class's final methods are helpers that the concrete simple processors wire into their
-// ClassProcessor vtable slots.
+
+
+
+
 
 #ifndef MATTICRAFT_NEOFORGESPI_TRANSFORMATION_BASESIMPLEPROCESSOR_H
 #define MATTICRAFT_NEOFORGESPI_TRANSFORMATION_BASESIMPLEPROCESSOR_H
@@ -15,4 +16,4 @@ void LIBMATTI_NEOFORGESPI_BaseSimpleProcessor_AfterProcessing(
 // Java: @Override public Set<ProcessorName> runsAfter() { return Set.of(SIMPLE_PROCESSORS_GROUP, COMPUTING_FRAMES); }
 const LIBMATTI_NEOFORGESPI_ProcessorName **LIBMATTI_NEOFORGESPI_BaseSimpleProcessor_RunsAfter(size_t *count);
 
-#endif //MATTICRAFT_NEOFORGESPI_TRANSFORMATION_BASESIMPLEPROCESSOR_H
+#endif

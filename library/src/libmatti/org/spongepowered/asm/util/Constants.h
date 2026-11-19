@@ -1,4 +1,5 @@
-// Port of org.spongepowered.asm.util.Constants (the parts the FML layer uses).
+
+
 
 #ifndef MATTICRAFT_SP_ASM_UTIL_CONSTANTS_H
 #define MATTICRAFT_SP_ASM_UTIL_CONSTANTS_H
@@ -20,4 +21,4 @@
 #define LIBMATTI_SP_Constants_ATTR_MIXINCONNECTOR "MixinConnector"
 #define LIBMATTI_SP_Constants_ATTR_COMPATIBILITY "MixinCompatibilityLevel"
 
-#endif //MATTICRAFT_SP_ASM_UTIL_CONSTANTS_H
+#endif

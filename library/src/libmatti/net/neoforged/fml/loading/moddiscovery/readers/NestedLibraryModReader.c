@@ -8,7 +8,7 @@ LIBMATTI_NEOFORGESPI_IModFile *LIBMATTI_FML_NestedLibraryModReader_Read(
     const LIBMATTI_NEOFORGESPI_ModFileDiscoveryAttributes *discoveryAttributes)
 {
     (void) self;
-    // Java: if (discoveryAttributes.parent() != null) return IModFile.create(jar, JarModsDotTomlModFileReader::manifestParser, IModFile.Type.LIBRARY, discoveryAttributes);
+// Java: if (discoveryAttributes.parent() != null) return IModFile.create(jar, JarModsDotTomlModFileReader::manifestParser, IModFile.Type.LIBRARY, discoveryAttributes);
     if (discoveryAttributes->parent == NULL)
         return NULL;
 

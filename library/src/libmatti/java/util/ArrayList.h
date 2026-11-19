@@ -1,5 +1,6 @@
-// Port of java.util.ArrayList<E>.
-// E is void* in the C port; the list does not own the elements (the owner frees).
+
+
+
 
 #ifndef MATTICRAFT_JAVA_UTIL_ARRAYLIST_H
 #define MATTICRAFT_JAVA_UTIL_ARRAYLIST_H
@@ -49,4 +50,4 @@ void LIBMATTI_JU_ArrayList_EnsureCapacity(LIBMATTI_JU_ArrayList *list, size_t mi
 // Java: Collections.sort(list, comparator)
 void LIBMATTI_JU_ArrayList_Sort(LIBMATTI_JU_ArrayList *list, int (*comparator)(const void *a, const void *b));
 
-#endif //MATTICRAFT_JAVA_UTIL_ARRAYLIST_H
+#endif

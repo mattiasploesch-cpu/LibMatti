@@ -1,6 +1,7 @@
-// Port of net.minecraft.world.level.block.state.BlockState (BlockBehaviour.BlockStateBase).
-// Java's BlockStateBase carries the owner block plus the StateHolder machinery; the port
-// embeds the StateHolder and adds the block accessors and the default-state link.
+
+
+
+
 
 #ifndef MATTICRAFT_MC_BLOCKSTATE_BLOCKSTATE_H
 #define MATTICRAFT_MC_BLOCKSTATE_BLOCKSTATE_H
@@ -14,7 +15,7 @@ extern "C" {
 // Java: public class BlockState extends BlockBehaviour.BlockStateBase
 typedef struct LIBMATTI_MC_BlockState
 {
-    // Java: the StateHolder base (owner = the Block, values, neighbours)
+// Java: the StateHolder base (owner = the Block, values, neighbours)
     LIBMATTI_MC_StateHolder holder;
 } LIBMATTI_MC_BlockState;
 
@@ -39,4 +40,4 @@ int LIBMATTI_MC_BlockState_HasProperty(const LIBMATTI_MC_BlockState *state, cons
 }
 #endif
 
-#endif //MATTICRAFT_MC_BLOCKSTATE_BLOCKSTATE_H
+#endif

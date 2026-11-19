@@ -1,4 +1,5 @@
-// Port of net.minecraft.client.resources.model.SpriteGetter (implementation).
+
+
 
 #include "libmatti/net/minecraft/client/resources/model/SpriteGetter.h"
 
@@ -13,7 +14,7 @@ int LIBMATTI_MC_SpriteGetter_SpriteRect(const LIBMATTI_MC_TextureAtlas *atlas, c
     if (atlas == NULL || textureId == NULL)
         return 0;
 
-    // Java: the model texture ids ("block/stone") become atlas Identifiers;
+// Java: the model texture ids ("block/stone") become atlas Identifiers;
     // a missing namespace defaults to "minecraft" like Identifier.parse.
     LIBMATTI_MC_Identifier *id = strchr(textureId, ':') != NULL
                                      ? LIBMATTI_MC_Identifier_Parse(textureId)
@@ -21,7 +22,7 @@ int LIBMATTI_MC_SpriteGetter_SpriteRect(const LIBMATTI_MC_TextureAtlas *atlas, c
     if (id == NULL)
         return 0;
 
-    // Java: getSprite(Identifier) falls back to the missing sprite.
+// Java: getSprite(Identifier) falls back to the missing sprite.
     LIBMATTI_MC_TextureAtlasSprite *sprite = LIBMATTI_MC_TextureAtlas_GetSprite(atlas, id);
     LIBMATTI_MC_Identifier_Free(id);
     if (sprite == NULL || sprite->contents == NULL)
@@ -32,7 +33,7 @@ int LIBMATTI_MC_SpriteGetter_SpriteRect(const LIBMATTI_MC_TextureAtlas *atlas, c
     if (atlasWidth <= 0 || atlasHeight <= 0)
         return 0;
 
-    // Java: getU0/getV0/getU1/getV1 = (x + inset) / atlasSize - the port
+// Java: getU0/getV0/getU1/getV1 = (x + inset) / atlasSize - the port
     // keeps the un-inset rect (the vanilla sprites carry no frame inset).
     uvRect[0] = (float) sprite->x / (float) atlasWidth;
     uvRect[1] = (float) sprite->y / (float) atlasHeight;

@@ -1,5 +1,6 @@
-// Port of net.neoforged.fml.loading.ModSorter.
-// Dependency overrides resolve through FMLConfig.getDependencyOverrides().
+
+
+
 
 #ifndef MATTICRAFT_FML_LOADING_MODSORTER_H
 #define MATTICRAFT_FML_LOADING_MODSORTER_H
@@ -21,7 +22,7 @@ typedef struct
     size_t discouragedCount;
     LIBMATTI_NEOFORGESPI_IModInfo_ModVersion **versionResolution;
     size_t versionResolutionCount;
-    // Java: Map<String, ArtifactVersion> modVersions
+// Java: Map<String, ArtifactVersion> modVersions
     char **modVersionKeys;
     LIBMATTI_NEOFORGESPI_ArtifactVersion **modVersionValues;
     size_t modVersionCount;
@@ -44,4 +45,4 @@ LIBMATTI_FML_ModLoadingIssue **LIBMATTI_FML_DependencyResolutionResult_BuildWarn
 LIBMATTI_FML_ModLoadingIssue **LIBMATTI_FML_DependencyResolutionResult_BuildErrorMessages(
     const LIBMATTI_FML_DependencyResolutionResult *result, size_t *count);
 
-#endif //MATTICRAFT_FML_LOADING_MODSORTER_H
+#endif

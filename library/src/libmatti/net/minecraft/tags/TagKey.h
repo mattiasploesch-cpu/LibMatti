@@ -1,4 +1,5 @@
-// Port of net.minecraft.tags.TagKey.
+
+
 
 #ifndef MATTICRAFT_MC_TAGS_TAGKEY_H
 #define MATTICRAFT_MC_TAGS_TAGKEY_H
@@ -16,8 +17,8 @@ extern "C" {
 // port keeps the two identifiers and compares by value.
 typedef struct LIBMATTI_MC_TagKey
 {
-    char *registry;   // Java: registry().location() - the registry the tag belongs to
-    char *location;   // Java: location() - the tag itself, e.g. minecraft:planks
+    char *registry;// Java: registry().location() - the registry the tag belongs to
+    char *location;// Java: location() - the tag itself, e.g. minecraft:planks
 } LIBMATTI_MC_TagKey;
 
 // Java: public static <T> TagKey<T> create(ResourceKey<? extends Registry<T>> registry, Identifier location)
@@ -35,4 +36,4 @@ void LIBMATTI_MC_TagKey_Free(LIBMATTI_MC_TagKey *tag);
 }
 #endif
 
-#endif //MATTICRAFT_MC_TAGS_TAGKEY_H
+#endif

@@ -1,4 +1,5 @@
-// Port of net.neoforged.bus.api.SubscribeEvent.
+
+
 
 #include "libmatti/net/neoforged/bus/api/SubscribeEvent.h"
 

@@ -148,22 +148,22 @@ static LIBMATTI_FML_FMLLoader *fmlloader_new(LIBMATTI_JL_ClassLoader *currentCla
 {
     LIBMATTI_FML_FMLLoader *loader = calloc(1, sizeof(LIBMATTI_FML_FMLLoader));
 
-    // Java: private final ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
+// Java: private final ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
     loader->originalClassLoader =
         LIBMATTI_JL_Thread_GetContextClassLoader(LIBMATTI_JL_Thread_CurrentThread());
     loader->currentClassLoader = currentClassLoader;
 
-    // Java: this.programArgs = ProgramArgs.from(programArgs);
+// Java: this.programArgs = ProgramArgs.from(programArgs);
     loader->programArgs = LIBMATTI_FML_ProgramArgs_From(argc, argv);
 
     loader->dist = dist;
     loader->production = production;
     loader->gameDir = gameDir;
 
-    // Java: private final ClassProcessorAuditLog classTransformerAuditLog = new ClassProcessorAuditLog();
+// Java: private final ClassProcessorAuditLog classTransformerAuditLog = new ClassProcessorAuditLog();
     loader->classTransformerAuditLog = LIBMATTI_FML_ClassProcessorAuditLog_New();
 
-    // Java: versionInfo = new VersionInfo(this.programArgs.remove("fml.neoForgeVersion"),
+// Java: versionInfo = new VersionInfo(this.programArgs.remove("fml.neoForgeVersion"),
     //         this.programArgs.remove("fml.mcVersion"), this.programArgs.remove("fml.neoFormVersion"));
     char *neoForgeVersion = LIBMATTI_FML_ProgramArgs_Remove(loader->programArgs, "fml.neoForgeVersion");
     char *mcVersion = LIBMATTI_FML_ProgramArgs_Remove(loader->programArgs, "fml.mcVersion");
@@ -173,24 +173,24 @@ static LIBMATTI_FML_FMLLoader *fmlloader_new(LIBMATTI_JL_ClassLoader *currentCla
     free(mcVersion);
     free(neoFormVersion);
 
-    // Java: LOGGER.info("Starting FancyModLoader version {} ({} in {})", FMLVersion.getVersion(), dist, production ? "PROD" : "DEV");
+// Java: LOGGER.info("Starting FancyModLoader version {} ({} in {})", FMLVersion.getVersion(), dist, production ? "PROD" : "DEV");
     LIBMATTI_ML_Logger_Info(LOGGER(), NULL, "Starting FancyModLoader version {} ({} in {})",
                             LIBMATTI_FML_FMLVersion_GetVersion(),
                             dist == LIBMATTI_DIST_CLIENT ? "CLIENT" : "DEDICATED_SERVER",
                             production ? "PROD" : "DEV");
 
-    // Java: LOGGER.info("Game directory: {}", gameDir);
+// Java: LOGGER.info("Game directory: {}", gameDir);
     LIBMATTI_ML_Logger_Info(LOGGER(), NULL, "Game directory: {}", gameDir);
 
-    // Java: makeCurrent();
+// Java: makeCurrent();
     {
-        // Java: FMLLoader witness = current.compareAndExchange(null, this);
+// Java: FMLLoader witness = current.compareAndExchange(null, this);
         LIBMATTI_FML_FMLLoader *witness = s_current;
         s_current = loader;
 
         if (witness != NULL)
         {
-            // Java: throw new IllegalStateException("Another FML loader is already active: " + witness);
+// Java: throw new IllegalStateException("Another FML loader is already active: " + witness);
             char witnessIdentity[2 * sizeof(void *) + 1];
             snprintf(witnessIdentity, sizeof(witnessIdentity), "%zx", (size_t) (uintptr_t) witness);
             LIBMATTI_ML_Logger_Error(LOGGER(), NULL, "Another FML loader is already active: {}", witnessIdentity);
@@ -204,7 +204,7 @@ static LIBMATTI_FML_FMLLoader *fmlloader_new(LIBMATTI_JL_ClassLoader *currentCla
 LIBMATTI_FML_ClassProcessorAuditSource *LIBMATTI_FML_FMLLoader_GetClassTransformerAuditLog(
     const LIBMATTI_FML_FMLLoader *loader)
 {
-    // Java: return classTransformerAuditLog;
+// Java: return classTransformerAuditLog;
     return &loader->classTransformerAuditLog->source;
 }
 
@@ -212,11 +212,11 @@ LIBMATTI_FML_ClassProcessorAuditSource *LIBMATTI_FML_FMLLoader_GetClassTransform
 void **LIBMATTI_FML_FMLLoader_DiscoveryResult_AllContent(const LIBMATTI_FML_FMLLoader_DiscoveryResult *result,
                                                          size_t *count)
 {
-    // Java: var content = new ArrayList<ModFile>(pluginContent.size() + gameContent.size() + gameLibraryContent.size());
+// Java: var content = new ArrayList<ModFile>(pluginContent.size() + gameContent.size() + gameLibraryContent.size());
     *count = result->pluginContentCount + result->gameContentCount + result->gameLibraryContentCount;
     void **content = malloc(sizeof(*content) * (*count == 0 ? 1 : *count));
 
-    // Java: content.addAll(pluginContent); content.addAll(gameContent); content.addAll(gameLibraryContent);
+// Java: content.addAll(pluginContent); content.addAll(gameContent); content.addAll(gameLibraryContent);
     size_t index = 0;
     for (size_t i = 0; i < result->pluginContentCount; i++) content[index++] = result->pluginContent[i];
     for (size_t i = 0; i < result->gameContentCount; i++) content[index++] = result->gameContent[i];
@@ -229,11 +229,11 @@ void **LIBMATTI_FML_FMLLoader_DiscoveryResult_AllContent(const LIBMATTI_FML_FMLL
 void **LIBMATTI_FML_FMLLoader_DiscoveryResult_AllGameContent(const LIBMATTI_FML_FMLLoader_DiscoveryResult *result,
                                                             size_t *count)
 {
-    // Java: var content = new ArrayList<ModFile>(gameContent.size() + gameLibraryContent.size());
+// Java: var content = new ArrayList<ModFile>(gameContent.size() + gameLibraryContent.size());
     *count = result->gameContentCount + result->gameLibraryContentCount;
     void **content = malloc(sizeof(*content) * (*count == 0 ? 1 : *count));
 
-    // Java: content.addAll(gameContent); content.addAll(gameLibraryContent);
+// Java: content.addAll(gameContent); content.addAll(gameLibraryContent);
     size_t index = 0;
     for (size_t i = 0; i < result->gameContentCount; i++) content[index++] = result->gameContent[i];
     for (size_t i = 0; i < result->gameLibraryContentCount; i++) content[index++] = result->gameLibraryContent[i];
@@ -244,7 +244,7 @@ void **LIBMATTI_FML_FMLLoader_DiscoveryResult_AllGameContent(const LIBMATTI_FML_
 // Java: public boolean hasErrors()
 int LIBMATTI_FML_FMLLoader_DiscoveryResult_HasErrors(const LIBMATTI_FML_FMLLoader_DiscoveryResult *result)
 {
-    // Java: return discoveryIssues.stream().anyMatch(i -> i.severity() == ModLoadingIssue.Severity.ERROR);
+// Java: return discoveryIssues.stream().anyMatch(i -> i.severity() == ModLoadingIssue.Severity.ERROR);
     for (size_t i = 0; i < result->discoveryIssueCount; i++)
     {
         if (result->discoveryIssues[i]->severity == LIBMATTI_FML_ModLoadingIssue_SEVERITY_ERROR) return 1;
@@ -258,7 +258,7 @@ void *LIBMATTI_FML_FMLLoader_GetModFileByClass(const LIBMATTI_FML_FMLLoader *loa
 {
     if (loader->loadingModList == NULL || clazz == NULL) return NULL;
 
-    // Java: var packageName = clazz.getPackageName(); - everything before the last '.'
+// Java: var packageName = clazz.getPackageName(); - everything before the last '.'
     const char *className = LIBMATTI_JL_Class_GetName(clazz);
     const char *lastDot = className != NULL ? strrchr(className, '.') : NULL;
     if (lastDot == NULL) return NULL;
@@ -268,7 +268,7 @@ void *LIBMATTI_FML_FMLLoader_GetModFileByClass(const LIBMATTI_FML_FMLLoader *loa
     memcpy(packageName, className, packageLength);
     packageName[packageLength] = '\0';
 
-    // Java: if (packageName.isEmpty()) return null;
+// Java: if (packageName.isEmpty()) return null;
     // Java: return loadingModList.getPackageIndex().get(packageName);
     const char **packageNames = NULL;
     size_t count = 0;
@@ -290,7 +290,7 @@ void *LIBMATTI_FML_FMLLoader_GetModFileByClass(const LIBMATTI_FML_FMLLoader *loa
 // Java: public void addCloseCallback(AutoCloseable callback)
 void LIBMATTI_FML_FMLLoader_AddCloseCallback(LIBMATTI_FML_FMLLoader *loader, LIBMATTI_JL_AutoCloseable callback)
 {
-    // Java: closeCallbacks.add(callback);
+// Java: closeCallbacks.add(callback);
     add_closeable(&loader->closeCallbacks, &loader->closeCallbackCount, callback);
 }
 
@@ -302,10 +302,10 @@ void LIBMATTI_FML_FMLLoader_Close(LIBMATTI_FML_FMLLoader *loader)
     char identity[2 * sizeof(void *) + 1];
     snprintf(identity, sizeof(identity), "%zx", (size_t) (uintptr_t) loader);
 
-    // Java: LOGGER.info("Closing FML Loader {}", Integer.toHexString(System.identityHashCode(this)));
+// Java: LOGGER.info("Closing FML Loader {}", Integer.toHexString(System.identityHashCode(this)));
     LIBMATTI_ML_Logger_Info(LOGGER(), NULL, "Closing FML Loader {}", identity);
 
-    // Java: for (var closeCallback : closeCallbacks) { try { closeCallback.close(); } catch (Exception e) {
+// Java: for (var closeCallback : closeCallbacks) { try { closeCallback.close(); } catch (Exception e) {
     //           LOGGER.error("Failed to run mod-supplied close callback {}", closeCallback, e); } }
     for (size_t i = 0; i < loader->closeCallbackCount; i++)
     {
@@ -315,27 +315,27 @@ void LIBMATTI_FML_FMLLoader_Close(LIBMATTI_FML_FMLLoader *loader)
     loader->closeCallbacks = NULL;
     loader->closeCallbackCount = 0;
 
-    // Java: for (var modFile : earlyServicesJars) { modFile.close(); }
+// Java: for (var modFile : earlyServicesJars) { modFile.close(); }
     for (size_t i = 0; i < loader->earlyServicesJarCount; i++)
         LIBMATTI_FML_ModFile_Close((LIBMATTI_FML_ModFile *) loader->earlyServicesJars[i]);
 
     if (loader->loadingModList != NULL)
     {
-        // Java: for (var modFile : loadingModList.getModFiles()) { modFile.getFile().close(); }
+// Java: for (var modFile : loadingModList.getModFiles()) { modFile.getFile().close(); }
         size_t modFileCount = 0;
         LIBMATTI_FML_ModFileInfo **modFiles =
             LIBMATTI_FML_LoadingModList_GetModFiles(loader->loadingModList, &modFileCount);
         for (size_t i = 0; i < modFileCount; i++)
             LIBMATTI_FML_ModFile_Close(LIBMATTI_FML_ModFileInfo_GetFile(modFiles[i]));
 
-        // Java: for (var modFile : loadingModList.getPlugins()) { ((ModFile) modFile.getFile()).close(); }
+// Java: for (var modFile : loadingModList.getPlugins()) { ((ModFile) modFile.getFile()).close(); }
         size_t pluginCount = 0;
         LIBMATTI_NEOFORGESPI_IModFileInfo **plugins =
             LIBMATTI_FML_LoadingModList_GetPlugins(loader->loadingModList, &pluginCount);
         for (size_t i = 0; i < pluginCount; i++)
             LIBMATTI_FML_ModFile_Close((LIBMATTI_FML_ModFile *) LIBMATTI_NEOFORGESPI_IModFileInfo_GetFile(plugins[i]));
 
-        // Java: for (var modFile : loadingModList.getGameLibraries()) { ((ModFile) modFile).close(); }
+// Java: for (var modFile : loadingModList.getGameLibraries()) { ((ModFile) modFile).close(); }
         size_t gameLibraryCount = 0;
         LIBMATTI_NEOFORGESPI_IModFile **gameLibraries =
             LIBMATTI_FML_LoadingModList_GetGameLibraries(loader->loadingModList, &gameLibraryCount);
@@ -343,7 +343,7 @@ void LIBMATTI_FML_FMLLoader_Close(LIBMATTI_FML_FMLLoader *loader)
             LIBMATTI_FML_ModFile_Close((LIBMATTI_FML_ModFile *) gameLibraries[i]);
     }
 
-    // Java: if (this == current.compareAndExchange(this, null)) { ModList.clear(); ModLoader.clear(); }
+// Java: if (this == current.compareAndExchange(this, null)) { ModList.clear(); ModLoader.clear(); }
     if (loader == s_current)
     {
         s_current = NULL;
@@ -351,7 +351,7 @@ void LIBMATTI_FML_FMLLoader_Close(LIBMATTI_FML_FMLLoader *loader)
         LIBMATTI_FML_ModLoader_Clear();
     }
 
-    // Java: for (var ownedResource : ownedResources) { try { ownedResource.close(); } catch (Exception e) {
+// Java: for (var ownedResource : ownedResources) { try { ownedResource.close(); } catch (Exception e) {
     //           LOGGER.error("Failed to close resource {} owned by FMLLoader", ownedResource, e); } }
     for (size_t i = 0; i < loader->ownedResourceCount; i++)
     {
@@ -361,7 +361,7 @@ void LIBMATTI_FML_FMLLoader_Close(LIBMATTI_FML_FMLLoader *loader)
     loader->ownedResources = NULL;
     loader->ownedResourceCount = 0;
 
-    // Java: if (Thread.currentThread().getContextClassLoader() == currentClassLoader) {
+// Java: if (Thread.currentThread().getContextClassLoader() == currentClassLoader) {
     //           Thread.currentThread().setContextClassLoader(originalClassLoader); }
     LIBMATTI_JL_Thread *thread = LIBMATTI_JL_Thread_CurrentThread();
     if (LIBMATTI_JL_Thread_GetContextClassLoader(thread) == loader->currentClassLoader)
@@ -370,7 +370,8 @@ void LIBMATTI_FML_FMLLoader_Close(LIBMATTI_FML_FMLLoader *loader)
     }
 }
 
-// Java has no destructor; the C port releases what the constructor allocated.
+
+
 void LIBMATTI_FML_FMLLoader_Free(LIBMATTI_FML_FMLLoader *loader)
 {
     if (loader == NULL) return;
@@ -409,31 +410,31 @@ void LIBMATTI_FML_FMLLoader_Free(LIBMATTI_FML_FMLLoader *loader)
 // Java: public ClassLoader getCurrentClassLoader()
 LIBMATTI_JL_ClassLoader *LIBMATTI_FML_FMLLoader_GetCurrentClassLoader(const LIBMATTI_FML_FMLLoader *loader)
 {
-    // Java: return currentClassLoader;
+// Java: return currentClassLoader;
     return loader->currentClassLoader;
 }
 
 // Java: public ProgramArgs getProgramArgs()
 LIBMATTI_FML_ProgramArgs *LIBMATTI_FML_FMLLoader_GetProgramArgs(const LIBMATTI_FML_FMLLoader *loader)
 {
-    // Java: return programArgs;
+// Java: return programArgs;
     return loader->programArgs;
 }
 
 // Java: @ApiStatus.Internal public IBindingsProvider getBindings()
 LIBMATTI_FML_IBindingsProvider *LIBMATTI_FML_FMLLoader_GetBindings(LIBMATTI_FML_FMLLoader *loader)
 {
-    // Java: if (bindings == null) { synchronized (this) { if (bindings == null) { ... } } }
+// Java: if (bindings == null) { synchronized (this) { if (bindings == null) { ... } } }
     if (loader->bindings == NULL)
     {
         if (loader->gameLayer == NULL)
         {
-            // Java: throw new IllegalStateException("Cannot retrieve bindings before the game layer is initialized.");
+// Java: throw new IllegalStateException("Cannot retrieve bindings before the game layer is initialized.");
             LIBMATTI_ML_Logger_Error(LOGGER(), NULL, "Cannot retrieve bindings before the game layer is initialized.");
             return NULL;
         }
 
-        // Java: var providers = ServiceLoader.load(gameLayer, IBindingsProvider.class).stream().toList();
+// Java: var providers = ServiceLoader.load(gameLayer, IBindingsProvider.class).stream().toList();
         size_t providerCount = 0;
         LIBMATTI_JU_ServiceLoader *services =
             LIBMATTI_JU_ServiceLoader_Load(loader->gameLayer, "net.neoforged.fml.IBindingsProvider");
@@ -441,7 +442,7 @@ LIBMATTI_FML_IBindingsProvider *LIBMATTI_FML_FMLLoader_GetBindings(LIBMATTI_FML_
 
         if (providerCount == 0)
         {
-            // Java: throw new IllegalStateException("Could not find bindings provider");
+// Java: throw new IllegalStateException("Could not find bindings provider");
             LIBMATTI_ML_Logger_Error(LOGGER(), NULL, "Could not find bindings provider");
             LIBMATTI_JU_ServiceLoader_Free(services);
             return NULL;
@@ -449,7 +450,7 @@ LIBMATTI_FML_IBindingsProvider *LIBMATTI_FML_FMLLoader_GetBindings(LIBMATTI_FML_
 
         if (providerCount > 1)
         {
-            // Java: String providerList = providers.stream().map(p -> p.type().getName()).collect(Collectors.joining(", "));
+// Java: String providerList = providers.stream().map(p -> p.type().getName()).collect(Collectors.joining(", "));
             //       throw new IllegalStateException("Found more than one bindings provider: " + providerList);
             size_t length = 1;
             for (size_t i = 0; i < providerCount; i++)
@@ -467,7 +468,7 @@ LIBMATTI_FML_IBindingsProvider *LIBMATTI_FML_FMLLoader_GetBindings(LIBMATTI_FML_
             return NULL;
         }
 
-        // Java: bindings = providers.getFirst().get();
+// Java: bindings = providers.getFirst().get();
         loader->bindings = providers[0].provider;
         LIBMATTI_JU_ServiceLoader_Free(services);
     }
@@ -478,7 +479,7 @@ LIBMATTI_FML_IBindingsProvider *LIBMATTI_FML_FMLLoader_GetBindings(LIBMATTI_FML_
 // Java: public static FMLLoader create(StartupArgs startupArgs)
 LIBMATTI_FML_FMLLoader *LIBMATTI_FML_FMLLoader_Create(LIBMATTI_FML_StartupArgs *startupArgs)
 {
-    // Java: var instrumentation = InstrumentationHelper.obtainInstrumentation();
+// Java: var instrumentation = InstrumentationHelper.obtainInstrumentation();
     return LIBMATTI_FML_FMLLoader_CreateWithInstrumentation(
         LIBMATTI_FML_InstrumentationHelper_ObtainInstrumentation(), startupArgs);
 }
@@ -487,54 +488,54 @@ LIBMATTI_FML_FMLLoader *LIBMATTI_FML_FMLLoader_Create(LIBMATTI_FML_StartupArgs *
 LIBMATTI_FML_FMLLoader *LIBMATTI_FML_FMLLoader_CreateWithInstrumentation(void *instrumentation,
                                                                         LIBMATTI_FML_StartupArgs *startupArgs)
 {
-    // Java: var initialLoader = Objects.requireNonNullElse(startupArgs.parentClassLoader(), ClassLoader.getSystemClassLoader());
+// Java: var initialLoader = Objects.requireNonNullElse(startupArgs.parentClassLoader(), ClassLoader.getSystemClassLoader());
     LIBMATTI_JL_ClassLoader *initialLoader = startupArgs->parentClassLoader != NULL
                                                  ? startupArgs->parentClassLoader
                                                  : LIBMATTI_JL_ClassLoader_GetSystemClassLoader();
 
-    // Java: PathPrettyPrinting.addRoot(startupArgs.gameDirectory());
+// Java: PathPrettyPrinting.addRoot(startupArgs.gameDirectory());
     LIBMATTI_FML_PathPrettyPrinting_AddRoot(startupArgs->gameDirectory);
 
-    // Java: var loader = new FMLLoader(initialLoader, startupArgs.programArgs(), Objects.requireNonNullElseGet(startupArgs.dist(),
+// Java: var loader = new FMLLoader(initialLoader, startupArgs.programArgs(), Objects.requireNonNullElseGet(startupArgs.dist(),
     //             () -> detectDist(initialLoader)), detectProduction(initialLoader), startupArgs.gameDirectory());
     // The C port of StartupArgs has no nullable Dist, so detectDist(initialLoader) is not reachable here.
     LIBMATTI_FML_FMLLoader *loader = fmlloader_new(initialLoader, startupArgs->argc, startupArgs->programArgs,
                                                    startupArgs->dist, LIBMATTI_FML_FMLLoader_DetectProduction(initialLoader),
                                                    startupArgs->gameDirectory);
 
-    // Java: try {
+// Java: try {
     {
-        // Java: FMLPaths.loadAbsolutePaths(startupArgs.gameDirectory());
+// Java: FMLPaths.loadAbsolutePaths(startupArgs.gameDirectory());
         LIBMATTI_FML_FMLPaths_LoadAbsolutePaths(startupArgs->gameDirectory);
-        // Java: FMLConfig.load();
+// Java: FMLConfig.load();
         LIBMATTI_FML_FMLConfig_Load();
 
-        // Java: var launchContext = loader.new LaunchContextAdapter();
+// Java: var launchContext = loader.new LaunchContextAdapter();
         LIBMATTI_FML_FMLLoader_LaunchContextAdapter *launchContext =
             LIBMATTI_FML_FMLLoader_LaunchContextAdapter_New(loader);
 
-        // Java: for (var claimedFile : startupArgs.claimedFiles()) { launchContext.addLocated(claimedFile.toPath()); }
+// Java: for (var claimedFile : startupArgs.claimedFiles()) { launchContext.addLocated(claimedFile.toPath()); }
         for (size_t i = 0; i < startupArgs->claimedFileCount; i++)
         {
             LIBMATTI_FML_FMLLoader_LaunchContextAdapter_AddLocated(launchContext, startupArgs->claimedFiles[i]);
         }
 
-        // Java: loader.loadEarlyServices(startupArgs);
+// Java: loader.loadEarlyServices(startupArgs);
         LIBMATTI_FML_FMLLoader_LoadEarlyServices(loader, startupArgs);
 
-        // Java: ImmediateWindowHandler.load(launchContext, startupArgs.headless(), loader.programArgs);
+// Java: ImmediateWindowHandler.load(launchContext, startupArgs.headless(), loader.programArgs);
         LIBMATTI_FML_ImmediateWindowHandler_Load(
             LIBMATTI_FML_FMLLoader_LaunchContextAdapter_AsLaunchContext(launchContext), startupArgs->headless,
             loader->programArgs);
 
-        // Java: if (loader.versionInfo.neoForgeVersion() != null) ImmediateWindowHandler.setNeoForgeVersion(loader.versionInfo.neoForgeVersion());
+// Java: if (loader.versionInfo.neoForgeVersion() != null) ImmediateWindowHandler.setNeoForgeVersion(loader.versionInfo.neoForgeVersion());
         if (loader->versionInfo->neoForgeVersion != NULL)
             LIBMATTI_FML_ImmediateWindowHandler_SetNeoForgeVersion(loader->versionInfo->neoForgeVersion);
-        // Java: if (loader.versionInfo.mcVersion() != null) ImmediateWindowHandler.setMinecraftVersion(loader.versionInfo.mcVersion());
+// Java: if (loader.versionInfo.mcVersion() != null) ImmediateWindowHandler.setMinecraftVersion(loader.versionInfo.mcVersion());
         if (loader->versionInfo->mcVersion != NULL)
             LIBMATTI_FML_ImmediateWindowHandler_SetMinecraftVersion(loader->versionInfo->mcVersion);
 
-        // Java: if (startupArgs.headless()) { discoveryResult = loader.runDiscovery(); }
+// Java: if (startupArgs.headless()) { discoveryResult = loader.runDiscovery(); }
         //       else { discoveryResult = runOffThread(loader::runDiscovery); }
         LIBMATTI_FML_FMLLoader_DiscoveryResult *discoveryResult =
             startupArgs->headless
@@ -543,14 +544,14 @@ LIBMATTI_FML_FMLLoader *LIBMATTI_FML_FMLLoader_CreateWithInstrumentation(void *i
 
         if (discoveryResult == NULL)
         {
-            // Java: catch (RuntimeException | Error e) { try { loader.close(); } catch (Throwable t) { e.addSuppressed(t); } throw e; }
+// Java: catch (RuntimeException | Error e) { try { loader.close(); } catch (Throwable t) { e.addSuppressed(t); } throw e; }
             LIBMATTI_FML_FMLLoader_LaunchContextAdapter_Free(launchContext);
             LIBMATTI_FML_FMLLoader_Close(loader);
             LIBMATTI_FML_FMLLoader_Free(loader);
             return NULL;
         }
 
-        // Java: for (var issue : discoveryResult.discoveryIssues()) { LOGGER.atLevel(issue.severity() == ERROR ? Level.ERROR : Level.WARN).setCause(issue.cause()).log("{}", FMLTranslations.translateIssueEnglish(issue)); }
+// Java: for (var issue : discoveryResult.discoveryIssues()) { LOGGER.atLevel(issue.severity() == ERROR ? Level.ERROR : Level.WARN).setCause(issue.cause()).log("{}", FMLTranslations.translateIssueEnglish(issue)); }
         for (size_t i = 0; i < discoveryResult->discoveryIssueCount; i++)
         {
             LIBMATTI_FML_ModLoadingIssue *issue = discoveryResult->discoveryIssues[i];
@@ -566,7 +567,7 @@ LIBMATTI_FML_FMLLoader *LIBMATTI_FML_FMLLoader_CreateWithInstrumentation(void *i
             free(translation);
         }
 
-        // Java: if (discoveryResult.hasErrors()) { throw new ModLoadingException(discoveryResult.discoveryIssues); }
+// Java: if (discoveryResult.hasErrors()) { throw new ModLoadingException(discoveryResult.discoveryIssues); }
         if (LIBMATTI_FML_FMLLoader_DiscoveryResult_HasErrors(discoveryResult))
         {
             lastException = &LIBMATTI_FML_ModLoadingException_NewWithIssues(discoveryResult->discoveryIssues,
@@ -577,7 +578,7 @@ LIBMATTI_FML_FMLLoader *LIBMATTI_FML_FMLLoader_CreateWithInstrumentation(void *i
             return NULL;
         }
 
-        // Java: discoveryResult.allContent().stream().parallel().forEach(ModFile::getModuleDescriptor);
+// Java: discoveryResult.allContent().stream().parallel().forEach(ModFile::getModuleDescriptor);
         // (the port runs it sequentially over the three content lists; the descriptor computes once per file)
         for (size_t i = 0; i < discoveryResult->pluginContentCount; i++)
             LIBMATTI_FML_ModFile_GetModuleDescriptor((LIBMATTI_FML_ModFile *) discoveryResult->pluginContent[i]);
@@ -586,7 +587,7 @@ LIBMATTI_FML_FMLLoader *LIBMATTI_FML_FMLLoader_CreateWithInstrumentation(void *i
         for (size_t i = 0; i < discoveryResult->gameLibraryContentCount; i++)
             LIBMATTI_FML_ModFile_GetModuleDescriptor((LIBMATTI_FML_ModFile *) discoveryResult->gameLibraryContent[i]);
 
-        // Java: if (instrumentation != null) { classLoadingGuardian = new ClassLoadingGuardian(instrumentation, discoveryResult.allGameContent()); loader.ownedResources.add(classLoadingGuardian); }
+// Java: if (instrumentation != null) { classLoadingGuardian = new ClassLoadingGuardian(instrumentation, discoveryResult.allGameContent()); loader.ownedResources.add(classLoadingGuardian); }
         // the guardian's protected packages come from the game content module descriptors
         // Java: the guardian is an owned resource; keep it around for the hand-off below.
         LIBMATTI_FML_ClassLoadingGuardian *classLoadingGuardian = NULL;
@@ -611,12 +612,12 @@ LIBMATTI_FML_FMLLoader *LIBMATTI_FML_FMLLoader_CreateWithInstrumentation(void *i
             add_closeable(&loader->ownedResources, &loader->ownedResourceCount, guardianCloseable);
         }
 
-        // Java: var mixinFacade = new MixinFacade(); loader.ownedResources.add(mixinFacade);
+// Java: var mixinFacade = new MixinFacade(); loader.ownedResources.add(mixinFacade);
         LIBMATTI_FML_MixinFacade *mixinFacade = LIBMATTI_FML_MixinFacade_New();
         LIBMATTI_JL_AutoCloseable mixinFacadeCloseable = {mixinFacade, close_mixin_facade};
         add_closeable(&loader->ownedResources, &loader->ownedResourceCount, mixinFacadeCloseable);
 
-        // Java: loader.loadPlugins(loader.loadingModList.getPlugins());
+// Java: loader.loadPlugins(loader.loadingModList.getPlugins());
         {
             size_t pluginCount = 0;
             LIBMATTI_NEOFORGESPI_IModFileInfo **plugins = LIBMATTI_FML_LoadingModList_GetPlugins(
@@ -624,15 +625,15 @@ LIBMATTI_FML_FMLLoader *LIBMATTI_FML_FMLLoader_CreateWithInstrumentation(void *i
             LIBMATTI_FML_FMLLoader_LoadPlugins(loader, (void **) plugins, pluginCount);
         }
 
-        // Java: loader.languageProviderLoader = new LanguageProviderLoader(launchContext);
+// Java: loader.languageProviderLoader = new LanguageProviderLoader(launchContext);
         loader->languageProviderLoader = LIBMATTI_FML_LanguageProviderLoader_New(
             LIBMATTI_FML_FMLLoader_LaunchContextAdapter_AsLaunchContext(launchContext));
 
-        // Java: for (var modFile : discoveryResult.gameContent) { modFile.identifyLanguage(); }
+// Java: for (var modFile : discoveryResult.gameContent) { modFile.identifyLanguage(); }
         for (size_t i = 0; i < discoveryResult->gameContentCount; i++)
             LIBMATTI_FML_ModFile_IdentifyLanguage(discoveryResult->gameContent[i]);
 
-        // Java: var gameContent = new ArrayList<JarContentsModule>();
+// Java: var gameContent = new ArrayList<JarContentsModule>();
         //       for (var modFile : discoveryResult.allGameContent()) { gameContent.add(new JarContentsModule(modFile.getContents(), modFile.getModuleDescriptor())); }
         size_t allGameContentCount = 0;
         void **allGameContent =
@@ -648,24 +649,24 @@ LIBMATTI_FML_FMLLoader *LIBMATTI_FML_FMLLoader_CreateWithInstrumentation(void *i
         }
         free(allGameContent);
 
-        // Java: var classProcessorSet = createClassProcessorSet(startupArgs, launchContext, discoveryResult, mixinFacade);
+// Java: var classProcessorSet = createClassProcessorSet(startupArgs, launchContext, discoveryResult, mixinFacade);
         LIBMATTI_FML_ClassProcessorSet *classProcessorSet = LIBMATTI_FML_FMLLoader_CreateClassProcessorSet(
             startupArgs, launchContext, discoveryResult, mixinFacade);
 
-        // Java: if (!classProcessorSet.getGeneratedPackages().isEmpty()) {
+// Java: if (!classProcessorSet.getGeneratedPackages().isEmpty()) {
         size_t generatedPackageCount = 0;
         const char **generatedPackages =
             LIBMATTI_FML_ClassProcessorSet_GetGeneratedPackages(classProcessorSet, &generatedPackageCount);
         if (generatedPackageCount > 0)
         {
-            // Java: var descriptor = ModuleDescriptor.newAutomaticModule(ClassProcessor.GENERATED_PACKAGE_MODULE).packages(classProcessorSet.getGeneratedPackages()).build();
+// Java: var descriptor = ModuleDescriptor.newAutomaticModule(ClassProcessor.GENERATED_PACKAGE_MODULE).packages(classProcessorSet.getGeneratedPackages()).build();
             LIBMATTI_JL_ModuleDescriptor *descriptor = LIBMATTI_JL_ModuleDescriptor_Create(
                 LIBMATTI_NEOFORGESPI_ClassProcessor_GENERATED_PACKAGE_MODULE, NULL, 0);
             LIBMATTI_JL_ModuleDescriptor_AddModifier(descriptor, LIBMATTI_JL_MODIFIER_AUTOMATIC);
             for (size_t i = 0; i < generatedPackageCount; i++)
                 LIBMATTI_JL_ModuleDescriptor_AddPackage(descriptor, generatedPackages[i]);
 
-            // Java: gameContent.add(new JarContentsModule(JarContents.empty(Path.of("VirtualJar/" + descriptor.name())), descriptor));
+// Java: gameContent.add(new JarContentsModule(JarContents.empty(Path.of("VirtualJar/" + descriptor.name())), descriptor));
             size_t virtualJarLength = strlen(descriptor->name) + 11;
             char *virtualJarPath = malloc(virtualJarLength);
             snprintf(virtualJarPath, virtualJarLength, "VirtualJar/%s", descriptor->name);
@@ -676,34 +677,35 @@ LIBMATTI_FML_FMLLoader *LIBMATTI_FML_FMLLoader_CreateWithInstrumentation(void *i
                 LIBMATTI_FML_JarContentsModule_NewWithDescriptor(emptyContents, descriptor);
         }
 
-        // Java: var transformingLoader = loader.buildTransformingLoader(classProcessorSet, loader.classTransformerAuditLog, gameContent);
+// Java: var transformingLoader = loader.buildTransformingLoader(classProcessorSet, loader.classTransformerAuditLog, gameContent);
         LIBMATTI_FML_TransformingClassLoader *transformingLoader = LIBMATTI_FML_FMLLoader_BuildTransformingLoader(
             loader, classProcessorSet, loader->classTransformerAuditLog, gameContent, gameContentCount);
 
-        // Java: the local gameContent list becomes unreachable here; the ModuleDescriptors and the
+// Java: the local gameContent list becomes unreachable here; the ModuleDescriptors and the
         //       JarContents stay alive through the game layer's Configuration.
         for (size_t i = 0; i < gameContentCount; i++) free(gameContent[i]);
         free(gameContent);
 
-        // Java: if (classLoadingGuardian != null) { classLoadingGuardian.setAllowedClassLoader(transformingLoader); }
+// Java: if (classLoadingGuardian != null) { classLoadingGuardian.setAllowedClassLoader(transformingLoader); }
         if (classLoadingGuardian != NULL)
         {
             LIBMATTI_FML_ClassLoadingGuardian_SetAllowedClassLoader(classLoadingGuardian,
                                                                     (void *) transformingLoader);
         }
 
-        // Java: mixinFacade.finishInitialization(loader.loadingModList, transformingLoader);
+// Java: mixinFacade.finishInitialization(loader.loadingModList, transformingLoader);
         LIBMATTI_FML_MixinFacade_FinishInitialization(mixinFacade, loader->loadingModList, transformingLoader);
 
-        // Java: ImmediateWindowHandler.updateProgress("Launching minecraft"); ImmediateWindowHandler.renderTick();
+// Java: ImmediateWindowHandler.updateProgress("Launching minecraft"); ImmediateWindowHandler.renderTick();
         LIBMATTI_FML_ImmediateWindowHandler_UpdateProgress("Launching minecraft");
         LIBMATTI_FML_ImmediateWindowHandler_RenderTick();
 
-        // Java keeps the adapter alive through LanguageProviderLoader and the class processor set, both of which
-        // have taken what they need by now.
+
+
+
         LIBMATTI_FML_FMLLoader_LaunchContextAdapter_Free(launchContext);
 
-        // Java: return loader;
+// Java: return loader;
         return loader;
     }
 }
@@ -727,24 +729,24 @@ LIBMATTI_FML_ClassProcessorSet *LIBMATTI_FML_FMLLoader_CreateClassProcessorSet(
     LIBMATTI_FML_StartupArgs *startupArgs, LIBMATTI_FML_FMLLoader_LaunchContextAdapter *launchContext,
     LIBMATTI_FML_FMLLoader_DiscoveryResult *discoveryResult, LIBMATTI_FML_MixinFacade *mixinFacade)
 {
-    // Java: var builtInProcessors = new ArrayList<ClassProcessor>();
+// Java: var builtInProcessors = new ArrayList<ClassProcessor>();
     LIBMATTI_NEOFORGESPI_ClassProcessor **builtInProcessors = NULL;
     size_t builtInCount = 0;
 
-    // Java: builtInProcessors.add(createAccessTransformerService(discoveryResult));
+// Java: builtInProcessors.add(createAccessTransformerService(discoveryResult));
     add_processor(&builtInProcessors, &builtInCount,
                   LIBMATTI_FML_FMLLoader_CreateAccessTransformerService(discoveryResult));
 
-    // Java: builtInProcessors.add(new RuntimeEnumExtender());
+// Java: builtInProcessors.add(new RuntimeEnumExtender());
     add_processor(&builtInProcessors, &builtInCount, &LIBMATTI_FML_RuntimeEnumExtender_New()->processor);
 
-    // Java: builtInProcessors.add(new SimpleProcessorsGroup());
+// Java: builtInProcessors.add(new SimpleProcessorsGroup());
     add_processor(&builtInProcessors, &builtInCount, &LIBMATTI_FML_SimpleProcessorsGroup_New()->processor);
 
-    // Java: if (startupArgs.cleanDist()) {
+// Java: if (startupArgs.cleanDist()) {
     if (startupArgs->cleanDist)
     {
-        // Java: var minecraftModFile = discoveryResult.gameContent().stream().filter(mf -> mf.getId().equals("minecraft")).findFirst().map(ModFile::getContents).orElse(null);
+// Java: var minecraftModFile = discoveryResult.gameContent().stream().filter(mf -> mf.getId().equals("minecraft")).findFirst().map(ModFile::getContents).orElse(null);
         LIBMATTI_FML_JarContents *minecraftModFile = NULL;
         for (size_t i = 0; i < discoveryResult->gameContentCount; i++)
         {
@@ -756,7 +758,7 @@ LIBMATTI_FML_ClassProcessorSet *LIBMATTI_FML_FMLLoader_CreateClassProcessorSet(
             }
         }
 
-        // Java: if (minecraftModFile != null && NeoForgeDevDistCleaner.supportsDistCleaning(minecraftModFile)) { builtInProcessors.add(new NeoForgeDevDistCleaner(minecraftModFile, startupArgs.dist())); }
+// Java: if (minecraftModFile != null && NeoForgeDevDistCleaner.supportsDistCleaning(minecraftModFile)) { builtInProcessors.add(new NeoForgeDevDistCleaner(minecraftModFile, startupArgs.dist())); }
         if (minecraftModFile != NULL &&
             LIBMATTI_FML_NeoForgeDevDistCleaner_SupportsDistCleaning(minecraftModFile))
         {
@@ -766,7 +768,7 @@ LIBMATTI_FML_ClassProcessorSet *LIBMATTI_FML_FMLLoader_CreateClassProcessorSet(
         }
     }
 
-    // Java: builtInProcessors.add(mixinFacade.getClassProcessor());
+// Java: builtInProcessors.add(mixinFacade.getClassProcessor());
     // Java: builtInProcessors.add(mixinFacade.getGeneratingClassProcessor());
     // The two Mixin class processors come from org.spongepowered.asm (external) and are NULL in the port.
     add_processor(&builtInProcessors, &builtInCount, LIBMATTI_FML_MixinFacade_GetClassProcessor(mixinFacade));
@@ -780,20 +782,20 @@ LIBMATTI_FML_ClassProcessorSet *LIBMATTI_FML_FMLLoader_CreateClassProcessorSet(
         .instantiate = instantiate_service,
     };
 
-    // Java: additionalServices = the built-in processors
+// Java: additionalServices = the built-in processors
     LIBMATTI_FML_Service *additionalServices = calloc(builtInCount > 0 ? builtInCount : 1,
                                                       sizeof(*additionalServices));
     for (size_t i = 0; i < builtInCount; i++)
         additionalServices[i].service = builtInProcessors[i];
     free(builtInProcessors);
 
-    // Java: ServiceLoaderUtil.loadServices(launchContext, ClassProcessor.class, builtInProcessors)
+// Java: ServiceLoaderUtil.loadServices(launchContext, ClassProcessor.class, builtInProcessors)
     LIBMATTI_FML_ServiceList *processorServices = LIBMATTI_FML_ServiceLoaderUtil_LoadServicesWithAdditional(
         LIBMATTI_FML_FMLLoader_LaunchContextAdapter_AsLaunchContext(launchContext),
         "net.neoforged.neoforgespi.transformation.ClassProcessor", additionalServices, builtInCount, &hooks);
     free(additionalServices);
 
-    // Java: ServiceLoaderUtil.loadServices(launchContext, ClassProcessorProvider.class)
+// Java: ServiceLoaderUtil.loadServices(launchContext, ClassProcessorProvider.class)
     LIBMATTI_FML_ServiceList *providerServices = LIBMATTI_FML_ServiceLoaderUtil_LoadServices(
         LIBMATTI_FML_FMLLoader_LaunchContextAdapter_AsLaunchContext(launchContext),
         "net.neoforged.neoforgespi.transformation.ClassProcessorProvider", &hooks);
@@ -808,7 +810,7 @@ LIBMATTI_FML_ClassProcessorSet *LIBMATTI_FML_FMLLoader_CreateClassProcessorSet(
     for (size_t i = 0; i < providerServices->count; i++)
         providers[i] = providerServices->services[i].service;
 
-    // Java: return ClassProcessorSet.builder().markMarker(ClassProcessorIds.SIMPLE_PROCESSORS_GROUP)
+// Java: return ClassProcessorSet.builder().markMarker(ClassProcessorIds.SIMPLE_PROCESSORS_GROUP)
     //             .markMarker(ClassProcessorIds.COMPUTING_FRAMES).addProcessors(...).addProcessorProviders(...).build();
     LIBMATTI_FML_ClassProcessorSet_Builder *builder = LIBMATTI_FML_ClassProcessorSet_Builder_New();
     LIBMATTI_FML_ClassProcessorSet_Builder_MarkMarker(
@@ -831,10 +833,10 @@ LIBMATTI_FML_ClassProcessorSet *LIBMATTI_FML_FMLLoader_CreateClassProcessorSet(
 LIBMATTI_NEOFORGESPI_ClassProcessor *LIBMATTI_FML_FMLLoader_CreateAccessTransformerService(
     LIBMATTI_FML_FMLLoader_DiscoveryResult *discoveryResult)
 {
-    // Java: var engine = AccessTransformerEngine.newEngine();
+// Java: var engine = AccessTransformerEngine.newEngine();
     LIBMATTI_AT_AccessTransformerEngine *engine = LIBMATTI_AT_AccessTransformerEngine_New();
 
-    // Java: for (var modFile : discoveryResult.gameContent()) { for (var atPath : modFile.getAccessTransformers()) { ... } }
+// Java: for (var modFile : discoveryResult.gameContent()) { for (var atPath : modFile.getAccessTransformers()) { ... } }
     for (size_t i = 0; i < discoveryResult->gameContentCount; i++)
     {
         LIBMATTI_FML_ModFile *modFile = discoveryResult->gameContent[i];
@@ -845,27 +847,27 @@ LIBMATTI_NEOFORGESPI_ClassProcessor *LIBMATTI_FML_FMLLoader_CreateAccessTransfor
         {
             const char *atPath = atPaths[j];
 
-            // Java: LOGGER.debug("Adding Access Transformer {} in {}", atPath, modFile);
+// Java: LOGGER.debug("Adding Access Transformer {} in {}", atPath, modFile);
             LIBMATTI_ML_Logger_Debug(LOGGER(), NULL, "Adding Access Transformer {} in {}", atPath, modFile->id);
 
-            // Java: try (var in = modFile.getContents().openFile(atPath)) {
+// Java: try (var in = modFile.getContents().openFile(atPath)) {
             size_t length = 0;
             unsigned char *in = LIBMATTI_FML_JarContents_OpenFile(modFile->contents, atPath, &length);
             if (in == NULL)
             {
-                // Java: LOGGER.error(LogMarkers.LOADING, "Access transformer file {} provided by {} does not exist!", atPath, modFile);
+// Java: LOGGER.error(LogMarkers.LOADING, "Access transformer file {} provided by {} does not exist!", atPath, modFile);
                 LIBMATTI_ML_Logger_Error(LOGGER(), (LIBMATTI_ML_LogMarker *) &LIBMATTI_FML_MARKER_LOADING,
                                          "Access transformer file {} provided by {} does not exist!", atPath,
                                          modFile->id);
             }
             else
             {
-                // Java: engine.loadAT(new InputStreamReader(new BufferedInputStream(in)), atPath);
+// Java: engine.loadAT(new InputStreamReader(new BufferedInputStream(in)), atPath);
                 in[length] = '\0';
                 int errorLine = 0;
                 if (!LIBMATTI_AT_AccessTransformerEngine_LoadAT(engine, (const char *) in, atPath, &errorLine))
                 {
-                    // Java: the reader throws with the line number
+// Java: the reader throws with the line number
                     LIBMATTI_ML_Logger_Error(LOGGER(), (LIBMATTI_ML_LogMarker *) &LIBMATTI_FML_MARKER_LOADING,
                                              "Failed to parse access transformer file {} at line {}", atPath, errorLine);
                 }
@@ -874,7 +876,7 @@ LIBMATTI_NEOFORGESPI_ClassProcessor *LIBMATTI_FML_FMLLoader_CreateAccessTransfor
         }
     }
 
-    // Java: return new AccessTransformerService(engine);
+// Java: return new AccessTransformerService(engine);
     return &LIBMATTI_FML_AccessTransformerService_New(engine)->processor;
 }
 
@@ -885,16 +887,16 @@ LIBMATTI_FML_TransformingClassLoader *LIBMATTI_FML_FMLLoader_BuildTransformingLo
     LIBMATTI_FML_ClassProcessorAuditLog *auditTrail, LIBMATTI_FML_JarContentsModule **content,
     size_t contentCount)
 {
-    // Java: maskContentAlreadyOnClasspath(content);
+// Java: maskContentAlreadyOnClasspath(content);
     LIBMATTI_FML_FMLLoader_MaskContentAlreadyOnClasspath(loader, content, contentCount);
 
-    // Java: long start = System.currentTimeMillis();
+// Java: long start = System.currentTimeMillis();
     long long start = LIBMATTI_JL_System_CurrentTimeMillis();
 
-    // Java: var parentLayers = List.of(ModuleLayer.boot());
+// Java: var parentLayers = List.of(ModuleLayer.boot());
     LIBMATTI_JL_ModuleLayer *parentLayers[1] = {LIBMATTI_JL_ModuleLayer_Boot()};
 
-    // Java: var cf = Configuration.resolveAndBind(new JarContentsModuleFinder(content),
+// Java: var cf = Configuration.resolveAndBind(new JarContentsModuleFinder(content),
     //             parentLayers.stream().map(ModuleLayer::configuration).toList(), ModuleFinder.of(),
     //             content.stream().map(JarContentsModule::moduleName).toList());
     LIBMATTI_FML_JarContentsModuleFinder *finder = LIBMATTI_FML_JarContentsModuleFinder_New(
@@ -907,43 +909,43 @@ LIBMATTI_FML_TransformingClassLoader *LIBMATTI_FML_FMLLoader_BuildTransformingLo
     for (size_t i = 0; i < contentCount; i++)
         roots[i] = LIBMATTI_FML_JarContentsModule_ModuleName(content[i]);
 
-    // Java: resolveAndBind() additionally binds service providers into the resolution graph
+// Java: resolveAndBind() additionally binds service providers into the resolution graph
     LIBMATTI_JL_Configuration *cf = LIBMATTI_JL_Configuration_ResolveAndBind(
         (LIBMATTI_JL_ModuleReference **) references, referenceCount, roots, contentCount);
     free(roots);
     free(references);
 
-    // Java: the resolved Configuration keeps its ModuleReferences alive for as long as the game layer exists;
+// Java: the resolved Configuration keeps its ModuleReferences alive for as long as the game layer exists;
     //       only the finder's own bookkeeping is released here.
     for (size_t i = 0; i < finder->count; i++) free(finder->names[i]);
     free(finder->names);
     free(finder->references);
     free(finder);
 
-    // Java: var moduleNames = getModuleNameList(cf, content); LOGGER.info("Building game content classloader:\n{}", moduleNames);
+// Java: var moduleNames = getModuleNameList(cf, content); LOGGER.info("Building game content classloader:\n{}", moduleNames);
     char *moduleNames = LIBMATTI_FML_FMLLoader_GetModuleNameList(cf, content, contentCount);
     LIBMATTI_ML_Logger_Info(LOGGER(), NULL, "Building game content classloader:\n{}", moduleNames);
     free(moduleNames);
 
-    // Java: var loader = new TransformingClassLoader(classProcessorSet, auditTrail, cf, parentLayers, currentClassLoader);
+// Java: var loader = new TransformingClassLoader(classProcessorSet, auditTrail, cf, parentLayers, currentClassLoader);
     LIBMATTI_FML_TransformingClassLoader *transformingLoader = LIBMATTI_FML_TransformingClassLoader_New(
         classProcessorSet, auditTrail, cf, parentLayers, 1, loader->currentClassLoader);
 
-    // Java: var layer = ModuleLayer.defineModules(cf, parentLayers, f -> loader).layer();
+// Java: var layer = ModuleLayer.defineModules(cf, parentLayers, f -> loader).layer();
     LIBMATTI_JL_ModuleLayerController *controller = LIBMATTI_JL_ModuleLayer_DefineModules(
         cf, parentLayers, 1, module_layer_class_loader_for, transformingLoader);
     LIBMATTI_JL_ModuleLayer *layer = LIBMATTI_JL_ModuleLayerController_Layer(controller);
 
-    // Java: var elapsed = System.currentTimeMillis() - start; LOGGER.info("Built game content classloader in {}ms", elapsed);
+// Java: var elapsed = System.currentTimeMillis() - start; LOGGER.info("Built game content classloader in {}ms", elapsed);
     long long elapsed = LIBMATTI_JL_System_CurrentTimeMillis() - start;
     char elapsedText[32];
     snprintf(elapsedText, sizeof(elapsedText), "%lld", elapsed);
     LIBMATTI_ML_Logger_Info(LOGGER(), NULL, "Built game content classloader in {}ms", elapsedText);
 
-    // Java: loader.setFallbackClassLoader(currentClassLoader);
+// Java: loader.setFallbackClassLoader(currentClassLoader);
     LIBMATTI_FML_ModuleClassLoader_SetFallbackClassLoader(&transformingLoader->base, loader->currentClassLoader);
 
-    // Java: gameLayer = layer; ownedResources.add(loader); currentClassLoader = loader;
+// Java: gameLayer = layer; ownedResources.add(loader); currentClassLoader = loader;
     //       Thread.currentThread().setContextClassLoader(loader);
     loader->gameLayer = layer;
     LIBMATTI_JL_AutoCloseable closeable = {transformingLoader, close_transforming_class_loader};
@@ -951,7 +953,7 @@ LIBMATTI_FML_TransformingClassLoader *LIBMATTI_FML_FMLLoader_BuildTransformingLo
     loader->currentClassLoader = (LIBMATTI_JL_ClassLoader *) transformingLoader;
     LIBMATTI_JL_Thread_SetContextClassLoader(LIBMATTI_JL_Thread_CurrentThread(), loader->currentClassLoader);
 
-    // Java: the JVM defines net.minecraft.client.main.Main through this loader when
+// Java: the JVM defines net.minecraft.client.main.Main through this loader when
     // Client.main resolves it (createMainMethodCallable -> Class.forName). The port
     // registers the game stand-in class on the game content classloader here, so
     // Class.forName finds it with the defining loader the check below requires.
@@ -966,12 +968,12 @@ void LIBMATTI_FML_FMLLoader_MaskContentAlreadyOnClasspath(LIBMATTI_FML_FMLLoader
                                                           LIBMATTI_FML_JarContentsModule **content,
                                                           size_t contentCount)
 {
-    // Java: var classpathItems = ClasspathResourceUtils.getAllClasspathItems(currentClassLoader);
+// Java: var classpathItems = ClasspathResourceUtils.getAllClasspathItems(currentClassLoader);
     size_t classpathItemCount = 0;
     char **classpathItems =
         LIBMATTI_FML_ClasspathResourceUtils_GetAllClasspathItems(loader->currentClassLoader, &classpathItemCount);
 
-    // Java: Set<Path> needsMasking = new HashSet<>();
+// Java: Set<Path> needsMasking = new HashSet<>();
     //       for (var secureJar : content) { for (var basePath : getBasePaths(secureJar.contents(), true)) { if (classpathItems.contains(basePath)) needsMasking.add(basePath); } }
     char **needsMasking = NULL;
     size_t needsMaskingCount = 0;
@@ -1002,10 +1004,10 @@ void LIBMATTI_FML_FMLLoader_MaskContentAlreadyOnClasspath(LIBMATTI_FML_FMLLoader
     }
     free(classpathItems);
 
-    // Java: if (!needsMasking.isEmpty()) {
+// Java: if (!needsMasking.isEmpty()) {
     if (needsMaskingCount > 0)
     {
-        // Java: if (LOGGER.isDebugEnabled()) { LOGGER.debug("Masking classpath elements: {}", needsMasking.stream().map(PathPrettyPrinting::prettyPrint).toList()); }
+// Java: if (LOGGER.isDebugEnabled()) { LOGGER.debug("Masking classpath elements: {}", needsMasking.stream().map(PathPrettyPrinting::prettyPrint).toList()); }
         for (size_t i = 0; i < needsMaskingCount; i++)
         {
             char *pretty = LIBMATTI_FML_PathPrettyPrinting_PrettyPrint(needsMasking[i]);
@@ -1013,16 +1015,16 @@ void LIBMATTI_FML_FMLLoader_MaskContentAlreadyOnClasspath(LIBMATTI_FML_FMLLoader
             free(pretty);
         }
 
-        // Java: var maskedLoader = new ResourceMaskingClassLoader(currentClassLoader, needsMasking);
+// Java: var maskedLoader = new ResourceMaskingClassLoader(currentClassLoader, needsMasking);
         LIBMATTI_FML_ResourceMaskingClassLoader *maskedLoader = LIBMATTI_FML_ResourceMaskingClassLoader_New(
             loader->currentClassLoader, (const char **) needsMasking, needsMaskingCount);
 
-        // Java: if (Thread.currentThread().getContextClassLoader() == currentClassLoader) { Thread.currentThread().setContextClassLoader(maskedLoader); }
+// Java: if (Thread.currentThread().getContextClassLoader() == currentClassLoader) { Thread.currentThread().setContextClassLoader(maskedLoader); }
         LIBMATTI_JL_Thread *thread = LIBMATTI_JL_Thread_CurrentThread();
         if (LIBMATTI_JL_Thread_GetContextClassLoader(thread) == loader->currentClassLoader)
             LIBMATTI_JL_Thread_SetContextClassLoader(thread, (LIBMATTI_JL_ClassLoader *) maskedLoader);
 
-        // Java: currentClassLoader = maskedLoader;
+// Java: currentClassLoader = maskedLoader;
         loader->currentClassLoader = (LIBMATTI_JL_ClassLoader *) maskedLoader;
     }
 
@@ -1040,7 +1042,7 @@ char **LIBMATTI_FML_FMLLoader_GetBasePaths(LIBMATTI_FML_JarContents *contents, i
     {
         case LIBMATTI_FML_JARCONTENTS_KIND_COMPOSITE:
         {
-            // Java: if (!ignoreFilter && compositeModContainer.isFiltered()) throw new IllegalStateException("Cannot load filtered Jar content into a URL classloader");
+// Java: if (!ignoreFilter && compositeModContainer.isFiltered()) throw new IllegalStateException("Cannot load filtered Jar content into a URL classloader");
             if (!ignoreFilter && LIBMATTI_FML_CompositeJarContents_IsFiltered(contents))
             {
                 LIBMATTI_ML_Logger_Error(LOGGER(), NULL,
@@ -1048,7 +1050,7 @@ char **LIBMATTI_FML_FMLLoader_GetBasePaths(LIBMATTI_FML_JarContents *contents, i
                 return NULL;
             }
 
-            // Java: for (var delegate : compositeModContainer.getDelegates()) { result.addAll(getBasePaths(delegate, ignoreFilter)); }
+// Java: for (var delegate : compositeModContainer.getDelegates()) { result.addAll(getBasePaths(delegate, ignoreFilter)); }
             size_t delegateCount = 0;
             LIBMATTI_FML_JarContents **delegates =
                 LIBMATTI_FML_CompositeJarContents_GetDelegates(contents, &delegateCount);
@@ -1069,11 +1071,11 @@ char **LIBMATTI_FML_FMLLoader_GetBasePaths(LIBMATTI_FML_JarContents *contents, i
             break;
         }
         case LIBMATTI_FML_JARCONTENTS_KIND_EMPTY:
-            // Java: case EmptyJarContents ignored -> {}
+// Java: case EmptyJarContents ignored -> {}
             break;
         case LIBMATTI_FML_JARCONTENTS_KIND_FOLDER:
         case LIBMATTI_FML_JARCONTENTS_KIND_JARFILE:
-            // Java: result.add(folderModContainer.getPrimaryPath()); / result.add(jarModContainer.getPrimaryPath());
+// Java: result.add(folderModContainer.getPrimaryPath()); / result.add(jarModContainer.getPrimaryPath());
             paths = malloc(sizeof(*paths));
             paths[0] = strdup(LIBMATTI_FML_JarContents_GetPrimaryPath(contents));
             *count = 1;
@@ -1093,29 +1095,29 @@ static int compare_lines(const void *left, const void *right)
 char *LIBMATTI_FML_FMLLoader_GetModuleNameList(LIBMATTI_JL_Configuration *configuration,
                                                LIBMATTI_FML_JarContentsModule **content, size_t contentCount)
 {
-    // Java: var jarsById = content.stream().collect(Collectors.toMap(JarContentsModule::moduleName, Function.identity()));
+// Java: var jarsById = content.stream().collect(Collectors.toMap(JarContentsModule::moduleName, Function.identity()));
     size_t moduleCount = 0;
     LIBMATTI_JL_ResolvedModule **modules = LIBMATTI_JL_Configuration_Modules(configuration, &moduleCount);
 
-    // Java: .map(module -> " - " + module.name() + " (" + contentList + ")").sorted().collect(Collectors.joining("\n"))
+// Java: .map(module -> " - " + module.name() + " (" + contentList + ")").sorted().collect(Collectors.joining("\n"))
     char **lines = malloc(sizeof(*lines) * (moduleCount == 0 ? 1 : moduleCount));
     for (size_t i = 0; i < moduleCount; i++)
     {
         const char *name = LIBMATTI_JL_ResolvedModule_Name(modules[i]);
 
-        // Java: var jar = jarsById.get(module.name());
+// Java: var jar = jarsById.get(module.name());
         char *contentList = NULL;
         for (size_t j = 0; j < contentCount; j++)
         {
             if (strcmp(LIBMATTI_FML_JarContentsModule_ModuleName(content[j]), name) == 0)
             {
-                // Java: jar.contents() - string concatenation calls toString()
+// Java: jar.contents() - string concatenation calls toString()
                 contentList = LIBMATTI_FML_JarContents_ToString(content[j]->contents);
                 break;
             }
         }
 
-        // Java: var contentList = jar != null ? jar.contents() : module.reference().location().map(URI::toString).orElse("unknown");
+// Java: var contentList = jar != null ? jar.contents() : module.reference().location().map(URI::toString).orElse("unknown");
         if (contentList == NULL)
         {
             LIBMATTI_JL_ModuleReference *reference = LIBMATTI_JL_ResolvedModule_Reference(modules[i]);
@@ -1149,7 +1151,7 @@ char *LIBMATTI_FML_FMLLoader_GetModuleNameList(LIBMATTI_JL_Configuration *config
 // Java: private static Dist detectDist(ClassLoader classLoader)
 LIBMATTI_DIST_Dist LIBMATTI_FML_FMLLoader_DetectDist(LIBMATTI_JL_ClassLoader *classLoader)
 {
-    // Java: var clientAvailable = classLoader.getResource("net/minecraft/client/main/Main.class") != null;
+// Java: var clientAvailable = classLoader.getResource("net/minecraft/client/main/Main.class") != null;
     //       return clientAvailable ? Dist.CLIENT : Dist.DEDICATED_SERVER;
     LIBMATTI_JN_URL *resource = LIBMATTI_JL_ClassLoader_GetResource(classLoader, "net/minecraft/client/main/Main.class");
     if (resource == NULL) return LIBMATTI_DIST_DEDICATED_SERVER;
@@ -1161,7 +1163,7 @@ LIBMATTI_DIST_Dist LIBMATTI_FML_FMLLoader_DetectDist(LIBMATTI_JL_ClassLoader *cl
 // Java: private static boolean detectProduction(ClassLoader classLoader)
 int LIBMATTI_FML_FMLLoader_DetectProduction(LIBMATTI_JL_ClassLoader *classLoader)
 {
-    // Java: try (var resource = classLoader.getResourceAsStream("net/minecraft/SharedConstants.class")) {
+// Java: try (var resource = classLoader.getResourceAsStream("net/minecraft/SharedConstants.class")) {
     static const char *SIGNATURE = "net/neoforged/fml";
     size_t signatureLength = strlen(SIGNATURE);
 
@@ -1169,29 +1171,29 @@ int LIBMATTI_FML_FMLLoader_DetectProduction(LIBMATTI_JL_ClassLoader *classLoader
     char *resourceContent = LIBMATTI_JL_ClassLoader_GetResourceAsStream(classLoader, "net/minecraft/SharedConstants.class",
                                                                         &length);
 
-    // Java: if (resource == null) return true; // Likely an error but missing classes will be reported by the game locator more competently
+// Java: if (resource == null) return true; // Likely an error but missing classes will be reported by the game locator more competently
     if (resourceContent == NULL) return 1;
 
-    // Java: var signature = "net/neoforged/fml".getBytes(StandardCharsets.UTF_8);
+// Java: var signature = "net/neoforged/fml".getBytes(StandardCharsets.UTF_8);
     //       for (int i = 0; i < resourceContent.length - signature.length; i++) { ... if (match) return false; }
     for (size_t i = 0; i + signatureLength < length; i++)
     {
         if (memcmp(resourceContent + i, SIGNATURE, signatureLength) != 0) continue;
 
-        // Java: Found signature -> we're definitely in dev
+// Java: Found signature -> we're definitely in dev
         free(resourceContent);
         return 0;
     }
 
     free(resourceContent);
-    // Java: return true; // didn't find patched-in NeoForge reference in bytecode -> not in dev
+// Java: return true; // didn't find patched-in NeoForge reference in bytecode -> not in dev
     return 1;
 }
 
 // Java: private void loadEarlyServices(StartupArgs startupArgs)
 void LIBMATTI_FML_FMLLoader_LoadEarlyServices(LIBMATTI_FML_FMLLoader *loader, LIBMATTI_FML_StartupArgs *startupArgs)
 {
-    // Java: this.earlyServicesJars.addAll(EarlyServiceDiscovery.findEarlyServiceJars(startupArgs, FMLPaths.MODSDIR.get()));
+// Java: this.earlyServicesJars.addAll(EarlyServiceDiscovery.findEarlyServiceJars(startupArgs, FMLPaths.MODSDIR.get()));
     size_t earlyServiceJarCount = 0;
     void **earlyServiceJars = LIBMATTI_FML_EarlyServiceDiscovery_FindEarlyServiceJars(
         startupArgs, LIBMATTI_FML_FMLPaths_Get(LIBMATTI_FML_FMLPaths_MODSDIR), &earlyServiceJarCount);
@@ -1204,7 +1206,7 @@ void LIBMATTI_FML_FMLLoader_LoadEarlyServices(LIBMATTI_FML_FMLLoader *loader, LI
     }
     free(earlyServiceJars);
 
-    // Java: if (!earlyServicesJars.isEmpty()) { appendLoader("FML Early Services", earlyServicesJars.stream().map(IModFile::getContents).toList()); }
+// Java: if (!earlyServicesJars.isEmpty()) { appendLoader("FML Early Services", earlyServicesJars.stream().map(IModFile::getContents).toList()); }
     if (loader->earlyServicesJarCount > 0)
     {
         void **contents = malloc(sizeof(void *) * loader->earlyServicesJarCount);
@@ -1220,7 +1222,7 @@ void LIBMATTI_FML_FMLLoader_LoadEarlyServices(LIBMATTI_FML_FMLLoader *loader, LI
 // Java: private void loadPlugins(List<IModFileInfo> plugins)
 void LIBMATTI_FML_FMLLoader_LoadPlugins(LIBMATTI_FML_FMLLoader *loader, void **plugins, size_t pluginCount)
 {
-    // Java: appendLoader("FML Plugins", plugins.stream().map(mfi -> mfi.getFile().getContents()).toList());
+// Java: appendLoader("FML Plugins", plugins.stream().map(mfi -> mfi.getFile().getContents()).toList());
     void **contents = malloc(sizeof(void *) * (pluginCount > 0 ? pluginCount : 1));
     for (size_t i = 0; i < pluginCount; i++)
         contents[i] = LIBMATTI_NEOFORGESPI_IModFile_GetContents(LIBMATTI_NEOFORGESPI_IModFileInfo_GetFile(
@@ -1241,12 +1243,12 @@ void LIBMATTI_FML_FMLLoader_AppendLoader(LIBMATTI_FML_FMLLoader *loader, const c
 {
     if (jarCount == 0)
     {
-        // Java: LOGGER.info("No additional classpath items for {} were found.", loaderName);
+// Java: LOGGER.info("No additional classpath items for {} were found.", loaderName);
         LIBMATTI_ML_Logger_Info(LOGGER(), NULL, "No additional classpath items for {} were found.", loaderName);
         return;
     }
 
-    // Java: LOGGER.info("Loading {}:", loaderName);
+// Java: LOGGER.info("Loading {}:", loaderName);
     LIBMATTI_ML_Logger_Info(LOGGER(), NULL, "Loading {}:", loaderName);
 
     LIBMATTI_JN_URL **rootUrls = NULL;
@@ -1254,12 +1256,12 @@ void LIBMATTI_FML_FMLLoader_AppendLoader(LIBMATTI_FML_FMLLoader *loader, const c
 
     for (size_t i = 0; i < jarCount; i++)
     {
-        // Java: if (jar instanceof CompositeJarContents compositeJarContents && compositeJarContents.isFiltered()) throw new IllegalArgumentException("Cannot use simple URLClassLoader for filtered content " + jar);
+// Java: if (jar instanceof CompositeJarContents compositeJarContents && compositeJarContents.isFiltered()) throw new IllegalArgumentException("Cannot use simple URLClassLoader for filtered content " + jar);
         LIBMATTI_FML_JarContents *jar = jars[i];
         if (jar->kind == LIBMATTI_FML_JARCONTENTS_KIND_COMPOSITE &&
             LIBMATTI_FML_CompositeJarContents_IsFiltered(jar))
         {
-            // Java: throw new IllegalArgumentException(...)
+// Java: throw new IllegalArgumentException(...)
             LIBMATTI_ML_Logger_Error(LOGGER(), NULL,
                                      "Cannot use simple URLClassLoader for filtered content {}", loaderName);
             free(rootUrls);
@@ -1270,12 +1272,12 @@ void LIBMATTI_FML_FMLLoader_AppendLoader(LIBMATTI_FML_FMLLoader *loader, const c
         const char **contentRoots = LIBMATTI_FML_JarContents_GetContentRoots(jar, &rootCount);
         for (size_t j = 0; j < rootCount; j++)
         {
-            // Java: LOGGER.info(" - {}", PathPrettyPrinting.prettyPrint(contentRoot));
+// Java: LOGGER.info(" - {}", PathPrettyPrinting.prettyPrint(contentRoot));
             char *pretty = LIBMATTI_FML_PathPrettyPrinting_PrettyPrint(contentRoots[j]);
             LIBMATTI_ML_Logger_Info(LOGGER(), NULL, " - {}", pretty);
             free(pretty);
 
-            // Java: rootUrls.add(contentRoot.toUri().toURL())
+// Java: rootUrls.add(contentRoot.toUri().toURL())
             size_t length = strlen(contentRoots[j]) + 6;
             char *spec = malloc(length);
             snprintf(spec, length, "file:%s", contentRoots[j]);
@@ -1283,13 +1285,13 @@ void LIBMATTI_FML_FMLLoader_AppendLoader(LIBMATTI_FML_FMLLoader *loader, const c
             rootUrls[rootUrlCount++] = LIBMATTI_JN_URL_New(spec);
             free(spec);
 
-            // Java: locatedPaths.add(contentRoot)
+// Java: locatedPaths.add(contentRoot)
             located_add(loader, contentRoots[j]);
         }
         free((void *) contentRoots);
     }
 
-    // Java: var loader = new URLClassLoader(loaderName, rootUrls.toArray(URL[]::new), currentClassLoader);
+// Java: var loader = new URLClassLoader(loaderName, rootUrls.toArray(URL[]::new), currentClassLoader);
     LIBMATTI_JL_ClassLoader *classLoader =
         LIBMATTI_JL_URLClassLoader_New(loaderName, rootUrls, rootUrlCount, loader->currentClassLoader);
 
@@ -1297,11 +1299,11 @@ void LIBMATTI_FML_FMLLoader_AppendLoader(LIBMATTI_FML_FMLLoader *loader, const c
         LIBMATTI_JN_URL_Free(rootUrls[i]);
     free(rootUrls);
 
-    // Java: ownedResources.add(loader);
+// Java: ownedResources.add(loader);
     LIBMATTI_JL_AutoCloseable closeable = {classLoader, close_url_class_loader};
     add_closeable(&loader->ownedResources, &loader->ownedResourceCount, closeable);
 
-    // Java: currentClassLoader = loader; Thread.currentThread().setContextClassLoader(loader);
+// Java: currentClassLoader = loader; Thread.currentThread().setContextClassLoader(loader);
     loader->currentClassLoader = classLoader;
     LIBMATTI_JL_Thread_SetContextClassLoader(LIBMATTI_JL_Thread_CurrentThread(), classLoader);
 }
@@ -1309,11 +1311,11 @@ void LIBMATTI_FML_FMLLoader_AppendLoader(LIBMATTI_FML_FMLLoader *loader, const c
 // Java: private DiscoveryResult runDiscovery()
 LIBMATTI_FML_FMLLoader_DiscoveryResult *LIBMATTI_FML_FMLLoader_RunDiscovery(LIBMATTI_FML_FMLLoader *loader)
 {
-    // Java: var progress = StartupNotificationManager.prependProgressBar("Discovering mods...", 0);
+// Java: var progress = StartupNotificationManager.prependProgressBar("Discovering mods...", 0);
     LIBMATTI_FML_ProgressMeter *progress =
         LIBMATTI_FML_StartupNotificationManager_PrependProgressBar("Discovering mods...", 0);
 
-    // Java: var additionalLocators = new ArrayList<IModFileCandidateLocator>();
+// Java: var additionalLocators = new ArrayList<IModFileCandidateLocator>();
     //       additionalLocators.add(new GameLocator()); ... InDevFolderLocator, InDevJarLocator, ModsFolderLocator
     LIBMATTI_FML_GameLocator *gameLocator = LIBMATTI_FML_GameLocator_New();
     LIBMATTI_FML_InDevFolderLocator *inDevFolderLocator = LIBMATTI_FML_InDevFolderLocator_New();
@@ -1326,7 +1328,7 @@ LIBMATTI_FML_FMLLoader_DiscoveryResult *LIBMATTI_FML_FMLLoader_RunDiscovery(LIBM
         (LIBMATTI_NEOFORGESPI_IModFileCandidateLocator *) modsFolderLocator,
     };
 
-    // Java: the readers come from "META-INF/services/net.neoforged.neoforgespi.locating.IModFileReader"
+// Java: the readers come from "META-INF/services/net.neoforged.neoforgespi.locating.IModFileReader"
     //       in the FML artifact. C has no service files, so the port registers its built-in readers here
     //       (java/util/ServiceLoader.h), like the host registers the launch handlers.
     LIBMATTI_JU_ServiceLoader_Register(
@@ -1336,7 +1338,7 @@ LIBMATTI_FML_FMLLoader_DiscoveryResult *LIBMATTI_FML_FMLLoader_RunDiscovery(LIBM
         "net.neoforged.neoforgespi.locating.IModFileReader", LIBMATTI_FML_NestedLibraryModReader_AsReader(),
         "net.neoforged.fml.loading.moddiscovery.readers.NestedLibraryModReader", NULL);
 
-    // Java: var modDiscoverer = new ModDiscoverer(new LaunchContextAdapter(), additionalLocators);
+// Java: var modDiscoverer = new ModDiscoverer(new LaunchContextAdapter(), additionalLocators);
     //       var discoveryResult = modDiscoverer.discoverMods(earlyServicesJars);
     LIBMATTI_FML_FMLLoader_LaunchContextAdapter *discoveryContext =
         LIBMATTI_FML_FMLLoader_LaunchContextAdapter_New(loader);
@@ -1352,14 +1354,14 @@ LIBMATTI_FML_FMLLoader_DiscoveryResult *LIBMATTI_FML_FMLLoader_RunDiscovery(LIBM
     free(inDevJarLocator);
     free(modsFolderLocator);
 
-    // Java: var neoForgeVersion = versionInfo.neoForgeVersion(); var minecraftVersion = versionInfo.mcVersion();
+// Java: var neoForgeVersion = versionInfo.neoForgeVersion(); var minecraftVersion = versionInfo.mcVersion();
     char *neoForgeVersion = loader->versionInfo->neoForgeVersion != NULL
                                 ? strdup(loader->versionInfo->neoForgeVersion)
                                 : NULL;
     char *minecraftVersion =
         loader->versionInfo->mcVersion != NULL ? strdup(loader->versionInfo->mcVersion) : NULL;
 
-    // Java: for (var modFile : discoveryResult.modFiles()) { ... switch (modFile.getId()) { case "minecraft" / "neoforge" } }
+// Java: for (var modFile : discoveryResult.modFiles()) { ... switch (modFile.getId()) { case "minecraft" / "neoforge" } }
     for (size_t i = 0; i < discoveryResult->modFileCount; i++)
     {
         LIBMATTI_FML_ModFile *modFile = discoveryResult->modFiles[i];
@@ -1381,7 +1383,7 @@ LIBMATTI_FML_FMLLoader_DiscoveryResult *LIBMATTI_FML_FMLLoader_RunDiscovery(LIBM
         }
     }
 
-    // Java: versionInfo = new VersionInfo(neoForgeVersion, minecraftVersion, getVersionInfo().neoFormVersion());
+// Java: versionInfo = new VersionInfo(neoForgeVersion, minecraftVersion, getVersionInfo().neoFormVersion());
     char *neoFormVersion = loader->versionInfo->neoFormVersion != NULL
                                ? strdup(loader->versionInfo->neoFormVersion)
                                : NULL;
@@ -1391,35 +1393,35 @@ LIBMATTI_FML_FMLLoader_DiscoveryResult *LIBMATTI_FML_FMLLoader_RunDiscovery(LIBM
     free(minecraftVersion);
     free(neoFormVersion);
 
-    // Java: versionSupportMatrix = new VersionSupportMatrix(versionInfo);
+// Java: versionSupportMatrix = new VersionSupportMatrix(versionInfo);
     loader->versionSupportMatrix = LIBMATTI_FML_VersionSupportMatrix_New(loader->versionInfo);
 
-    // Java: progress.complete();
+// Java: progress.complete();
     LIBMATTI_FML_ProgressMeter_Complete(progress);
     LIBMATTI_FML_ProgressMeter_Free(progress);
 
-    // Java: ImmediateWindowHandler.setMinecraftVersion(versionInfo.mcVersion()); ...setNeoForgeVersion(...);
+// Java: ImmediateWindowHandler.setMinecraftVersion(versionInfo.mcVersion()); ...setNeoForgeVersion(...);
     LIBMATTI_FML_ImmediateWindowHandler_SetMinecraftVersion(loader->versionInfo->mcVersion);
     LIBMATTI_FML_ImmediateWindowHandler_SetNeoForgeVersion(loader->versionInfo->neoForgeVersion);
 
-    // Java: loadingModList = ModSorter.sort(discoveryResult.modFiles(), discoveryResult.discoveryIssues());
+// Java: loadingModList = ModSorter.sort(discoveryResult.modFiles(), discoveryResult.discoveryIssues());
     LIBMATTI_FML_LoadingModList *loadingModList = LIBMATTI_FML_ModSorter_Sort(
         discoveryResult->modFiles, discoveryResult->modFileCount, discoveryResult->discoveryIssues,
         discoveryResult->discoveryIssueCount);
     loader->loadingModList = loadingModList;
 
-    // Java: Map<IModInfo, JarResource> enumExtensionsByMod = new HashMap<>();
+// Java: Map<IModInfo, JarResource> enumExtensionsByMod = new HashMap<>();
     LIBMATTI_NEOFORGESPI_IModInfo **enumExtensionMods = NULL;
     LIBMATTI_FML_JarResource **enumExtensionResources = NULL;
     size_t enumExtensionCount = 0;
 
-    // Java: for (var modFile : loadingModList.getAllModFiles())
+// Java: for (var modFile : loadingModList.getAllModFiles())
     size_t extensionModFileCount = 0;
     LIBMATTI_NEOFORGESPI_IModFile **extensionModFiles = LIBMATTI_FML_LoadingModList_GetAllModFiles(
         loadingModList, &extensionModFileCount);
     for (size_t i = 0; i < extensionModFileCount; i++)
     {
-        // Java: var mods = modFile.getModInfos();
+// Java: var mods = modFile.getModInfos();
         size_t extensionModCount = 0;
         LIBMATTI_NEOFORGESPI_IModInfo **extensionMods = LIBMATTI_NEOFORGESPI_IModFile_GetModInfos(
             extensionModFiles[i], &extensionModCount);
@@ -1428,20 +1430,20 @@ LIBMATTI_FML_FMLLoader_DiscoveryResult *LIBMATTI_FML_FMLLoader_RunDiscovery(LIBM
         {
             LIBMATTI_NEOFORGESPI_IModInfo *mod = extensionMods[j];
 
-            // Java: mod.getConfig().<String>getConfigElement("enumExtensions").ifPresent(file -> { ... })
+// Java: mod.getConfig().<String>getConfigElement("enumExtensions").ifPresent(file -> { ... })
             LIBMATTI_NEOFORGESPI_IConfigurable *config = LIBMATTI_NEOFORGESPI_IModInfo_GetConfig(mod);
             LIBMATTI_NEOFORGESPI_IConfigurable_Value value;
             if (!LIBMATTI_NEOFORGESPI_IConfigurable_GetElement(config, "enumExtensions", &value)) continue;
             if (value.type != LIBMATTI_NEOFORGESPI_IConfigurable_STRING) continue;
             const char *file = value.string;
 
-            // Java: var resource = mod.getOwningFile().getFile().getContents().get(file);
+// Java: var resource = mod.getOwningFile().getFile().getContents().get(file);
             LIBMATTI_NEOFORGESPI_IModFileInfo *owningFile = LIBMATTI_NEOFORGESPI_IModInfo_GetOwningFile(mod);
             LIBMATTI_NEOFORGESPI_IModFile *modFile = LIBMATTI_NEOFORGESPI_IModFileInfo_GetFile(owningFile);
             LIBMATTI_FML_JarResource *resource = LIBMATTI_FML_JarContents_Get(
                 LIBMATTI_NEOFORGESPI_IModFile_GetContents(modFile), file);
 
-            // Java: if (resource == null) { ModLoader.addLoadingIssue(ModLoadingIssue.error(
+// Java: if (resource == null) { ModLoader.addLoadingIssue(ModLoadingIssue.error(
             //         "fml.modloadingissue.enumextender.file_not_found", file).withAffectedMod(mod)); return; }
             if (resource == NULL)
             {
@@ -1450,12 +1452,13 @@ LIBMATTI_FML_FMLLoader_DiscoveryResult *LIBMATTI_FML_FMLLoader_RunDiscovery(LIBM
                     "fml.modloadingissue.enumextender.file_not_found", args, 1);
                 LIBMATTI_FML_ModLoader_AddLoadingIssue(LIBMATTI_FML_ModLoadingIssue_WithAffectedMod(
                     issue, mod, modFile, LIBMATTI_NEOFORGESPI_IModFile_GetFilePath(modFile)));
-                // Java's record withers are garbage collected; the port frees the issue it replaced.
+
+
                 LIBMATTI_FML_ModLoadingIssue_Free(issue);
                 continue;
             }
 
-            // Java: enumExtensionsByMod.put(mod, resource);
+// Java: enumExtensionsByMod.put(mod, resource);
             enumExtensionMods = realloc(enumExtensionMods, sizeof(*enumExtensionMods) * (enumExtensionCount + 1));
             enumExtensionResources = realloc(enumExtensionResources,
                                              sizeof(*enumExtensionResources) * (enumExtensionCount + 1));
@@ -1465,20 +1468,20 @@ LIBMATTI_FML_FMLLoader_DiscoveryResult *LIBMATTI_FML_FMLLoader_RunDiscovery(LIBM
         }
     }
 
-    // Java: RuntimeEnumExtender.loadEnumPrototypes(enumExtensionsByMod)
+// Java: RuntimeEnumExtender.loadEnumPrototypes(enumExtensionsByMod)
     LIBMATTI_FML_RuntimeEnumExtender_LoadEnumPrototypes((const LIBMATTI_NEOFORGESPI_IModInfo **) enumExtensionMods,
                                                         (const LIBMATTI_FML_JarResource **) enumExtensionResources,
                                                         enumExtensionCount);
     free(enumExtensionMods);
     free(enumExtensionResources);
 
-    // Java: backgroundScanHandler = new BackgroundScanHandler(loadingModList.getAllModFiles());
+// Java: backgroundScanHandler = new BackgroundScanHandler(loadingModList.getAllModFiles());
     size_t allModFileCount = 0;
     LIBMATTI_NEOFORGESPI_IModFile **allModFiles =
         LIBMATTI_FML_LoadingModList_GetAllModFiles(loadingModList, &allModFileCount);
     loader->backgroundScanHandler = LIBMATTI_FML_BackgroundScanHandler_New(allModFiles, allModFileCount);
 
-    // Java: return this.discoveryResult = new DiscoveryResult(
+// Java: return this.discoveryResult = new DiscoveryResult(
     //         loadingModList.getPlugins().stream().map(mfi -> (ModFile) mfi.getFile()).toList(),
     //         loadingModList.getModFiles().stream().map(ModFileInfo::getFile).toList(),
     //         loadingModList.getGameLibraries().stream().map(mf -> (ModFile) mf).toList(),
@@ -1522,7 +1525,7 @@ LIBMATTI_FML_FMLLoader_DiscoveryResult *LIBMATTI_FML_FMLLoader_RunDiscovery(LIBM
 LIBMATTI_FML_FMLLoader_DiscoveryResult *LIBMATTI_FML_FMLLoader_RunOffThread_DiscoveryResult(
     LIBMATTI_FML_FMLLoader *loader)
 {
-    // Java: ImmediateWindowHandler.updateProgress("Discovering mods");
+// Java: ImmediateWindowHandler.updateProgress("Discovering mods");
     LIBMATTI_FML_ImmediateWindowHandler_UpdateProgress("Discovering mods");
     LIBMATTI_FML_FMLLoader_DiscoveryResult *result = LIBMATTI_FML_FMLLoader_RunDiscovery(loader);
     LIBMATTI_FML_ImmediateWindowHandler_RenderTick();
@@ -1532,7 +1535,7 @@ LIBMATTI_FML_FMLLoader_DiscoveryResult *LIBMATTI_FML_FMLLoader_RunOffThread_Disc
 // Java: public static LanguageProviderLoader getLanguageLoadingProvider()
 void *LIBMATTI_FML_FMLLoader_GetLanguageLoadingProvider(void)
 {
-    // Java: return getCurrent().languageProviderLoader;
+// Java: return getCurrent().languageProviderLoader;
     LIBMATTI_FML_FMLLoader *loader = LIBMATTI_FML_FMLLoader_GetCurrent();
     return loader != NULL ? loader->languageProviderLoader : NULL;
 }
@@ -1540,7 +1543,7 @@ void *LIBMATTI_FML_FMLLoader_GetLanguageLoadingProvider(void)
 // Java: public static FMLLoader getCurrent()
 LIBMATTI_FML_FMLLoader *LIBMATTI_FML_FMLLoader_GetCurrent(void)
 {
-    // Java: var current = getCurrentOrNull(); if (current == null) throw new IllegalStateException("There is no current FML Loader");
+// Java: var current = getCurrentOrNull(); if (current == null) throw new IllegalStateException("There is no current FML Loader");
     LIBMATTI_FML_FMLLoader *loader = LIBMATTI_FML_FMLLoader_GetCurrentOrNull();
     if (loader == NULL)
     {
@@ -1553,21 +1556,21 @@ LIBMATTI_FML_FMLLoader *LIBMATTI_FML_FMLLoader_GetCurrent(void)
 // Java: @Nullable public static FMLLoader getCurrentOrNull()
 LIBMATTI_FML_FMLLoader *LIBMATTI_FML_FMLLoader_GetCurrentOrNull(void)
 {
-    // Java: return current.get();
+// Java: return current.get();
     return s_current;
 }
 
 // Java: public Dist getDist()
 LIBMATTI_DIST_Dist LIBMATTI_FML_FMLLoader_GetDist(const LIBMATTI_FML_FMLLoader *loader)
 {
-    // Java: return dist;
+// Java: return dist;
     return loader->dist;
 }
 
 // Java: public LoadingModList getLoadingModList()
 void *LIBMATTI_FML_FMLLoader_GetLoadingModList(const LIBMATTI_FML_FMLLoader *loader)
 {
-    // Java: if (loadingModList == null) throw new IllegalStateException("The loading mod list isn't built yet.");
+// Java: if (loadingModList == null) throw new IllegalStateException("The loading mod list isn't built yet.");
     if (loader->loadingModList == NULL)
     {
         LIBMATTI_ML_Logger_Error(LOGGER(), NULL, "The loading mod list isn't built yet.");
@@ -1579,21 +1582,21 @@ void *LIBMATTI_FML_FMLLoader_GetLoadingModList(const LIBMATTI_FML_FMLLoader *loa
 // Java: public Path getGameDir()
 const char *LIBMATTI_FML_FMLLoader_GetGameDir(const LIBMATTI_FML_FMLLoader *loader)
 {
-    // Java: return gameDir;
+// Java: return gameDir;
     return loader->gameDir;
 }
 
 // Java: public boolean isProduction()
 int LIBMATTI_FML_FMLLoader_IsProduction(const LIBMATTI_FML_FMLLoader *loader)
 {
-    // Java: return production;
+// Java: return production;
     return loader->production;
 }
 
 // Java: public ModuleLayer getGameLayer()
 LIBMATTI_JL_ModuleLayer *LIBMATTI_FML_FMLLoader_GetGameLayer(const LIBMATTI_FML_FMLLoader *loader)
 {
-    // Java: if (gameLayer == null) throw new IllegalStateException("This can only be called after mod discovery is completed");
+// Java: if (gameLayer == null) throw new IllegalStateException("This can only be called after mod discovery is completed");
     if (loader->gameLayer == NULL)
     {
         LIBMATTI_ML_Logger_Error(LOGGER(), NULL, "This can only be called after mod discovery is completed");
@@ -1605,14 +1608,14 @@ LIBMATTI_JL_ModuleLayer *LIBMATTI_FML_FMLLoader_GetGameLayer(const LIBMATTI_FML_
 // Java: public VersionInfo getVersionInfo()
 LIBMATTI_FML_VersionInfo *LIBMATTI_FML_FMLLoader_GetVersionInfo(const LIBMATTI_FML_FMLLoader *loader)
 {
-    // Java: return versionInfo;
+// Java: return versionInfo;
     return loader->versionInfo;
 }
 
 // Java: VersionSupportMatrix getVersionSupportMatrix()
 void *LIBMATTI_FML_FMLLoader_GetVersionSupportMatrix(const LIBMATTI_FML_FMLLoader *loader)
 {
-    // Java: if (versionSupportMatrix == null) throw new IllegalStateException("Mod discovery has not completed yet, versions may not be known.");
+// Java: if (versionSupportMatrix == null) throw new IllegalStateException("Mod discovery has not completed yet, versions may not be known.");
     if (loader->versionSupportMatrix == NULL)
     {
         LIBMATTI_ML_Logger_Error(LOGGER(), NULL, "Mod discovery has not completed yet, versions may not be known.");
@@ -1685,7 +1688,7 @@ void LIBMATTI_FML_FMLLoader_LaunchContextAdapter_Free(LIBMATTI_FML_FMLLoader_Lau
 LIBMATTI_DIST_Dist LIBMATTI_FML_FMLLoader_LaunchContextAdapter_GetRequiredDistribution(
     const LIBMATTI_FML_FMLLoader_LaunchContextAdapter *adapter)
 {
-    // Java: return dist;
+// Java: return dist;
     return adapter->loader->dist;
 }
 
@@ -1693,7 +1696,7 @@ LIBMATTI_DIST_Dist LIBMATTI_FML_FMLLoader_LaunchContextAdapter_GetRequiredDistri
 const char *LIBMATTI_FML_FMLLoader_LaunchContextAdapter_GameDirectory(
     const LIBMATTI_FML_FMLLoader_LaunchContextAdapter *adapter)
 {
-    // Java: return gameDir;
+// Java: return gameDir;
     return adapter->loader->gameDir;
 }
 
@@ -1710,7 +1713,7 @@ LIBMATTI_JU_ServiceLoader *LIBMATTI_FML_FMLLoader_LaunchContextAdapter_LoadServi
 int LIBMATTI_FML_FMLLoader_LaunchContextAdapter_IsLocated(const LIBMATTI_FML_FMLLoader_LaunchContextAdapter *adapter,
                                                           const char *path)
 {
-    // Java: return FMLLoader.this.locatedPaths.contains(path);
+// Java: return FMLLoader.this.locatedPaths.contains(path);
     return located_contains(adapter->loader, path);
 }
 
@@ -1718,7 +1721,7 @@ int LIBMATTI_FML_FMLLoader_LaunchContextAdapter_IsLocated(const LIBMATTI_FML_FML
 int LIBMATTI_FML_FMLLoader_LaunchContextAdapter_AddLocated(const LIBMATTI_FML_FMLLoader_LaunchContextAdapter *adapter,
                                                            const char *path)
 {
-    // Java: return FMLLoader.this.locatedPaths.add(path);
+// Java: return FMLLoader.this.locatedPaths.add(path);
     return located_add((LIBMATTI_FML_FMLLoader *) adapter->loader, path);
 }
 
@@ -1726,6 +1729,6 @@ int LIBMATTI_FML_FMLLoader_LaunchContextAdapter_AddLocated(const LIBMATTI_FML_FM
 LIBMATTI_FML_VersionInfo *LIBMATTI_FML_FMLLoader_LaunchContextAdapter_GetVersions(
     const LIBMATTI_FML_FMLLoader_LaunchContextAdapter *adapter)
 {
-    // Java: return versionInfo;
+// Java: return versionInfo;
     return adapter->loader->versionInfo;
 }

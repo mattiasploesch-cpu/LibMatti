@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.ModContainer.
+
+
 
 #include "libmatti/net/neoforged/fml/ModContainer.h"
 
@@ -23,7 +24,7 @@ void LIBMATTI_FML_ModContainer_Init(LIBMATTI_FML_ModContainer *container, LIBMAT
     container->extensionPointCount = 0;
 
     container->modId = strdup(LIBMATTI_NEOFORGESPI_IModInfo_GetModId(info));
-    // Java (the source carries the same TODO upstream): // TODO: Currently not reading namespace from configuration..
+// Java (the source carries the same TODO upstream): // TODO: Currently not reading namespace from configuration..
     //       this.namespace = this.modId;
     container->namespace = strdup(container->modId);
     container->modInfo = info;
@@ -159,15 +160,16 @@ void LIBMATTI_FML_ModContainer_AcceptEvent(LIBMATTI_FML_ModContainer *container,
     LIBMATTI_BUS_IEventBus *bus = LIBMATTI_FML_ModContainer_GetEventBus(container);
     if (bus == NULL) return;
 
-    // Java: try { LOGGER.trace(LOADING, "Firing event for modid {} : {}", getModId(), e); bus.post(e);
+// Java: try { LOGGER.trace(LOADING, "Firing event for modid {} : {}", getModId(), e); bus.post(e);
     //              LOGGER.trace(LOADING, "Fired event for modid {} : {}", getModId(), e); }
     //       catch (Throwable t) { ... throw new ModLoadingException(...) }
     // A C listener does not throw into the bus (see EventBus.post), so there is nothing to catch.
     //LIBMATTI_ML_Logger_Trace(LOGGER(), &LIBMATTI_FML_Logging_LOADING, "Firing event for modid {} : {}",
     //                         container->modId, LIBMATTI_JL_Class_GetName(event->clazz));
     LIBMATTI_BUS_IEventBus_Post(bus, event);
-    //LIBMATTI_ML_Logger_Trace(LOGGER(), &LIBMATTI_FML_Logging_LOADING, "Fired event for modid {} : {}",
-    //                         container->modId, LIBMATTI_JL_Class_GetName(event->clazz));
+
+
+
 }
 
 // Java: public final <T extends Event & IModBusEvent> void acceptEvent(EventPriority phase, T e)
@@ -177,11 +179,13 @@ void LIBMATTI_FML_ModContainer_AcceptEventWithPhase(LIBMATTI_FML_ModContainer *c
     LIBMATTI_BUS_IEventBus *bus = LIBMATTI_FML_ModContainer_GetEventBus(container);
     if (bus == NULL) return;
 
-    //LIBMATTI_ML_Logger_Trace(LOGGER(), &LIBMATTI_FML_Logging_LOADING, "Firing event for phase {} for modid {} : {}",
-    //                         LIBMATTI_BUS_EventPriority_Name(phase), container->modId,
-    //                         LIBMATTI_JL_Class_GetName(event->clazz));
+
+
+
+
     LIBMATTI_BUS_IEventBus_PostPhase(bus, phase, event);
-    //LIBMATTI_ML_Logger_Trace(LOGGER(), &LIBMATTI_FML_Logging_LOADING, "Fired event for phase {} for modid {} : {}",
-    //                         LIBMATTI_BUS_EventPriority_Name(phase), container->modId,
-    //                         LIBMATTI_JL_Class_GetName(event->clazz));
+
+
+
+
 }

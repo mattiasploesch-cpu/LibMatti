@@ -21,7 +21,7 @@ static void queue_add(void **queue, size_t *count, void *node, int (*comparator)
         return;
     }
 
-    // Java: PriorityQueue.add - insert at the position the comparator selects
+// Java: PriorityQueue.add - insert at the position the comparator selects
     size_t index = *count;
     while (index > 0 && comparator(queue[index - 1], node, userdata) > 0)
     {
@@ -57,13 +57,13 @@ void **LIBMATTI_FML_TopologicalSort_TopologicalSort(LIBMATTI_FML_Graph *graph,
     *count = 0;
     *cycles = NULL;
 
-    // Java: Preconditions.checkArgument(graph.isDirected(), "Cannot topologically sort an undirected graph!");
+// Java: Preconditions.checkArgument(graph.isDirected(), "Cannot topologically sort an undirected graph!");
     if (!LIBMATTI_FML_Graph_IsDirected(graph))
     {
         LIBMATTI_ML_Logger_Error(LOGGER(), NULL, "Cannot topologically sort an undirected graph!");
         return NULL;
     }
-    // Java: Preconditions.checkArgument(!graph.allowsSelfLoops(), "Cannot topologically sort a graph with self loops!");
+// Java: Preconditions.checkArgument(!graph.allowsSelfLoops(), "Cannot topologically sort a graph with self loops!");
     if (LIBMATTI_FML_Graph_AllowsSelfLoops(graph))
     {
         LIBMATTI_ML_Logger_Error(LOGGER(), NULL, "Cannot topologically sort a graph with self loops!");
@@ -113,7 +113,7 @@ void **LIBMATTI_FML_TopologicalSort_TopologicalSort(LIBMATTI_FML_Graph *graph,
     for (size_t i = 0; i < nodeCount; i++)
     {
         if (degrees[i] == 0) continue;
-        // Java: only the nodes that were added to the map are checked (degree > 0)
+// Java: only the nodes that were added to the map are checked (degree > 0)
         hasDegrees = 1;
         break;
     }
@@ -128,7 +128,7 @@ void **LIBMATTI_FML_TopologicalSort_TopologicalSort(LIBMATTI_FML_Graph *graph,
 
     free(results);
 
-    // Java: Set<Set<T>> components = new StronglyConnectedComponentDetector<>(graph).getComponents(); components.removeIf(set -> set.size() < 2);
+// Java: Set<Set<T>> components = new StronglyConnectedComponentDetector<>(graph).getComponents(); components.removeIf(set -> set.size() < 2);
     LIBMATTI_FML_StronglyConnectedComponentDetector *detector =
         LIBMATTI_FML_StronglyConnectedComponentDetector_New(graph);
     size_t *componentSizes = NULL;

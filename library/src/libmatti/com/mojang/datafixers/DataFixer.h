@@ -1,7 +1,8 @@
-// Port of com.mojang.datafixers (the surface the game needs):
-// DataFixerUpper with versioned DataFix entries and the Dynamic value tree.
-// The generic optics/type rewriting is folded into the version rule the game
-// uses: fix(schemaVersion, data) picks the newest fix chain.
+
+
+
+
+
 
 #ifndef MATTICRAFT_DFUP_DATAFIXER_H
 #define MATTICRAFT_DFUP_DATAFIXER_H
@@ -42,10 +43,13 @@ struct LIBMATTI_DFUP_Dynamic
     long longValue;
     float floatValue;
     double doubleValue;
-    char *stringValue;      // owned
-    LIBMATTI_DFUP_Dynamic **list; // owned, size listCount
+    char *stringValue;
+
+    LIBMATTI_DFUP_Dynamic **list;
+
     size_t listCount;
-    LIBMATTI_DFUP_MapEntry *map; // owned entries (key + value), size mapCount
+    LIBMATTI_DFUP_MapEntry *map;
+
     size_t mapCount;
 };
 
@@ -54,7 +58,8 @@ LIBMATTI_DFUP_Dynamic *LIBMATTI_DFUP_Dynamic_Empty(void);
 LIBMATTI_DFUP_Dynamic *LIBMATTI_DFUP_Dynamic_Int(int value);
 LIBMATTI_DFUP_Dynamic *LIBMATTI_DFUP_Dynamic_String(const char *value);
 LIBMATTI_DFUP_Dynamic *LIBMATTI_DFUP_Dynamic_Map(void);
-// Sets or replaces a map entry (the key is copied)
+
+
 LIBMATTI_DFUP_Dynamic *LIBMATTI_DFUP_Dynamic_Set(LIBMATTI_DFUP_Dynamic *dynamic, const char *key,
                                                  LIBMATTI_DFUP_Dynamic *value);
 // Java: Dynamic.get(key) -> Optional - NULL when absent
@@ -73,8 +78,8 @@ typedef LIBMATTI_DFUP_Dynamic *(*LIBMATTI_DFUP_Fix)(LIBMATTI_DFUP_Dynamic *data,
 
 typedef struct
 {
-    int version;        // Java: the schema version this fix upgrades to
-    char *name;         // Java: SCHEMA_NAME / the fix name
+    int version;// Java: the schema version this fix upgrades to
+    char *name;// Java: SCHEMA_NAME / the fix name
     LIBMATTI_DFUP_Fix fix;
     void *self;
 } LIBMATTI_DFUP_DataFix;
@@ -85,7 +90,8 @@ typedef struct
 
 typedef struct
 {
-    LIBMATTI_DFUP_DataFix *fixes; // sorted by version ascending
+    LIBMATTI_DFUP_DataFix *fixes;
+
     size_t fixCount;
     size_t fixCapacity;
 } LIBMATTI_DFUP_DataFixerUpper;
@@ -104,4 +110,4 @@ void LIBMATTI_DFUP_DataFixerUpper_Free(LIBMATTI_DFUP_DataFixerUpper *fixer);
 LIBMATTI_DFUP_Dynamic *LIBMATTI_DFUP_DataFixUtils_UpdateNamed(
     LIBMATTI_DFUP_Dynamic *data, const char *oldName, const char *newName);
 
-#endif //MATTICRAFT_DFUP_DATAFIXER_H
+#endif

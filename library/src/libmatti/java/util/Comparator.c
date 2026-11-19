@@ -92,7 +92,7 @@ void LIBMATTI_JU_Collections_Swap(struct LIBMATTI_JU_ArrayList *list, size_t i, 
 
 void LIBMATTI_JU_Collections_Reverse(struct LIBMATTI_JU_ArrayList *list)
 {
-    // Java: Collections.reverse
+// Java: Collections.reverse
     if (list->size < 2)
         return;
     for (size_t i = 0, j = list->size - 1; i < j; i++, j--)

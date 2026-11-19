@@ -1,4 +1,5 @@
-// Port of net.neoforged.neoforge.internal.CommonModLoader.
+
+
 
 #include "libmatti/net/neoforged/neoforge/internal/CommonModLoader.h"
 
@@ -41,7 +42,7 @@ int LIBMATTI_NEOFORGE_CommonModLoader_AreRegistriesLoaded(void)
 static void registry_initialization(void *userdata)
 {
     (void) userdata;
-    // Java: Main.main runs Bootstrap.bootStrap() (via BackgroundWaiter) before the mod loading
+// Java: Main.main runs Bootstrap.bootStrap() (via BackgroundWaiter) before the mod loading
     //       starts - the guard goes up, the registries class-initialise and bootStrap() freezes
     //       them; the per-registry game contents are the game port's part
     LIBMATTI_MC_Bootstrap_BootStrap();
@@ -83,7 +84,7 @@ static void noop_periodic(void *userdata)
 // Java: protected static void begin(Runnable periodicTask, boolean datagen)
 void LIBMATTI_NEOFORGE_CommonModLoader_Begin(void (*periodicTask)(void *userdata), void *userdata, int datagen)
 {
-    // Java: var syncExecutor = ModWorkManager.syncExecutor();
+// Java: var syncExecutor = ModWorkManager.syncExecutor();
     // The port's executors run on the caller's thread; ModLoader takes the callbacks directly.
 
     LIBMATTI_FML_ModLoader_GatherAndInitializeMods(periodicTask, userdata);
@@ -96,7 +97,7 @@ void LIBMATTI_NEOFORGE_CommonModLoader_Begin(void (*periodicTask)(void *userdata
         LIBMATTI_FML_ModLoader_RunInitTask("Config loading", periodicTask, userdata, config_loading, NULL);
     }
 
-    // Java: NeoForge.EVENT_BUS.start();
+// Java: NeoForge.EVENT_BUS.start();
     LIBMATTI_BUS_IEventBus_Start(LIBMATTI_NEOFORGE_NeoForge_EVENT_BUS());
 }
 
@@ -129,14 +130,14 @@ static LIBMATTI_BUS_Event *new_sided_setup(LIBMATTI_FML_ModContainer *container,
 // Java: protected static void load(Executor syncExecutor, Executor parallelExecutor)
 void LIBMATTI_NEOFORGE_CommonModLoader_Load(void)
 {
-    // Java: Runnable periodicTask = () -> {}; server: no progress screen; client ticks its own screen
+// Java: Runnable periodicTask = () -> {}; server: no progress screen; client ticks its own screen
     void (*periodicTask)(void *userdata) = noop_periodic;
     void *userdata = NULL;
 
     LIBMATTI_FML_ModLoader_DispatchParallelEvent("Common setup", periodicTask, userdata, new_common_setup, NULL);
     LIBMATTI_FML_ModLoader_DispatchParallelEvent("Sided setup", periodicTask, userdata, new_sided_setup, NULL);
 
-    // Java: ModLoader.runInitTask("Registration events", syncExecutor, periodicTask, RegistrationEvents::init);
+// Java: ModLoader.runInitTask("Registration events", syncExecutor, periodicTask, RegistrationEvents::init);
     LIBMATTI_FML_ModLoader_RunInitTask("Registration events", periodicTask, userdata,
                                        LIBMATTI_NEOFORGE_RegistrationEvents_Init, NULL);
 }
@@ -202,7 +203,7 @@ void LIBMATTI_NEOFORGE_CommonModLoader_Finish(void)
                                                  userdata, new_load_complete, NULL);
     free(name);
 
-    // Java: ModLoader.runInitTask("Network registry lock", syncExecutor, periodicTask, NetworkRegistry::setup)
+// Java: ModLoader.runInitTask("Network registry lock", syncExecutor, periodicTask, NetworkRegistry::setup)
     LIBMATTI_FML_ModLoader_RunInitTask("Network registry lock", periodicTask, userdata,
                                        network_registry_setup_task, NULL);
 }

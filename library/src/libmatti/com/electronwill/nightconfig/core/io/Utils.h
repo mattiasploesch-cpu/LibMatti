@@ -1,4 +1,5 @@
-// Port of com.electronwill.nightconfig.core.io.Utils.
+
+
 
 #ifndef MATTICRAFT_NC_CORE_IO_UTILS_H
 #define MATTICRAFT_NC_CORE_IO_UTILS_H
@@ -15,4 +16,4 @@ double LIBMATTI_NC_Utils_ParseDouble(const LIBMATTI_NC_CharsWrapper *chars, int 
 // the UTF-8 encoding of a code point (Java: new String(new int[] { codePoint }, 0, 1))
 size_t LIBMATTI_NC_Utils_EncodeUtf8(int codePoint, char out[4]);
 
-#endif //MATTICRAFT_NC_CORE_IO_UTILS_H
+#endif

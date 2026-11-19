@@ -1,6 +1,7 @@
-// Port of net.neoforged.neoforge.registries.RegistryManager.
-// The event lifecycle runs exactly like Java; the Registry object model (BuiltInRegistries)
-// is the game port's part, so the port tracks registry names instead of Registry objects.
+
+
+
+
 
 #include "libmatti/net/neoforged/neoforge/registries/RegistryManager.h"
 
@@ -13,7 +14,7 @@
 
 static char **pendingModdedRegistries = NULL;
 static size_t pendingModdedRegistryCount = 0;
-static int pendingModdedRegistriesOpen = 0; // Java: pendingModdedRegistries != null
+static int pendingModdedRegistriesOpen = 0;// Java: pendingModdedRegistries != null
 
 static char **vanillaRegistryKeys = NULL;
 static size_t vanillaRegistryKeyCount = 0;
@@ -40,18 +41,18 @@ void LIBMATTI_NEOFORGE_RegistryManager_PostNewRegistryEvent(void)
     LIBMATTI_ML_Logger *logger = LIBMATTI_ML_LogManager_GetLogger();
 
     LIBMATTI_NEOFORGE_Registries_NewRegistryEvent *event = LIBMATTI_NEOFORGE_Registries_NewRegistryEvent_New();
-    // Java: DataPackRegistryEvent.NewRegistry dataPackEvent - posted in the same order below
+// Java: DataPackRegistryEvent.NewRegistry dataPackEvent - posted in the same order below
 
-    // Java: vanillaRegistryKeys = Set.copyOf(BuiltInRegistries.REGISTRY.keySet())
+// Java: vanillaRegistryKeys = Set.copyOf(BuiltInRegistries.REGISTRY.keySet())
     pendingModdedRegistriesOpen = 1;
 
-    // Java: ModLoader.postEventWrapContainerInModOrder(event)
+// Java: ModLoader.postEventWrapContainerInModOrder(event)
     LIBMATTI_FML_ModLoader_PostEventWrapContainerInModOrder(&event->base);
 
-    // Java: event.fill() - the registered registries leave the pending set
+// Java: event.fill() - the registered registries leave the pending set
     LIBMATTI_NEOFORGE_RegistryManager_ClearPendingModdedRegistries();
 
-    // Java: ModLoader.postEvent(new ModifyRegistriesEvent())
+// Java: ModLoader.postEvent(new ModifyRegistriesEvent())
     LIBMATTI_NEOFORGE_Registries_ModifyRegistriesEvent *modifyEvent =
         LIBMATTI_NEOFORGE_Registries_ModifyRegistriesEvent_New();
     LIBMATTI_FML_ModLoader_PostEvent(&modifyEvent->base);
@@ -64,7 +65,7 @@ void LIBMATTI_NEOFORGE_RegistryManager_PostNewRegistryEvent(void)
 // Java: public static void initDataMaps()
 void LIBMATTI_NEOFORGE_RegistryManager_InitDataMaps(void)
 {
-    // Java: ModLoader.postEvent(new RegisterDataMapTypesEvent(dataMapTypes)); the port keeps the
+// Java: ModLoader.postEvent(new RegisterDataMapTypesEvent(dataMapTypes)); the port keeps the
     // collected type names (the data map payload model is the game port's part)
     for (size_t i = 0; i < dataMapTypeCount; i++)
         free(dataMapTypes[i]);

@@ -1,6 +1,7 @@
-// Port of org.joml.Matrix4f.
-// The field order matches JOML exactly (m00..m32), so the struct can be
-// uploaded to OpenGL with glUniformMatrix4fv without transposing.
+
+
+
+
 
 #ifndef MATTICRAFT_JOML_MATRIX4F_H
 #define MATTICRAFT_JOML_MATRIX4F_H
@@ -70,4 +71,4 @@ void LIBMATTI_JOML_Matrix4f_TransformPosition(const LIBMATTI_JOML_Matrix4f *m, f
 // Java: public Vector3f transformDirection(Vector3f v) - the upper 3x3 only, not normalized
 void LIBMATTI_JOML_Matrix4f_TransformDirection(const LIBMATTI_JOML_Matrix4f *m, float *x, float *y, float *z);
 
-#endif //MATTICRAFT_JOML_MATRIX4F_H
+#endif

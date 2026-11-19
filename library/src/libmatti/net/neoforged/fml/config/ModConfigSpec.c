@@ -1,9 +1,10 @@
-// Port-only stand-in for NeoForge's ModConfigSpec (see the header).
-// The behaviour follows SimpleConfigSpec from FML's ConfigTrackerTest:
-//   correct(config, dryRun): "configEntry" must exist and be an Integer, else set 4;
-//   comment "Test comment:" is added on the real run.
-// The port's CommentedConfig has no comment storage yet (the parser does not read comments),
-// so correct() only restores the value.
+
+
+
+
+
+
+
 
 #include "libmatti/net/neoforged/fml/config/ModConfigSpec.h"
 
@@ -25,7 +26,7 @@ static int correct_impl(const LIBMATTI_NC_Config *config, int dryRun)
             LIBMATTI_NC_Config_Set((LIBMATTI_NC_Config *) config, path, 1, &defaultValue);
         }
     }
-    // Java: if (!dryRun && !config.containsComment("configEntry")) setComment("configEntry", "Test comment:")
+// Java: if (!dryRun && !config.containsComment("configEntry")) setComment("configEntry", "Test comment:")
     return ok;
 }
 

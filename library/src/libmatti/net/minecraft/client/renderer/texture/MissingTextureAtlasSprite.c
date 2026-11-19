@@ -1,4 +1,5 @@
-// Implementation of the MissingTextureAtlasSprite SpriteContents factory.
+
+
 
 #include "libmatti/net/minecraft/client/renderer/texture/MissingTextureAtlasSprite.h"
 
@@ -8,7 +9,7 @@
 
 LIBMATTI_MC_SpriteContents *LIBMATTI_MC_MissingTextureAtlasSprite_Create(void)
 {
-    // Java: NativeImage image = generateMissingImage(16, 16);
+// Java: NativeImage image = generateMissingImage(16, 16);
     //       return new SpriteContents(MISSING_TEXTURE_LOCATION, new FrameSize(16, 16), image);
     LIBMATTI_B3D_NativeImage *image = LIBMATTI_MC_MissingTextureAtlasSprite_GenerateMissingImage();
     LIBMATTI_MC_Identifier *name = LIBMATTI_MC_MissingTextureAtlasSprite_GetLocation();

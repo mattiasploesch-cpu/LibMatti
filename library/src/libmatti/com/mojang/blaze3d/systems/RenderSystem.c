@@ -1,7 +1,8 @@
-// Port of com.mojang.blaze3d.systems.RenderSystem - the static render API.
-// The 1.21.11 original routes through a GpuDevice; the port keeps the static
-// surface (thread assertions, poll/flip, FPS limit, model-view stack, shared
-// index buffers) and talks to GL through the GlStateManager cache layer.
+
+
+
+
+
 
 #include "libmatti/com/mojang/blaze3d/systems/RenderSystem.h"
 
@@ -57,8 +58,9 @@ typedef struct AutoStorageIndexBuffer
 {
     int vertexStride;
     int indexStride;
-    // Java: IndexGenerator - fills the buffer for one index quad/segment base.
-    int kind;  // 0 = sequential, 1 = quad, 2 = lines
+// Java: IndexGenerator - fills the buffer for one index quad/segment base.
+    int kind;
+
     unsigned int buffer;
     LIBMATTI_B3D_VertexFormat_IndexType type;
     int indexCount;
@@ -75,13 +77,14 @@ static LIBMATTI_ML_Logger *logger(void)
 
 void LIBMATTI_B3D_RenderSystem_InitRenderThread(void)
 {
-    // Java: if (renderThread != null) throw new IllegalStateException(...)
+// Java: if (renderThread != null) throw new IllegalStateException(...)
     if (renderThread != NULL)
     {
         LIBMATTI_ML_Logger_Error(logger(), NULL, "Could not initialize render thread");
         return;
     }
-    renderThread = (void *) (size_t) 1;  // Port: single render thread marker.
+    renderThread = (void *) (size_t) 1;
+
 }
 
 int LIBMATTI_B3D_RenderSystem_IsOnRenderThread(void)
@@ -91,7 +94,7 @@ int LIBMATTI_B3D_RenderSystem_IsOnRenderThread(void)
 
 void LIBMATTI_B3D_RenderSystem_AssertOnRenderThread(void)
 {
-    // Java: assertOnRenderThread throws "Rendersystem called from wrong thread";
+// Java: assertOnRenderThread throws "Rendersystem called from wrong thread";
     // the port logs once per call site state and continues (the game loop is
     // single threaded in the current skeleton).
     if (!LIBMATTI_B3D_RenderSystem_IsOnRenderThread())
@@ -107,7 +110,7 @@ void LIBMATTI_B3D_RenderSystem_AssertOnRenderThread(void)
 
 void LIBMATTI_B3D_RenderSystem_PollEvents(void)
 {
-    // Java: pollEventsWaitStart.set(Util.getMillis()); pollingEvents.set(true);
+// Java: pollEventsWaitStart.set(Util.getMillis()); pollingEvents.set(true);
     // Java: Util.getMillis() - the port's time base is System.currentTimeMillis.
     pollEventsWaitStart = LIBMATTI_JL_System_CurrentTimeMillis();
     pollingEvents = 1;
@@ -123,17 +126,17 @@ int LIBMATTI_B3D_RenderSystem_IsFrozenAtPollEvents(void)
 void LIBMATTI_B3D_RenderSystem_FlipFrame(long window)
 {
     LIBMATTI_B3D_RenderSystem_PollEvents();
-    // Java: Tesselator.getInstance().clear();
+// Java: Tesselator.getInstance().clear();
     // Java: GLFW.glfwSwapBuffers(p_424398_.handle());
     LIBMATTI_GLFW_glfwSwapBuffers(window);
-    // Java: dynamicUniforms.reset(); Minecraft.getInstance().levelRenderer.endFrame();
+// Java: dynamicUniforms.reset(); Minecraft.getInstance().levelRenderer.endFrame();
     // - nothing registered in the skeleton yet.
     LIBMATTI_B3D_RenderSystem_PollEvents();
 }
 
 void LIBMATTI_B3D_RenderSystem_LimitDisplayFPS(int fps)
 {
-    // Java: double d0 = lastDrawTime + 1.0 / fps;
+// Java: double d0 = lastDrawTime + 1.0 / fps;
     //       for (d1 = glfwGetTime(); d1 < d0; d1 = glfwGetTime())
     //           glfwWaitEventsTimeout(d0 - d1);
     //       lastDrawTime = d1;
@@ -166,11 +169,11 @@ void *LIBMATTI_B3D_RenderSystem_GetShaderLights(void)
 
 void LIBMATTI_B3D_RenderSystem_EnableScissorForRenderTypeDraws(int x, int y, int width, int height)
 {
-    // Java: scissorStateForRenderTypeDraws.enable(...); the ScissorState tracks
+// Java: scissorStateForRenderTypeDraws.enable(...); the ScissorState tracks
     // a stack of rectangles. The port enables the scissor test directly through
     // the state manager (one level, matching what RenderType draws need).
     LIBMATTI_B3D_GlStateManager_EnableScissorTest();
-    // Java: ScissorState.enable applies y-flip against the window height in the
+// Java: ScissorState.enable applies y-flip against the window height in the
     // caller; the raw box is forwarded.
     LIBMATTI_B3D_GlStateManager_ScissorBox(x, y, width, height);
 }
@@ -182,7 +185,7 @@ void LIBMATTI_B3D_RenderSystem_DisableScissorForRenderTypeDraws(void)
 
 const char *LIBMATTI_B3D_RenderSystem_GetBackendDescription(void)
 {
-    // Java: String.format("LWJGL version %s", GLX._getLWJGLVersion());
+// Java: String.format("LWJGL version %s", GLX._getLWJGLVersion());
     return "LWJGL version 3.3.3+build.1 (port)";
 }
 
@@ -194,7 +197,7 @@ const char *LIBMATTI_B3D_RenderSystem_GetApiDescription(void)
 void LIBMATTI_B3D_RenderSystem_InitRenderer(long window)
 {
     (void) window;
-    // Java: DEVICE = new GlDevice(handle, ...); apiDescription = getDevice()
+// Java: DEVICE = new GlDevice(handle, ...); apiDescription = getDevice()
     //       .getImplementationInformation();
     // The port resolves the GL entry points eagerly for the current context.
     LIBMATTI_GL_Load();
@@ -224,7 +227,7 @@ void LIBMATTI_B3D_RenderSystem_InitRenderer(long window)
 
 void LIBMATTI_B3D_RenderSystem_SetupDefaultState(void)
 {
-    // Java: modelViewStack.clear() - identity, position 0.
+// Java: modelViewStack.clear() - identity, position 0.
     modelViewStackPosition = 0;
     LIBMATTI_JOML_Matrix4f_Identity(&modelViewStack);
 }
@@ -271,7 +274,7 @@ LIBMATTI_JOML_Matrix4f *LIBMATTI_B3D_RenderSystem_GetModelViewStack(void)
 
 void LIBMATTI_B3D_RenderSystem_PushModelView(void)
 {
-    // Java: Matrix4fStack.push() - copies the current matrix one level down.
+// Java: Matrix4fStack.push() - copies the current matrix one level down.
     LIBMATTI_B3D_RenderSystem_AssertOnRenderThread();
     if (modelViewStackPosition >= MODELVIEW_STACK_DEPTH)
         return;
@@ -281,7 +284,7 @@ void LIBMATTI_B3D_RenderSystem_PushModelView(void)
 
 void LIBMATTI_B3D_RenderSystem_PopModelView(void)
 {
-    // Java: Matrix4fStack.pop() - restores the matrix one level down.
+// Java: Matrix4fStack.pop() - restores the matrix one level down.
     LIBMATTI_B3D_RenderSystem_AssertOnRenderThread();
     if (modelViewStackPosition <= 0)
         return;
@@ -295,7 +298,8 @@ static void index_generator_fill(const AutoStorageIndexBuffer *storage, unsigned
     int i = 0;
     switch (storage->kind)
     {
-        case 1:  // sharedSequentialQuad: v, v+1, v+2, v+2, v+3, v
+        case 1:
+
             out[i++] = (unsigned short) (base + 0);
             out[i++] = (unsigned short) (base + 1);
             out[i++] = (unsigned short) (base + 2);
@@ -303,7 +307,8 @@ static void index_generator_fill(const AutoStorageIndexBuffer *storage, unsigned
             out[i++] = (unsigned short) (base + 3);
             out[i++] = (unsigned short) (base + 0);
             break;
-        case 2:  // sharedSequentialLines: v, v+1, v+2, v+3, v+2, v+1
+        case 2:
+
             out[i++] = (unsigned short) (base + 0);
             out[i++] = (unsigned short) (base + 1);
             out[i++] = (unsigned short) (base + 2);
@@ -311,7 +316,8 @@ static void index_generator_fill(const AutoStorageIndexBuffer *storage, unsigned
             out[i++] = (unsigned short) (base + 2);
             out[i++] = (unsigned short) (base + 1);
             break;
-        default:  // sharedSequential: v
+        default:
+
             out[i++] = (unsigned short) base;
             break;
     }
@@ -323,12 +329,12 @@ static void ensure_storage(AutoStorageIndexBuffer *storage, int count)
     if (count <= storage->indexCount)
         return;
 
-    // Java: p_157477_ = Mth.roundToward(p_157477_ * 2, this.indexStride);
+// Java: p_157477_ = Mth.roundToward(p_157477_ * 2, this.indexStride);
     count = LIBMATTI_MC_Mth_RoundToward(count * 2, storage->indexStride);
     LIBMATTI_ML_Logger_Debug(logger(), NULL, "Growing IndexBuffer: Old limit {}, new limit {}.",
                              storage->indexCount, count);
     int vertices = count / storage->indexStride;
-    // Java: VertexFormat.IndexType.least(j) - INT when the vertex count exceeds
+// Java: VertexFormat.IndexType.least(j) - INT when the vertex count exceeds
     // 65535, SHORT otherwise.
     LIBMATTI_B3D_VertexFormat_IndexType type = (vertices & -65536) != 0 ? LIBMATTI_B3D_IndexType_INT
                                                                         : LIBMATTI_B3D_IndexType_SHORT;
@@ -341,7 +347,7 @@ static void ensure_storage(AutoStorageIndexBuffer *storage, int count)
 
     storage->buffer = LIBMATTI_B3D_GlStateManager_GenBuffers();
     LIBMATTI_B3D_GlStateManager_BindBuffer(LIBMATTI_GL_GL_ELEMENT_ARRAY_BUFFER, storage->buffer);
-    // Java: fill a ByteBuffer through the IndexGenerator and upload it.
+// Java: fill a ByteBuffer through the IndexGenerator and upload it.
     {
         unsigned short *indices = malloc((size_t) byteSize);
         int index = 0;
@@ -398,7 +404,7 @@ void LIBMATTI_B3D_RenderSystem_QueueFencedTask(void (*callback)(void *), void *u
 
 void LIBMATTI_B3D_RenderSystem_ExecutePendingTasks(void)
 {
-    // Java: the loop only runs the task when the fence reports completion with
+// Java: the loop only runs the task when the fence reports completion with
     // a zero timeout; the port has no fences, every task is ready immediately.
     while (pendingTasksHead != NULL)
     {

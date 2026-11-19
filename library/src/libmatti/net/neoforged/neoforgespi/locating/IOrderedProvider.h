@@ -1,4 +1,5 @@
-// Port of net.neoforged.neoforgespi.locating.IOrderedProvider.
+
+
 
 #ifndef MATTICRAFT_NEOFORGESPI_LOCATING_IORDEREDPROVIDER_H
 #define MATTICRAFT_NEOFORGESPI_LOCATING_IORDEREDPROVIDER_H
@@ -17,11 +18,11 @@ struct LIBMATTI_NEOFORGESPI_IOrderedProvider
 {
     void *self;
 
-    // Java: default int getPriority()
+// Java: default int getPriority()
     int (*getPriority)(void *self);
 };
 
 // Java: public default int getPriority()
 int LIBMATTI_NEOFORGESPI_IOrderedProvider_GetPriority(const LIBMATTI_NEOFORGESPI_IOrderedProvider *provider);
 
-#endif //MATTICRAFT_NEOFORGESPI_LOCATING_IORDEREDPROVIDER_H
+#endif

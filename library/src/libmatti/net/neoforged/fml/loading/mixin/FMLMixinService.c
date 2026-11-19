@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.loading.mixin.FMLMixinService.
+
+
 
 #include "libmatti/net/neoforged/fml/loading/mixin/FMLMixinService.h"
 
@@ -27,12 +28,12 @@ static LoggerEntry *loggers = NULL;
 static size_t loggerCount = 0;
 static LIBMATTI_SP_ReEntranceLock *lock = NULL;
 static void *classProvider = NULL;
-static void *bytecodeProvider = NULL; // Java: @Nullable IClassBytecodeProvider
+static void *bytecodeProvider = NULL;// Java: @Nullable IClassBytecodeProvider
 static void *classTracker = NULL;
 static void *auditTrail = NULL;
 static void *featureValidator = NULL;
 static void *adviceProvider = NULL;
-static void *mixinTransformer = NULL; // Java: @Nullable IMixinTransformer
+static void *mixinTransformer = NULL;// Java: @Nullable IMixinTransformer
 
 // Java: private final Map<String, byte[]> mixinConfigContents
 typedef struct
@@ -122,7 +123,8 @@ static const char *svc_get_side_name(void *self)
 {
     (void) self;
     LIBMATTI_DIST_Dist dist = LIBMATTI_FML_FMLLoader_GetDist(LIBMATTI_FML_FMLLoader_GetCurrent());
-    // The port's Dist enum: CLIENT first, DEDICATED_SERVER second
+
+
     return dist == 0 ? LIBMATTI_SP_Constants_SIDE_CLIENT : LIBMATTI_SP_Constants_SIDE_SERVER;
 }
 
@@ -280,7 +282,7 @@ void LIBMATTI_FML_FMLMixinService_AddMixinConfigContent(const char *config, cons
     {
         if (strcmp(mixinConfigContents[i].name, config) == 0)
         {
-            // Java: HashMap.put replaces
+// Java: HashMap.put replaces
             free(mixinConfigContents[i].content);
             mixinConfigContents[i].content = malloc(length);
             memcpy(mixinConfigContents[i].content, resource, length);
@@ -312,7 +314,8 @@ void LIBMATTI_FML_FMLMixinService_ClearMixinContainers(void)
     mixinContainerCount = 0;
 }
 
-// The interface dispatch table (Java's implements)
+
+
 static LIBMATTI_SP_IMixinService theService = {
     NULL,
     svc_prepare,

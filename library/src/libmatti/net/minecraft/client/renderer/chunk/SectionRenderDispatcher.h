@@ -1,6 +1,7 @@
-// Port of net.minecraft.client.renderer.chunk.SectionRenderDispatcher and
-// net.minecraft.client.renderer.chunk.RenderSection (the compile/upload/render
-// state machine per section).
+
+
+
+
 
 #ifndef MATTICRAFT_MC_CLIENT_RENDERER_CHUNK_SECTIONRENDERDISPATCHER_H
 #define MATTICRAFT_MC_CLIENT_RENDERER_CHUNK_SECTIONRENDERDISPATCHER_H
@@ -20,13 +21,13 @@ extern "C" {
 // the per-section compile result and its world anchor.
 typedef struct LIBMATTI_MC_RenderSection
 {
-    // Java: private final SectionPos sectionPos
+// Java: private final SectionPos sectionPos
     LIBMATTI_MC_SectionPos *sectionPos;
-    // Java: private volatile CompiledSectionMesh compiledSectionMesh
+// Java: private volatile CompiledSectionMesh compiledSectionMesh
     LIBMATTI_MC_CompiledSectionMesh *compiled;
-    // Java: private boolean dirty - set on every block change in the section.
+// Java: private boolean dirty - set on every block change in the section.
     int dirty;
-    // Java: private long lastSubmittedTimeMs / lastPrevBuiltTimeMs (the port
+// Java: private long lastSubmittedTimeMs / lastPrevBuiltTimeMs (the port
     // keeps the one rebuild counter the skeleton needs).
     long long lastBuiltAtMs;
 } LIBMATTI_MC_RenderSection;
@@ -56,12 +57,12 @@ int LIBMATTI_MC_RenderSection_HasRenderedLayer(const LIBMATTI_MC_RenderSection *
 // ReentrantSectorLock + worker pool are the parallel-dispatch part).
 typedef struct LIBMATTI_MC_SectionRenderDispatcher
 {
-    // Java: private final SectionCompiler compiler
+// Java: private final SectionCompiler compiler
     LIBMATTI_MC_SectionCompiler *compiler;
-    // Java: private final SectionBufferBuilderPack.FixedSizeArray pool - the
+// Java: private final SectionBufferBuilderPack.FixedSizeArray pool - the
     // port keeps one shared pack the synchronous compile borrows.
     LIBMATTI_MC_SectionBufferBuilderPack *pack;
-    // Java: private final List<RenderSection> sections - the port stores the
+// Java: private final List<RenderSection> sections - the port stores the
     // sections the client registered for the rebuild pass.
     LIBMATTI_MC_RenderSection **sections;
     int sectionCount;
@@ -113,4 +114,4 @@ unsigned int LIBMATTI_MC_SectionShader_Compile(int *mvpLocation, int *originLoca
 }
 #endif
 
-#endif //MATTICRAFT_MC_CLIENT_RENDERER_CHUNK_SECTIONRENDERDISPATCHER_H
+#endif

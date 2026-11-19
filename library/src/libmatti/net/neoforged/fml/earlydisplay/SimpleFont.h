@@ -1,13 +1,14 @@
-// Port of net.neoforged.fml.earlydisplay.render.SimpleFont (the Monocraft.ttf
-// bitmap font the earlydisplay renders). Java packs the ASCII range 32..126
-// into a 256x128 GL_R8/GL_RED texture through LWJGL's STBTruetype; the port
-// drives the same pack path over the vendored stb_truetype and keeps the
-// Glyph/DisplayText model.
-//
-// The port renders with a tiny POS_TEX_COLOR quad batcher ported from
-// SimpleBufferBuilder (the slice the font path needs): positions in screen
-// pixels, GL handles the projection through the font shader's screenSize
-// uniform, exactly like the Java vertex shader (position / screenSize * 2 - 1).
+
+
+
+
+
+
+
+
+
+
+
 
 #ifndef MATTICRAFT_FML_EARLYDISPLAY_SIMPLEFONT_H
 #define MATTICRAFT_FML_EARLYDISPLAY_SIMPLEFONT_H
@@ -22,17 +23,19 @@ extern "C"
 // Java: SimpleFont.Glyph - the packed quad for one codepoint
 typedef struct LIBMATTI_FML_SimpleFont_Glyph
 {
-    int codepoint;   // Java: char c
-    int charwidth;   // the x advance (Java: (int)(x[0] - 0f))
-    int pos[4];      // Java: int[] pos {x0, y0, x1, y1} (rounded)
-    float uv[4];     // Java: float[] uv {s0, t0, s1, t1}
+    int codepoint;// Java: char c
+    int charwidth;// the x advance (Java: (int)(x[0] - 0f))
+    int pos[4];// Java: int[] pos {x0, y0, x1, y1} (rounded)
+    float uv[4];// Java: float[] uv {s0, t0, s1, t1}
 } LIBMATTI_FML_SimpleFont_Glyph;
 
 // Java: SimpleFont.DisplayText - a string with an RGBA packed colour
 typedef struct LIBMATTI_FML_SimpleFont_DisplayText
 {
-    const char *string; // not owned (the caller keeps the buffer alive per call)
-    unsigned int colour; // ARGB packed, like ThemeColor.toArgb()
+    const char *string;
+
+    unsigned int colour;
+
 } LIBMATTI_FML_SimpleFont_DisplayText;
 
 typedef struct LIBMATTI_FML_SimpleFont LIBMATTI_FML_SimpleFont;
@@ -69,4 +72,4 @@ size_t LIBMATTI_FML_SimpleFont_DrawTexts(LIBMATTI_FML_SimpleFont *font, float x,
 }
 #endif
 
-#endif //MATTICRAFT_FML_EARLYDISPLAY_SIMPLEFONT_H
+#endif

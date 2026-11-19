@@ -33,7 +33,7 @@ static int isNeoForgeManifestPath(const char *path)
     unsigned char *bytes = LIBMATTI_JNF_Files_ReadAllBytes(path, &length);
     if (bytes == NULL)
     {
-        // Java: LOG.debug("Failed to read manifest at {}: {}", path, e);
+// Java: LOG.debug("Failed to read manifest at {}: {}", path, e);
         return 0;
     }
 
@@ -50,7 +50,7 @@ static LIBMATTI_FML_JarContents *openOrThrow(const char *root)
     LIBMATTI_FML_JarContents *contents = LIBMATTI_FML_JarContents_OfPath(root);
     if (contents == NULL)
     {
-        // Java: throw new ModLoadingException(error("fml.modloadingissue.corrupted_minecraft_jar").withAffectedPath(root).withCause(e));
+// Java: throw new ModLoadingException(error("fml.modloadingissue.corrupted_minecraft_jar").withAffectedPath(root).withCause(e));
         LIBMATTI_FML_ModLoadingIssue *issue = LIBMATTI_FML_ModLoadingIssue_Error(
             "fml.modloadingissue.corrupted_minecraft_jar", NULL, 0);
         issue = LIBMATTI_FML_ModLoadingIssue_WithAffectedPath(issue, root);
@@ -66,7 +66,7 @@ static LIBMATTI_FML_JarContents *findAndOpen(LIBMATTI_NEOFORGESPI_ILaunchContext
                                              LIBMATTI_FML_JarContents ***alreadyOpened, size_t *alreadyOpenedCount,
                                              const char *relativePath)
 {
-    // Java: for (var contents : alreadyOpened) if (contents.containsFile(relativePath)) return contents;
+// Java: for (var contents : alreadyOpened) if (contents.containsFile(relativePath)) return contents;
     for (size_t i = 0; i < *alreadyOpenedCount; i++)
         if (LIBMATTI_FML_JarContents_ContainsFile((*alreadyOpened)[i], relativePath))
             return (*alreadyOpened)[i];
@@ -76,7 +76,7 @@ static LIBMATTI_FML_JarContents *findAndOpen(LIBMATTI_NEOFORGESPI_ILaunchContext
 
     for (size_t i = 0; i < rootCount; i++)
     {
-        // Java: if (!context.isLocated(path)) { var jar = openOrThrow(path); alreadyOpened.add(jar); return jar; }
+// Java: if (!context.isLocated(path)) { var jar = openOrThrow(path); alreadyOpened.add(jar); return jar; }
         if (LIBMATTI_NEOFORGESPI_ILaunchContext_IsLocated(context, roots[i])) continue;
 
         LIBMATTI_FML_JarContents *jar = openOrThrow(roots[i]);
@@ -96,7 +96,7 @@ static LIBMATTI_FML_JarContents *findNeoForgeResources(LIBMATTI_FML_JarContents 
                                                        size_t locatedRootCount,
                                                        LIBMATTI_JL_ClassLoader *loader)
 {
-    // Java: for (var root : locatedRoots) if (isNeoForgeManifest(root.getManifest())) { LOG.debug("Found NeoForge MANIFEST.MF in {}", root); return root; }
+// Java: for (var root : locatedRoots) if (isNeoForgeManifest(root.getManifest())) { LOG.debug("Found NeoForge MANIFEST.MF in {}", root); return root; }
     for (size_t i = 0; i < locatedRootCount; i++)
     {
         if (!LIBMATTI_FML_RequiredSystemFiles_IsNeoForgeManifest(
@@ -107,13 +107,13 @@ static LIBMATTI_FML_JarContents *findNeoForgeResources(LIBMATTI_FML_JarContents 
         return locatedRoots[i];
     }
 
-    // Java: var manifestRoots = ClasspathResourceUtils.findFileSystemRootsOfFileOnClasspath(loader, JarModsDotTomlModFileReader.MANIFEST);
+// Java: var manifestRoots = ClasspathResourceUtils.findFileSystemRootsOfFileOnClasspath(loader, JarModsDotTomlModFileReader.MANIFEST);
     size_t rootCount = 0;
     char **manifestRoots = LIBMATTI_FML_ClasspathResourceUtils_FindRoots(loader, LIBMATTI_FML_MODS_TOML_MANIFEST,
                                                                          &rootCount);
     for (size_t i = 0; i < rootCount; i++)
     {
-        // Java: if (!Files.isDirectory(manifestRoot)) continue;
+// Java: if (!Files.isDirectory(manifestRoot)) continue;
         if (!LIBMATTI_JNF_Files_IsDirectory(manifestRoots[i])) continue;
 
         size_t length = strlen(manifestRoots[i]) + strlen(LIBMATTI_FML_MODS_TOML_MANIFEST) + 2;
@@ -149,7 +149,7 @@ LIBMATTI_FML_RequiredSystemFiles *LIBMATTI_FML_RequiredSystemFiles_Find(LIBMATTI
                                                 LIBMATTI_FML_REQUIRED_NEOFORGE_CLIENT_CLASS);
     result->neoForgeResources = findNeoForgeResources(locatedRoots, locatedRootCount, loader);
 
-    // Java: catch (Exception e) { closeAll(locatedRoots); throw e; }
+// Java: catch (Exception e) { closeAll(locatedRoots); throw e; }
     // the opened roots are kept by the result; only the lookup array is released here
     free(locatedRoots);
     return result;
@@ -202,7 +202,7 @@ int LIBMATTI_FML_RequiredSystemFiles_AreNeoForgeAndMinecraftSeparate(
     LIBMATTI_FML_JarContents **neoForge = LIBMATTI_FML_RequiredSystemFiles_GetNeoForgeJarComponents(
         files, &neoForgeCount);
 
-    // Java: Collections.disjoint(...)
+// Java: Collections.disjoint(...)
     int disjoint = 1;
     for (size_t i = 0; i < minecraftCount && disjoint; i++)
         for (size_t j = 0; j < neoForgeCount; j++)
@@ -238,7 +238,7 @@ int LIBMATTI_FML_RequiredSystemFiles_CheckForMissingMinecraftFiles(const LIBMATT
 
     if (missingCount == 0) return 1;
 
-    // Java: LOG.error("Couldn't find {} on classpath, while we did find other required files in: {}", missingFiles, foundRoots);
+// Java: LOG.error("Couldn't find {} on classpath, while we did find other required files in: {}", missingFiles, foundRoots);
     char missingCountText[32];
     snprintf(missingCountText, sizeof(missingCountText), "%zu", missingCount);
     LIBMATTI_ML_Logger_Error(LOGGER(), NULL, "Couldn't find {} of the required files on the classpath",
@@ -340,6 +340,7 @@ void LIBMATTI_FML_RequiredSystemFiles_Close(LIBMATTI_FML_RequiredSystemFiles *fi
     LIBMATTI_FML_JarContents **all = LIBMATTI_FML_RequiredSystemFiles_GetAll(files, &count);
     closeAll(all, count);
     free(all);
-    // Java lets the GC collect the closed resources
+
+
     free(files);
 }

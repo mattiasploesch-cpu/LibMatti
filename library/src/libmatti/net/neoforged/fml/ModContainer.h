@@ -1,6 +1,7 @@
-// Port of net.neoforged.fml.ModContainer.
-// Java's abstract getEventBus() and the overridable constructMod() become the function pointers the
-// concrete container fills in (the same convention the port uses for the other abstract classes).
+
+
+
+
 
 #ifndef MATTICRAFT_FML_MODCONTAINER_H
 #define MATTICRAFT_FML_MODCONTAINER_H
@@ -21,7 +22,7 @@ typedef struct LIBMATTI_FML_ModContainer LIBMATTI_FML_ModContainer;
 typedef struct
 {
     LIBMATTI_FML_IExtensionPoint point;
-    // Java: Supplier<?> - with a NULL get the entry holds the extension directly
+// Java: Supplier<?> - with a NULL get the entry holds the extension directly
     // (Java: registerExtensionPoint(point, () -> extension))
     LIBMATTI_JU_Supplier supplier;
     void *value;
@@ -30,16 +31,16 @@ typedef struct
 // Java: public abstract class ModContainer
 struct LIBMATTI_FML_ModContainer
 {
-    // Java: the VM's virtual dispatch
+// Java: the VM's virtual dispatch
     void (*constructMod)(void *self);
     LIBMATTI_BUS_IEventBus *(*getEventBus)(void *self);
     void (*free)(void *self);
 
-    // Java: protected final String modId
+// Java: protected final String modId
     char *modId;
-    // Java: protected final String namespace
+// Java: protected final String namespace
     char *namespace;
-    // Java: protected final IModInfo modInfo
+// Java: protected final IModInfo modInfo
     LIBMATTI_NEOFORGESPI_IModInfo *modInfo;
     LIBMATTI_FML_ModContainer_ExtensionPoint *extensionPoints;
     size_t extensionPointCount;
@@ -86,4 +87,4 @@ void LIBMATTI_FML_ModContainer_AcceptEvent(LIBMATTI_FML_ModContainer *container,
 void LIBMATTI_FML_ModContainer_AcceptEventWithPhase(LIBMATTI_FML_ModContainer *container,
                                                    LIBMATTI_BUS_EventPriority phase, LIBMATTI_BUS_Event *event);
 
-#endif //MATTICRAFT_FML_MODCONTAINER_H
+#endif

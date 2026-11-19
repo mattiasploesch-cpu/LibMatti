@@ -1,7 +1,8 @@
-// Port of net.neoforged.neoforge.network.registration.NetworkRegistry.
-// The payload handling/negotiation runs over the Minecraft Connection objects, which are the
-// game port's part; the port keeps the registration state machine (setup phase, the payload
-// registrations collected through RegisterPayloadHandlersEvent, and the post-setup guard).
+
+
+
+
+
 
 #ifndef MATTICRAFT_NEOFORGE_NETWORK_REGISTRATION_NETWORKREGISTRY_H
 #define MATTICRAFT_NEOFORGE_NETWORK_REGISTRATION_NETWORKREGISTRY_H
@@ -18,4 +19,4 @@ int LIBMATTI_NEOFORGE_NetworkRegistry_IsSetup(void);
 // Java: public static <T, B> void register(...) - throws after the registration phase
 int LIBMATTI_NEOFORGE_NetworkRegistry_Register(const char *payloadId, const char *version, int optional);
 
-#endif //MATTICRAFT_NEOFORGE_NETWORK_REGISTRATION_NETWORKREGISTRY_H
+#endif

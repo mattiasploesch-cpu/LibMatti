@@ -1,6 +1,7 @@
-// Port of net.minecraft.client.renderer.texture.Stitcher - the region tree
-// bin-packer the SpriteLoader uses to lay the atlas out. 1:1 with the Java
-// original (HOLDER_COMPARATOR sort, expand growth, recursive Region.add).
+
+
+
+
 
 #ifndef MATTICRAFT_MC_CLIENT_RENDERER_TEXTURE_STITCHER_H
 #define MATTICRAFT_MC_CLIENT_RENDERER_TEXTURE_STITCHER_H
@@ -17,7 +18,8 @@ typedef struct LIBMATTI_MC_Stitcher_Entry
 {
     int width;
     int height;
-    const char *name; // borrowed
+    const char *name;
+
 } LIBMATTI_MC_Stitcher_Entry;
 
 // Java: interface SpriteLoader<T> { void load(T entry, int originX, int originY, int padding); }
@@ -47,4 +49,4 @@ void LIBMATTI_MC_Stitcher_GatherSprites(const LIBMATTI_MC_Stitcher *stitcher, vo
 }
 #endif
 
-#endif //MATTICRAFT_MC_CLIENT_RENDERER_TEXTURE_STITCHER_H
+#endif

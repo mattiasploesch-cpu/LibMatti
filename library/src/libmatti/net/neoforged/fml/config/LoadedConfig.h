@@ -12,12 +12,13 @@ typedef struct LIBMATTI_FML_LoadedConfig LIBMATTI_FML_LoadedConfig;
 
 struct LIBMATTI_FML_LoadedConfig
 {
-    // Java: implements ILoadedConfig - the interface the spec sees
+// Java: implements ILoadedConfig - the interface the spec sees
     LIBMATTI_FML_ILoadedConfig loaded;
 
-    // Java: the record's components
+// Java: the record's components
     LIBMATTI_NC_Config *config;
-    char *path; // NULL = loaded from memory
+    char *path;
+
     LIBMATTI_FML_ModConfig *modConfig;
 };
 
@@ -27,4 +28,4 @@ LIBMATTI_FML_LoadedConfig *LIBMATTI_FML_LoadedConfig_New(LIBMATTI_NC_Config *con
                                                          LIBMATTI_FML_ModConfig *modConfig);
 void LIBMATTI_FML_LoadedConfig_Free(LIBMATTI_FML_LoadedConfig *config);
 
-#endif //MATTICRAFT_FML_CONFIG_LOADEDCONFIG_H
+#endif

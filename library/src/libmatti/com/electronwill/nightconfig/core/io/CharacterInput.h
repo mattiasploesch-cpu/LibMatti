@@ -1,8 +1,9 @@
-// Port of com.electronwill.nightconfig.core.io.CharacterInput and its ReaderInput implementation.
-// Java reads from a Reader and buffers peeked characters in a deque; the port already holds the
-// whole document in memory, so the deque collapses into "index + how many characters are peeked".
-// Java's readChar()/peekChar() throw ParsingException at the end of the data; C has no exception
-// channel, so the port returns -1 (readChar) and reports the failure at the call site.
+
+
+
+
+
+
 
 #ifndef MATTICRAFT_NC_CORE_IO_CHARACTERINPUT_H
 #define MATTICRAFT_NC_CORE_IO_CHARACTERINPUT_H
@@ -49,4 +50,4 @@ int LIBMATTI_NC_ReaderInput_ReadCharAndSkip(LIBMATTI_NC_ReaderInput *input, cons
 // Java: public int readAndSkip(char[] skipChars)
 int LIBMATTI_NC_ReaderInput_ReadAndSkip(LIBMATTI_NC_ReaderInput *input, const char *skipChars, size_t skipLength);
 
-#endif //MATTICRAFT_NC_CORE_IO_CHARACTERINPUT_H
+#endif

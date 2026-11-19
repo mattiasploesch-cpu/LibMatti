@@ -1,4 +1,5 @@
-// Port of net.minecraft.world.level.block.entity.BlockEntity.
+
+
 
 #include "libmatti/net/minecraft/world/level/block/entity/BlockEntity.h"
 
@@ -78,9 +79,10 @@ void LIBMATTI_MC_BlockEntity_SetBlockState(LIBMATTI_MC_BlockEntity *blockEntity,
 // Java: the save/load surface
 // ---------------------------------------------------------------------------
 
-// The virtual saveAdditional/loadAdditional hooks: the base implementation is
-// a no-op (Java's abstract methods become overridable no-ops until the game
-// content subclasses arrive); the BlockEntityType can install the hooks.
+
+
+
+
 __attribute__((weak)) void LIBMATTI_MC_BlockEntity_SaveAdditional(LIBMATTI_MC_BlockEntity *blockEntity, LIBMATTI_MC_Nbt_CompoundTag *tag)
 {
     (void) blockEntity;
@@ -155,7 +157,7 @@ LIBMATTI_MC_BlockEntity *LIBMATTI_MC_BlockEntity_LoadStatic(struct LIBMATTI_MC_L
 {
     const char *id = NULL;
     if (!LIBMATTI_MC_Nbt_CompoundTag_GetString(tag, "id", &id) || id == NULL)
-        return NULL; // Java: LOGGER.warn("Skipping BlockEntity with invalid id: {}", string)
+        return NULL;// Java: LOGGER.warn("Skipping BlockEntity with invalid id: {}", string)
     // resolve the type through the registered types (the by-id scan over the
     // vanilla constants; the registry becomes the lookup with the P5 tick port)
     const LIBMATTI_MC_BlockEntityType *type = NULL;

@@ -1,4 +1,5 @@
-// Port of cpw.mods.modlauncher.VotingContext.
+
+
 
 #ifndef MATTICRAFT_MODLAUNCHER_VOTINGCONTEXT_H
 #define MATTICRAFT_MODLAUNCHER_VOTINGCONTEXT_H
@@ -12,13 +13,13 @@ struct LIBMATTI_MLA_ITransformerVotingContext
 {
     char *className;
     int classExists;
-    // Java: Supplier<byte[]> sha256
+// Java: Supplier<byte[]> sha256
     unsigned char *(*sha256)(void *userdata, size_t *length);
     void *sha256Userdata;
     LIBMATTI_MLA_ITransformerActivity *auditActivities;
     size_t auditActivityCount;
     char *reason;
-    // Java: Object node
+// Java: Object node
     void *node;
 };
 
@@ -36,4 +37,4 @@ void LIBMATTI_ML_VotingContext_Free(LIBMATTI_ML_VotingContext *context);
 // Java: <T> void setNode(T node)
 void LIBMATTI_ML_VotingContext_SetNode(LIBMATTI_ML_VotingContext *context, void *node);
 
-#endif //MATTICRAFT_MODLAUNCHER_VOTINGCONTEXT_H
+#endif

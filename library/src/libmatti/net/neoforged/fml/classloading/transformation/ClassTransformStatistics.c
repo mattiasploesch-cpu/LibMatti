@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.classloading.transformation.ClassTransformStatistics.
+
+
 
 #include "libmatti/net/neoforged/fml/classloading/transformation/ClassTransformStatistics.h"
 
@@ -65,7 +66,7 @@ void LIBMATTI_FML_ClassTransformStatistics_IncrementMixinParsedClasses(void)
 
 void LIBMATTI_FML_ClassTransformStatistics_IncrementAskedForTransform(LIBMATTI_NEOFORGESPI_ClassProcessor *processor)
 {
-    // Java: if (!processor.name().equals(ClassProcessorIds.COMPUTING_FRAMES)) POTENTIAL_BY_PROCESSOR.compute(...)
+// Java: if (!processor.name().equals(ClassProcessorIds.COMPUTING_FRAMES)) POTENTIAL_BY_PROCESSOR.compute(...)
     LIBMATTI_NEOFORGESPI_ProcessorName *name = LIBMATTI_NEOFORGESPI_ClassProcessor_Name(processor);
     if (LIBMATTI_NEOFORGESPI_ProcessorName_CompareTo(
             name, LIBMATTI_NEOFORGESPI_ClassProcessorIds_COMPUTING_FRAMES()) != 0)
@@ -92,7 +93,7 @@ void LIBMATTI_FML_ClassTransformStatistics_IncrementTransformedClasses(void)
 
 char *LIBMATTI_FML_ClassTransformStatistics_GetTransformationSummary(void)
 {
-    // Java: String.format("%s/%s (%.2f%%)", transformed, loaded, ratio)
+// Java: String.format("%s/%s (%.2f%%)", transformed, loaded, ratio)
     double ratio = loadedClassCount == 0 ? 0.0 : ((double) transformedClassCount) / loadedClassCount * 100;
     char buffer[64];
     snprintf(buffer, sizeof(buffer), "%d/%d (%.2f%%)", transformedClassCount, loadedClassCount, ratio);
@@ -101,7 +102,7 @@ char *LIBMATTI_FML_ClassTransformStatistics_GetTransformationSummary(void)
 
 char *LIBMATTI_FML_ClassTransformStatistics_GetMixinParsedClassesSummary(void)
 {
-    // Java: return String.valueOf(MIXIN_PARSED_CLASS_COUNT.get())
+// Java: return String.valueOf(MIXIN_PARSED_CLASS_COUNT.get())
     char buffer[32];
     snprintf(buffer, sizeof(buffer), "%d", mixinParsedClassCount);
     return strdup(buffer);
@@ -119,7 +120,7 @@ void LIBMATTI_FML_ClassTransformStatistics_LogTransformationSummary(void)
 
 void LIBMATTI_FML_ClassTransformStatistics_CheckTransformationBehavior(void)
 {
-    // Java: keys.forEach(name -> { ratio = actual/potential; if (ratio > 0.25) LOGGER.error(...) })
+// Java: keys.forEach(name -> { ratio = actual/potential; if (ratio > 0.25) LOGGER.error(...) })
     for (size_t i = 0; i < transformsCount; i++)
     {
         const LIBMATTI_NEOFORGESPI_ProcessorName *name = transformsByProcessor[i].name;
@@ -147,7 +148,7 @@ void LIBMATTI_FML_ClassTransformStatistics_CheckTransformationBehavior(void)
 
 char *LIBMATTI_FML_ClassTransformStatistics_ComputeCrashReportEntry(const LIBMATTI_FML_ClassProcessorSet *set)
 {
-    // Java: entries.stream().map(e -> String.format("%05.2f%%: %s", e.ratio, e.name))
+// Java: entries.stream().map(e -> String.format("%05.2f%%: %s", e.ratio, e.name))
     //           .collect(Collectors.joining("\n\t\t", "\n\t\t", ""))
     size_t count = 0;
     LIBMATTI_NEOFORGESPI_ClassProcessor **transforms = LIBMATTI_FML_ClassProcessorSet_GetSortedProcessors(set, &count);
@@ -164,7 +165,7 @@ char *LIBMATTI_FML_ClassTransformStatistics_ComputeCrashReportEntry(const LIBMAT
         int potential = counter_for(potentialByProcessor, potentialCount, name);
         double ratio = (actual == 0 || potential == 0) ? 0.0 : 100.0 * ((double) actual) / potential;
 
-        // Java: classProcessorSet.isMarker(transform) ? name + " (marker)" : name.toString()
+// Java: classProcessorSet.isMarker(transform) ? name + " (marker)" : name.toString()
         char *nameString = LIBMATTI_NEOFORGESPI_ProcessorName_ToString(name);
         char *entry = NULL;
         if (LIBMATTI_FML_ClassProcessorSet_IsMarker(set, transforms[i]))

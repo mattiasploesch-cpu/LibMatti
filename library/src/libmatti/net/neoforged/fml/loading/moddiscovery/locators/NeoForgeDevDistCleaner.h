@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.loading.moddiscovery.locators.NeoForgeDevDistCleaner.
+
+
 
 #ifndef MATTICRAFT_FML_LOADING_MODDISCOVERY_LOCATORS_NEOFORGEDEVDISTCLEANER_H
 #define MATTICRAFT_FML_LOADING_MODDISCOVERY_LOCATORS_NEOFORGEDEVDISTCLEANER_H
@@ -25,12 +26,12 @@ char **LIBMATTI_FML_NeoForgeDevDistCleaner_GetMaskedFiles(LIBMATTI_FML_JarConten
 // Java: public class NeoForgeDevDistCleaner implements ClassProcessor
 typedef struct LIBMATTI_FML_NeoForgeDevDistCleaner
 {
-    // Java: implements ClassProcessor
+// Java: implements ClassProcessor
     LIBMATTI_NEOFORGESPI_ClassProcessor processor;
 
-    // Java: private final Dist dist
+// Java: private final Dist dist
     LIBMATTI_DIST_Dist dist;
-    // Java: private final Set<String> maskedClasses
+// Java: private final Set<String> maskedClasses
     char **maskedClasses;
     size_t maskedClassCount;
 } LIBMATTI_FML_NeoForgeDevDistCleaner;
@@ -40,4 +41,4 @@ LIBMATTI_FML_NeoForgeDevDistCleaner *LIBMATTI_FML_NeoForgeDevDistCleaner_New(
     LIBMATTI_FML_JarContents *minecraftModFile, LIBMATTI_DIST_Dist requestedDist);
 void LIBMATTI_FML_NeoForgeDevDistCleaner_Free(LIBMATTI_FML_NeoForgeDevDistCleaner *cleaner);
 
-#endif //MATTICRAFT_FML_LOADING_MODDISCOVERY_LOCATORS_NEOFORGEDEVDISTCLEANER_H
+#endif

@@ -1,6 +1,7 @@
-// Ports of net.neoforged.fml.loading.mixin.FMLClassProvider,
-// net.neoforged.fml.loading.mixin.FMLMixinFeatureValidator and
-// net.neoforged.fml.loading.mixin.FMLMixinAdviceProvider.
+
+
+
+
 
 #include "libmatti/net/neoforged/fml/loading/mixin/FMLClassProvider.h"
 
@@ -12,9 +13,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-// ---------------------------------------------------------------------------
-// FMLClassProvider - "Class provider for use under ModLauncher"
-// ---------------------------------------------------------------------------
+
+
+
+
 
 // Java: @Deprecated public URL[] getClassPath() { return new URL[0]; }
 static void class_provider_get_class_path(void *self, size_t *count)
@@ -51,9 +53,10 @@ LIBMATTI_SP_IClassProvider *LIBMATTI_FML_FMLClassProvider_Instance(void)
     return provider;
 }
 
-// ---------------------------------------------------------------------------
-// FMLMixinFeatureValidator
-// ---------------------------------------------------------------------------
+
+
+
+
 
 // Java: public void validateEnumExtension(IMixinInfo mixin, ClassInfo targetClass)
 // The port has no mixin/target ClassInfo; the native backend never extends Java enums.
@@ -73,9 +76,10 @@ LIBMATTI_SP_IFeatureValidator *LIBMATTI_FML_FMLMixinFeatureValidator_Instance(vo
     return validator;
 }
 
-// ---------------------------------------------------------------------------
-// FMLMixinAdviceProvider
-// ---------------------------------------------------------------------------
+
+
+
+
 
 // Java: public String higherCompatibilityNeeded(int requiredCompatibility, String requiredCompatibilityString)
 //       { return "Set `behaviorVersion = \"%s\"` or higher on your mixin config in your neoforge.mods.toml"

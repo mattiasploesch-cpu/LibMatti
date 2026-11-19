@@ -1,4 +1,5 @@
-// Port of net.neoforged.bus.EventBus.
+
+
 
 #include "libmatti/net/neoforged/bus/EventBus.h"
 
@@ -145,7 +146,7 @@ static void validate_abstract_chain(LIBMATTI_JL_Class *eventType)
         LIBMATTI_JL_Class *superclass = LIBMATTI_JL_Class_GetSuperclass(eventType);
         if (!LIBMATTI_JL_Modifier_IsAbstract(LIBMATTI_JL_Class_GetModifiers(superclass)))
         {
-            // Java: throw new IllegalArgumentException("Abstract event " + eventType + " has a non-abstract superclass " + eventType.getSuperclass() + ". The superclass must be made abstract.")
+// Java: throw new IllegalArgumentException("Abstract event " + eventType + " has a non-abstract superclass " + eventType.getSuperclass() + ". The superclass must be made abstract.")
             LIBMATTI_ML_Logger_Error(LOGGER(), &LIBMATTI_BUS_LogMarkers_EVENTBUS,
                                      "Abstract event {} has a non-abstract superclass {}. The superclass must be made abstract.",
                                      LIBMATTI_JL_Class_GetName(eventType),
@@ -189,7 +190,7 @@ static LIBMATTI_BUS_ListenerList *get_listener_list(LIBMATTI_BUS_EventBus *bus, 
 static void add_to_listeners(LIBMATTI_BUS_EventBus *bus, void *target, LIBMATTI_JL_Class *eventType,
                              LIBMATTI_BUS_EventListener *listener, LIBMATTI_BUS_EventPriority priority)
 {
-    // Java: if (Modifier.isAbstract(eventType.getModifiers())) throw new IllegalArgumentException("Cannot register listeners for abstract " + eventType + ". ...")
+// Java: if (Modifier.isAbstract(eventType.getModifiers())) throw new IllegalArgumentException("Cannot register listeners for abstract " + eventType + ". ...")
     if (LIBMATTI_JL_Modifier_IsAbstract(LIBMATTI_JL_Class_GetModifiers(eventType)))
     {
         LIBMATTI_ML_Logger_Error(LOGGER(), &LIBMATTI_BUS_LogMarkers_EVENTBUS,
@@ -208,7 +209,7 @@ static void add_listener_with_filter(LIBMATTI_BUS_EventBus *bus, LIBMATTI_BUS_Ev
                                      LIBMATTI_JU_Predicate *filter, LIBMATTI_JL_Class *eventClass,
                                      const LIBMATTI_JU_Consumer *consumer)
 {
-    // Java: try { classChecker.check(eventClass); } catch (IllegalArgumentException e) { throw ... } - the checker logs
+// Java: try { classChecker.check(eventClass); } catch (IllegalArgumentException e) { throw ... } - the checker logs
     if (bus->classChecker.check != NULL)
         bus->classChecker.check(bus->classChecker.self, eventClass);
 
@@ -238,7 +239,7 @@ static void do_post_checks(LIBMATTI_BUS_EventBus *bus, LIBMATTI_BUS_Event *event
 {
     if (!bus->checkTypesOnDispatch) return;
 
-    // Java: try { classChecker.check(event.getClass()); } catch (IllegalArgumentException e) { throw new
+// Java: try { classChecker.check(event.getClass()); } catch (IllegalArgumentException e) { throw new
     //       IllegalArgumentException("Cannot post event of type " + event.getClass().getSimpleName() + " to this bus", e); }
     if (bus->classChecker.check != NULL)
         bus->classChecker.check(bus->classChecker.self, event->clazz);
@@ -250,7 +251,7 @@ static LIBMATTI_BUS_Event *post_to_listeners(LIBMATTI_BUS_EventBus *bus, LIBMATT
 {
     (void)bus;
 
-    // Java: int index = 0; try { for (; index < listeners.length; index++) listeners[index].invoke(event); }
+// Java: int index = 0; try { for (; index < listeners.length; index++) listeners[index].invoke(event); }
     //       catch (Throwable throwable) { exceptionHandler.handleException(this, event, listeners, index, throwable); throw throwable; }
     // A C callback cannot unwind into the bus, so a failing listener reports through the exception
     // handler itself (LIBMATTI_BUS_EventBus_HandleException).
@@ -266,7 +267,7 @@ static void event_bus_register(void *self, void *target)
     LIBMATTI_BUS_EventBus *bus = self;
     if (listener_map_contains(bus->listeners, target)) return;
 
-    // Java: scans target.getClass().getDeclaredMethods() (or the passed Method) for @SubscribeEvent
+// Java: scans target.getClass().getDeclaredMethods() (or the passed Method) for @SubscribeEvent
     // methods through reflection and creates a listener per method. C has neither reflection nor
     // annotations, so the port registers through LIBMATTI_BUS_EventBus_RegisterListener.
     LIBMATTI_ML_Logger_Warn(LOGGER(), &LIBMATTI_BUS_LogMarkers_EVENTBUS,
@@ -322,7 +323,7 @@ static LIBMATTI_BUS_Event *event_bus_post_phase(void *self, LIBMATTI_BUS_EventPr
 
     if (!bus->allowPerPhasePost)
     {
-        // Java: throw new IllegalStateException("This bus does not allow calling phase-specific post.")
+// Java: throw new IllegalStateException("This bus does not allow calling phase-specific post.")
         LIBMATTI_ML_Logger_Error(LOGGER(), &LIBMATTI_BUS_LogMarkers_EVENTBUS,
                                  "This bus does not allow calling phase-specific post.");
         return event;
@@ -346,7 +347,7 @@ static void event_bus_handle_exception(void *self, LIBMATTI_BUS_IEventBus *bus, 
     (void)self;
     (void)bus;
 
-    // Java: LOGGER.error(EVENTBUS, () -> new EventBusErrorMessage(event, index, listeners, throwable));
+// Java: LOGGER.error(EVENTBUS, () -> new EventBusErrorMessage(event, index, listeners, throwable));
     LIBMATTI_BUS_EventBusErrorMessage *message =
         LIBMATTI_BUS_EventBusErrorMessage_New(event, index, listeners, listenerCount, throwable);
     char *formatted = LIBMATTI_BUS_EventBusErrorMessage_FormatTo(message);
@@ -375,7 +376,7 @@ LIBMATTI_BUS_EventBus *LIBMATTI_BUS_EventBus_New(LIBMATTI_BUS_BusBuilderImpl *bu
 {
     LIBMATTI_BUS_EventBus *bus = calloc(1, sizeof(LIBMATTI_BUS_EventBus));
 
-    // Java: implements IEventExceptionHandler, IEventBus
+// Java: implements IEventExceptionHandler, IEventBus
     bus->handlerBase.self = bus;
     bus->handlerBase.handleException = event_bus_handle_exception;
     bus->busBase.self = bus;
@@ -389,7 +390,7 @@ LIBMATTI_BUS_EventBus *LIBMATTI_BUS_EventBus_New(LIBMATTI_BUS_BusBuilderImpl *bu
     bus->listenerLists = LIBMATTI_BUS_LockHelper_WithIdentityHashMap();
     bus->listeners = listener_map_new();
 
-    // Java: if (handler == null) exceptionHandler = this; else exceptionHandler = handler;
+// Java: if (handler == null) exceptionHandler = this; else exceptionHandler = handler;
     bus->exceptionHandler = busBuilder->exceptionHandler.handleException == NULL
                                 ? &bus->handlerBase
                                 : &busBuilder->exceptionHandler;
@@ -422,7 +423,7 @@ void LIBMATTI_BUS_EventBus_RegisterListener(LIBMATTI_BUS_IEventBus *eventBus, LI
 {
     LIBMATTI_BUS_EventBus *bus = eventBus->self;
 
-    // Java: registerListener validates that the method takes a single Event parameter
+// Java: registerListener validates that the method takes a single Event parameter
     if (!LIBMATTI_JL_Class_IsAssignableFrom(LIBMATTI_BUS_Event_Class(), eventType))
     {
         LIBMATTI_ML_Logger_Error(LOGGER(), &LIBMATTI_BUS_LogMarkers_EVENTBUS,

@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.util.thread.SidedThreadGroups.
+
+
 
 #include "libmatti/net/neoforged/fml/util/thread/SidedThreadGroups.h"
 

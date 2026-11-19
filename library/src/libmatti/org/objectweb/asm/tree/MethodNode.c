@@ -1,4 +1,5 @@
-// Port of org.objectweb.asm.tree.MethodNode.
+
+
 
 #include "libmatti/org/objectweb/asm/tree/MethodNode.h"
 

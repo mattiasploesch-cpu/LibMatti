@@ -1,4 +1,5 @@
-// Port of com.electronwill.nightconfig.core.io.CharsWrapper.
+
+
 
 #ifndef MATTICRAFT_NC_CORE_IO_CHARSWRAPPER_H
 #define MATTICRAFT_NC_CORE_IO_CHARSWRAPPER_H
@@ -63,4 +64,4 @@ char *LIBMATTI_NC_CharsWrapper_Builder_ToString(const LIBMATTI_NC_CharsWrapper_B
 char *LIBMATTI_NC_CharsWrapper_Builder_ToStringFrom(const LIBMATTI_NC_CharsWrapper_Builder *builder, size_t from);
 void LIBMATTI_NC_CharsWrapper_Builder_Free(LIBMATTI_NC_CharsWrapper_Builder *builder);
 
-#endif //MATTICRAFT_NC_CORE_IO_CHARSWRAPPER_H
+#endif

@@ -1,4 +1,5 @@
-// Port of net.neoforged.neoforgespi.locating.ModFileDiscoveryAttributes.
+
+
 
 #ifndef MATTICRAFT_NEOFORGESPI_LOCATING_MODFILEDISCOVERYATTRIBUTES_H
 #define MATTICRAFT_NEOFORGESPI_LOCATING_MODFILEDISCOVERYATTRIBUTES_H
@@ -16,10 +17,10 @@ typedef struct LIBMATTI_NEOFORGESPI_IDependencyLocator LIBMATTI_NEOFORGESPI_IDep
 //         @Nullable IModFileCandidateLocator locator, @Nullable IDependencyLocator dependencyLocator)
 typedef struct LIBMATTI_NEOFORGESPI_ModFileDiscoveryAttributes
 {
-    LIBMATTI_NEOFORGESPI_IModFile *parent; // Java: @Nullable IModFile parent
-    LIBMATTI_NEOFORGESPI_IModFileReader *reader; // Java: @Nullable IModFileReader reader
-    LIBMATTI_NEOFORGESPI_IModFileCandidateLocator *locator; // Java: @Nullable IModFileCandidateLocator locator
-    LIBMATTI_NEOFORGESPI_IDependencyLocator *dependencyLocator; // Java: @Nullable IDependencyLocator dependencyLocator
+    LIBMATTI_NEOFORGESPI_IModFile *parent;// Java: @Nullable IModFile parent
+    LIBMATTI_NEOFORGESPI_IModFileReader *reader;// Java: @Nullable IModFileReader reader
+    LIBMATTI_NEOFORGESPI_IModFileCandidateLocator *locator;// Java: @Nullable IModFileCandidateLocator locator
+    LIBMATTI_NEOFORGESPI_IDependencyLocator *dependencyLocator;// Java: @Nullable IDependencyLocator dependencyLocator
 } LIBMATTI_NEOFORGESPI_ModFileDiscoveryAttributes;
 
 // Java: public static final ModFileDiscoveryAttributes DEFAULT = new ModFileDiscoveryAttributes(null, null, null, null)
@@ -47,4 +48,4 @@ LIBMATTI_NEOFORGESPI_ModFileDiscoveryAttributes LIBMATTI_NEOFORGESPI_ModFileDisc
 char *LIBMATTI_NEOFORGESPI_ModFileDiscoveryAttributes_ToString(
     const LIBMATTI_NEOFORGESPI_ModFileDiscoveryAttributes *attributes);
 
-#endif //MATTICRAFT_NEOFORGESPI_LOCATING_MODFILEDISCOVERYATTRIBUTES_H
+#endif

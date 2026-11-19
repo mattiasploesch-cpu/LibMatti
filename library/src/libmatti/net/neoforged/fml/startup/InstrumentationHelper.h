@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.startup.InstrumentationHelper.
+
+
 
 #ifndef MATTICRAFT_FML_INSTRUMENTATIONHELPER_H
 #define MATTICRAFT_FML_INSTRUMENTATIONHELPER_H
@@ -19,4 +20,4 @@ LIBMATTI_JLI_Instrumentation *LIBMATTI_FML_InstrumentationHelper_ObtainInstrumen
 // NULL = the Java method threw (DevAgent not attached / no instrumentation)
 LIBMATTI_JLI_Instrumentation *LIBMATTI_FML_InstrumentationHelper_GetFromOurOwnAgent(void);
 
-#endif //MATTICRAFT_FML_INSTRUMENTATIONHELPER_H
+#endif

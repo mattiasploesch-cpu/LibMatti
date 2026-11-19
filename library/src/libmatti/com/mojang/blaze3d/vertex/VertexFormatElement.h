@@ -13,13 +13,20 @@ extern "C"
 // Java: public static enum Type - byteSize + the GL enum from GlConst.toGl.
 typedef enum LIBMATTI_B3D_VFE_Type
 {
-    LIBMATTI_B3D_VFE_FLOAT = 0,  // GL_FLOAT 5126
-    LIBMATTI_B3D_VFE_UBYTE,      // GL_UNSIGNED_BYTE 5121
-    LIBMATTI_B3D_VFE_BYTE,       // GL_BYTE 5120
-    LIBMATTI_B3D_VFE_SHORT,      // GL_SHORT 5122
-    LIBMATTI_B3D_VFE_USHORT,     // GL_UNSIGNED_SHORT 5123
-    LIBMATTI_B3D_VFE_INT,        // GL_INT 5124
-    LIBMATTI_B3D_VFE_UINT        // GL_UNSIGNED_INT 5125
+    LIBMATTI_B3D_VFE_FLOAT = 0,
+
+    LIBMATTI_B3D_VFE_UBYTE,
+
+    LIBMATTI_B3D_VFE_BYTE,
+
+    LIBMATTI_B3D_VFE_SHORT,
+
+    LIBMATTI_B3D_VFE_USHORT,
+
+    LIBMATTI_B3D_VFE_INT,
+
+    LIBMATTI_B3D_VFE_UINT
+
 } LIBMATTI_B3D_VFE_Type;
 
 // Java: public static enum Usage.
@@ -39,7 +46,7 @@ typedef struct LIBMATTI_B3D_VertexFormatElement
     LIBMATTI_B3D_VFE_Type type;
     LIBMATTI_B3D_VFE_Usage usage;
     int count;
-    int index;  // Java: the UV index (0..2), 0 for everything else.
+    int index;// Java: the UV index (0..2), 0 for everything else.
 } LIBMATTI_B3D_VertexFormatElement;
 
 // Java: public int byteSize() - type.byteSize * count.

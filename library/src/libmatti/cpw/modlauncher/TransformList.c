@@ -1,6 +1,7 @@
-// Port of cpw.mods.modlauncher.TransformList.
-// Java's ConcurrentHashMap keeps the key object that was first inserted; the C
-// port therefore takes ownership of the TransformTargetLabel passed in.
+
+
+
+
 
 #include "libmatti/cpw/modlauncher/TransformList.h"
 
@@ -33,7 +34,8 @@ static LIBMATTI_ML_TransformListEntry *entry_for(LIBMATTI_ML_TransformList *list
     for (size_t i = 0; i < list->count; i++)
     {
         if (!LIBMATTI_ML_TransformTargetLabel_Equals(list->entries[i].label, label)) continue;
-        // an equal key is already present, so the map does not take the new one
+
+
         LIBMATTI_ML_TransformTargetLabel_Free(label);
         return &list->entries[i];
     }

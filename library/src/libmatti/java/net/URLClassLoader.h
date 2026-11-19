@@ -1,6 +1,7 @@
-// Port of java.net.URLClassLoader.
-// The C port folds the URL list into the base java.lang.ClassLoader type, since
-// every loader the port creates is a URL loader.
+
+
+
+
 
 #ifndef MATTICRAFT_JAVA_NET_URLCLASSLOADER_H
 #define MATTICRAFT_JAVA_NET_URLCLASSLOADER_H
@@ -20,4 +21,4 @@ void LIBMATTI_JL_URLClassLoader_Close(LIBMATTI_JL_ClassLoader *classLoader);
 // Java: public String getName()
 const char *LIBMATTI_JL_URLClassLoader_GetName(const LIBMATTI_JL_ClassLoader *classLoader);
 
-#endif //MATTICRAFT_JAVA_NET_URLCLASSLOADER_H
+#endif

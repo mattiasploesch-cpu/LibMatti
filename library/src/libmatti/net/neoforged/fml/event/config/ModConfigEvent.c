@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.event.config.ModConfigEvent.
+
+
 
 #include "libmatti/net/neoforged/fml/event/config/ModConfigEvent.h"
 

@@ -1,4 +1,5 @@
-// Port of net.minecraft.server.Bootstrap (the bootstrapped guard the registries use).
+
+
 
 #include "libmatti/net/minecraft/Bootstrap.h"
 
@@ -23,11 +24,11 @@ void LIBMATTI_MC_Bootstrap_BootStrap(void)
 {
     if (isBootstrapped)
         return;
-    // Java: isBootstrapped = true comes first - the registry initialisation below passes the
+// Java: isBootstrapped = true comes first - the registry initialisation below passes the
     // guard through internalRegister's checkBootstrapCalled
     isBootstrapped = 1;
 
-    // Java: if (BuiltInRegistries.REGISTRY.keySet().isEmpty()) throw
+// Java: if (BuiltInRegistries.REGISTRY.keySet().isEmpty()) throw
     //       new IllegalStateException("Unable to load registries") - the reference
     //       class-initialises the registries first; the port runs the constructors explicitly
     LIBMATTI_MC_BuiltInRegistries_InitializeAll();
@@ -41,7 +42,7 @@ void LIBMATTI_MC_Bootstrap_BootStrap(void)
         exit(1);
     }
 
-    // Java: BuiltInRegistries.bootStrap() (createContents, freeze, validate); the game
+// Java: BuiltInRegistries.bootStrap() (createContents, freeze, validate); the game
     //       bootstraps around it are the game port's part
     LIBMATTI_MC_BuiltInRegistries_BootStrap();
 }

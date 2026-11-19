@@ -1,7 +1,8 @@
-// Port of net.minecraft.world.level.GrassColor and net.minecraft.world.level.FoliageColor.
-// Both classes are pure color-table holders; the pixel data lives in the client's
-// texture files, the port embeds the 256-entry defaults like the vanilla
-// grass.png/foliage.png textures resolve to in the absence of a resource pack.
+
+
+
+
+
 
 #ifndef MATTICRAFT_MC_WORLD_LEVEL_GRASSCOLOR_H
 #define MATTICRAFT_MC_WORLD_LEVEL_GRASSCOLOR_H
@@ -26,4 +27,4 @@ int LIBMATTI_MC_FoliageColor_GetDefaultColor(void);
 }
 #endif
 
-#endif //MATTICRAFT_MC_WORLD_LEVEL_GRASSCOLOR_H
+#endif

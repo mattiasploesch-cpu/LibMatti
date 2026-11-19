@@ -1,5 +1,6 @@
-// Port of org.spongepowered.asm.launch.platform.MixinConnectorManager.
-// "Manager for Mixin containers bootstrapping via IMixinConnector"
+
+
+
 
 #include "libmatti/org/spongepowered/asm/launch/platform/MixinConnectorManager.h"
 
@@ -38,7 +39,7 @@ static void load_connectors(LIBMATTI_SP_MixinConnectorManager *manager)
     {
         const char *connectorClassName = manager->connectorClasses[i];
 
-        // Java: Class<?> clazz = classProvider.findClass(connectorClassName);
+// Java: Class<?> clazz = classProvider.findClass(connectorClassName);
         LIBMATTI_JL_Class *clazz = NULL;
         if (classProvider != NULL)
         {
@@ -46,7 +47,7 @@ static void load_connectors(LIBMATTI_SP_MixinConnectorManager *manager)
             clazz = provider->findClass(provider->self, connectorClassName, 1);
         }
 
-        // Java: catch (ClassNotFoundException ex) { logger.catching(ex); continue; }
+// Java: catch (ClassNotFoundException ex) { logger.catching(ex); continue; }
         if (clazz == NULL)
         {
             char *msg = malloc(strlen("Mixin Connector [] was not found") + strlen(connectorClassName) + 1);
@@ -56,7 +57,7 @@ static void load_connectors(LIBMATTI_SP_MixinConnectorManager *manager)
             continue;
         }
 
-        // Java: if (!IMixinConnector.class.isAssignableFrom(clazz)) { logger.error(...); continue; }
+// Java: if (!IMixinConnector.class.isAssignableFrom(clazz)) { logger.error(...); continue; }
         LIBMATTI_JL_Class_StaticMethod *method = LIBMATTI_JL_Class_FindStaticMethod(clazz, "connect");
         if (method == NULL)
         {
@@ -67,7 +68,7 @@ static void load_connectors(LIBMATTI_SP_MixinConnectorManager *manager)
             continue;
         }
 
-        // Java: IMixinConnector connector = connectorClass.getDeclaredConstructor().newInstance();
+// Java: IMixinConnector connector = connectorClass.getDeclaredConstructor().newInstance();
         LIBMATTI_SP_IMixinConnector *connector = malloc(sizeof(*connector));
         connector->self = method;
         connector->connect = connector_connect;
@@ -75,7 +76,7 @@ static void load_connectors(LIBMATTI_SP_MixinConnectorManager *manager)
                                       sizeof(LIBMATTI_SP_IMixinConnector *) * (manager->connectorCount + 1));
         manager->connectors[manager->connectorCount++] = connector;
 
-        // Java: logger.info("Successfully loaded Mixin Connector [{}]", connectorClassName);
+// Java: logger.info("Successfully loaded Mixin Connector [{}]", connectorClassName);
         char *msg = malloc(strlen("Successfully loaded Mixin Connector []") + strlen(connectorClassName) + 1);
         sprintf(msg, "Successfully loaded Mixin Connector [%s]", connectorClassName);
         LIBMATTI_SP_ILogger_Info(LOGGER(), msg);
@@ -89,7 +90,7 @@ static void init_connectors(LIBMATTI_SP_MixinConnectorManager *manager)
     for (size_t i = 0; i < manager->connectorCount; i++)
     {
         LIBMATTI_SP_IMixinConnector *connector = manager->connectors[i];
-        // Java: try { connector.connect(); } catch (Exception ex) { logger.warn(...); }
+// Java: try { connector.connect(); } catch (Exception ex) { logger.warn(...); }
         connector->connect(connector->self);
     }
 }
@@ -114,7 +115,7 @@ void LIBMATTI_SP_MixinConnectorManager_Free(LIBMATTI_SP_MixinConnectorManager *m
 void LIBMATTI_SP_MixinConnectorManager_AddConnector(LIBMATTI_SP_MixinConnectorManager *manager,
                                                     const char *connectorClass)
 {
-    // Java: a LinkedHashSet
+// Java: a LinkedHashSet
     for (size_t i = 0; i < manager->connectorClassCount; i++)
         if (strcmp(manager->connectorClasses[i], connectorClass) == 0) return;
 
@@ -128,7 +129,7 @@ void LIBMATTI_SP_MixinConnectorManager_Inject(LIBMATTI_SP_MixinConnectorManager 
     load_connectors(manager);
     init_connectors(manager);
 
-    // Java: this.connectorClasses.clear();
+// Java: this.connectorClasses.clear();
     for (size_t i = 0; i < manager->connectorClassCount; i++) free(manager->connectorClasses[i]);
     free(manager->connectorClasses);
     manager->connectorClasses = NULL;

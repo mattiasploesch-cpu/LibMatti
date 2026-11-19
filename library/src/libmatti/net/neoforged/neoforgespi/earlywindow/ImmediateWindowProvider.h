@@ -1,4 +1,5 @@
-// Port of net.neoforged.neoforgespi.earlywindow.ImmediateWindowProvider.
+
+
 
 #ifndef MATTICRAFT_NEOFORGESPI_EARLYWINDOW_IMMEDIATEWINDOWPROVIDER_H
 #define MATTICRAFT_NEOFORGESPI_EARLYWINDOW_IMMEDIATEWINDOWPROVIDER_H
@@ -14,20 +15,20 @@ typedef struct LIBMATTI_NEOFORGESPI_ImmediateWindowProvider LIBMATTI_NEOFORGESPI
 
 struct LIBMATTI_NEOFORGESPI_ImmediateWindowProvider
 {
-    // Java: extends EarlyLoadingScreenController
+// Java: extends EarlyLoadingScreenController
     LIBMATTI_FML_EarlyLoadingScreenController controller;
 
-    // Java: String name()
+// Java: String name()
     const char *(*name)(void *self);
-    // Java: void initialize(ProgramArgs args)
+// Java: void initialize(ProgramArgs args)
     void (*initialize)(void *self, LIBMATTI_FML_ProgramArgs *args);
-    // Java: void setMinecraftVersion(String version)
+// Java: void setMinecraftVersion(String version)
     void (*setMinecraftVersion)(void *self, const char *version);
-    // Java: void setNeoForgeVersion(String version)
+// Java: void setNeoForgeVersion(String version)
     void (*setNeoForgeVersion)(void *self, const char *version);
-    // Java: void crash(String message)
+// Java: void crash(String message)
     void (*crash)(void *self, const char *message);
-    // Java: void displayFatalErrorAndExit(List<ModLoadingIssue> issues, Path modsFolder, Path logFile, Path crashReportFile)
+// Java: void displayFatalErrorAndExit(List<ModLoadingIssue> issues, Path modsFolder, Path logFile, Path crashReportFile)
     void (*displayFatalErrorAndExit)(void *self, LIBMATTI_FML_ModLoadingIssue **issues, size_t issueCount,
                                      const char *modsFolder, const char *logFile, const char *crashReportFile);
 };
@@ -52,4 +53,4 @@ void LIBMATTI_NEOFORGESPI_ImmediateWindowProvider_DisplayFatalErrorAndExit(
     const LIBMATTI_NEOFORGESPI_ImmediateWindowProvider *provider, LIBMATTI_FML_ModLoadingIssue **issues,
     size_t issueCount, const char *modsFolder, const char *logFile, const char *crashReportFile);
 
-#endif //MATTICRAFT_NEOFORGESPI_EARLYWINDOW_IMMEDIATEWINDOWPROVIDER_H
+#endif

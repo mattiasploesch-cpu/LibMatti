@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.classloading.JarContentsModuleReference.
+
+
 
 #ifndef MATTICRAFT_FML_CLASSLOADING_JARCONTENTSMODULEREFERENCE_H
 #define MATTICRAFT_FML_CLASSLOADING_JARCONTENTSMODULEREFERENCE_H
@@ -12,7 +13,7 @@ typedef struct LIBMATTI_FML_JarContentsModuleReader LIBMATTI_FML_JarContentsModu
 // Java: final class JarContentsModuleReference extends ModuleReference
 typedef struct
 {
-    LIBMATTI_JL_ModuleReference base; // Java: super(descriptor, getModuleLocation(contents))
+    LIBMATTI_JL_ModuleReference base;// Java: super(descriptor, getModuleLocation(contents))
     LIBMATTI_FML_JarContents *contents;
 } LIBMATTI_FML_JarContentsModuleReference;
 
@@ -42,4 +43,4 @@ void LIBMATTI_FML_JarContentsModuleReader_Close(LIBMATTI_FML_JarContentsModuleRe
 // Java: public String toString() { return contents.toString(); }
 char *LIBMATTI_FML_JarContentsModuleReader_ToString(const LIBMATTI_FML_JarContentsModuleReader *reader);
 
-#endif //MATTICRAFT_FML_CLASSLOADING_JARCONTENTSMODULEREFERENCE_H
+#endif

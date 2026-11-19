@@ -1,7 +1,8 @@
-// Port of net.neoforged.bus.EventBus.
-// Java's ConcurrentHashMap<Object, List<EventListener>> becomes an identity-keyed entry list behind a
-// mutex (the keys are Objects and Classes, which do not override equals); listenerLists stays a
-// LockHelper<Class<?>, ListenerList>.
+
+
+
+
+
 
 #ifndef MATTICRAFT_BUS_EVENTBUS_H
 #define MATTICRAFT_BUS_EVENTBUS_H
@@ -21,18 +22,18 @@ typedef struct LIBMATTI_BUS_EventBus LIBMATTI_BUS_EventBus;
 
 struct LIBMATTI_BUS_EventBus
 {
-    // Java: public class EventBus implements IEventExceptionHandler, IEventBus
+// Java: public class EventBus implements IEventExceptionHandler, IEventBus
     LIBMATTI_BUS_IEventExceptionHandler handlerBase;
     LIBMATTI_BUS_IEventBus busBase;
-    // Java: private final LockHelper<Class<?>, ListenerList> listenerLists
+// Java: private final LockHelper<Class<?>, ListenerList> listenerLists
     LIBMATTI_BUS_LockHelper *listenerLists;
-    // Java: private final ConcurrentHashMap<Object, List<EventListener>> listeners
+// Java: private final ConcurrentHashMap<Object, List<EventListener>> listeners
     LIBMATTI_BUS_EventBus_ListenerMap *listeners;
-    // Java: private final IEventExceptionHandler exceptionHandler
+// Java: private final IEventExceptionHandler exceptionHandler
     const LIBMATTI_BUS_IEventExceptionHandler *exceptionHandler;
-    // Java: private volatile boolean shutdown = false;
+// Java: private volatile boolean shutdown = false;
     int shutdown;
-    // Java: private final IEventClassChecker classChecker
+// Java: private final IEventClassChecker classChecker
     LIBMATTI_BUS_IEventClassChecker classChecker;
     int checkTypesOnDispatch;
     int allowPerPhasePost;
@@ -57,4 +58,4 @@ void LIBMATTI_BUS_EventBus_RegisterListener(LIBMATTI_BUS_IEventBus *eventBus, LI
                                             void (*callback)(void *target, LIBMATTI_BUS_Event *event),
                                             LIBMATTI_BUS_SubscribeEvent subInfo);
 
-#endif //MATTICRAFT_BUS_EVENTBUS_H
+#endif

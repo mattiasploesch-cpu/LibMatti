@@ -1,7 +1,8 @@
-// Port of net.minecraft.client.renderer.block.model.FaceBakery.
-// Every formula follows the vendored 1.21.11 source: defaultFaceUV's
-// per-direction UV derivation, bakeVertex's coordinate/UV pipeline, the
-// calculateFacing normal snap and recalculateWinding.
+
+
+
+
+
 
 #ifndef MATTICRAFT_MC_CLIENT_RENDERER_BLOCK_MODEL_FACEBAKERY_H
 #define MATTICRAFT_MC_CLIENT_RENDERER_BLOCK_MODEL_FACEBAKERY_H
@@ -17,14 +18,14 @@ extern "C" {
 // Java: BakedQuad's vertex/UV pairs before the quad record wraps them.
 typedef struct LIBMATTI_MC_BakedQuad
 {
-    // Java: the four vertex positions in block space (already /16 scaled).
+// Java: the four vertex positions in block space (already /16 scaled).
     float pos[4][3];
-    // Java: the four packed UV pairs (the sprite-atlas space, u then v).
+// Java: the four packed UV pairs (the sprite-atlas space, u then v).
     float uv[4][2];
     int tintIndex;
-    // Java: the calculated face direction (UP when the snap fails).
+// Java: the calculated face direction (UP when the snap fails).
     LIBMATTI_MC_Direction direction;
-    // Java: boolean shade
+// Java: boolean shade
     int shade;
 } LIBMATTI_MC_BakedQuad;
 
@@ -52,4 +53,4 @@ void LIBMATTI_MC_FaceBakery_BakeQuad(const float from[3], const float to[3],
 }
 #endif
 
-#endif //MATTICRAFT_MC_CLIENT_RENDERER_BLOCK_MODEL_FACEBAKERY_H
+#endif

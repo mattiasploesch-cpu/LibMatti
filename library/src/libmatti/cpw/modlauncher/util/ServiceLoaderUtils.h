@@ -1,4 +1,5 @@
-// Port of cpw.mods.modlauncher.util.ServiceLoaderUtils.
+
+
 
 #ifndef MATTICRAFT_MODLAUNCHER_SERVICELOADERUTILS_H
 #define MATTICRAFT_MODLAUNCHER_SERVICELOADERUTILS_H
@@ -18,4 +19,4 @@ void **LIBMATTI_MLU_ServiceLoaderUtils_StreamServiceLoader(
 // Java: static String fileNameFor(Class<?> clazz); caller frees
 char *LIBMATTI_MLU_ServiceLoaderUtils_FileNameFor(const char *providerClassName);
 
-#endif //MATTICRAFT_MODLAUNCHER_SERVICELOADERUTILS_H
+#endif

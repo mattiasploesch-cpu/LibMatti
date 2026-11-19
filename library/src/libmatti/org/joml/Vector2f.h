@@ -1,4 +1,5 @@
-// Port of org.joml.Vector2f.
+
+
 
 #ifndef MATTICRAFT_JOML_VECTOR2F_H
 #define MATTICRAFT_JOML_VECTOR2F_H
@@ -32,4 +33,4 @@ float LIBMATTI_JOML_Vector2f_Distance(const LIBMATTI_JOML_Vector2f *a, const LIB
 // Java: public float dot(Vector2fc v)
 float LIBMATTI_JOML_Vector2f_Dot(const LIBMATTI_JOML_Vector2f *a, const LIBMATTI_JOML_Vector2f *b);
 
-#endif //MATTICRAFT_JOML_VECTOR2F_H
+#endif

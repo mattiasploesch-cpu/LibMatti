@@ -1,6 +1,7 @@
-//
-// Port of java.lang.ModuleLayer.
-//
+
+
+
+
 
 #include "libmatti/java/lang/ModuleLayer.h"
 
@@ -15,7 +16,7 @@ struct LIBMATTI_JL_ModuleLayer
     LIBMATTI_JL_Configuration *configuration;
     LIBMATTI_JL_ModuleLayer **parents;
     size_t parentCount;
-    // Java: the module -> ClassLoader mapping established by defineModules
+// Java: the module -> ClassLoader mapping established by defineModules
     char **moduleNames;
     void **loaders;
     size_t moduleCount;
@@ -35,10 +36,10 @@ LIBMATTI_JL_ModuleLayer *LIBMATTI_JL_ModuleLayer_Boot(void)
     {
         bootLayer = calloc(1, sizeof(LIBMATTI_JL_ModuleLayer));
 
-        // Java: the boot layer has no name
+// Java: the boot layer has no name
         bootLayer->name = NULL;
 
-        // Java: the JVM's boot configuration; the C port has no boot modules
+// Java: the JVM's boot configuration; the C port has no boot modules
         bootLayer->configuration = calloc(1, sizeof(LIBMATTI_JL_Configuration));
     }
 
@@ -82,7 +83,7 @@ LIBMATTI_JL_ModuleLayerController *LIBMATTI_JL_ModuleLayer_DefineModules(
         layer->parentCount = parentCount;
     }
 
-    // Java: every module of the configuration is mapped to clf.apply(moduleName)
+// Java: every module of the configuration is mapped to clf.apply(moduleName)
     size_t moduleCount = 0;
     LIBMATTI_JL_ResolvedModule **modules = LIBMATTI_JL_Configuration_Modules(configuration, &moduleCount);
 
@@ -112,7 +113,8 @@ LIBMATTI_JL_ModuleLayer *LIBMATTI_JL_ModuleLayerController_Layer(const LIBMATTI_
     return controller->layer;
 }
 
-// releases what defineModules allocated (the configuration is owned by the caller)
+
+
 void LIBMATTI_JL_ModuleLayer_Free(LIBMATTI_JL_ModuleLayer *layer)
 {
     if (layer == NULL) return;

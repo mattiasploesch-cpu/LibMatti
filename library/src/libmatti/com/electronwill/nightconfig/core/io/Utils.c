@@ -1,4 +1,5 @@
-// Port of com.electronwill.nightconfig.core.io.Utils.
+
+
 
 #include "libmatti/com/electronwill/nightconfig/core/io/Utils.h"
 

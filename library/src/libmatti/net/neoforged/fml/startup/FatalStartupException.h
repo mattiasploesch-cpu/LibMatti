@@ -24,4 +24,4 @@ void LIBMATTI_FML_FatalStartupException_Free(LIBMATTI_FML_FatalStartupException 
 LIBMATTI_FML_StartupArgs *LIBMATTI_FML_FatalStartupException_GetStartupArgs(
     const LIBMATTI_FML_FatalStartupException *exception);
 
-#endif //MATTICRAFT_FML_FATALSTARTUPEXCEPTION_H
+#endif

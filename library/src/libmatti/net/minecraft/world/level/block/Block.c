@@ -1,4 +1,5 @@
-// Port of net.minecraft.world.level.block.Block (the registry-data part).
+
+
 
 #include "libmatti/net/minecraft/world/level/block/Block.h"
 
@@ -35,7 +36,7 @@ static LIBMATTI_MC_Block *alloc_block(LIBMATTI_MC_BlockBehaviour_Properties *pro
 
 LIBMATTI_MC_Block *LIBMATTI_MC_Block_New(void)
 {
-    // Java: Block(BlockBehaviour.Properties.of())
+// Java: Block(BlockBehaviour.Properties.of())
     return alloc_block(LIBMATTI_MC_BlockBehaviour_Properties_Of());
 }
 

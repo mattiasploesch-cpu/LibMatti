@@ -1,6 +1,7 @@
-// Port of org.spongepowered.asm.launch.platform.MixinPlatformAgentAbstract - the agent base
-// class. Java's abstract class becomes a factory that fills the dispatch struct with the base
-// behaviour; concrete agents (MixinPlatformAgentDefault) override the hooks they implement.
+
+
+
+
 
 #ifndef MATTICRAFT_SP_ASM_LAUNCH_PLATFORM_MIXINPLATFORMAGENTABSTRACT_H
 #define MATTICRAFT_SP_ASM_LAUNCH_PLATFORM_MIXINPLATFORMAGENTABSTRACT_H
@@ -19,4 +20,4 @@ typedef struct
 // Java: protected MixinPlatformAgentAbstract() - fills the base behaviour into the struct
 void LIBMATTI_SP_MixinPlatformAgentAbstract_Init(LIBMATTI_SP_MixinPlatformAgentAbstract *agent);
 
-#endif //MATTICRAFT_SP_ASM_LAUNCH_PLATFORM_MIXINPLATFORMAGENTABSTRACT_H
+#endif

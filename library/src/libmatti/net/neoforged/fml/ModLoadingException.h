@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.ModLoadingException.
+
+
 
 #ifndef MATTICRAFT_FML_MODLOADINGEXCEPTION_H
 #define MATTICRAFT_FML_MODLOADINGEXCEPTION_H
@@ -31,4 +32,4 @@ char *LIBMATTI_FML_ModLoadingException_GetMessage(const LIBMATTI_FML_ModLoadingE
 
 void LIBMATTI_FML_ModLoadingException_Free(LIBMATTI_FML_ModLoadingException *exception);
 
-#endif //MATTICRAFT_FML_MODLOADINGEXCEPTION_H
+#endif

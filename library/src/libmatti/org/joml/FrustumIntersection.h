@@ -1,6 +1,7 @@
-// Port of org.joml.FrustumIntersection (vendor/JOML).
-// The six frustum planes extracted from the projection*view matrix; the
-// intersection tests are the JOML ones line for line.
+
+
+
+
 
 #ifndef MATTICRAFT_JOML_FRUSTUMINTERSECTION_H
 #define MATTICRAFT_JOML_FRUSTUMINTERSECTION_H
@@ -30,7 +31,7 @@ extern "C" {
 // unnormalized exactly like JOML (the AAB tests do not need unit normals).
 typedef struct LIBMATTI_JOML_FrustumIntersection
 {
-    // Java: nxX .. pzW (plane x/y/z/w six times)
+// Java: nxX .. pzW (plane x/y/z/w six times)
     float nxX, nxY, nxZ, nxW;
     float pxX, pxY, pxZ, pxW;
     float nyX, nyY, nyZ, nyW;

@@ -1,6 +1,7 @@
-// Port of net.minecraft.core.Vec3i.
-// Java allocates a fresh object per operation (the type is immutable); the C port keeps
-// the same semantics - every operation returns a new heap object the caller owns.
+
+
+
+
 
 #include "libmatti/net/minecraft/core/Vec3i.h"
 

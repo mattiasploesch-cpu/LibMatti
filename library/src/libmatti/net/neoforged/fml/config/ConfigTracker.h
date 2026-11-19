@@ -79,4 +79,4 @@ LIBMATTI_FML_ModConfig **LIBMATTI_FML_ModConfigs_GetFileMap(size_t *count);
 LIBMATTI_FML_ModConfig *LIBMATTI_FML_ConfigTracker_GetByFileName(LIBMATTI_FML_ConfigTracker *configTracker,
                                                                  const char *fileName);
 
-#endif //MATTICRAFT_FML_CONFIG_CONFIGTRACKER_H
+#endif

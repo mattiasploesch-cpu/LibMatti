@@ -1,4 +1,5 @@
-// Port of net.minecraft.world.level.levelgen.Heightmap.
+
+
 
 #include "libmatti/net/minecraft/world/level/levelgen/Heightmap.h"
 
@@ -21,14 +22,14 @@ static bool is_opaque(const LIBMATTI_MC_Heightmap *heightmap, const LIBMATTI_MC_
         case LIBMATTI_MC_Heightmap_WORLD_SURFACE:
             return notAir;
         default:
-            // Java: blocksMotion() || fluid - non-air approximates it
+// Java: blocksMotion() || fluid - non-air approximates it
             return notAir;
     }
 }
 
 int LIBMATTI_MC_Heightmap_GetIndex(int x, int z)
 {
-    // Java: x + z * 16
+// Java: x + z * 16
     return x + z * 16;
 }
 
@@ -46,7 +47,7 @@ static int chunk_min_y(const LIBMATTI_MC_ChunkAccess *chunk)
 
 int LIBMATTI_MC_Heightmap_GetFirstAvailable(const LIBMATTI_MC_Heightmap *heightmap, int x, int z)
 {
-    // Java: data.get(index) + chunk.getMinY()
+// Java: data.get(index) + chunk.getMinY()
     return heightmap->data[LIBMATTI_MC_Heightmap_GetIndex(x, z)] + chunk_min_y(heightmap->chunk);
 }
 
@@ -62,7 +63,7 @@ static void set_height(LIBMATTI_MC_Heightmap *heightmap, int x, int z, int y)
 
 bool LIBMATTI_MC_Heightmap_Update(LIBMATTI_MC_Heightmap *heightmap, int x, int y, int z, const void *state)
 {
-    // Java: 1:1 - the early-out ladder
+// Java: 1:1 - the early-out ladder
     int firstAvailable = LIBMATTI_MC_Heightmap_GetFirstAvailable(heightmap, x, z);
     if (y <= firstAvailable - 2)
         return false;
@@ -77,7 +78,8 @@ bool LIBMATTI_MC_Heightmap_Update(LIBMATTI_MC_Heightmap *heightmap, int x, int y
     }
     else if (firstAvailable - 1 == y)
     {
-        // the removed block was the top - rescan down for the new top
+
+
         const LIBMATTI_MC_ChunkAccess *chunk = heightmap->chunk;
         for (int j = y - 1; j >= chunk->levelHeightAccessor.minY; j--)
         {
@@ -98,7 +100,7 @@ bool LIBMATTI_MC_Heightmap_Update(LIBMATTI_MC_Heightmap *heightmap, int x, int y
 
 bool LIBMATTI_MC_Heightmap_SetRawData(LIBMATTI_MC_Heightmap *heightmap, const int64_t *rawData, size_t count)
 {
-    // Java: the packed long[] must match the storage length (256 entries packed);
+// Java: the packed long[] must match the storage length (256 entries packed);
     // the port takes the unpacked heights
     if (count != 256)
         return false;
@@ -118,7 +120,7 @@ void LIBMATTI_MC_Heightmap_PrimeHeightmaps(struct LIBMATTI_MC_ChunkAccess *chunk
     if (count == 0)
         return;
 
-    // Java: primeHeightmaps - scan every column top-down, set each heightmap once
+// Java: primeHeightmaps - scan every column top-down, set each heightmap once
     LIBMATTI_MC_Heightmap *maps[LIBMATTI_MC_Heightmap_TYPES_COUNT];
     for (size_t i = 0; i < count; i++)
         maps[i] = LIBMATTI_MC_ChunkAccess_GetOrCreateHeightmapUnprimed((LIBMATTI_MC_ChunkAccess *) chunk, (int) types[i]);

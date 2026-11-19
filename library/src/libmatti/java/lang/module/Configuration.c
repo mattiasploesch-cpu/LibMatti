@@ -11,7 +11,7 @@ LIBMATTI_JL_ResolvedModule **LIBMATTI_JL_Configuration_Modules(const LIBMATTI_JL
 
 LIBMATTI_JL_ResolvedModule *LIBMATTI_JL_Configuration_FindModule(const LIBMATTI_JL_Configuration *configuration, const char *name)
 {
-    // Java: Optional<ResolvedModule> findModule(String name)
+// Java: Optional<ResolvedModule> findModule(String name)
     for (size_t i = 0; i < configuration->moduleCount; i++)
     {
         if (strcmp(configuration->modules[i]->name, name) == 0) return configuration->modules[i];
@@ -33,22 +33,25 @@ static int nameInList(char **names, size_t count, const char *name)
 static LIBMATTI_JL_Configuration *resolve_internal(LIBMATTI_JL_ModuleReference **references, size_t referenceCount,
                                                    const char **roots, size_t rootCount, int bindService)
 {
-    // Java (Resolver): DFS from the roots; each module's non-static requires
-    // (Requires.Modifier.STATIC is compile-time only) are resolved transitively.
 
-    // name -> reference lookup over the 'before' finder's modules
-    // (Java builds the same lookup while searching 'before' then 'after')
+
+
+
+
+
+
     char **resolvedNames = NULL;
     size_t resolvedCount = 0;
     LIBMATTI_JL_ModuleReference **resolvedRefs = NULL;
 
-    // DFS queue (Java: Deque<ModuleDescriptor>)
+// DFS queue (Java: Deque<ModuleDescriptor>)
     char **queue = NULL;
     size_t queueHead = 0, queueTail = 0;
     for (size_t i = 0; i < rootCount; i++)
     {
         queue = realloc(queue, sizeof(char *) * (queueTail + 1));
-        queue[queueTail++] = (char *)roots[i]; // borrowed, never freed
+        queue[queueTail++] = (char *)roots[i];
+
     }
 
     while (queueHead < queueTail)
@@ -56,7 +59,7 @@ static LIBMATTI_JL_Configuration *resolve_internal(LIBMATTI_JL_ModuleReference *
         char *name = queue[queueHead++];
         if (nameInList(resolvedNames, resolvedCount, name)) continue;
 
-        // Java: finder.find(name).orElseThrow(FindException) - 'before' finder only here
+// Java: finder.find(name).orElseThrow(FindException) - 'before' finder only here
         LIBMATTI_JL_ModuleReference *ref = NULL;
         for (size_t i = 0; i < referenceCount; i++)
         {
@@ -68,7 +71,7 @@ static LIBMATTI_JL_Configuration *resolve_internal(LIBMATTI_JL_ModuleReference *
         }
         if (ref == NULL)
         {
-            // Java: FindException("Module " + name + " not found")
+// Java: FindException("Module " + name + " not found")
             for (size_t i = 0; i < resolvedCount; i++) free(resolvedNames[i]);
             free(resolvedNames);
             free(resolvedRefs);
@@ -82,7 +85,8 @@ static LIBMATTI_JL_Configuration *resolve_internal(LIBMATTI_JL_ModuleReference *
         resolvedRefs[resolvedCount] = ref;
         resolvedCount++;
 
-        // process dependences: only required at compile time (STATIC) is skipped
+
+
         size_t reqCount = 0;
         LIBMATTI_JL_ModuleDescriptor_Requires **requires = LIBMATTI_JL_ModuleDescriptor_GetRequires(LIBMATTI_JL_ModuleReference_Descriptor(ref), &reqCount);
         for (size_t r = 0; r < reqCount; r++)
@@ -92,11 +96,13 @@ static LIBMATTI_JL_Configuration *resolve_internal(LIBMATTI_JL_ModuleReference *
             if (!nameInList(resolvedNames, resolvedCount, dn) && !nameInList(queue + queueHead, queueTail - queueHead, dn))
             {
                 queue = realloc(queue, sizeof(char *) * (queueTail + 1));
-                queue[queueTail++] = dn; // borrowed, never freed
+                queue[queueTail++] = dn;
+
             }
         }
-        // Java (Resolver.bind): a module that 'uses' a service pulls every module
-        // that 'provides' it into the resolution graph, transitively.
+
+
+
         if (bindService)
         {
             size_t usesCount = 0;
@@ -117,7 +123,8 @@ static LIBMATTI_JL_Configuration *resolve_internal(LIBMATTI_JL_ModuleReference *
                             !nameInList(queue + queueHead, queueTail - queueHead, providerName))
                         {
                             queue = realloc(queue, sizeof(char *) * (queueTail + 1));
-                            queue[queueTail++] = (char *) providerName; // borrowed
+                            queue[queueTail++] = (char *) providerName;
+
                         }
                     }
                 }
@@ -140,9 +147,10 @@ static LIBMATTI_JL_Configuration *resolve_internal(LIBMATTI_JL_ModuleReference *
     free(resolvedNames);
     free(resolvedRefs);
 
-    // Java (Configuration.build): reads edges - automatic modules read all other
-    // modules in the configuration; otherwise every requires edge whose target is
-    // present in the configuration.
+
+
+
+
     for (size_t i = 0; i < resolvedCount; i++)
     {
         LIBMATTI_JL_ResolvedModule *module = configuration->modules[i];
@@ -172,8 +180,9 @@ static LIBMATTI_JL_Configuration *resolve_internal(LIBMATTI_JL_ModuleReference *
         }
     }
 
-    // Java (Resolver.bind / Configuration.build): a module that 'uses' a service also
-    // reads every resolved module that 'provides' the service.
+
+
+
     for (size_t i = 0; i < configuration->moduleCount; i++)
     {
         LIBMATTI_JL_ResolvedModule *module = configuration->modules[i];

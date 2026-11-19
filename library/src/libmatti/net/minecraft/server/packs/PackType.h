@@ -1,4 +1,5 @@
-// Port of net.minecraft.server.packs.PackType.
+
+
 
 #ifndef MATTICRAFT_MC_PACKS_PACKTYPE_H
 #define MATTICRAFT_MC_PACKS_PACKTYPE_H
@@ -13,4 +14,4 @@ typedef enum
 // Java: public String getDirectory()
 const char *LIBMATTI_MC_PackType_GetDirectory(LIBMATTI_MC_PackType type);
 
-#endif //MATTICRAFT_MC_PACKS_PACKTYPE_H
+#endif

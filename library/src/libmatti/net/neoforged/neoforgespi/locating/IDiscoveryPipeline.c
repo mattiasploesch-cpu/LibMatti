@@ -8,7 +8,7 @@ int LIBMATTI_NEOFORGESPI_IDiscoveryPipeline_AddPath(
     const LIBMATTI_NEOFORGESPI_ModFileDiscoveryAttributes *attributes,
     LIBMATTI_NEOFORGESPI_IncompatibleFileReporting incompatibleFileReporting, LIBMATTI_NEOFORGESPI_IModFile **out)
 {
-    // Java: return addPath(List.of(path), attributes, incompatibleFileReporting);
+// Java: return addPath(List.of(path), attributes, incompatibleFileReporting);
     return pipeline->addPath(pipeline->issueReporting.self, &path, 1, attributes, incompatibleFileReporting, out);
 }
 

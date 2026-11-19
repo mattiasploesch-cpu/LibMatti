@@ -1,5 +1,6 @@
-// Port of org.spongepowered.asm.launch.MixinInitialisationError and
-// org.spongepowered.asm.mixin.throwables.MixinError.
+
+
+
 
 #include "libmatti/org/spongepowered/asm/launch/MixinInitialisationError.h"
 
@@ -9,7 +10,7 @@
 LIBMATTI_SP_MixinInitialisationError *LIBMATTI_SP_MixinInitialisationError_New(const char *message)
 {
     LIBMATTI_SP_MixinInitialisationError *error = calloc(1, sizeof(*error));
-    // Java: org.spongepowered.asm.launch.MixinInitialisationError
+// Java: org.spongepowered.asm.launch.MixinInitialisationError
     error->base = *LIBMATTI_JL_Throwable_NewNamed("org.spongepowered.asm.launch.MixinInitialisationError", message);
     return error;
 }

@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.loading.modscan.ModMethodVisitor.
+
+
 
 #include "libmatti/net/neoforged/fml/loading/modscan/ModMethodVisitor.h"
 
@@ -31,7 +32,7 @@ LIBMATTI_FML_ModAnnotationVisitor *LIBMATTI_FML_ModMethodVisitor_VisitAnnotation
 {
     (void) runtimeVisible;
 
-    // Java: methodName + methodDescriptor
+// Java: methodName + methodDescriptor
     size_t nameLength = visitor->methodName != NULL ? strlen(visitor->methodName) : 0;
     size_t descLength = visitor->methodDescriptor != NULL ? strlen(visitor->methodDescriptor) : 0;
     char *member = malloc(nameLength + descLength + 1);

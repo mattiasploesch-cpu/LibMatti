@@ -1,5 +1,6 @@
-// Port of java.nio.file.Path. The C port carries paths as plain strings; every
-// function returns a newly allocated string that the caller frees.
+
+
+
 
 #ifndef MATTICRAFT_JAVA_NIO_FILE_PATH_H
 #define MATTICRAFT_JAVA_NIO_FILE_PATH_H
@@ -19,4 +20,4 @@ char *LIBMATTI_JNF_Path_GetFileName(const char *path);
 // Java: Path getParent() (NULL = no parent)
 char *LIBMATTI_JNF_Path_GetParent(const char *path);
 
-#endif //MATTICRAFT_JAVA_NIO_FILE_PATH_H
+#endif

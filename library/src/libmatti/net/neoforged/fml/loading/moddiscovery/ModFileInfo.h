@@ -26,14 +26,14 @@ struct LIBMATTI_FML_ModFileInfo
 
     LIBMATTI_NEOFORGESPI_IConfigurable *config;
     LIBMATTI_FML_ModFile *modFile;
-    void *issueURL; // Java: private final URL issueURL
+    void *issueURL;// Java: private final URL issueURL
     LIBMATTI_NEOFORGESPI_IModFileInfo_LanguageSpec *languageSpecs;
     size_t languageSpecCount;
     int showAsResourcePack;
     int showAsDataPack;
     LIBMATTI_NEOFORGESPI_IModInfo **mods;
     size_t modCount;
-    LIBMATTI_JU_HashMap *properties; // Java: Map<String, Object> properties
+    LIBMATTI_JU_HashMap *properties;// Java: Map<String, Object> properties
     char *license;
     char **usesServices;
     size_t usesServiceCount;
@@ -73,4 +73,4 @@ int LIBMATTI_FML_ModFileInfo_GetConfigElement(void *self, const char *const *key
 LIBMATTI_NEOFORGESPI_IConfigurable **LIBMATTI_FML_ModFileInfo_GetConfigList(void *self, const char *const *key,
                                                                             size_t keyCount, size_t *count);
 
-#endif //MATTICRAFT_FML_LOADING_MODDISCOVERY_MODFILEINFO_H
+#endif

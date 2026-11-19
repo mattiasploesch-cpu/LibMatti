@@ -1,4 +1,5 @@
-// Port of net.minecraft.client.resources.model.QuadCollection (implementation).
+
+
 
 #include "libmatti/net/minecraft/client/resources/model/QuadCollection.h"
 

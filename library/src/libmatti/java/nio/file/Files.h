@@ -1,4 +1,5 @@
-// Port of java.nio.file.Files (the operations the loader uses).
+
+
 
 #ifndef MATTICRAFT_JAVA_NIO_FILE_FILES_H
 #define MATTICRAFT_JAVA_NIO_FILE_FILES_H
@@ -31,7 +32,7 @@ typedef enum
 typedef struct
 {
     void *self;
-    // Java: public FileVisitResult visitFile(T file, BasicFileAttributes attrs)
+// Java: public FileVisitResult visitFile(T file, BasicFileAttributes attrs)
     LIBMATTI_JNF_FileVisitResult (*visitFile)(void *self, const char *file, int isRegularFile, long size);
 } LIBMATTI_JNF_SimpleFileVisitor;
 
@@ -63,4 +64,4 @@ int LIBMATTI_JNF_Files_Copy(const char *source, const char *target);
 // Java: static Path move(Path source, Path target) - 0 on failure
 int LIBMATTI_JNF_Files_Move(const char *source, const char *target);
 
-#endif //MATTICRAFT_JAVA_NIO_FILE_FILES_H
+#endif

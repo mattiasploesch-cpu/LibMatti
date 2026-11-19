@@ -1,4 +1,5 @@
-// Port of the java.util.Collections unmodifiable wrappers (implementation).
+
+
 
 #include "libmatti/java/util/Collections.h"
 

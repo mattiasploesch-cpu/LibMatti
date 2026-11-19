@@ -1,4 +1,5 @@
-// Port of cpw.mods.modlauncher.ArgumentHandler.
+
+
 
 #include "libmatti/cpw/modlauncher/ArgumentHandler.h"
 
@@ -24,7 +25,7 @@ static char **option_result_values(LIBMATTI_MLA_ITransformationService_OptionRes
 // Java: private <V> void checkOwnership(OptionSpec<V> option)
 static int check_ownership(const OptionResult *result, const LIBMATTI_JOPT_OptionSpec *option)
 {
-    // Java: option.options().stream().allMatch(opt -> opt.startsWith(serviceName + ".") || !opt.contains("."))
+// Java: option.options().stream().allMatch(opt -> opt.startsWith(serviceName + ".") || !opt.contains("."))
     const char *name = LIBMATTI_JOPT_OptionSpec_Options(option);
     if (strchr(name, '.') == NULL) return 1;
 
@@ -122,7 +123,8 @@ LIBMATTI_ML_ArgumentHandler_DiscoveryData LIBMATTI_ML_ArgumentHandler_SetArgs(LI
     return data;
 }
 
-// the env.computePropertyIfAbsent value functions
+
+
 typedef struct
 {
     const LIBMATTI_JOPT_OptionSpec *option;
@@ -165,7 +167,7 @@ void LIBMATTI_ML_ArgumentHandler_ProcessArguments(
     handler->launchTarget = LIBMATTI_JOPT_OptionSpec_WithRequiredArg(
         LIBMATTI_JOPT_OptionParser_Accepts(parser, "launchTarget", "LauncherService target to launch"));
 
-    // Java: parserConsumer.accept(parser)
+// Java: parserConsumer.accept(parser)
     if (parserConsumer != NULL) parserConsumer(parser, parserUserdata);
 
     handler->nonOption = LIBMATTI_JOPT_OptionParser_NonOptions(parser);
@@ -188,7 +190,7 @@ void LIBMATTI_ML_ArgumentHandler_ProcessArguments(
     LIBMATTI_ML_Environment_ComputePropertyIfAbsent(env, LIBMATTI_MLA_IEnvironment_Keys_Uuid(), supply_option_value,
                                                     &uuid);
 
-    // Java: resultConsumer.accept(this.optionSet, this::optionResults)
+// Java: resultConsumer.accept(this.optionSet, this::optionResults)
     if (resultConsumer != NULL) resultConsumer(handler->optionSet, LIBMATTI_ML_ArgumentHandler_OptionResults,
                                                resultUserdata);
 }
@@ -225,7 +227,7 @@ char **LIBMATTI_ML_ArgumentHandler_BuildArgumentList(const LIBMATTI_ML_ArgumentH
     add_option_to_string(handler->assetsDirOption, handler->optionSet, &args, &argCount);
     add_option_to_string(handler->uuidOption, handler->optionSet, &args, &argCount);
 
-    // Java: this.optionSet.nonOptionArguments().stream().map(Object::toString).forEach(args::add)
+// Java: this.optionSet.nonOptionArguments().stream().map(Object::toString).forEach(args::add)
     size_t nonOptionCount = 0;
     char **nonOptions = LIBMATTI_JOPT_OptionSet_NonOptionArguments(handler->optionSet, &nonOptionCount);
 

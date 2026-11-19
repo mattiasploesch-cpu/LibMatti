@@ -1,4 +1,5 @@
-// Port of net.minecraft.server.packs.resources.Resource.
+
+
 
 #include "libmatti/net/minecraft/server/packs/resources/Resource.h"
 
@@ -42,7 +43,7 @@ const unsigned char *LIBMATTI_MC_Resource_Metadata(const LIBMATTI_MC_Resource *r
 
 const char *LIBMATTI_MC_Resource_SourcePackId(const LIBMATTI_MC_Resource *resource)
 {
-    // Java: resource.source.packId()
+// Java: resource.source.packId()
     LIBMATTI_MC_PackResources *pack = (LIBMATTI_MC_PackResources *) resource->source;
     return pack->vtable->packId(pack);
 }

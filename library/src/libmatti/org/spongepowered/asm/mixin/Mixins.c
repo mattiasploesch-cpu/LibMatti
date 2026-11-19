@@ -1,6 +1,7 @@
-// Port of org.spongepowered.asm.mixin.Mixins.
-// "Entry point for registering global mixin resources. Compatibility with pre-0.6 versions is
-// maintained via the methods on MixinEnvironment delegating to the methods here."
+
+
+
+
 
 #include "libmatti/org/spongepowered/asm/mixin/Mixins.h"
 
@@ -65,11 +66,11 @@ static void register_configuration(LIBMATTI_SP_Config *config);
 //                                            MixinEnvironment fallback, IMixinConfigSource source)
 static void create_configuration(const char *configFile, void *fallback, LIBMATTI_SP_ContainerHandle *source)
 {
-    // Java: Config config = null; try { config = Config.create(configFile, fallback, source); }
+// Java: Config config = null; try { config = Config.create(configFile, fallback, source); }
     //       catch (Exception ex) { logger.error("Error encountered reading mixin config " + ...); }
     LIBMATTI_SP_Config *config = LIBMATTI_SP_Config_Create(configFile, fallback, source);
 
-    // Java: Mixins.registerConfiguration(config);
+// Java: Mixins.registerConfiguration(config);
     register_configuration(config);
 }
 
@@ -78,19 +79,19 @@ static void register_configuration(LIBMATTI_SP_Config *config)
 {
     if (config == NULL || registered_configs_contains(config->name)) return;
 
-    // Java: MixinEnvironment env = config.getEnvironment(); if (env != null) env.registerConfig(config.getName());
+// Java: MixinEnvironment env = config.getEnvironment(); if (env != null) env.registerConfig(config.getName());
     if (config->environment != NULL)
     {
         LIBMATTI_SP_MixinEnvironment_RegisterConfig(config->environment, config->name);
     }
 
-    // Java: Mixins.getConfigs().add(config);
+// Java: Mixins.getConfigs().add(config);
     LIBMATTI_SP_ConfigSet_Add(get_configs_set(), config);
 
-    // Java: Mixins.registeredConfigs.add(config.getName());
+// Java: Mixins.registeredConfigs.add(config.getName());
     registered_configs_add(config->name);
 
-    // Java: Config parent = config.getParent(); if (parent != null) Mixins.registerConfiguration(parent);
+// Java: Config parent = config.getParent(); if (parent != null) Mixins.registerConfiguration(parent);
     if (config->parent != NULL) register_configuration(config->parent);
 }
 
@@ -104,7 +105,7 @@ void LIBMATTI_SP_Mixins_AddConfigurations(const char *const *configFiles, size_t
 void LIBMATTI_SP_Mixins_AddConfigurationsWithSource(const char *const *configFiles, size_t count,
                                                     LIBMATTI_SP_ContainerHandle *source)
 {
-    // Java: MixinEnvironment fallback = MixinEnvironment.getDefaultEnvironment();
+// Java: MixinEnvironment fallback = MixinEnvironment.getDefaultEnvironment();
     void *fallback = LIBMATTI_SP_MixinEnvironment_GetDefaultEnvironment();
     for (size_t i = 0; i < count; i++)
         create_configuration(configFiles[i], fallback, source);
@@ -119,7 +120,7 @@ void LIBMATTI_SP_Mixins_AddConfiguration(const char *configFile)
 // Java: public static void addConfiguration(String configFile, IMixinConfigSource source)
 void LIBMATTI_SP_Mixins_AddConfigurationWithSource(const char *configFile, LIBMATTI_SP_ContainerHandle *source)
 {
-    // Java: Mixins.createConfiguration(configFile, MixinEnvironment.getDefaultEnvironment(), source);
+// Java: Mixins.createConfiguration(configFile, MixinEnvironment.getDefaultEnvironment(), source);
     create_configuration(configFile, LIBMATTI_SP_MixinEnvironment_GetDefaultEnvironment(), source);
 }
 

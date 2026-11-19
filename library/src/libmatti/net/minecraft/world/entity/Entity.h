@@ -1,7 +1,8 @@
-// Port of net.minecraft.world.entity.Entity (the base-class core the game
-// needs before the P5 player/mob work: position + rotation, the dimensions-
-// derived bounding box, the entity id + UUID, the command tags, the base tick
-// bookkeeping and the NBT surface Java's saveWithoutId/load write).
+
+
+
+
+
 
 #ifndef MATTICRAFT_MC_WORLD_ENTITY_ENTITY_H
 #define MATTICRAFT_MC_WORLD_ENTITY_ENTITY_H
@@ -36,60 +37,60 @@ typedef enum LIBMATTI_MC_EntityRemovalReason
 // Java: public abstract class Entity
 typedef struct LIBMATTI_MC_Entity
 {
-    // Java: private final EntityType<?> type
+// Java: private final EntityType<?> type
     const LIBMATTI_MC_EntityType *type;
-    // Java: protected Level level (NULL until the entity is added to a level)
+// Java: protected Level level (NULL until the entity is added to a level)
     struct LIBMATTI_MC_Level *level;
-    // Java: private int id = ENTITY_COUNTER.incrementAndGet()
+// Java: private int id = ENTITY_COUNTER.incrementAndGet()
     int id;
-    // Java: private UUID uuid
+// Java: private UUID uuid
     LIBMATTI_JU_UUID uuid;
-    // Java: private Vec3 position - the port keeps the flat triple like Camera
+// Java: private Vec3 position - the port keeps the flat triple like Camera
     double x;
     double y;
     double z;
-    // Java: private Vec3 lastKnownPosition (the interpolation anchor)
+// Java: private Vec3 lastKnownPosition (the interpolation anchor)
     bool hasLastKnownPosition;
     double lastX;
     double lastY;
     double lastZ;
-    // Java: private Vec3 deltaMovement = Vec3.ZERO
+// Java: private Vec3 deltaMovement = Vec3.ZERO
     double dx;
     double dy;
     double dz;
-    // Java: private float yRot / xRot (+ the old rotations xRotO/yRotO)
+// Java: private float yRot / xRot (+ the old rotations xRotO/yRotO)
     float yRot;
     float xRot;
     float yRotO;
     float xRotO;
-    // Java: private float fallDistance
+// Java: private float fallDistance
     float fallDistance;
-    // Java: private AABB bb - derived from the dimensions + position
+// Java: private AABB bb - derived from the dimensions + position
     LIBMATTI_MC_AABB *bb;
-    // Java: private boolean onGround
+// Java: private boolean onGround
     bool onGround;
-    // Java: private boolean invulnerable
+// Java: private boolean invulnerable
     bool invulnerable;
-    // Java: private int remainingFireTicks / portalCooldown
+// Java: private int remainingFireTicks / portalCooldown
     int remainingFireTicks;
     int portalCooldown;
-    // Java: private boolean removed + the RemovalReason
+// Java: private boolean removed + the RemovalReason
     bool removed;
     LIBMATTI_MC_EntityRemovalReason removalReason;
-    // Java: private final ArraySetSorted<String> tags (the /tag command set)
+// Java: private final ArraySetSorted<String> tags (the /tag command set)
     char **tags;
     int tagCount;
     int tagCapacity;
-    // Java: protected int airSupply = getMaxAirSupply() - 300 by default
+// Java: protected int airSupply = getMaxAirSupply() - 300 by default
     int airSupply;
-    // Java: private boolean noPhysics / noCulling / hasVisualFire ...
+// Java: private boolean noPhysics / noCulling / hasVisualFire ...
     bool noPhysics;
     bool glowing;
     bool silent;
     bool noGravity;
-    // Java: the first tick flag (EntitiesStatefulSection)
+// Java: the first tick flag (EntitiesStatefulSection)
     bool firstTick;
-    // Java: protected boolean horizontalCollision / verticalCollision /
+// Java: protected boolean horizontalCollision / verticalCollision /
     // verticalCollisionBelow / minorHorizontalCollision (the move() results)
     bool horizontalCollision;
     bool verticalCollision;
@@ -110,9 +111,11 @@ typedef enum LIBMATTI_MC_MoverType
 // Java: protected Entity(EntityType<?>, Level) - the subclass entry; sets the
 // id + uuid, positions at origin with the type's dimensions
 LIBMATTI_MC_Entity *LIBMATTI_MC_Entity_New(const LIBMATTI_MC_EntityType *type, struct LIBMATTI_MC_Level *level);
-// The subclass tail: the concrete type calls this after embedding the base
+
+
 void LIBMATTI_MC_Entity_Init(LIBMATTI_MC_Entity *entity, const LIBMATTI_MC_EntityType *type, struct LIBMATTI_MC_Level *level);
-// The base free (frees the bbox + tags; the subclass frees its own fields)
+
+
 void LIBMATTI_MC_Entity_Free(LIBMATTI_MC_Entity *entity);
 
 // Java: public final int getId() / public final EntityType<?> getType()
@@ -242,4 +245,4 @@ int LIBMATTI_MC_Entity_NextEntityCounter(void);
 }
 #endif
 
-#endif //MATTICRAFT_MC_WORLD_ENTITY_ENTITY_H
+#endif

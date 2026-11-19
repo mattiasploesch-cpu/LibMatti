@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.common.asm.enumextension.NetworkedEnum.
+
+
 
 #include "libmatti/net/neoforged/fml/common/asm/enumextension/NetworkedEnum.h"
 

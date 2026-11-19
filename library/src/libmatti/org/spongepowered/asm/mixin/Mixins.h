@@ -1,5 +1,6 @@
-// Port of org.spongepowered.asm.mixin.Mixins (sponge-mixin 0.17.3+mixin.0.8.7).
-// "Entry point for registering global mixin resources."
+
+
+
 
 #ifndef MATTICRAFT_SP_ASM_MIXIN_MIXINS_H
 #define MATTICRAFT_SP_ASM_MIXIN_MIXINS_H
@@ -33,4 +34,4 @@ void LIBMATTI_SP_Mixins_RegisterErrorHandlerClass(const char *handlerName);
 // Java: public static Set<String> getErrorHandlerClasses()
 const char *const *LIBMATTI_SP_Mixins_GetErrorHandlerClasses(size_t *count);
 
-#endif //MATTICRAFT_SP_ASM_MIXIN_MIXINS_H
+#endif

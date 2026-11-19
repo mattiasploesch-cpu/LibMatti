@@ -16,4 +16,4 @@ typedef struct
 LIBMATTI_FML_NeoForgeLaunchHandler *LIBMATTI_FML_NeoForgeLaunchHandler_New(void);
 void LIBMATTI_FML_NeoForgeLaunchHandler_Free(LIBMATTI_FML_NeoForgeLaunchHandler *handler);
 
-#endif //MATTICRAFT_FML_NEOFORGELAUNCHHANDLER_H
+#endif

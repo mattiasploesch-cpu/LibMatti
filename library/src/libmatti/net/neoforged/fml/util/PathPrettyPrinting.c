@@ -107,7 +107,7 @@ char *LIBMATTI_FML_PathPrettyPrinting_PrettyPrint(const char *path)
         }
     }
 
-    // Java: no known prefix, it might come from Gradle like in dev, or similar
+// Java: no known prefix, it might come from Gradle like in dev, or similar
     if (resultPath == NULL)
     {
         if (LIBMATTI_JNF_Files_IsDirectory(path))
@@ -116,7 +116,7 @@ char *LIBMATTI_FML_PathPrettyPrinting_PrettyPrint(const char *path)
             resultPath = duplicateString(path);
     }
 
-    // Java: resultPath.replace('\\', '/')
+// Java: resultPath.replace('\\', '/')
     for (char *c = resultPath; *c != '\0'; c++)
         if (*c == '\\')
             *c = '/';

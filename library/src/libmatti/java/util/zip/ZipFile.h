@@ -1,7 +1,8 @@
-// Port of java.util.zip.ZipFile.
-// Java opens the central directory lazily on first access; the port reads it
-// eagerly on open. ZIP64 is out of scope (Java supports it; the packs this port
-// reads stay under the classic limits).
+
+
+
+
+
 
 #ifndef MATTICRAFT_JAVA_UTIL_ZIP_ZIPFILE_H
 #define MATTICRAFT_JAVA_UTIL_ZIP_ZIPFILE_H
@@ -14,7 +15,7 @@ typedef struct LIBMATTI_JU_ZipEntry
 {
     char *name;
     int isDirectory;
-    int method; // Java: STORED (0) / DEFLATED (8)
+    int method;// Java: STORED (0) / DEFLATED (8)
     uint32_t crc;
     uint32_t compressedSize;
     uint32_t uncompressedSize;
@@ -41,4 +42,4 @@ const LIBMATTI_JU_ZipEntry *LIBMATTI_JU_ZipFile_EntryAt(const LIBMATTI_JU_ZipFil
 unsigned char *LIBMATTI_JU_ZipFile_Read(const LIBMATTI_JU_ZipFile *zipFile, const LIBMATTI_JU_ZipEntry *entry,
                                         size_t *outLength);
 
-#endif //MATTICRAFT_JAVA_UTIL_ZIP_ZIPFILE_H
+#endif

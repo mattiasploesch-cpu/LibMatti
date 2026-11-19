@@ -1,8 +1,9 @@
-// Port of net.minecraft.core.component.DataComponents.
-// Generated from the vendor Java sources: every public static final DataComponentType
-// constant becomes one accessor in declaration order. The Java value-type generics
-// (CustomData, FoodProperties, ...) collapse to void* component values; their codecs
-// stay with the game port.
+
+
+
+
+
+
 
 #ifndef MATTICRAFT_MC_CORE_COMPONENT_DATACOMPONENTS_H
 #define MATTICRAFT_MC_CORE_COMPONENT_DATACOMPONENTS_H
@@ -17,7 +18,8 @@ extern "C" {
 // Java: COMMON_ITEM_COMPONENTS - the prototype map every item starts from
 LIBMATTI_MC_DataComponentMap *LIBMATTI_MC_DataComponents_CommonItemComponents(void);
 
-// One accessor per Java constant, in declaration order.
+
+
 const LIBMATTI_MC_DataComponentType *LIBMATTI_MC_DataComponents_CUSTOM_DATA(void);
 const LIBMATTI_MC_DataComponentType *LIBMATTI_MC_DataComponents_MAX_STACK_SIZE(void);
 const LIBMATTI_MC_DataComponentType *LIBMATTI_MC_DataComponents_MAX_DAMAGE(void);
@@ -111,4 +113,4 @@ const LIBMATTI_MC_DataComponentType *LIBMATTI_MC_DataComponents_SHULKER_COLOR(vo
 }
 #endif
 
-#endif //MATTICRAFT_MC_CORE_COMPONENT_DATACOMPONENTS_H
+#endif

@@ -1,4 +1,5 @@
-// Port of cpw.mods.modlauncher.api.TargetType.
+
+
 
 #include "libmatti/cpw/modlauncher/api/TargetType.h"
 

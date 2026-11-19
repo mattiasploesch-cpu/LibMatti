@@ -1,7 +1,8 @@
-// Port of net.minecraft.world.level.block.EntityBlock. Java models it as an
-// interface the concrete Block implements (newBlockEntity + getTicker); the C
-// port hangs a small vtable off the Block so the BlockEntity paths ask the
-// block directly instead of scanning the 49 BlockEntityType validBlocks sets.
+
+
+
+
+
 
 #ifndef MATTICRAFT_MC_WORLD_LEVEL_BLOCK_ENTITYBLOCK_H
 #define MATTICRAFT_MC_WORLD_LEVEL_BLOCK_ENTITYBLOCK_H
@@ -32,12 +33,12 @@ struct LIBMATTI_MC_Block;
 // the required member; getTicker arrives with the P5 block-tick port.
 typedef struct LIBMATTI_MC_EntityBlock
 {
-    // Java: @Nullable BlockEntity newBlockEntity(BlockPos, BlockState) -
+// Java: @Nullable BlockEntity newBlockEntity(BlockPos, BlockState) -
     // the concrete block creates its block entity (NULL when this block has
     // no entity behaviour)
     struct LIBMATTI_MC_BlockEntity *(*newBlockEntity)(struct LIBMATTI_MC_Block *block,
                                                       const LIBMATTI_MC_BlockPos *pos, LIBMATTI_MC_BlockState *state);
-    // Java: default BlockEntityType<?> getEntityType() - the port keeps the
+// Java: default BlockEntityType<?> getEntityType() - the port keeps the
     // type pointer next to the factory so the save path can name it
     const struct LIBMATTI_MC_BlockEntityType *entityType;
 } LIBMATTI_MC_EntityBlock;
@@ -49,8 +50,9 @@ bool LIBMATTI_MC_EntityBlock_HasBlockEntity(const LIBMATTI_MC_Block *block);
 struct LIBMATTI_MC_BlockEntity *LIBMATTI_MC_EntityBlock_NewBlockEntity(LIBMATTI_MC_Block *block,
                                                                        const LIBMATTI_MC_BlockPos *pos,
                                                                        LIBMATTI_MC_BlockState *state);
-// The vtable the vanilla entity blocks install (the concrete factories live
-// with the game content; the helper builds the vtable over a type + factory)
+
+
+
 LIBMATTI_MC_EntityBlock *LIBMATTI_MC_EntityBlock_New(
         const struct LIBMATTI_MC_BlockEntityType *entityType,
         struct LIBMATTI_MC_BlockEntity *(*newBlockEntity)(struct LIBMATTI_MC_Block *block,
@@ -61,4 +63,4 @@ LIBMATTI_MC_EntityBlock *LIBMATTI_MC_EntityBlock_New(
 }
 #endif
 
-#endif //MATTICRAFT_MC_WORLD_LEVEL_BLOCK_ENTITYBLOCK_H
+#endif

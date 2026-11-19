@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.event.lifecycle.FMLDedicatedServerSetupEvent.
+
+
 
 #ifndef MATTICRAFT_FML_EVENT_LIFECYCLE_FMLDEDICATEDSERVERSETUPEVENT_H
 #define MATTICRAFT_FML_EVENT_LIFECYCLE_FMLDEDICATEDSERVERSETUPEVENT_H
@@ -10,7 +11,7 @@ typedef struct LIBMATTI_FML_Event_Lifecycle_FMLDedicatedServerSetupEvent LIBMATT
 // Java: public class FMLDedicatedServerSetupEvent extends ParallelDispatchEvent
 struct LIBMATTI_FML_Event_Lifecycle_FMLDedicatedServerSetupEvent
 {
-    // Java: extends ParallelDispatchEvent
+// Java: extends ParallelDispatchEvent
     LIBMATTI_FML_Event_Lifecycle_ParallelDispatchEvent base;
 };
 
@@ -24,4 +25,4 @@ LIBMATTI_FML_Event_Lifecycle_FMLDedicatedServerSetupEvent_New(LIBMATTI_FML_ModCo
 void LIBMATTI_FML_Event_Lifecycle_FMLDedicatedServerSetupEvent_Free(
     LIBMATTI_FML_Event_Lifecycle_FMLDedicatedServerSetupEvent *event);
 
-#endif //MATTICRAFT_FML_EVENT_LIFECYCLE_FMLDEDICATEDSERVERSETUPEVENT_H
+#endif

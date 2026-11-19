@@ -1,6 +1,7 @@
-// Port of net.minecraft.world.item.Item (the data part: Properties, components,
-// descriptionId, registry id). Java's behaviour methods (use, interact, ...) stay
-// with the game port.
+
+
+
+
 
 #ifndef MATTICRAFT_MC_WORLD_ITEM_ITEM_H
 #define MATTICRAFT_MC_WORLD_ITEM_ITEM_H
@@ -15,41 +16,43 @@
 extern "C" {
 #endif
 
-// forward tags for the material parameters below (defined in ToolMaterial.h /
-// equipment/ArmorMaterials.h - both include this header)
+
+
+
 struct LIBMATTI_MC_ToolMaterial;
 struct LIBMATTI_MC_ArmorMaterial;
 
 // Java: public class Item
 typedef struct LIBMATTI_MC_Item
 {
-    // Java: the registered key (Properties.setId in the register path)
+// Java: the registered key (Properties.setId in the register path)
     LIBMATTI_MC_ResourceKey *key;
-    // Java: BlockItem.block / Item.BY_BLOCK - the block a BlockItem places (NULL otherwise)
+// Java: BlockItem.block / Item.BY_BLOCK - the block a BlockItem places (NULL otherwise)
     void *block;
-    // Java: private final DataComponentMap components
+// Java: private final DataComponentMap components
     const LIBMATTI_MC_DataComponentMap *components;
-    // Java: private final String descriptionId (resolved at register time)
+// Java: private final String descriptionId (resolved at register time)
     char *descriptionId;
-    // Java: private final Properties properties - the builder record the item was built from
+// Java: private final Properties properties - the builder record the item was built from
     struct LIBMATTI_MC_ItemProperties *properties;
 } LIBMATTI_MC_Item;
 
 // Java: public static class Properties
 typedef struct LIBMATTI_MC_ItemProperties
 {
-    // Java: private final DataComponentMap.Builder components (starts from COMMON_ITEM_COMPONENTS)
+// Java: private final DataComponentMap.Builder components (starts from COMMON_ITEM_COMPONENTS)
     LIBMATTI_MC_DataComponentMap *components;
-    // Java: @Nullable Item craftingRemainingItem
+// Java: @Nullable Item craftingRemainingItem
     LIBMATTI_MC_Item *craftingRemainingItem;
-    // Java: @Nullable ResourceKey<Item> id
+// Java: @Nullable ResourceKey<Item> id
     LIBMATTI_MC_ResourceKey *id;
-    // Java: private String descriptionId - NULL until overrideDescription/useBlockDescriptionPrefix
+// Java: private String descriptionId - NULL until overrideDescription/useBlockDescriptionPrefix
     char *descriptionId;
-    // Java: private boolean useBlockDescriptionPrefix
+// Java: private boolean useBlockDescriptionPrefix
     bool useBlockDescriptionPrefix;
-    // Java autoboxes int component values; the port boxes them into a per-properties
-    // arena so every properties object owns its values (the map stores void* only)
+
+
+
     int *boxedInts;
     size_t boxedIntCount;
     size_t boxedIntCapacity;
@@ -124,4 +127,4 @@ LIBMATTI_MC_Item *LIBMATTI_MC_Item_AsItem(LIBMATTI_MC_Item *item);
 }
 #endif
 
-#endif //MATTICRAFT_MC_WORLD_ITEM_ITEM_H
+#endif

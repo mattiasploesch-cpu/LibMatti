@@ -1,6 +1,7 @@
-// Port of net.minecraft.client.renderer.texture.TextureManager.
-// Java keys by Identifier with Identifier equality; the port keys the HashMap
-// by the "namespace:path" string (the HashMap port is string-keyed).
+
+
+
+
 
 #include "libmatti/net/minecraft/client/renderer/texture/TextureManager.h"
 
@@ -15,7 +16,8 @@
 // Java: private static final Logger LOGGER
 #define LOGGER() LIBMATTI_ML_LogManager_GetLogger()
 
-// The map key for an identifier: "namespace:path"
+
+
 static char *location_key(const LIBMATTI_MC_Identifier *location)
 {
     size_t size = strlen(location->namespace) + 1 + strlen(location->path) + 1;
@@ -29,7 +31,7 @@ static void safe_close(LIBMATTI_MC_TextureManager *manager, const char *key, LIB
 {
     (void) manager;
     (void) key;
-    // Java: this.tickableTextures.remove(texture)
+// Java: this.tickableTextures.remove(texture)
     for (size_t i = 0; i < manager->tickableCount; i++)
     {
         if (manager->tickableTextures[i] == texture)
@@ -41,7 +43,7 @@ static void safe_close(LIBMATTI_MC_TextureManager *manager, const char *key, LIB
         }
     }
 
-    // Java: try { texture.close(); } catch (Exception e) { LOGGER.warn(...) }
+// Java: try { texture.close(); } catch (Exception e) { LOGGER.warn(...) }
     LIBMATTI_MC_AbstractTexture_Close(texture);
     free(texture);
 }
@@ -53,14 +55,14 @@ LIBMATTI_MC_TextureManager *LIBMATTI_MC_TextureManager_New(const LIBMATTI_MC_Mul
     manager->byPath = LIBMATTI_JU_HashMap_New();
     manager->resourceManager = resourceManager;
 
-    // Java: NativeImage image = MissingTextureAtlasSprite.generateMissingImage();
+// Java: NativeImage image = MissingTextureAtlasSprite.generateMissingImage();
     //       this.register(MissingTextureAtlasSprite.getLocation(),
     //                     new DynamicTexture(() -> "(intentionally-)Missing Texture", image));
     LIBMATTI_B3D_NativeImage *missing = LIBMATTI_MC_MissingTextureAtlasSprite_GenerateMissingImage();
     LIBMATTI_MC_AbstractTexture *missingTexture = LIBMATTI_MC_DynamicTexture_New(missing);
     LIBMATTI_MC_Identifier *missingLocation = LIBMATTI_MC_MissingTextureAtlasSprite_GetLocation();
 
-    // Java: DynamicTexture uploads in its constructor; the port uploads when a
+// Java: DynamicTexture uploads in its constructor; the port uploads when a
     // GL context exists (GetTexture/RegisterAndLoad paths re-upload on load).
     LIBMATTI_MC_TextureManager_Register(manager, missingLocation, missingTexture);
     LIBMATTI_MC_Identifier_Free(missingLocation);
@@ -74,7 +76,7 @@ void LIBMATTI_MC_TextureManager_Register(LIBMATTI_MC_TextureManager *manager, co
     char *key = location_key(location);
     LIBMATTI_MC_AbstractTexture *previous = LIBMATTI_JU_HashMap_Put(manager->byPath, key, texture);
 
-    // Java: if (abstracttexture != p_118497_) { close the old one; track tickable }
+// Java: if (abstracttexture != p_118497_) { close the old one; track tickable }
     if (previous != texture)
     {
         if (previous != NULL)
@@ -103,7 +105,7 @@ static LIBMATTI_MC_TextureContents *load_contents_safe(LIBMATTI_MC_TextureManage
         LIBMATTI_MC_ReloadableTexture_LoadContents(texture, manager->resourceManager);
     if (contents == NULL)
     {
-        // Java: LOGGER.error("Failed to load texture {} into slot {}", ...)
+// Java: LOGGER.error("Failed to load texture {} into slot {}", ...)
         char message[512];
         snprintf(message, sizeof(message), "Failed to load texture %s:%s (missing resource)",
                  texture->resourceId->namespace, texture->resourceId->path);
@@ -117,7 +119,7 @@ static LIBMATTI_MC_TextureContents *load_contents_safe(LIBMATTI_MC_TextureManage
 void LIBMATTI_MC_TextureManager_RegisterAndLoad(LIBMATTI_MC_TextureManager *manager, const LIBMATTI_MC_Identifier *location,
                                                 LIBMATTI_MC_AbstractTexture *texture)
 {
-    // Java: texture.apply(this.loadContentsSafe(location, texture))
+// Java: texture.apply(this.loadContentsSafe(location, texture))
     LIBMATTI_MC_TextureContents *contents = load_contents_safe(manager, location, texture);
     LIBMATTI_MC_ReloadableTexture_Apply(texture, contents);
     LIBMATTI_MC_TextureContents_Free(contents);
@@ -136,7 +138,7 @@ LIBMATTI_MC_AbstractTexture *LIBMATTI_MC_TextureManager_GetTexture(LIBMATTI_MC_T
     if (texture != NULL)
         return texture;
 
-    // Java: SimpleTexture + registerAndLoad
+// Java: SimpleTexture + registerAndLoad
     texture = LIBMATTI_MC_SimpleTexture_New(location);
     LIBMATTI_MC_TextureManager_RegisterAndLoad(manager, location, texture);
     return texture;
@@ -165,8 +167,9 @@ void LIBMATTI_MC_TextureManager_Free(LIBMATTI_MC_TextureManager *manager)
     if (manager == NULL)
         return;
 
-    // The map keys are owned by the map (KeySet borrows them - do not free
-    // the strings); the values are the textures.
+
+
+
     size_t count = 0;
     char **keys = LIBMATTI_JU_HashMap_KeySet(manager->byPath, &count);
     for (size_t i = 0; i < count; i++)

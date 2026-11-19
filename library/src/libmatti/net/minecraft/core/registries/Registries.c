@@ -1,4 +1,5 @@
-// Port of net.minecraft.core.registries.Registries.
+
+
 
 #include "libmatti/net/minecraft/core/registries/Registries.h"
 

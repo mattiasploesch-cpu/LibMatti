@@ -1,9 +1,10 @@
-// Port of org.objectweb.asm.tree.AnnotationNode.
-// Java stores all annotation values in one alternating List<Object> values
-// (element name, value, element name, value, ...); the C port keeps the names and
-// the values in two parallel arrays.
-// The element_value union of the class file format is modelled as a tag plus the
-// fields belonging to that tag.
+
+
+
+
+
+
+
 
 #ifndef MATTICRAFT_ASMT_ANNOTATIONNODE_H
 #define MATTICRAFT_ASMT_ANNOTATIONNODE_H
@@ -16,23 +17,23 @@ typedef struct LIBMATTI_ASMT_AnnotationValue LIBMATTI_ASMT_AnnotationValue;
 
 struct LIBMATTI_ASMT_AnnotationValue
 {
-    // Java: the class file element_value tag
+// Java: the class file element_value tag
     char tag;
-    // Java: Integer / Byte / Short / Character / Boolean
+// Java: Integer / Byte / Short / Character / Boolean
     int intValue;
-    // Java: Long / Double
+// Java: Long / Double
     long long longValue;
     double doubleValue;
-    // Java: String
+// Java: String
     char *stringValue;
-    // Java: Type (the 'c' tag, or the descriptor of a 't' tag)
+// Java: Type (the 'c' tag, or the descriptor of a 't' tag)
     char *classDescriptor;
-    // Java: String[2] - the enum constant type descriptor and its name ('e' tag)
+// Java: String[2] - the enum constant type descriptor and its name ('e' tag)
     char *enumType;
     char *enumConst;
-    // Java: AnnotationNode ('@' tag)
+// Java: AnnotationNode ('@' tag)
     LIBMATTI_ASMT_AnnotationNode *annotation;
-    // Java: List<Object> ('[' tag)
+// Java: List<Object> ('[' tag)
     LIBMATTI_ASMT_AnnotationValue **arrayValues;
     size_t arrayValueCount;
 };
@@ -40,11 +41,11 @@ struct LIBMATTI_ASMT_AnnotationValue
 // Java: public class AnnotationNode
 struct LIBMATTI_ASMT_AnnotationNode
 {
-    // Java: public String desc
+// Java: public String desc
     char *desc;
-    // Java: public List<Object> values - the element names of the alternating list
+// Java: public List<Object> values - the element names of the alternating list
     char **valueNames;
-    // Java: public List<Object> values - the element values of the alternating list
+// Java: public List<Object> values - the element values of the alternating list
     LIBMATTI_ASMT_AnnotationValue **values;
     size_t valueCount;
 };
@@ -90,4 +91,4 @@ LIBMATTI_ASMT_AnnotationValue *LIBMATTI_ASMT_AnnotationValue_ArrayAt(const LIBMA
 
 void LIBMATTI_ASMT_AnnotationValue_Free(LIBMATTI_ASMT_AnnotationValue *value);
 
-#endif //MATTICRAFT_ASMT_ANNOTATIONNODE_H
+#endif

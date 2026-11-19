@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.loading.modscan.ModAnnotation.
+
+
 
 #include "libmatti/net/neoforged/fml/loading/modscan/ModAnnotation.h"
 
@@ -84,7 +85,7 @@ char *LIBMATTI_FML_ModAnnotationValue_ToString(const LIBMATTI_FML_ModAnnotationV
         return strdup(value->longValue != 0 ? "true" : "false");
     case LIBMATTI_FML_ModAnnotationValue_TYPE:
     {
-        // Java: the Type is kept as is; the port renders its class name
+// Java: the Type is kept as is; the port renders its class name
         const LIBMATTI_ASM_Type *type = LIBMATTI_ASM_Type_GetType(value->stringValue);
         char *name = LIBMATTI_ASM_Type_GetClassName(type);
         LIBMATTI_ASM_Type_Free((LIBMATTI_ASM_Type *) type);
@@ -260,11 +261,12 @@ LIBMATTI_FML_ModAnnotation *LIBMATTI_FML_ModAnnotation_New(LIBMATTI_NEOFORGESPI_
 {
     LIBMATTI_FML_ModAnnotation *annotation = calloc(1, sizeof(LIBMATTI_FML_ModAnnotation));
     annotation->type = type;
-    // Java keeps the Type reference, which every caller made for this annotation only,
-    // so the annotation owns and frees it.
+
+
+
     annotation->asmType = (LIBMATTI_ASM_Type *) asmType;
     annotation->member = member != NULL ? strdup(member) : NULL;
-    // Java: private final Map<String, Object> values = Maps.newHashMap();
+// Java: private final Map<String, Object> values = Maps.newHashMap();
     annotation->values = values_new();
     return annotation;
 }
@@ -357,7 +359,7 @@ LIBMATTI_FML_ModAnnotation *LIBMATTI_FML_ModAnnotation_AddChildAnnotation(LIBMAT
     LIBMATTI_FML_ModAnnotation *child =
         LIBMATTI_FML_ModAnnotation_NewChildAnnotation(LIBMATTI_ASM_Type_GetType(desc), annotation);
 
-    // Java: addProperty(name, child.getValues()) - the parent's value points at the child's Map
+// Java: addProperty(name, child.getValues()) - the parent's value points at the child's Map
     LIBMATTI_FML_ModAnnotationValue *property = value_new(LIBMATTI_FML_ModAnnotationValue_ANNOTATION);
     property->container = child->values;
     LIBMATTI_FML_ModAnnotation_AddProperty(annotation, name, property);
@@ -370,7 +372,7 @@ LIBMATTI_NEOFORGESPI_AnnotationData LIBMATTI_FML_ModAnnotation_FromModAnnotation
     const char *clazz, const LIBMATTI_FML_ModAnnotation *annotation)
 {
     LIBMATTI_NEOFORGESPI_AnnotationData data = {0};
-    // Java: the Type objects move into the record (annotation.asmType, clazz)
+// Java: the Type objects move into the record (annotation.asmType, clazz)
     data.annotationType = LIBMATTI_ASM_Type_GetObjectType(LIBMATTI_ASM_Type_GetInternalName(annotation->asmType));
     data.targetType = annotation->type;
     data.clazz = clazz != NULL ? LIBMATTI_ASM_Type_GetObjectType(clazz) : NULL;

@@ -1,4 +1,5 @@
-// Port of cpw.mods.modlauncher.api.TransformerVoteResult.
+
+
 
 #ifndef MATTICRAFT_MODLAUNCHER_TRANSFORMERVOTERESULT_H
 #define MATTICRAFT_MODLAUNCHER_TRANSFORMERVOTERESULT_H
@@ -12,4 +13,4 @@ typedef enum
     LIBMATTI_MLA_VOTE_REJECT
 } LIBMATTI_MLA_TransformerVoteResult;
 
-#endif //MATTICRAFT_MODLAUNCHER_TRANSFORMERVOTERESULT_H
+#endif

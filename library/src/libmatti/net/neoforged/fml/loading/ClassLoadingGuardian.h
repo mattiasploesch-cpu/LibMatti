@@ -34,7 +34,8 @@ unsigned char *LIBMATTI_FML_ClassLoadingGuardian_Transform(LIBMATTI_FML_ClassLoa
 // Java: public void close()
 void LIBMATTI_FML_ClassLoadingGuardian_Close(LIBMATTI_FML_ClassLoadingGuardian *guardian);
 
-// the port frees the guardian struct itself (Java has no explicit free)
+
+
 void LIBMATTI_FML_ClassLoadingGuardian_Free(LIBMATTI_FML_ClassLoadingGuardian *guardian);
 
-#endif //MATTICRAFT_FML_LOADING_CLASSLOADINGGUARDIAN_H
+#endif

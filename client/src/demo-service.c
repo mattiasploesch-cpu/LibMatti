@@ -1,11 +1,12 @@
-//
-// Demo services so the matticraft target exercises the whole chain:
-// Stage 1 -> Launcher -> PLUGIN/GAME layer -> launch handler.
-//
-// In Java these providers are found through META-INF/services inside the
-// modlauncher artifact and the mods. C has no service files, so the host
-// registers them here (java/util/ServiceLoader.h).
-//
+
+
+
+
+
+
+
+
+
 
 #include "demo-service.h"
 
@@ -73,27 +74,36 @@ static LIBMATTI_MLA_ITransformationService_Resource *demo_begin_scanning(
 
 // Java: default List<Resource> completeScan(IModuleLayerManager) -> NULL entry
 static LIBMATTI_MLA_ITransformationService demo_service = {
-    demo_name,          // name
-    NULL,               // arguments (default)
-    NULL,               // argumentValues (default)
-    demo_initialize,    // initialize
-    demo_on_load,       // onLoad
-    demo_transformers,  // transformers
-    demo_begin_scanning,// beginScanning
-    NULL                // completeScan (default)
+    demo_name,
+
+    NULL,
+
+    NULL,
+
+    demo_initialize,
+
+    demo_on_load,
+
+    demo_transformers,
+
+    demo_begin_scanning,
+
+    NULL
+
 };
 
-// ---------------------------------------------------------------------------
+
+
 
 void demo_register_services(void)
 {
-    // Java: META-INF/services/cpw.mods.modlauncher.api.ILaunchHandlerService
+// Java: META-INF/services/cpw.mods.modlauncher.api.ILaunchHandlerService
     //       -> the NeoForge target that starts net.neoforged.fml.startup.Client
     LIBMATTI_FML_NeoForgeLaunchHandler *neoforgeHandler = LIBMATTI_FML_NeoForgeLaunchHandler_New();
     LIBMATTI_JU_ServiceLoader_Register("cpw.mods.modlauncher.api.ILaunchHandlerService", &neoforgeHandler->base,
                                        "net.neoforged.fml.startup.NeoForgeLaunchHandler", "neoforge");
 
-    // Java: META-INF/services/cpw.mods.modlauncher.api.ITransformationService
+// Java: META-INF/services/cpw.mods.modlauncher.api.ITransformationService
     //       -> the demo mod's transformation service
     // (the launch handlers of the modlauncher module itself are registered by
     //  Launcher, mirroring the provides of module-info.java)

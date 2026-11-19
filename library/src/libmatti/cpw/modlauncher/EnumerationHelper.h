@@ -1,4 +1,5 @@
-// Port of cpw.mods.modlauncher.EnumerationHelper.
+
+
 
 #ifndef MATTICRAFT_MODLAUNCHER_ENUMERATIONHELPER_H
 #define MATTICRAFT_MODLAUNCHER_ENUMERATIONHELPER_H
@@ -19,4 +20,4 @@ LIBMATTI_ML_Enumeration LIBMATTI_ML_EnumerationHelper_Merge(LIBMATTI_ML_Enumerat
 // Java: static <T> T firstElementOrNull(Enumeration<T> enumeration)
 void *LIBMATTI_ML_EnumerationHelper_FirstElementOrNull(LIBMATTI_ML_Enumeration enumeration);
 
-#endif //MATTICRAFT_MODLAUNCHER_ENUMERATIONHELPER_H
+#endif

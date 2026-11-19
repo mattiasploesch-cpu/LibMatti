@@ -1,6 +1,7 @@
-// Port of java.util.HashMap<K,V> for the K=String case the codebase uses
-// (module names, package names, config names, ...). Keys are copied on put
-// and owned by the map; values stay owned by the caller.
+
+
+
+
 
 #ifndef MATTICRAFT_JAVA_UTIL_HASHMAP_H
 #define MATTICRAFT_JAVA_UTIL_HASHMAP_H
@@ -18,7 +19,7 @@ typedef struct LIBMATTI_JU_HashMapEntry
 typedef struct LIBMATTI_JU_HashMap
 {
     LIBMATTI_JU_HashMapEntry **table;
-    size_t capacity; // Java: table.length, always a power of two
+    size_t capacity;// Java: table.length, always a power of two
     size_t size;
 } LIBMATTI_JU_HashMap;
 
@@ -56,7 +57,8 @@ void LIBMATTI_JU_HashMap_Clear(LIBMATTI_JU_HashMap *map);
 void LIBMATTI_JU_HashMap_ForEach(const LIBMATTI_JU_HashMap *map,
                                  void (*action)(const char *key, void *value, void *self), void *self);
 
-// The keys point into the map's entries; valid until the next modification.
+
+
 char **LIBMATTI_JU_HashMap_KeySet(const LIBMATTI_JU_HashMap *map, size_t *count);
 
-#endif //MATTICRAFT_JAVA_UTIL_HASHMAP_H
+#endif

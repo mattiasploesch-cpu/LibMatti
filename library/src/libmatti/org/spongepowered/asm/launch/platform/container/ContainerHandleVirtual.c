@@ -1,4 +1,5 @@
-// Port of org.spongepowered.asm.launch.platform.container.ContainerHandleVirtual.
+
+
 
 #include "libmatti/org/spongepowered/asm/launch/platform/container/ContainerHandleVirtual.h"
 
@@ -67,7 +68,7 @@ LIBMATTI_SP_ContainerHandleVirtual *LIBMATTI_SP_ContainerHandleVirtual_SetAttrib
 LIBMATTI_SP_ContainerHandleVirtual *LIBMATTI_SP_ContainerHandleVirtual_Add(
     LIBMATTI_SP_ContainerHandleVirtual *handle, LIBMATTI_SP_ContainerHandle *nested)
 {
-    // Java: a LinkedHashSet; the port skips duplicates by pointer
+// Java: a LinkedHashSet; the port skips duplicates by pointer
     for (size_t i = 0; i < handle->nestedContainerCount; i++)
         if (handle->nestedContainers[i] == nested) return handle;
 

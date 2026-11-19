@@ -1,4 +1,5 @@
-// Port of cpw.mods.modlauncher.EnumerationHelper.
+
+
 
 #include "libmatti/cpw/modlauncher/EnumerationHelper.h"
 
@@ -8,7 +9,7 @@
 LIBMATTI_ML_Enumeration LIBMATTI_ML_EnumerationHelper_Merge(LIBMATTI_ML_Enumeration first,
                                                             LIBMATTI_ML_Enumeration second)
 {
-    // Java: hasMoreElements() { return first.hasMoreElements() || second.hasMoreElements(); }
+// Java: hasMoreElements() { return first.hasMoreElements() || second.hasMoreElements(); }
     //       nextElement() { return first.hasMoreElements() ? first.nextElement() : second.nextElement(); }
     LIBMATTI_ML_Enumeration merged;
     merged.count = (first.count - first.position) + (second.count - second.position);

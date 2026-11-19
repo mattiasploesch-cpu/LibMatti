@@ -1,4 +1,5 @@
-// Port of net.minecraft.core.Registry (the static register helpers).
+
+
 
 #include "libmatti/net/minecraft/core/Registry.h"
 

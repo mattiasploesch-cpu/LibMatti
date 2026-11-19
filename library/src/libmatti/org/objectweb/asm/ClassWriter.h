@@ -1,8 +1,9 @@
-// Port of org.objectweb.asm.ClassWriter.
-// Java's ClassWriter collects the class through the ClassVisitor callbacks of
-// ClassNode.accept(writer). In the C port the writer serializes the ClassNode it
-// was created for (ModLauncher always creates the writer from the very node it
-// then accepts into it), which is why New() takes the node.
+
+
+
+
+
+
 
 #ifndef MATTICRAFT_ASM_CLASSWRITER_H
 #define MATTICRAFT_ASM_CLASSWRITER_H
@@ -30,4 +31,4 @@ LIBMATTI_ASMT_ClassNode *LIBMATTI_ASM_ClassWriter_GetClass(const LIBMATTI_ASM_Cl
 // TransformerClassWriter (see TransformerClassWriter.h); the C ClassWriter does not
 // recompute frames, so it never calls it.
 
-#endif //MATTICRAFT_ASM_CLASSWRITER_H
+#endif

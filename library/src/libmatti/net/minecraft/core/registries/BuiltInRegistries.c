@@ -1,9 +1,10 @@
-// Port of net.minecraft.core.registries.BuiltInRegistries.
-// Java's static initialisers become lazy constructors; internalRegister stores the bootstrap
-// loader in the LOADERS map and registers the registry into WRITABLE_REGISTRY, bootStrap()
-// runs the loaders (the per-registry contents are the game port's part), freezes everything
-// and validates. The registration order and the NeoForge events are driven through GameData,
-// exactly like the Java call sites.
+
+
+
+
+
+
+
 
 #include "libmatti/net/minecraft/core/registries/BuiltInRegistries.h"
 
@@ -23,7 +24,7 @@
 typedef struct RegistryLoader
 {
     LIBMATTI_MC_Identifier *identifier;
-    // Java: RegistryBootstrap<T>.run(registry) - NULL in the port until the game port fills
+// Java: RegistryBootstrap<T>.run(registry) - NULL in the port until the game port fills
     // the registry (the contents are Minecraft's part)
     int ran;
     struct RegistryLoader *next;
@@ -65,11 +66,12 @@ static LIBMATTI_MC_MappedRegistry *internal_register(LIBMATTI_MC_ResourceKey *ke
         loadersTail->next = loader;
     loadersTail = loader;
 
-    // Java: WRITABLE_REGISTRY.register((ResourceKey) key, registry, RegistrationInfo.BUILT_IN)
+// Java: WRITABLE_REGISTRY.register((ResourceKey) key, registry, RegistrationInfo.BUILT_IN)
     LIBMATTI_MC_Registry_Register(root_registry(), key, registry);
 
-    // The vanilla registry keys snapshot of RegistryManager and the GameData registration
-    // order are built from the root registry in Java; the port feeds them here
+
+
+
     LIBMATTI_NEOFORGE_RegistryManager_AddVanillaRegistryKey(name);
     LIBMATTI_NEOFORGE_GameData_AddRootRegistry(name);
     free(name);
@@ -106,7 +108,8 @@ static LIBMATTI_MC_MappedRegistry *register_defaulted_intrusive(LIBMATTI_MC_Reso
                                                                      LIBMATTI_MJS_Lifecycle_Stable(), 1));
 }
 
-// One lazy constructor per Java static, in declaration order (the vanilla registration order)
+
+
 
 // Java: public static final DefaultedRegistry<GameEvent> GAME_EVENT = registerDefaulted(Registries.GAME_EVENT, "step", ...)
 LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_BuiltInRegistries_GAME_EVENT(void)
@@ -907,7 +910,7 @@ LIBMATTI_MC_Identifier **LIBMATTI_MC_BuiltInRegistries_GetVanillaRegistrationOrd
     if (rootCount > 0)
     {
         ordered = malloc(sizeof(LIBMATTI_MC_Identifier *) * rootCount);
-        // Java: the WRITABLE_REGISTRY registration order is the vanilla bootstrap order; the
+// Java: the WRITABLE_REGISTRY registration order is the vanilla bootstrap order; the
         // root key set is insertion-ordered in the port, so the order is carried over directly
         for (size_t i = 0; i < rootCount; i++)
             ordered[orderedCount++] = rootKeys[i];
@@ -1022,7 +1025,7 @@ static void create_contents(void)
     LIBMATTI_ML_Logger *logger = LIBMATTI_ML_LogManager_GetLogger();
     for (RegistryLoader *loader = loaders; loader != NULL; loader = loader->next)
     {
-        // Java: RegistryBootstrap.run(registry) - the vanilla content loaders are the
+// Java: RegistryBootstrap.run(registry) - the vanilla content loaders are the
         // Blocks/Items class initialisations; every other registry stays empty until the
         // game port bootstraps it (Java: the supplier returning null logs the error)
         if (loader->identifier != NULL &&
@@ -1065,7 +1068,7 @@ static void validate(void)
         if (entry == NULL)
             continue;
 
-        // Java: if (registry.keySet().isEmpty()) Util.logAndPauseIfInIde("Registry '...' was empty
+// Java: if (registry.keySet().isEmpty()) Util.logAndPauseIfInIde("Registry '...' was empty
         //       after loading") - until the game port bootstraps the vanilla contents every
         //       registry is empty, so the port logs at debug (the ERROR+pause is the IDE path
         //       once real contents exist)
@@ -1076,7 +1079,7 @@ static void validate(void)
             free(name);
         }
 
-        // Java: if (registry instanceof DefaultedRegistry) Objects.requireNonNull(getValue(defaultKey))
+// Java: if (registry instanceof DefaultedRegistry) Objects.requireNonNull(getValue(defaultKey))
         // - reported like the empty check until the game port fills the registries; the game
         // bootstrap makes every default resolvable
         const char *defaultKey = LIBMATTI_MC_MappedRegistry_GetDefaultKey(entry);

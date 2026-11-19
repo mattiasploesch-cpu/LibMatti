@@ -32,25 +32,25 @@ struct LIBMATTI_NEOFORGESPI_IModFile
 {
     void *self;
 
-    // Java: String getId()
+// Java: String getId()
     const char *(*getId)(void *self);
-    // Java: JarContents getContents()
+// Java: JarContents getContents()
     LIBMATTI_FML_JarContents *(*getContents)(void *self);
-    // Java: Supplier<Map<String, Object>> getSubstitutionMap() - invoked to build the map
+// Java: Supplier<Map<String, Object>> getSubstitutionMap() - invoked to build the map
     void *(*getSubstitutionMap)(void *self);
-    // Java: Type getType()
+// Java: Type getType()
     LIBMATTI_NEOFORGESPI_IModFile_Type (*getType)(void *self);
-    // Java: Path getFilePath()
+// Java: Path getFilePath()
     const char *(*getFilePath)(void *self);
-    // Java: List<IModInfo> getModInfos()
+// Java: List<IModInfo> getModInfos()
     LIBMATTI_NEOFORGESPI_IModInfo **(*getModInfos)(void *self, size_t *count);
-    // Java: ModFileScanData getScanResult()
+// Java: ModFileScanData getScanResult()
     LIBMATTI_NEOFORGESPI_ModFileScanData *(*getScanResult)(void *self);
-    // Java: String getFileName()
+// Java: String getFileName()
     const char *(*getFileName)(void *self);
-    // Java: ModFileDiscoveryAttributes getDiscoveryAttributes()
+// Java: ModFileDiscoveryAttributes getDiscoveryAttributes()
     LIBMATTI_NEOFORGESPI_ModFileDiscoveryAttributes *(*getDiscoveryAttributes)(void *self);
-    // Java: IModFileInfo getModFileInfo()
+// Java: IModFileInfo getModFileInfo()
     LIBMATTI_NEOFORGESPI_IModFileInfo *(*getModFileInfo)(void *self);
 };
 
@@ -100,4 +100,4 @@ LIBMATTI_NEOFORGESPI_ModFileDiscoveryAttributes *LIBMATTI_NEOFORGESPI_IModFile_G
 LIBMATTI_NEOFORGESPI_IModFileInfo *LIBMATTI_NEOFORGESPI_IModFile_GetModFileInfo(
     const LIBMATTI_NEOFORGESPI_IModFile *modFile);
 
-#endif //MATTICRAFT_NEOFORGESPI_LOCATING_IMODFILE_H
+#endif

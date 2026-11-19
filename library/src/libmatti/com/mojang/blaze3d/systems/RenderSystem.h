@@ -1,4 +1,5 @@
-// Port of com.mojang.blaze3d.systems.RenderSystem (1.21.11 static API).
+
+
 
 #ifndef MATTICRAFT_BLAZE3D_SYSTEMS_RENDERSYSTEM_H
 #define MATTICRAFT_BLAZE3D_SYSTEMS_RENDERSYSTEM_H

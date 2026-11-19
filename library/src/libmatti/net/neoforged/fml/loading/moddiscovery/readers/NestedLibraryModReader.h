@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.loading.moddiscovery.readers.NestedLibraryModReader.
+
+
 
 #ifndef MATTICRAFT_FML_LOADING_MODDISCOVERY_READERS_NESTEDLIBRARYMODREADER_H
 #define MATTICRAFT_FML_LOADING_MODDISCOVERY_READERS_NESTEDLIBRARYMODREADER_H
@@ -19,4 +20,4 @@ int LIBMATTI_FML_NestedLibraryModReader_GetPriority(void *self);
 // Java: @Override public String toString() { return "nested library mod provider"; }
 const char *LIBMATTI_FML_NestedLibraryModReader_ToString(void);
 
-#endif //MATTICRAFT_FML_LOADING_MODDISCOVERY_READERS_NESTEDLIBRARYMODREADER_H
+#endif

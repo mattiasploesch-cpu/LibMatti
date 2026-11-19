@@ -1,7 +1,8 @@
-// Port of net.minecraft.world.level.block.Block (the registry-data part).
-// Java's Block carries BlockBehaviour.Properties, the StateDefinition and the
-// defaultBlockState; the port keeps the id mapping plus the state machinery and
-// the properties surface (getProperties, getLootTable, getDescriptionId).
+
+
+
+
+
 
 #ifndef MATTICRAFT_MC_WORLD_LEVEL_BLOCK_BLOCK_H
 #define MATTICRAFT_MC_WORLD_LEVEL_BLOCK_BLOCK_H
@@ -17,11 +18,11 @@
 // Java: net.minecraft.world.level.block.Block
 typedef struct LIBMATTI_MC_Block
 {
-    // Java: the registered key (setId in the Properties)
+// Java: the registered key (setId in the Properties)
     LIBMATTI_MC_ResourceKey *key;
-    // Java: protected final BlockBehaviour.Properties properties
+// Java: protected final BlockBehaviour.Properties properties
     LIBMATTI_MC_BlockBehaviour_Properties *properties;
-    // Java: private final StateDefinition<Block, BlockState> stateDefinition
+// Java: private final StateDefinition<Block, BlockState> stateDefinition
     LIBMATTI_MC_StateDefinition *stateDefinition;
 } LIBMATTI_MC_Block;
 

@@ -1,5 +1,6 @@
-// Port of net.minecraft.server.Bootstrap (the subset the registries need: the
-// bootstrapped guard). The item/selector/dispense bootstraps are game-port parts.
+
+
+
 
 #ifndef MATTICRAFT_NET_MINECRAFT_SERVER_BOOTSTRAP_H
 #define MATTICRAFT_NET_MINECRAFT_SERVER_BOOTSTRAP_H
@@ -21,4 +22,4 @@ void LIBMATTI_MC_Bootstrap_BootStrap(void);
 // the guard through this setter
 void LIBMATTI_MC_Bootstrap_MarkBootstrapped(void);
 
-#endif //MATTICRAFT_NET_MINECRAFT_SERVER_BOOTSTRAP_H
+#endif

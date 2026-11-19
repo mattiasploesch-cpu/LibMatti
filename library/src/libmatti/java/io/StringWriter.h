@@ -9,7 +9,7 @@
 typedef struct
 {
     LIBMATTI_JI_Writer base;
-    // Java: private StringBuffer buf
+// Java: private StringBuffer buf
     char *value;
     size_t length;
     size_t capacity;
@@ -22,4 +22,4 @@ void LIBMATTI_JI_StringWriter_Free(LIBMATTI_JI_StringWriter *writer);
 // Java: public String toString()
 const char *LIBMATTI_JI_StringWriter_ToString(const LIBMATTI_JI_StringWriter *writer);
 
-#endif //MATTICRAFT_JAVA_IO_STRINGWRITER_H
+#endif

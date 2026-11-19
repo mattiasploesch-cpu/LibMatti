@@ -1,4 +1,5 @@
-// Port of net.minecraft.util.InclusiveRange (the T = int and T = PackFormat uses).
+
+
 
 #ifndef MATTICRAFT_MC_UTIL_INCLUSIVERANGE_H
 #define MATTICRAFT_MC_UTIL_INCLUSIVERANGE_H
@@ -21,4 +22,4 @@ int LIBMATTI_MC_InclusiveRange_IsValueInRange(const LIBMATTI_MC_InclusiveRange *
 // Java: public InclusiveRange<T> map(Function<T, U>) for the int identity
 LIBMATTI_MC_InclusiveRange LIBMATTI_MC_InclusiveRange_Cloned(const LIBMATTI_MC_InclusiveRange *range);
 
-#endif //MATTICRAFT_MC_UTIL_INCLUSIVERANGE_H
+#endif

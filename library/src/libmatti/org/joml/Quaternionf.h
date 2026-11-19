@@ -1,4 +1,5 @@
-// Port of org.joml.Quaternionf.
+
+
 
 #ifndef MATTICRAFT_JOML_QUATERNIONF_H
 #define MATTICRAFT_JOML_QUATERNIONF_H
@@ -23,7 +24,8 @@ LIBMATTI_JOML_Quaternionf *LIBMATTI_JOML_Quaternionf_RotateAxis(LIBMATTI_JOML_Qu
                                                                 float ay, float az);
 // Java: public Quaterniond rotationAxis / the axis-angle constructor value
 void LIBMATTI_JOML_Quaternionf_FromAxisAngle(LIBMATTI_JOML_Quaternionf *q, float angle, float ax, float ay, float az);
-// The stack variant Matrix4f.rotate uses (no allocation)
+
+
 void LIBMATTI_JOML_Quaternionf_FromAxisAngleStack(LIBMATTI_JOML_Quaternionf *q, float angle, float ax, float ay,
                                                   float az);
 
@@ -43,8 +45,9 @@ LIBMATTI_JOML_Quaternionf *LIBMATTI_JOML_Quaternionf_Slerp(LIBMATTI_JOML_Quatern
 // Java: public Matrix4f get(Matrix4f dest) - the rotation matrix
 LIBMATTI_JOML_Matrix4f *LIBMATTI_JOML_Quaternionf_ToMatrix4f(const LIBMATTI_JOML_Quaternionf *q,
                                                              LIBMATTI_JOML_Matrix4f *dest);
-// Stack variant without allocation
+
+
 LIBMATTI_JOML_Matrix4f *LIBMATTI_JOML_Quaternionf_ToMatrix4fStack(const LIBMATTI_JOML_Quaternionf *q,
                                                                   LIBMATTI_JOML_Matrix4f *dest);
 
-#endif //MATTICRAFT_JOML_QUATERNIONF_H
+#endif

@@ -1,4 +1,5 @@
-// Port of java.security.MessageDigest("SHA-256").
+
+
 
 #include "libmatti/java/security/MessageDigest.h"
 
@@ -145,7 +146,7 @@ LIBMATTI_JS_MessageDigest *LIBMATTI_JS_MessageDigest_GetInstance(const char *alg
     if (strcmp(algorithm, "SHA-256") != 0) return NULL;
 
     LIBMATTI_JS_MessageDigest *digest = calloc(1, sizeof(LIBMATTI_JS_MessageDigest));
-    // Java: MessageDigest is reset on creation
+// Java: MessageDigest is reset on creation
     sha256_reset(&digest->sha256);
     return digest;
 }
@@ -153,7 +154,7 @@ LIBMATTI_JS_MessageDigest *LIBMATTI_JS_MessageDigest_GetInstance(const char *alg
 unsigned char *LIBMATTI_JS_MessageDigest_Digest(LIBMATTI_JS_MessageDigest *digest, const unsigned char *input,
                                                 size_t length, size_t *outLength)
 {
-    // Java: digest(input) resets the digest afterwards
+// Java: digest(input) resets the digest afterwards
     sha256_reset(&digest->sha256);
     if (length > 0) sha256_update(&digest->sha256, input, length);
 

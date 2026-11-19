@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.common.asm.enumextension.EnumPrototype.
+
+
 
 #include "libmatti/net/neoforged/fml/common/asm/enumextension/EnumPrototype.h"
 
@@ -29,13 +30,14 @@ static void error(const char *message, const LIBMATTI_NEOFORGESPI_IModInfo *mod,
 {
     LIBMATTI_FML_ModLoadingIssue *issue = LIBMATTI_FML_ModLoadingIssue_Error(message, params, paramCount);
 
-    // Java: .withAffectedMod(mod) -> affectedMod.getOwningFile().getFile() and its getFilePath()
+// Java: .withAffectedMod(mod) -> affectedMod.getOwningFile().getFile() and its getFilePath()
     LIBMATTI_NEOFORGESPI_IModFileInfo *owningFile = LIBMATTI_NEOFORGESPI_IModInfo_GetOwningFile(mod);
     LIBMATTI_NEOFORGESPI_IModFile *file = LIBMATTI_NEOFORGESPI_IModFileInfo_GetFile(owningFile);
 
     LIBMATTI_FML_ModLoadingIssue *withMod = LIBMATTI_FML_ModLoadingIssue_WithAffectedMod(
         issue, mod, file, LIBMATTI_NEOFORGESPI_IModFile_GetFilePath(file));
-    // Java's record withers are garbage collected; the port frees the issue it replaced.
+
+
     LIBMATTI_FML_ModLoadingIssue_Free(issue);
 
     LIBMATTI_FML_ModLoader_AddLoadingIssue(withMod);
@@ -120,13 +122,13 @@ static LIBMATTI_FML_EnumParameters *loadConstantParameters(const LIBMATTI_NEOFOR
                                                            const char *ctorDesc,
                                                            LIBMATTI_GSON_JsonElement *obj)
 {
-    // Java: Type[] argTypes = Type.getArgumentTypes(ctorDesc);
+// Java: Type[] argTypes = Type.getArgumentTypes(ctorDesc);
     LIBMATTI_ASM_Type *methodType = LIBMATTI_ASM_Type_GetMethodType(ctorDesc);
     size_t argumentCount = 0;
     LIBMATTI_ASM_Type **argumentTypes = LIBMATTI_ASM_Type_GetArgumentTypes(methodType, &argumentCount);
     LIBMATTI_ASM_Type_Free(methodType);
 
-    // Java: if (argTypes.length != obj.size()) { error("fml.modloadingissue.enumextender.argument.constant.count_mismatch", mod, obj.size(), argTypes.length, ctorDesc, fieldName, enumName); return null; }
+// Java: if (argTypes.length != obj.size()) { error("fml.modloadingissue.enumextender.argument.constant.count_mismatch", mod, obj.size(), argTypes.length, ctorDesc, fieldName, enumName); return null; }
     size_t elementCount = LIBMATTI_GSON_JsonElement_ElementCount(obj);
     if (argumentCount != elementCount)
     {
@@ -150,7 +152,7 @@ static LIBMATTI_FML_EnumParameters *loadConstantParameters(const LIBMATTI_NEOFOR
         const char *descriptor = LIBMATTI_ASM_Type_GetDescriptor(argumentTypes[idx]);
         LIBMATTI_GSON_JsonElement *element = LIBMATTI_GSON_JsonElement_ElementAt(obj, idx);
 
-        // Java: switch (argType.getDescriptor())
+// Java: switch (argType.getDescriptor())
         if (strcmp(descriptor, "Z") == 0)
         {
             params[idx].type = LIBMATTI_FML_ENUMPARAMETERS_CONSTANT_BOOLEAN;
@@ -159,7 +161,7 @@ static LIBMATTI_FML_EnumParameters *loadConstantParameters(const LIBMATTI_NEOFOR
         else if (strcmp(descriptor, "C") == 0)
         {
             char *param = LIBMATTI_GSON_JsonElement_GetAsString(element);
-            // Java: if (param.length() != 1) { error("...constant.invalid_char", mod, param, idx, fieldName, enumName); return null; }
+// Java: if (param.length() != 1) { error("...constant.invalid_char", mod, param, idx, fieldName, enumName); return null; }
             if (param == NULL || strlen(param) != 1)
             {
                 char indexText[32];
@@ -223,7 +225,7 @@ static LIBMATTI_FML_EnumParameters *loadConstantParameters(const LIBMATTI_NEOFOR
         }
         else if (!LIBMATTI_GSON_JsonElement_IsJsonNull(element))
         {
-            // Java: error("fml.modloadingissue.enumextender.argument.constant.unsupported_type", mod, argType, idx, fieldName, enumName); return null;
+// Java: error("fml.modloadingissue.enumextender.argument.constant.unsupported_type", mod, argType, idx, fieldName, enumName); return null;
             char indexText[32];
             snprintf(indexText, sizeof(indexText), "%zu", idx);
             const char *args[] = {descriptor, indexText, fieldName, enumName};
@@ -253,7 +255,7 @@ LIBMATTI_FML_EnumPrototype *LIBMATTI_FML_EnumPrototype_Load(const LIBMATTI_NEOFO
 {
     *count = 0;
 
-    // Java: try (Reader reader = resource.bufferedReader()) { ... } catch (Throwable e) { ... }
+// Java: try (Reader reader = resource.bufferedReader()) { ... } catch (Throwable e) { ... }
     size_t length = 0;
     unsigned char *bytes = LIBMATTI_FML_JarResource_ReadAllBytes(resource, &length);
     LIBMATTI_GSON_JsonElement *json = LIBMATTI_GSON_Gson_FromJson(GSON(), (const char *) bytes, length);
@@ -261,7 +263,7 @@ LIBMATTI_FML_EnumPrototype *LIBMATTI_FML_EnumPrototype_Load(const LIBMATTI_NEOFO
 
     if (json == NULL)
     {
-        // Java: catch (Throwable e) { ModLoader.addLoadingIssue(ModLoadingIssue.error("fml.modloadingissue.enumextender.loading_error", resource).withAffectedMod(mod).withCause(e)); return List.of(); }
+// Java: catch (Throwable e) { ModLoader.addLoadingIssue(ModLoadingIssue.error("fml.modloadingissue.enumextender.loading_error", resource).withAffectedMod(mod).withCause(e)); return List.of(); }
         const char *args[] = {RESOURCE_LABEL};
         LIBMATTI_FML_ModLoadingIssue *issue = LIBMATTI_FML_ModLoadingIssue_Error(
             "fml.modloadingissue.enumextender.loading_error", args, 1);
@@ -274,7 +276,7 @@ LIBMATTI_FML_EnumPrototype *LIBMATTI_FML_EnumPrototype_Load(const LIBMATTI_NEOFO
         return NULL;
     }
 
-    // Java: JsonArray entries = json.getAsJsonArray("entries");
+// Java: JsonArray entries = json.getAsJsonArray("entries");
     LIBMATTI_GSON_JsonElement *entries =
         LIBMATTI_GSON_JsonElement_GetAsJsonArray(LIBMATTI_GSON_JsonElement_GetMember(json, "entries"));
     if (entries == NULL)
@@ -298,7 +300,7 @@ LIBMATTI_FML_EnumPrototype *LIBMATTI_FML_EnumPrototype_Load(const LIBMATTI_NEOFO
             LIBMATTI_GSON_JsonElement_GetMember(entry, "enum"));
         if (!isValidClassDescriptor(enumName))
         {
-            // Java: error("fml.modloadingissue.enumextender.invalid_enum_name", mod, enumName);
+// Java: error("fml.modloadingissue.enumextender.invalid_enum_name", mod, enumName);
             const char *args[] = {enumName != NULL ? enumName : ""};
             error("fml.modloadingissue.enumextender.invalid_enum_name", mod, args, 1);
             free(enumName);
@@ -308,7 +310,7 @@ LIBMATTI_FML_EnumPrototype *LIBMATTI_FML_EnumPrototype_Load(const LIBMATTI_NEOFO
         char *fieldName = LIBMATTI_GSON_JsonElement_GetAsString(
             LIBMATTI_GSON_JsonElement_GetMember(entry, "name"));
 
-        // Java: if (!fieldName.toLowerCase(Locale.ROOT).startsWith(mod.getModId())) { error(...field_name.missing_prefix...); continue; }
+// Java: if (!fieldName.toLowerCase(Locale.ROOT).startsWith(mod.getModId())) { error(...field_name.missing_prefix...); continue; }
         char *lowerFieldName = fieldName != NULL ? strdup(fieldName) : strdup("");
         for (char *c = lowerFieldName; *c != '\0'; c++)
             if (*c >= 'A' && *c <= 'Z') *c = (char) (*c - 'A' + 'a');
@@ -324,7 +326,7 @@ LIBMATTI_FML_EnumPrototype *LIBMATTI_FML_EnumPrototype_Load(const LIBMATTI_NEOFO
         }
         free(lowerFieldName);
 
-        // Java: if (!SourceVersion.isIdentifier(fieldName)) { error(...field_name.invalid...); continue; }
+// Java: if (!SourceVersion.isIdentifier(fieldName)) { error(...field_name.invalid...); continue; }
         if (!LIBMATTI_SV_SourceVersion_IsIdentifier(fieldName))
         {
             const char *args[] = {fieldName != NULL ? fieldName : "", enumName};
@@ -367,7 +369,7 @@ LIBMATTI_FML_EnumPrototype *LIBMATTI_FML_EnumPrototype_Load(const LIBMATTI_NEOFO
 
             if (!isValidClassDescriptor(className))
             {
-                // Java: error("...argument.reference.invalid_src_class", mod, className, fieldName, enumName); continue;
+// Java: error("...argument.reference.invalid_src_class", mod, className, fieldName, enumName); continue;
                 const char *args[] = {className != NULL ? className : "", fieldName, enumName};
                 error("fml.modloadingissue.enumextender.argument.reference.invalid_src_class", mod, args, 3);
                 free(className);
@@ -417,7 +419,7 @@ LIBMATTI_FML_EnumPrototype *LIBMATTI_FML_EnumPrototype_Load(const LIBMATTI_NEOFO
             }
             else
             {
-                // Java: error("fml.modloadingissue.enumextender.argument.reference.unexpected_decl", mod, paramElem, fieldName, enumName); continue;
+// Java: error("fml.modloadingissue.enumextender.argument.reference.unexpected_decl", mod, paramElem, fieldName, enumName); continue;
                 char *decl = LIBMATTI_GSON_JsonElement_ToString(paramElem);
                 const char *args[] = {decl != NULL ? decl : "", fieldName, enumName};
                 error("fml.modloadingissue.enumextender.argument.reference.unexpected_decl", mod, args, 3);
@@ -434,7 +436,7 @@ LIBMATTI_FML_EnumPrototype *LIBMATTI_FML_EnumPrototype_Load(const LIBMATTI_NEOFO
         }
         else
         {
-            // Java: error("fml.modloadingissue.enumextender.argument.unexpected_decl", mod, paramElem, fieldName, enumName); continue;
+// Java: error("fml.modloadingissue.enumextender.argument.unexpected_decl", mod, paramElem, fieldName, enumName); continue;
             char *decl = LIBMATTI_GSON_JsonElement_ToString(paramElem);
             const char *args[] = {decl != NULL ? decl : "", fieldName, enumName};
             error("fml.modloadingissue.enumextender.argument.unexpected_decl", mod, args, 3);
@@ -445,7 +447,7 @@ LIBMATTI_FML_EnumPrototype *LIBMATTI_FML_EnumPrototype_Load(const LIBMATTI_NEOFO
             continue;
         }
 
-        // Java: String fullCtorDesc = "(" + ENUM_CTOR_BASE_DESC + ctorDesc.substring(1);
+// Java: String fullCtorDesc = "(" + ENUM_CTOR_BASE_DESC + ctorDesc.substring(1);
         size_t fullLength = strlen(LIBMATTI_FML_ENUMPROTOTYPE_ENUM_CTOR_BASE_DESC) + strlen(ctorDesc) + 1;
         char *fullCtorDesc = malloc(fullLength);
         snprintf(fullCtorDesc, fullLength, "(%s%s", LIBMATTI_FML_ENUMPROTOTYPE_ENUM_CTOR_BASE_DESC,

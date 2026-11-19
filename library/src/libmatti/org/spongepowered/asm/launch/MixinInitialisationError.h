@@ -1,5 +1,6 @@
-// Port of org.spongepowered.asm.launch.MixinInitialisationError and
-// org.spongepowered.asm.mixin.throwables.MixinError (the throwables the loader layer uses).
+
+
+
 
 #ifndef MATTICRAFT_SP_ASM_LAUNCH_MIXININITIALISATIONERROR_H
 #define MATTICRAFT_SP_ASM_LAUNCH_MIXININITIALISATIONERROR_H
@@ -27,4 +28,4 @@ LIBMATTI_SP_MixinError *LIBMATTI_SP_MixinError_NewWithCause(LIBMATTI_JL_Throwabl
 LIBMATTI_SP_MixinError *LIBMATTI_SP_MixinError_New(const char *message);
 void LIBMATTI_SP_MixinError_Free(LIBMATTI_SP_MixinError *error);
 
-#endif //MATTICRAFT_SP_ASM_LAUNCH_MIXININITIALISATIONERROR_H
+#endif

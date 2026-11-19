@@ -13,7 +13,7 @@ LIBMATTI_JU_Optional LIBMATTI_JU_Optional_Of(void *value)
 {
     if (value == NULL)
     {
-        // Java: throw new NullPointerException("No value present")
+// Java: throw new NullPointerException("No value present")
         fprintf(stderr, "Exception in thread \"main\" java.lang.NullPointerException: No value present\n");
         abort();
     }
@@ -31,7 +31,7 @@ void *LIBMATTI_JU_Optional_Get(const LIBMATTI_JU_Optional *optional)
 {
     if (optional->value == NULL)
     {
-        // Java: throw new NoSuchElementException("No value present")
+// Java: throw new NoSuchElementException("No value present")
         fprintf(stderr, "Exception in thread \"main\" java.util.NoSuchElementException: No value present\n");
         abort();
     }

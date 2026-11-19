@@ -1,4 +1,5 @@
-// Port of org.joml.Vector3f.
+
+
 
 #ifndef MATTICRAFT_JOML_VECTOR3F_H
 #define MATTICRAFT_JOML_VECTOR3F_H
@@ -59,4 +60,4 @@ LIBMATTI_JOML_Vector3f *LIBMATTI_JOML_Vector3f_Floor(LIBMATTI_JOML_Vector3f *v);
 LIBMATTI_JOML_Vector3f *LIBMATTI_JOML_Vector3f_Ceil(LIBMATTI_JOML_Vector3f *v);
 LIBMATTI_JOML_Vector3f *LIBMATTI_JOML_Vector3f_Fabs(LIBMATTI_JOML_Vector3f *v);
 
-#endif //MATTICRAFT_JOML_VECTOR3F_H
+#endif

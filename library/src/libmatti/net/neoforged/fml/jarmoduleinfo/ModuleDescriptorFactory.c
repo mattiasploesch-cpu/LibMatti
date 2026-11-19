@@ -59,9 +59,10 @@ static int isAlphaNumeric(char c)
     return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || isDigit(c);
 }
 
-// ---------------------------------------------------------------------------
-// Pattern equivalents from jdk.internal.module.ModulePath
-// ---------------------------------------------------------------------------
+
+
+
+
 
 // Java: private static final Pattern DASH_VERSION = Pattern.compile("-([.\\d]+)")
 static const char *findDashVersion(const char *name)
@@ -101,13 +102,13 @@ static char *safeParseVersion(const char *ver, const char *filename)
     size_t length = strlen(ver);
     if (length == 0)
     {
-        // Java: throw new IllegalArgumentException("Error parsing version info from " + filename + ": Empty Version String")
+// Java: throw new IllegalArgumentException("Error parsing version info from " + filename + ": Empty Version String")
         LIBMATTI_ML_Logger_Error(LOGGER(), NULL,
                                  "Error parsing version info from {}: Empty Version String", filename);
         return NULL;
     }
 
-    // Java: attempt to filter out the common wrong file names
+// Java: attempt to filter out the common wrong file names
     char *trimmed = strdup(ver);
     char last = trimmed[length - 1];
     if (last == '.' || last == '+' || last == '-')
@@ -122,13 +123,13 @@ static char *safeParseVersion(const char *ver, const char *filename)
         trimmed[length - 1] = '\0';
     }
 
-    // Java: ModuleDescriptor.Version.parse(ver).toString()
+// Java: ModuleDescriptor.Version.parse(ver).toString()
     LIBMATTI_JL_ModuleDescriptor_Version *parsed = LIBMATTI_JL_ModuleDescriptor_Version_Parse(trimmed);
     free(trimmed);
 
     if (parsed == NULL)
     {
-        // Java: catch (IllegalArgumentException e) { throw new IllegalArgumentException("Error parsing version info from " + filename + " (" + ver + "): " + e.getMessage(), e); }
+// Java: catch (IllegalArgumentException e) { throw new IllegalArgumentException("Error parsing version info from " + filename + " (" + ver + "): " + e.getMessage(), e); }
         LIBMATTI_ML_Logger_Error(LOGGER(), NULL, "Error parsing version info from {} ({})", filename, ver);
         return NULL;
     }
@@ -166,20 +167,20 @@ char *LIBMATTI_FML_ModuleDescriptorFactory_CleanModuleName(const char *name)
 {
     char *mn = replaceNonAlphanumeric(name);
 
-    // Java: collapse repeating dots
+// Java: collapse repeating dots
     collapseRepeatingDots(mn);
 
-    // Java: drop leading dots
+// Java: drop leading dots
     char *start = mn;
     while (*start == '.')
         start++;
 
-    // Java: drop trailing dots
+// Java: drop trailing dots
     size_t length = strlen(start);
     while (length > 0 && start[length - 1] == '.')
         start[--length] = '\0';
 
-    // Java: NUMBERLIKE_PARTS = Pattern.compile("(?<=^|\\.)([0-9]+)") -> replaceAll("_$1")
+// Java: NUMBERLIKE_PARTS = Pattern.compile("(?<=^|\\.)([0-9]+)") -> replaceAll("_$1")
     //       KEYWORD_PARTS = Pattern.compile("(?<=^|\\.)(kw)(?=\\.|$)") -> replaceAll("_$1")
     char *result = calloc(1, strlen(start) * 2 + 1);
     size_t resultLength = 0;
@@ -190,13 +191,13 @@ char *LIBMATTI_FML_ModuleDescriptorFactory_CleanModuleName(const char *name)
         const char *dot = strchr(segment, '.');
         size_t segmentLength = dot != NULL ? (size_t)(dot - segment) : strlen(segment);
 
-        // Java: a segment made up entirely of digits gets an underscore prefix
+// Java: a segment made up entirely of digits gets an underscore prefix
         int allDigits = segmentLength > 0;
         for (size_t i = 0; i < segmentLength; i++)
             if (!isDigit(segment[i]))
                 allDigits = 0;
 
-        // Java: a segment that is a Java keyword gets an underscore prefix
+// Java: a segment that is a Java keyword gets an underscore prefix
         char *segmentCopy = malloc(segmentLength + 1);
         memcpy(segmentCopy, segment, segmentLength);
         segmentCopy[segmentLength] = '\0';
@@ -227,7 +228,7 @@ char *LIBMATTI_FML_ModuleDescriptorFactory_CleanModuleName(const char *name)
 // Java: static NameAndVersion computeNameAndVersion(Path path)
 LIBMATTI_FML_NameAndVersion *LIBMATTI_FML_ModuleDescriptorFactory_ComputeNameAndVersion(const char *path)
 {
-    // Java: detect Maven-like paths
+// Java: detect Maven-like paths
     char *versionMaybe = LIBMATTI_JNF_Path_GetParent(path);
     if (versionMaybe != NULL)
     {
@@ -246,14 +247,14 @@ LIBMATTI_FML_NameAndVersion *LIBMATTI_FML_ModuleDescriptorFactory_ComputeNameAnd
 
                 if (strncmp(fileName, prefix, prefixLength) == 0)
                 {
-                    // Java: var mat = MODULE_VERSION.matcher(ver); if (mat.find()) { potential = ver.substring(mat.start()); ... }
+// Java: var mat = MODULE_VERSION.matcher(ver); if (mat.find()) { potential = ver.substring(mat.start()); ... }
                     const char *match = findModuleVersion(versionName);
                     LIBMATTI_FML_NameAndVersion *result = calloc(1, sizeof(LIBMATTI_FML_NameAndVersion));
                     result->name = LIBMATTI_FML_ModuleDescriptorFactory_CleanModuleName(artifactNameMaybe);
 
                     if (match != NULL)
                         result->version = safeParseVersion(match, fileName);
-                    // Java: else return new NameAndVersion(cleanModuleName(name), null)
+// Java: else return new NameAndVersion(cleanModuleName(name), null)
 
                     free(prefix);
                     free(fileName);
@@ -275,12 +276,12 @@ LIBMATTI_FML_NameAndVersion *LIBMATTI_FML_ModuleDescriptorFactory_ComputeNameAnd
     }
     free(versionMaybe);
 
-    // Java: fallback parsing
+// Java: fallback parsing
     char *fileName = LIBMATTI_JNF_Path_GetFileName(path);
     if (fileName == NULL)
         fileName = strdup(path);
 
-    // Java: strip extension if possible
+// Java: strip extension if possible
     char *dot = strrchr(fileName, '.');
     if (dot != NULL && dot != fileName)
         *dot = '\0';
@@ -292,7 +293,7 @@ LIBMATTI_FML_NameAndVersion *LIBMATTI_FML_ModuleDescriptorFactory_ComputeNameAnd
     {
         result->version = safeParseVersion(dashVersion + 1, fileName);
 
-        // Java: var name = mat.replaceAll("") - remove every dash-version match
+// Java: var name = mat.replaceAll("") - remove every dash-version match
         char *name = strdup(fileName);
         char *dash = (char *)findDashVersion(name);
         if (dash != NULL)
@@ -322,12 +323,12 @@ static void parseServiceFile(const char *serviceName, const char *content, Strin
 
     while (line != NULL)
     {
-        // Java: strip comments
+// Java: strip comments
         char *comment = strchr(line, '#');
         if (comment != NULL)
             *comment = '\0';
 
-        // Java: line = line.trim() - trim whitespace *after* removing the comment
+// Java: line = line.trim() - trim whitespace *after* removing the comment
         char *start = line;
         while (*start != '\0' && *start <= ' ')
             start++;
@@ -341,7 +342,7 @@ static void parseServiceFile(const char *serviceName, const char *content, Strin
             char *packageName = LIBMATTI_FML_JlsConstants_GetPackageName(start);
             if (!setContains(packageNames, packageName))
             {
-                // Java: throw new InvalidModuleDescriptorException("Service provider file " + serviceName + " contains service that is not in this Jar file: " + line)
+// Java: throw new InvalidModuleDescriptorException("Service provider file " + serviceName + " contains service that is not in this Jar file: " + line)
                 LIBMATTI_ML_Logger_Error(
                     LOGGER(), NULL,
                     "Service provider file {} contains service that is not in this Jar file: {}", serviceName,
@@ -361,7 +362,7 @@ static void parseServiceFile(const char *serviceName, const char *content, Strin
 
     if (providerClassCount > 0)
     {
-        // Java: builder.provides(serviceName, providerClasses)
+// Java: builder.provides(serviceName, providerClasses)
         LIBMATTI_JL_ModuleDescriptor_AddProvides(builder, serviceName, providerClasses, providerClassCount);
     }
 
@@ -373,7 +374,7 @@ static void parseServiceFile(const char *serviceName, const char *content, Strin
 typedef struct
 {
     StringSet *packageNames;
-    // Java: Map<String, JarResource> serviceProviderFiles
+// Java: Map<String, JarResource> serviceProviderFiles
     char **serviceNames;
     char **serviceContents;
     size_t serviceCount;
@@ -389,7 +390,7 @@ static void scanAutomaticModuleVisit(const char *relativePath, LIBMATTI_FML_JarR
         const char *filename = strrchr(relativePath, '/');
         filename = filename != NULL ? filename + 1 : relativePath;
 
-        // Java: ignore files in META-INF/services/ whose filenames are not valid Java class names
+// Java: ignore files in META-INF/services/ whose filenames are not valid Java class names
         if (!LIBMATTI_FML_JlsConstants_IsTypeName(filename))
             return;
 
@@ -398,7 +399,7 @@ static void scanAutomaticModuleVisit(const char *relativePath, LIBMATTI_FML_JarR
         if (bytes == NULL)
             return;
 
-        // Java: resource.retain() - the port copies the content of the retained resource
+// Java: resource.retain() - the port copies the content of the retained resource
         char *content = calloc(1, length + 1);
         memcpy(content, bytes, length);
         free(bytes);
@@ -411,7 +412,7 @@ static void scanAutomaticModuleVisit(const char *relativePath, LIBMATTI_FML_JarR
     }
     else if (strlen(relativePath) >= 6 && strcmp(relativePath + strlen(relativePath) - 6, ".class") == 0)
     {
-        // Java: in automatic modules, only packages with .class files are considered
+// Java: in automatic modules, only packages with .class files are considered
         const char *lastSeparator = strrchr(relativePath, '/');
         if (lastSeparator == NULL || lastSeparator == relativePath)
             return;
@@ -435,7 +436,7 @@ void LIBMATTI_FML_ModuleDescriptorFactory_ScanAutomaticModule(LIBMATTI_FML_JarCo
                                                              const char **excludedRootDirectories,
                                                              size_t excludedRootDirectoryCount)
 {
-    // Java: Set<String> ignoredRootDirs = Set.of(excludedRootDirectories) - unused in the Java method too
+// Java: Set<String> ignoredRootDirs = Set.of(excludedRootDirectories) - unused in the Java method too
     (void) excludedRootDirectories;
     (void) excludedRootDirectoryCount;
 
@@ -444,7 +445,7 @@ void LIBMATTI_FML_ModuleDescriptorFactory_ScanAutomaticModule(LIBMATTI_FML_JarCo
 
     LIBMATTI_FML_JarContents_VisitContent(jar, scanAutomaticModuleVisit, &context);
 
-    // Java: builder.packages(packageNames)
+// Java: builder.packages(packageNames)
     for (size_t i = 0; i < packageNames.count; i++)
         LIBMATTI_JL_ModuleDescriptor_AddPackage(builder, packageNames.values[i]);
 
@@ -472,7 +473,7 @@ static void scanModulePackagesVisit(const char *relativePath, LIBMATTI_FML_JarRe
 
     const char *lastSeparator = strrchr(relativePath, '/');
     if (lastSeparator == NULL || lastSeparator == relativePath)
-        return; // Java: file is in the default package
+        return;// Java: file is in the default package
 
     size_t relativeDirLength = (size_t)(lastSeparator - relativePath);
     char *packageName = malloc(relativeDirLength + 1);

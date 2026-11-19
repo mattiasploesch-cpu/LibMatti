@@ -1,12 +1,14 @@
-// Port of net.minecraft.core.component.PatchedDataComponentMap and DataComponentPatch.
+
+
 
 #include "libmatti/net/minecraft/core/component/PatchedDataComponentMap.h"
 
 #include <stdlib.h>
 
-// ---------------------------------------------------------------------------
-// DataComponentPatch
-// ---------------------------------------------------------------------------
+
+
+
+
 
 LIBMATTI_MC_DataComponentPatch *LIBMATTI_MC_DataComponentPatch_Empty(void)
 {
@@ -82,16 +84,17 @@ void LIBMATTI_MC_DataComponentPatch_Free(LIBMATTI_MC_DataComponentPatch *patch)
     free(patch);
 }
 
-// ---------------------------------------------------------------------------
-// PatchedDataComponentMap
-// ---------------------------------------------------------------------------
+
+
+
+
 
 LIBMATTI_MC_PatchedDataComponentMap *LIBMATTI_MC_PatchedDataComponentMap_New(
         const LIBMATTI_MC_DataComponentMap *prototype)
 {
     LIBMATTI_MC_PatchedDataComponentMap *map = calloc(1, sizeof(LIBMATTI_MC_PatchedDataComponentMap));
     map->prototype = prototype;
-    // Java: this(prototype, emptyMap, true) - copy-on-write until the first mutation
+// Java: this(prototype, emptyMap, true) - copy-on-write until the first mutation
     map->copyOnWrite = true;
     return map;
 }

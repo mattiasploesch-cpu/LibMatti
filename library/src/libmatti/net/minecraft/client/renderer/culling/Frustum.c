@@ -1,8 +1,9 @@
-// Port of net.minecraft.client.renderer.culling.Frustum (implementation).
-// calculateFrustum is matrix.mul(projection) like Java (view * projection in
-// column-major terms), the view vector is the transformTranspose of (0,0,1,0)
-// and the cube tests convert world coordinates to camera-relative floats
-// exactly like Java's cubeInFrustum/pointInFrustum/offset helpers.
+
+
+
+
+
+
 
 #include "libmatti/net/minecraft/client/renderer/culling/Frustum.h"
 
@@ -20,8 +21,9 @@ static void calculate_frustum(LIBMATTI_MC_Frustum *frustum,
 {
     LIBMATTI_JOML_Matrix4f_Mul(projection, view, &frustum->matrix);
     LIBMATTI_JOML_FrustumIntersection_Set(&frustum->intersection, &frustum->matrix);
-    // JOML: transformTranspose((0,0,1,0)) -> dest = (m20, m21, m22, m23)
-    // (JOML names mXY column X, row Y - same convention as the C struct).
+
+
+
     frustum->viewVector.x = frustum->matrix.m20;
     frustum->viewVector.y = frustum->matrix.m21;
     frustum->viewVector.z = frustum->matrix.m22;

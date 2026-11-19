@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.classloading.JarContentsModule.
+
+
 
 #ifndef MATTICRAFT_FML_CLASSLOADING_JARCONTENTSMODULE_H
 #define MATTICRAFT_FML_CLASSLOADING_JARCONTENTSMODULE_H
@@ -21,4 +22,4 @@ LIBMATTI_FML_JarContentsModule *LIBMATTI_FML_JarContentsModule_NewWithDescriptor
 // Java: public String moduleName() { return moduleDescriptor.name(); }
 const char *LIBMATTI_FML_JarContentsModule_ModuleName(const LIBMATTI_FML_JarContentsModule *module);
 
-#endif //MATTICRAFT_FML_CLASSLOADING_JARCONTENTSMODULE_H
+#endif

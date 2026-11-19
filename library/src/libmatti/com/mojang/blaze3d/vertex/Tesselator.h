@@ -1,5 +1,6 @@
-// Port of com.mojang.blaze3d.vertex.Tesselator - the immediate-mode entry:
-// one shared ByteBufferBuilder the BufferBuilders write into.
+
+
+
 
 #ifndef MATTICRAFT_BLAZE3D_VERTEX_TESSELATOR_H
 #define MATTICRAFT_BLAZE3D_VERTEX_TESSELATOR_H

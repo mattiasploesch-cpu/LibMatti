@@ -1,4 +1,5 @@
-// Port of net.minecraft.core.MappedRegistry (with the DefaultedMappedRegistry fallbacks).
+
+
 
 #include "libmatti/net/minecraft/core/MappedRegistry.h"
 
@@ -46,7 +47,7 @@ static int resource_key_equals_entry(const void *a, const void *b)
 {
     if (a == b) return 1;
     if (a == NULL || b == NULL) return 0;
-    // Java: ResourceKey equality is the interned identity; the port compares the pair so
+// Java: ResourceKey equality is the interned identity; the port compares the pair so
     // keys built through different paths still find the same entry
     return LIBMATTI_MC_Identifier_Equals(((const LIBMATTI_MC_ResourceKey *) a)->registryName,
                                          ((const LIBMATTI_MC_ResourceKey *) b)->registryName) &&
@@ -68,7 +69,8 @@ LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_MappedRegistry_New(LIBMATTI_MC_ResourceK
     return registry;
 }
 
-// The port's DefaultedMappedRegistry constructor
+
+
 LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_DefaultedMappedRegistry_New(const char *defaultKey,
                                                                     LIBMATTI_MC_ResourceKey *key,
                                                                     LIBMATTI_MJS_Lifecycle lifecycle,
@@ -82,8 +84,9 @@ LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_DefaultedMappedRegistry_New(const char *
 void LIBMATTI_MC_MappedRegistry_Free(LIBMATTI_MC_MappedRegistry *registry)
 {
     if (registry == NULL) return;
-    // The ResourceKeys are interned (owned by the intern table); the holder records, the
-    // identifier copies in byLocation and the info array are this registry's own.
+
+
+
     for (size_t i = 0; i < registry->byIdCount; i++)
         free(registry->byId[i]);
     free(registry->byId);
@@ -156,7 +159,7 @@ LIBMATTI_MC_HolderReference *LIBMATTI_MC_MappedRegistry_Register(LIBMATTI_MC_Map
     LIBMATTI_MC_HolderReference *reference = NULL;
     if (registry->intrusiveHolders)
     {
-        // Java: the intrusive holder was created through createIntrusiveHolder(value) before
+// Java: the intrusive holder was created through createIntrusiveHolder(value) before
         // the register call; the port binds it here (the holder for the value is the registry's)
         reference = map_get((void **) registry->byValue.keys, (void **) registry->byValue.values,
                             registry->byValue.count, value, pointer_equals);
@@ -377,7 +380,7 @@ LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_MappedRegistry_Freeze(LIBMATTI_MC_Mapped
         return registry;
 
     registry->frozen = 1;
-    // Java: this.byValue.forEach((value, reference) -> reference.bindValue(value))
+// Java: this.byValue.forEach((value, reference) -> reference.bindValue(value))
     for (size_t i = 0; i < registry->byValue.count; i++)
     {
         LIBMATTI_MC_HolderReference *reference = registry->byValue.values[i];
@@ -385,7 +388,7 @@ LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_MappedRegistry_Freeze(LIBMATTI_MC_Mapped
         reference->bound = 1;
     }
 
-    // Java: collect the unbound holders' identifiers, sorted, and throw
+// Java: collect the unbound holders' identifiers, sorted, and throw
     for (size_t i = 0; i < registry->byKey.count; i++)
     {
         if (!registry->byKey.values[i]->bound)

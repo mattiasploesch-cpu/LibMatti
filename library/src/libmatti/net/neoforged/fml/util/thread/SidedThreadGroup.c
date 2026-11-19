@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.util.thread.SidedThreadGroup.
+
+
 
 #include "libmatti/net/neoforged/fml/util/thread/SidedThreadGroup.h"
 
@@ -52,7 +53,7 @@ LIBMATTI_FML_SidedThreadGroup *LIBMATTI_FML_SidedThreadGroup_GetThreadGroup(cons
 // Java: @Override public Thread newThread(Runnable runnable)
 typedef struct
 {
-    // Java: new Thread(this, runnable)
+// Java: new Thread(this, runnable)
     LIBMATTI_JL_Thread *thread;
     void (*runnable)(void *);
     void *userdata;

@@ -1,4 +1,5 @@
-// Port of net.minecraft.world.item.equipment.ArmorType.
+
+
 
 #ifndef MATTICRAFT_MC_WORLD_ITEM_EQUIPMENT_ARMORTYPE_H
 #define MATTICRAFT_MC_WORLD_ITEM_EQUIPMENT_ARMORTYPE_H
@@ -29,4 +30,4 @@ const char *LIBMATTI_MC_ArmorType_GetName(LIBMATTI_MC_ArmorType type);
 }
 #endif
 
-#endif //MATTICRAFT_MC_WORLD_ITEM_EQUIPMENT_ARMORTYPE_H
+#endif

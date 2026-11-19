@@ -1,4 +1,5 @@
-// Port of net.minecraft.world.entity.EntityAttachment(s) (implementation).
+
+
 
 #include "libmatti/net/minecraft/world/entity/EntityAttachments.h"
 
@@ -19,18 +20,21 @@ static void fallback_points(LIBMATTI_MC_EntityAttachment kind, float width, floa
     {
         case LIBMATTI_MC_EntityAttachment_PASSENGER:
         case LIBMATTI_MC_EntityAttachment_NAME_TAG:
-            // AT_HEIGHT: one point at (0, height, 0)
+
+
             out[0] = LIBMATTI_MC_Vec3_New(0.0, (double) height, 0.0);
             *outCount = 1;
             break;
         case LIBMATTI_MC_EntityAttachment_WARDEN_CHEST:
-            // AT_CENTER: one point at (0, height / 2, 0)
+
+
             out[0] = LIBMATTI_MC_Vec3_New(0.0, (double) (height / 2.0f), 0.0);
             *outCount = 1;
             break;
         case LIBMATTI_MC_EntityAttachment_VEHICLE:
         default:
-            // AT_FEET: the zero point
+
+
             out[0] = LIBMATTI_MC_Vec3_New(0.0, 0.0, 0.0);
             *outCount = 1;
             break;
@@ -47,7 +51,8 @@ LIBMATTI_MC_EntityAttachments *LIBMATTI_MC_EntityAttachments_CreateDefault(float
 
 struct LIBMATTI_MC_EntityAttachmentsBuilder
 {
-    // per kind: one Vec3 array each (the struct hands the arrays over)
+
+
     LIBMATTI_MC_Vec3 *points[LIBMATTI_MC_EntityAttachment_COUNT];
     size_t pointCount[LIBMATTI_MC_EntityAttachment_COUNT];
     size_t pointCapacity[LIBMATTI_MC_EntityAttachment_COUNT];
@@ -108,7 +113,7 @@ LIBMATTI_MC_EntityAttachments *LIBMATTI_MC_EntityAttachmentsBuilder_Build(
         }
         free(builder);
     }
-    // Java: the kinds without explicit points take their fallback lists
+// Java: the kinds without explicit points take their fallback lists
     for (int kind = 0; kind < LIBMATTI_MC_EntityAttachment_COUNT; kind++)
     {
         if (attachments->pointCount[kind] > 0)

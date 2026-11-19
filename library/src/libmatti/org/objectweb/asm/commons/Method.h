@@ -1,4 +1,5 @@
-// Port of org.objectweb.asm.commons.Method.
+
+
 
 #ifndef MATTICRAFT_ASM_COMMONS_METHOD_H
 #define MATTICRAFT_ASM_COMMONS_METHOD_H
@@ -13,9 +14,9 @@
 // Java: public final class Method
 typedef struct LIBMATTI_ASM_COMMONS_Method
 {
-    // Java: private final String name
+// Java: private final String name
     char *name;
-    // Java: private final String descriptor
+// Java: private final String descriptor
     char *descriptor;
 } LIBMATTI_ASM_COMMONS_Method;
 
@@ -48,4 +49,4 @@ int LIBMATTI_ASM_COMMONS_Method_Equals(const LIBMATTI_ASM_COMMONS_Method *method
 // Java: @Override public int hashCode()
 int LIBMATTI_ASM_COMMONS_Method_HashCode(const LIBMATTI_ASM_COMMONS_Method *method);
 
-#endif //MATTICRAFT_ASM_COMMONS_METHOD_H
+#endif

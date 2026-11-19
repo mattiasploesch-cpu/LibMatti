@@ -3,4 +3,4 @@
 
 typedef struct LIBMATTI_L4J_Configuration LIBMATTI_L4J_Configuration;
 
-#endif //MATTICRAFT_L4J_CONFIGURATION_H
+#endif

@@ -1,5 +1,6 @@
-// Port of net.minecraft.world.level.BlockAndTintGetter (the slice the render
-// paths call directly).
+
+
+
 
 #include "libmatti/net/minecraft/world/level/BlockAndTintGetter.h"
 

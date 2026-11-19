@@ -20,4 +20,4 @@ LIBMATTI_JL_ModuleDescriptor *LIBMATTI_JL_ModuleDescriptor_Read(const unsigned c
 LIBMATTI_JL_ModuleDescriptor *LIBMATTI_JL_ModuleDescriptor_ReadWithFlags(const unsigned char *bytes, size_t length,
                                                                          int strict);
 
-#endif //MATTICRAFT_MODULEDESCRIPTORREAD_H
+#endif

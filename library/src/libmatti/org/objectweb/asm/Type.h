@@ -1,4 +1,5 @@
-// Port of org.objectweb.asm.Type.
+
+
 
 #ifndef MATTICRAFT_ASM_TYPE_H
 #define MATTICRAFT_ASM_TYPE_H
@@ -65,4 +66,4 @@ int LIBMATTI_ASM_Type_Equals(const LIBMATTI_ASM_Type *type, const LIBMATTI_ASM_T
 
 void LIBMATTI_ASM_Type_Free(LIBMATTI_ASM_Type *type);
 
-#endif //MATTICRAFT_ASM_TYPE_H
+#endif

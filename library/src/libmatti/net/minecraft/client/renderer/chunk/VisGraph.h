@@ -1,5 +1,6 @@
-// Port of net.minecraft.client.renderer.chunk.VisGraph - the 16x16x16
-// visibility flood fill over the opaque positions of one section.
+
+
+
 
 #ifndef MATTICRAFT_MC_CLIENT_RENDERER_CHUNK_VISGRAPH_H
 #define MATTICRAFT_MC_CLIENT_RENDERER_CHUNK_VISGRAPH_H
@@ -30,4 +31,4 @@ LIBMATTI_MC_VisibilitySet *LIBMATTI_MC_VisGraph_Resolve(LIBMATTI_MC_VisGraph *gr
 }
 #endif
 
-#endif //MATTICRAFT_MC_CLIENT_RENDERER_CHUNK_VISGRAPH_H
+#endif

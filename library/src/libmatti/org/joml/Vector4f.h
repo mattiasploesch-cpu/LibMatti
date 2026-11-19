@@ -1,4 +1,5 @@
-// Port of org.joml.Vector4f.
+
+
 
 #ifndef MATTICRAFT_JOML_VECTOR4F_H
 #define MATTICRAFT_JOML_VECTOR4F_H
@@ -27,4 +28,4 @@ LIBMATTI_JOML_Vector4f *LIBMATTI_JOML_Vector4f_Normalize(LIBMATTI_JOML_Vector4f 
 // Java: public float dot(Vector4fc v)
 float LIBMATTI_JOML_Vector4f_Dot(const LIBMATTI_JOML_Vector4f *a, const LIBMATTI_JOML_Vector4f *b);
 
-#endif //MATTICRAFT_JOML_VECTOR4F_H
+#endif

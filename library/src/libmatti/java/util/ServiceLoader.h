@@ -1,8 +1,9 @@
-// Port of java.util.ServiceLoader.
-// Java discovers providers through the module layer and META-INF/services. In
-// pure C there is no module system, so the port keeps the ServiceLoader surface
-// and lets the host register the providers (the same seam Stage 1 uses to hand
-// the modules to ModLauncher).
+
+
+
+
+
+
 
 #ifndef MATTICRAFT_SERVICELOADER_H
 #define MATTICRAFT_SERVICELOADER_H
@@ -15,7 +16,7 @@ typedef struct
     const char *serviceType;
     void *provider;
     const char *providerClassName;
-    // Java: clazz.getModule().getLayer().configuration().findModule(...).reference().location()
+// Java: clazz.getModule().getLayer().configuration().findModule(...).reference().location()
     const char *location;
 } LIBMATTI_JU_ServiceLoader_Provider;
 
@@ -45,4 +46,4 @@ const char *LIBMATTI_JU_ServiceLoader_LocationForClass(const char *providerClass
 
 void LIBMATTI_JU_ServiceLoader_Free(LIBMATTI_JU_ServiceLoader *loader);
 
-#endif //MATTICRAFT_SERVICELOADER_H
+#endif

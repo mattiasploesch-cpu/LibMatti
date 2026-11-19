@@ -11,7 +11,7 @@ LIBMATTI_CL_ModularURLHandler *LIBMATTI_CL_ModularURLHandler_GetInstance(void)
 
 void LIBMATTI_CL_ModularURLHandler_InitFrom(LIBMATTI_CL_ModularURLHandler *handler, LIBMATTI_CL_ModuleLayer *layer)
 {
-    // Java: new HashMap<>(); unionHandler is required for SJH to work
+// Java: new HashMap<>(); unionHandler is required for SJH to work
     // Java: ServiceLoader.load(IURLProvider.class).stream().map(Provider::get)
     //       .forEach(h -> handlers.putIfAbsent(h.protocol(), h))
     // the port's IURLProvider comes from the union fs module (bsl/sjh): the
@@ -24,7 +24,7 @@ void LIBMATTI_CL_ModularURLHandler_InitFrom(LIBMATTI_CL_ModularURLHandler *handl
 
 LIBMATTI_CL_FunctionURLStreamHandler *LIBMATTI_CL_ModularURLHandler_CreateURLStreamHandler(const LIBMATTI_CL_ModularURLHandler *handler, const char *protocol)
 {
-    // Java: if (handlers == null) return null; if (!handlers.containsKey(protocol)) return null;
+// Java: if (handlers == null) return null; if (!handlers.containsKey(protocol)) return null;
     for (size_t i = 0; i < handler->count; i++)
     {
         if (strcmp(handler->protocols[i], protocol) == 0)
@@ -47,12 +47,12 @@ LIBMATTI_CL_FunctionURLConnection *LIBMATTI_CL_FunctionURLStreamHandler_OpenConn
 
 void LIBMATTI_CL_FunctionURLConnection_Connect(const LIBMATTI_CL_FunctionURLConnection *connection)
 {
-    (void)connection; // Java: empty body
+    (void)connection;// Java: empty body
 }
 
 LIBMATTI_JI_InputStream *LIBMATTI_CL_FunctionURLConnection_GetInputStream(const LIBMATTI_CL_FunctionURLConnection *connection)
 {
-    // Java: provider.inputStreamFunction().apply(url)
+// Java: provider.inputStreamFunction().apply(url)
     return connection->provider->inputStreamFunction(connection->url);
 }
 

@@ -1,6 +1,7 @@
-// Port of the ModelBakery's vanilla block model bootstrap slice: the demo
-// level's models (stone, dirt) baked against the atlas. Java reads them from
-// the resource pack; the port bakes the embedded VanillaModels JSONs.
+
+
+
+
 
 #ifndef MATTICRAFT_MC_SERVER_BOOTSTRAP_VANILLABLOCKMODELS_H
 #define MATTICRAFT_MC_SERVER_BOOTSTRAP_VANILLABLOCKMODELS_H
@@ -20,4 +21,4 @@ int LIBMATTI_MC_VanillaBlockModels_Bootstrap(LIBMATTI_MC_ModelManager *manager);
 }
 #endif
 
-#endif //MATTICRAFT_MC_SERVER_BOOTSTRAP_VANILLABLOCKMODELS_H
+#endif

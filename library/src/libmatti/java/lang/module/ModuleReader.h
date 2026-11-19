@@ -1,7 +1,8 @@
-//
-// Created by administrator on 09.09.26.
-//
-// Port of java.lang.module.ModuleReader (interface).
+
+
+
+
+
 
 #ifndef MATTICRAFT_MODULEREADER_H
 #define MATTICRAFT_MODULEREADER_H
@@ -15,4 +16,4 @@
 //   void close(void);              // Java: void close()
 typedef struct LIBMATTI_JL_ModuleReader LIBMATTI_JL_ModuleReader;
 
-#endif //MATTICRAFT_MODULEREADER_H
+#endif

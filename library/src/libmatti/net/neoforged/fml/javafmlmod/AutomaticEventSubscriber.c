@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.javafmlmod.AutomaticEventSubscriber.
+
+
 
 #include "libmatti/net/neoforged/fml/javafmlmod/AutomaticEventSubscriber.h"
 
@@ -60,7 +61,7 @@ static const char *annotation_value(const LIBMATTI_NEOFORGESPI_AnnotationData *d
 // Java: public static EnumSet<Dist> getSides(Object data)
 size_t LIBMATTI_FML_AutomaticEventSubscriber_GetSides(const char *data, LIBMATTI_DIST_Dist *sides, size_t capacity)
 {
-    // Java: if (data == null) return EnumSet.allOf(Dist.class);
+// Java: if (data == null) return EnumSet.allOf(Dist.class);
     if (data == NULL)
     {
         size_t count = 0;
@@ -69,7 +70,8 @@ size_t LIBMATTI_FML_AutomaticEventSubscriber_GetSides(const char *data, LIBMATTI
         return count;
     }
 
-    // Java maps each ModAnnotation.EnumHolder's value() with Dist.valueOf
+
+
     size_t count = 0;
     const char *cursor = data;
     while (*cursor != '\0')
@@ -135,7 +137,7 @@ static int sides_contain(const LIBMATTI_DIST_Dist *sides, size_t count, LIBMATTI
 // Java: modBus.register(method) / FMLLoader.getCurrent().getBindings().getGameBus().register(method)
 static void subscribe(LIBMATTI_FML_ModContainer *mod, RegisteredMethod *method, const char *className)
 {
-    // Java: if (!Modifier.isStatic(method.getModifiers())) throw new IllegalArgumentException(...)
+// Java: if (!Modifier.isStatic(method.getModifiers())) throw new IllegalArgumentException(...)
     if (!method->isStatic)
     {
         LIBMATTI_ML_Logger_Error(LOGGER(), &LIBMATTI_FML_Logging_LOADING,
@@ -143,7 +145,7 @@ static void subscribe(LIBMATTI_FML_ModContainer *mod, RegisteredMethod *method, 
         return;
     }
 
-    // Java: method.getParameterCount() != 1 || !Event.class.isAssignableFrom(method.getParameterTypes()[0])
+// Java: method.getParameterCount() != 1 || !Event.class.isAssignableFrom(method.getParameterTypes()[0])
     if (method->eventType == NULL ||
         !LIBMATTI_JL_Class_IsAssignableFrom(LIBMATTI_BUS_Event_Class(), method->eventType))
     {
@@ -153,7 +155,7 @@ static void subscribe(LIBMATTI_FML_ModContainer *mod, RegisteredMethod *method, 
         return;
     }
 
-    // Java: if (IModBusEvent.class.isAssignableFrom(eventType)) { var modBus = mod.getEventBus(); ... }
+// Java: if (IModBusEvent.class.isAssignableFrom(eventType)) { var modBus = mod.getEventBus(); ... }
     if (LIBMATTI_JL_Class_IsAssignableFrom(LIBMATTI_FML_Event_IModBusEvent_Class(), method->eventType))
     {
         LIBMATTI_BUS_IEventBus *modBus = LIBMATTI_FML_ModContainer_GetEventBus(mod);
@@ -176,13 +178,13 @@ static void subscribe(LIBMATTI_FML_ModContainer *mod, RegisteredMethod *method, 
     LIBMATTI_ML_Logger_Debug(LOGGER(), &LIBMATTI_FML_Logging_LOADING, "Subscribing method {} to the game event bus",
                              method->methodName);
 
-    // Java: FMLLoader.getCurrent().getBindings().getGameBus().register(method)
+// Java: FMLLoader.getCurrent().getBindings().getGameBus().register(method)
     LIBMATTI_FML_FMLLoader *loader = LIBMATTI_FML_FMLLoader_GetCurrent();
     LIBMATTI_FML_IBindingsProvider *bindings =
         loader != NULL ? LIBMATTI_FML_FMLLoader_GetBindings(loader) : NULL;
     if (bindings == NULL)
     {
-        // Java: NPE when no mod has provided the game bus
+// Java: NPE when no mod has provided the game bus
         LIBMATTI_ML_Logger_Error(LOGGER(), &LIBMATTI_FML_Logging_LOADING,
                                  "Cannot subscribe method {} to the game event bus: no IBindingsProvider",
                                  method->methodName);
@@ -201,7 +203,7 @@ void LIBMATTI_FML_AutomaticEventSubscriber_Inject(LIBMATTI_FML_ModContainer *mod
 {
     (void)moduleName;
 
-    // Java: if (scanData == null) return;
+// Java: if (scanData == null) return;
     if (scanData == NULL) return;
 
     LIBMATTI_ML_Logger_Debug(LOGGER(), &LIBMATTI_FML_Logging_LOADING,
@@ -211,7 +213,7 @@ void LIBMATTI_FML_AutomaticEventSubscriber_Inject(LIBMATTI_FML_ModContainer *mod
     LIBMATTI_FML_FMLLoader *loader = LIBMATTI_FML_FMLLoader_GetCurrent();
     LIBMATTI_DIST_Dist dist = loader != NULL ? LIBMATTI_FML_FMLLoader_GetDist(loader) : LIBMATTI_DIST_CLIENT;
 
-    // Java: Map<String, String> modids = the @Mod annotations mapped clazz -> value
+// Java: Map<String, String> modids = the @Mod annotations mapped clazz -> value
     for (size_t i = 0; i < scanData->annotationCount; i++)
     {
         LIBMATTI_NEOFORGESPI_AnnotationData *annotation = &scanData->annotations[i];
@@ -221,12 +223,12 @@ void LIBMATTI_FML_AutomaticEventSubscriber_Inject(LIBMATTI_FML_ModContainer *mod
         free(annotationName);
         if (!isSubscriber) continue;
 
-        // Java: EnumSet<Dist> sides = getSides(ad.annotationData().get("value"));
+// Java: EnumSet<Dist> sides = getSides(ad.annotationData().get("value"));
         LIBMATTI_DIST_Dist sides[2];
         size_t sideCount = LIBMATTI_FML_AutomaticEventSubscriber_GetSides(annotation_value(annotation, "value"),
                                                                           sides, 2);
 
-        // Java: String modId = ad.annotationData().getOrDefault("modid", modids.getOrDefault(ad.clazz(),
+// Java: String modId = ad.annotationData().getOrDefault("modid", modids.getOrDefault(ad.clazz(),
         //       mod.getModId()));
         const char *modId = annotation_value(annotation, "modid");
         if (modId == NULL || modId[0] == '\0')

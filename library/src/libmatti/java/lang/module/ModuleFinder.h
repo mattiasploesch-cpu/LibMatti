@@ -1,7 +1,8 @@
-//
-// Created by administrator on 09.09.26.
-//
-// Port of java.lang.module.ModuleFinder (interface).
+
+
+
+
+
 
 #ifndef MATTICRAFT_MODULEFINDER_H
 #define MATTICRAFT_MODULEFINDER_H
@@ -13,4 +14,4 @@
 //   findAll()      // Java: Set<ModuleReference> findAll()
 typedef struct LIBMATTI_JL_ModuleFinder LIBMATTI_JL_ModuleFinder;
 
-#endif //MATTICRAFT_MODULEFINDER_H
+#endif

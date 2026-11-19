@@ -1,7 +1,8 @@
-// Port of net.minecraft.client.renderer.ShaderManager - loads the GLSL sources
-// through the ResourceManager, preprocesses them and compiles the shader
-// modules the GlProgram links. Post chains stay game-port content (the port
-// keeps the CompilationException channel).
+
+
+
+
+
 
 #ifndef MATTICRAFT_MC_CLIENT_RENDERER_SHADERMANAGER_H
 #define MATTICRAFT_MC_CLIENT_RENDERER_SHADERMANAGER_H

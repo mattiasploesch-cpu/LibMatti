@@ -49,7 +49,7 @@ unsigned int LIBMATTI_FML_FontShader_Compile(int *screenSizeLocation)
     LIBMATTI_GL_glAttachShader(program, vertex);
     LIBMATTI_GL_glAttachShader(program, fragment);
 
-    // Java: gui.vert's attribute names (the port binds them to the batcher's
+// Java: gui.vert's attribute names (the port binds them to the batcher's
     // fixed slots 0/1/2 - POS/TEX/COLOR, see SimpleFont's VAO setup).
     LIBMATTI_GL_glBindAttribLocation(program, 0, "position");
     LIBMATTI_GL_glBindAttribLocation(program, 1, "uv");

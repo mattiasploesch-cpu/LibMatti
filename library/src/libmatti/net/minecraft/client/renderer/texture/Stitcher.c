@@ -1,6 +1,7 @@
-// Implementation of net.minecraft.client.renderer.texture.Stitcher. The
-// Region tree and the expansion heuristic follow the Java original line by
-// line; the sort comparator (descending height, then width, then name) too.
+
+
+
+
 
 #include "libmatti/net/minecraft/client/renderer/texture/Stitcher.h"
 
@@ -12,7 +13,8 @@
 // Java: record Holder<T>(T entry, int width, int height)
 typedef struct Holder
 {
-    LIBMATTI_MC_Stitcher_Entry entry; // the width/height already include padding
+    LIBMATTI_MC_Stitcher_Entry entry;
+
     int width;
     int height;
 } Holder;
@@ -26,18 +28,19 @@ typedef struct Region
     int height;
     struct Region **subSlots;
     size_t subSlotCount;
-    Holder holder;   // Java: the holder reference - the port stores the value
-    int hasHolder;   // (the stitch copy would dangle otherwise)
+    Holder holder;// Java: the holder reference - the port stores the value
+    int hasHolder;
+
 } Region;
 
 struct LIBMATTI_MC_Stitcher
 {
     int mipLevel;
-    // Java: private final List<Holder<T>> texturesToBeStitched
+// Java: private final List<Holder<T>> texturesToBeStitched
     Holder *holders;
     size_t holderCount;
     size_t holderCapacity;
-    // Java: private final List<Region<T>> storage
+// Java: private final List<Region<T>> storage
     Region **storage;
     size_t storageCount;
     size_t storageCapacity;
@@ -70,7 +73,7 @@ LIBMATTI_MC_Stitcher *LIBMATTI_MC_Stitcher_New(int maxWidth, int maxHeight, int 
     stitcher->mipLevel = mipLevel;
     stitcher->maxWidth = maxWidth;
     stitcher->maxHeight = maxHeight;
-    // Java: this.padding = 1 << mipLevel << Mth.clamp(anisotropy - 1, 0, 4)
+// Java: this.padding = 1 << mipLevel << Mth.clamp(anisotropy - 1, 0, 4)
     stitcher->padding = 1 << mipLevel << LIBMATTI_MC_Mth_ClampI(anisotropy - 1, 0, 4);
     return stitcher;
 }
@@ -82,11 +85,13 @@ void LIBMATTI_MC_Stitcher_Free(LIBMATTI_MC_Stitcher *stitcher)
 
     free(stitcher->holders);
 
-    // The storage regions own their subSlot trees; the holders are copied by
-    // value into the sorted array at stitch time (nothing extra to free).
+
+
+
     for (size_t i = 0; i < stitcher->storageCount; i++)
     {
-        // walk the tree depth-first
+
+
         Region *stack[4096];
         int top = 0;
         stack[top++] = stitcher->storage[i];
@@ -150,7 +155,7 @@ static int region_add(Region *region, Holder *holder)
         return 1;
     }
 
-    // Java: if (this.subSlots == null) { ... split ... }
+// Java: if (this.subSlots == null) { ... split ... }
     if (region->subSlots == NULL)
     {
         region->subSlotCount = 1;
@@ -158,11 +163,13 @@ static int region_add(Region *region, Holder *holder)
         region->subSlots[0] = calloc(1, sizeof(Region));
         *region->subSlots[0] = (Region){region->originX, region->originY, width, height, {0}, 0};
 
-        int k = region->width - width;  // remaining right
-        int l = region->height - height; // remaining below
+        int k = region->width - width;
+
+        int l = region->height - height;
+
         if (l > 0 && k > 0)
         {
-            int i1 = l > k ? l : k; // Java: Math.max(this.height... no - max(height, k) with height=l? keep Java
+            int i1 = l > k ? l : k;// Java: Math.max(this.height... no - max(height, k) with height=l? keep Java
             // Java: int i1 = Math.max(this.height, k); int j1 = Math.max(this.width, l);
             i1 = region->height > k ? region->height : k;
             int j1 = region->width > l ? region->width : l;
@@ -170,7 +177,8 @@ static int region_add(Region *region, Holder *holder)
             region->subSlots = realloc(region->subSlots, 3 * sizeof(Region *));
             if (i1 >= j1)
             {
-                // below, then right
+
+
                 region->subSlots[1] = calloc(1, sizeof(Region));
                 *region->subSlots[1] = (Region){region->originX, region->originY + height, width, l, {0}, 0};
                 region->subSlots[2] = calloc(1, sizeof(Region));
@@ -178,7 +186,8 @@ static int region_add(Region *region, Holder *holder)
             }
             else
             {
-                // right, then below
+
+
                 region->subSlots[1] = calloc(1, sizeof(Region));
                 *region->subSlots[1] = (Region){region->originX + width, region->originY, k, height, {0}, 0};
                 region->subSlots[2] = calloc(1, sizeof(Region));
@@ -221,7 +230,7 @@ static int expand(LIBMATTI_MC_Stitcher *stitcher, Holder *holder)
     if (!flag1 && !flag2)
         return 0;
 
-    // Java: boolean flag3 = flag1 && i != k; flag4 = flag2 && j != l;
+// Java: boolean flag3 = flag1 && i != k; flag4 = flag2 && j != l;
     int flag3 = flag1 && i != k;
     int flag4 = flag2 && j != l;
     int flag;
@@ -269,7 +278,7 @@ static int add_to_storage(LIBMATTI_MC_Stitcher *stitcher, Holder *holder)
 // Java: public void stitch() - the port reports the failure through the return
 int LIBMATTI_MC_Stitcher_Stitch(LIBMATTI_MC_Stitcher *stitcher)
 {
-    // Java: List<Holder> list = new ArrayList<>(texturesToBeStitched); list.sort(...)
+// Java: List<Holder> list = new ArrayList<>(texturesToBeStitched); list.sort(...)
     Holder *sorted = malloc(stitcher->holderCount * sizeof(Holder));
     memcpy(sorted, stitcher->holders, stitcher->holderCount * sizeof(Holder));
     qsort(sorted, stitcher->holderCount, sizeof(Holder), holder_compare);

@@ -1,4 +1,5 @@
-// Port of cpw.mods.modlauncher.api.ServiceRunner.
+
+
 
 #ifndef MATTICRAFT_MODLAUNCHER_SERVICERUNNER_H
 #define MATTICRAFT_MODLAUNCHER_SERVICERUNNER_H
@@ -13,4 +14,4 @@ typedef struct LIBMATTI_MLA_ServiceRunner
 // Java: Class<?> run(ClassLoader loader)
 void *LIBMATTI_MLA_ServiceRunner_Run(LIBMATTI_MLA_ServiceRunner *runner, void *classLoader);
 
-#endif //MATTICRAFT_MODLAUNCHER_SERVICERUNNER_H
+#endif

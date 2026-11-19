@@ -1,7 +1,8 @@
-// Port of net.minecraft.world.food.FoodData + FoodConstants (the hunger bar
-// state machine: foodLevel/saturationLevel/exhaustionLevel/tickTimer). The
-// tick() body rides the P6 health work - the port carries the state, the eat/
-// exhaustion paths and the NBT surface the Player save writes.
+
+
+
+
+
 
 #ifndef MATTICRAFT_MC_WORLD_FOOD_FOODDATA_H
 #define MATTICRAFT_MC_WORLD_FOOD_FOODDATA_H
@@ -36,13 +37,13 @@ extern "C" {
 // Java: public class FoodData
 typedef struct LIBMATTI_MC_FoodData
 {
-    // Java: private int foodLevel = 20
+// Java: private int foodLevel = 20
     int foodLevel;
-    // Java: private float saturationLevel = 5.0F
+// Java: private float saturationLevel = 5.0F
     float saturationLevel;
-    // Java: private float exhaustionLevel
+// Java: private float exhaustionLevel
     float exhaustionLevel;
-    // Java: private int tickTimer
+// Java: private int tickTimer
     int tickTimer;
 } LIBMATTI_MC_FoodData;
 
@@ -84,4 +85,4 @@ void LIBMATTI_MC_FoodData_ReadAdditionalSaveData(LIBMATTI_MC_FoodData *foodData,
 }
 #endif
 
-#endif //MATTICRAFT_MC_WORLD_FOOD_FOODDATA_H
+#endif

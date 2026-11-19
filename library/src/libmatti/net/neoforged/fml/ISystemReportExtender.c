@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.ISystemReportExtender.
+
+
 
 #include "libmatti/net/neoforged/fml/ISystemReportExtender.h"
 
@@ -11,7 +12,7 @@ char *LIBMATTI_FML_ISystemReportExtender_GetLabel(LIBMATTI_FML_ISystemReportExte
 
 int LIBMATTI_FML_ISystemReportExtender_IsActive(LIBMATTI_FML_ISystemReportExtender *extender)
 {
-    // Java: default boolean isActive() { return true; }
+// Java: default boolean isActive() { return true; }
     if (extender->isActive == NULL) return 1;
     return extender->isActive(extender);
 }

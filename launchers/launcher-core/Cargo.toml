@@ -1,0 +1,24 @@
+[package]
+name = "launcher-core"
+description = "Profiles, accounts, versions, mods, logs and updates for Matticraft"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[lib]
+name = "launcher_core"
+path = "src/lib.rs"
+
+[dependencies]
+serde.workspace = true
+serde_json.workspace = true
+directories.workspace = true
+ring.workspace = true
+hex.workspace = true
+time.workspace = true
+ureq = { version = "2", default-features = false, features = ["tls"], optional = true }
+
+[features]
+default = []
+upload = ["dep:ureq"]

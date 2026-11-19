@@ -1,4 +1,5 @@
-// Port of net.minecraft.world.entity.MobCategory (the spawn classification).
+
+
 
 #ifndef MATTICRAFT_MC_WORLD_ENTITY_MOBCATEGORY_H
 #define MATTICRAFT_MC_WORLD_ENTITY_MOBCATEGORY_H
@@ -13,14 +14,22 @@ extern "C" {
 // the name, the cap (max * perPlayer), the friendly flag and the persistent flag
 typedef enum LIBMATTI_MC_MobCategory
 {
-    LIBMATTI_MC_MobCategory_MONSTER,              // "monster", 70, not friendly, not persistent
-    LIBMATTI_MC_MobCategory_CREATURE,             // "creature", 10, friendly, persistent
-    LIBMATTI_MC_MobCategory_AMBIENT,              // "ambient", 15, friendly, not persistent
-    LIBMATTI_MC_MobCategory_AXOLOTLS,             // "axolotls", 5, friendly, persistent
-    LIBMATTI_MC_MobCategory_UNDERGROUND_WATER_CREATURE, // "underground_water_creature", 5
-    LIBMATTI_MC_MobCategory_WATER_CREATURE,       // "water_creature", 5
-    LIBMATTI_MC_MobCategory_WATER_AMBIENT,        // "water_ambient", 20
-    LIBMATTI_MC_MobCategory_MISC,                 // "misc", -1, friendly, persistent
+    LIBMATTI_MC_MobCategory_MONSTER,
+
+    LIBMATTI_MC_MobCategory_CREATURE,
+
+    LIBMATTI_MC_MobCategory_AMBIENT,
+
+    LIBMATTI_MC_MobCategory_AXOLOTLS,
+
+    LIBMATTI_MC_MobCategory_UNDERGROUND_WATER_CREATURE,
+
+    LIBMATTI_MC_MobCategory_WATER_CREATURE,
+
+    LIBMATTI_MC_MobCategory_WATER_AMBIENT,
+
+    LIBMATTI_MC_MobCategory_MISC,
+
     LIBMATTI_MC_MobCategory_COUNT,
 } LIBMATTI_MC_MobCategory;
 
@@ -41,4 +50,4 @@ LIBMATTI_MC_MobCategory LIBMATTI_MC_MobCategory_ByName(const char *name);
 }
 #endif
 
-#endif //MATTICRAFT_MC_WORLD_ENTITY_MOBCATEGORY_H
+#endif

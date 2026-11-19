@@ -1,6 +1,7 @@
-// Implementation of net.minecraft.client.renderer.texture.SpriteLoader:
-// the sprite list -> mip level resolution -> Stitcher -> Preparations.
-// Java's executor chain collapses into the synchronous call order.
+
+
+
+
 
 #include "libmatti/net/minecraft/client/renderer/texture/SpriteLoader.h"
 
@@ -30,9 +31,10 @@ void LIBMATTI_MC_SpriteLoader_Free(LIBMATTI_MC_SpriteLoader *loader)
     free(loader);
 }
 
-// The gather context maps a stitched Stitcher.Entry back to its
-// SpriteContents (the entries carry only width/height/name) and builds
-// the TextureAtlasSprites.
+
+
+
+
 typedef struct GatherContext
 {
     LIBMATTI_MC_SpriteContents **contents;
@@ -65,8 +67,9 @@ static void gather_callback(void *userData, const LIBMATTI_MC_Stitcher_Entry *en
         LIBMATTI_MC_TextureAtlasSprite_New(context->atlas, matched, context->preparations->width,
                                            context->preparations->height, x, y, padding);
     LIBMATTI_MC_Identifier_Free(name);
-    // TextureAtlasSprite_New copies the atlas id but keeps the contents
-    // pointer; the sprite takes the contents over (the port's ownership).
+
+
+
     (void) name;
 
     size_t index = context->preparations->spriteCount++;
@@ -81,7 +84,7 @@ static LIBMATTI_MC_SpriteLoader_Preparations *stitch(LIBMATTI_MC_SpriteLoader *l
                                                      int requestedMipLevel, const LIBMATTI_MC_Identifier *atlas)
 {
     int maxSupportedTextureSize = loader->maxSupportedTextureSize;
-    // Java: int j = Integer.MAX_VALUE - the min width/height over all sprites
+// Java: int j = Integer.MAX_VALUE - the min width/height over all sprites
     int minimum = 0x7FFFFFFF;
     int k = 1 << requestedMipLevel;
 
@@ -91,7 +94,7 @@ static LIBMATTI_MC_SpriteLoader_Preparations *stitch(LIBMATTI_MC_SpriteLoader *l
         int smaller = sprite->width < sprite->height ? sprite->width : sprite->height;
         if (smaller < minimum)
             minimum = smaller;
-        // Java: Integer.lowestOneBit - the mip clamp per sprite
+// Java: Integer.lowestOneBit - the mip clamp per sprite
         int lowestW = sprite->width & -sprite->width;
         int lowestH = sprite->height & -sprite->height;
         int lowest = lowestW < lowestH ? lowestW : lowestH;
@@ -114,7 +117,7 @@ static LIBMATTI_MC_SpriteLoader_Preparations *stitch(LIBMATTI_MC_SpriteLoader *l
 
     if (!LIBMATTI_MC_Stitcher_Stitch(stitcher))
     {
-        // Java: StitcherException -> CrashReport("Stitching")
+// Java: StitcherException -> CrashReport("Stitching")
         LIBMATTI_MC_Stitcher_Free(stitcher);
         return NULL;
     }
@@ -129,7 +132,7 @@ static LIBMATTI_MC_SpriteLoader_Preparations *stitch(LIBMATTI_MC_SpriteLoader *l
     GatherContext context = {contents, count, preparations, (LIBMATTI_MC_Identifier *) atlas};
     LIBMATTI_MC_Stitcher_GatherSprites(stitcher, &context, gather_callback);
 
-    // Java: map.values().forEach(contents -> increaseMipLevel(l1)) - after
+// Java: map.values().forEach(contents -> increaseMipLevel(l1)) - after
     // gathering, every sprite's mip chain grows to the effective level.
     for (size_t i = 0; i < preparations->spriteCount; i++)
         LIBMATTI_MC_SpriteContents_IncreaseMipLevel(preparations->sprites[i]->contents, effectiveMipLevel);
@@ -143,7 +146,7 @@ LIBMATTI_MC_SpriteLoader_Preparations *LIBMATTI_MC_SpriteLoader_LoadAndStitch(
     LIBMATTI_MC_SpriteLoader *loader, const LIBMATTI_MC_MultiPackResourceManager *resourceManager,
     const LIBMATTI_MC_Identifier *atlasInfo, int mipLevel)
 {
-    // Java: SpriteSourceList.load(...).list(...) -> the resource entries
+// Java: SpriteSourceList.load(...).list(...) -> the resource entries
     size_t sourceCount = 0;
     LIBMATTI_MC_SpriteSource **sources = LIBMATTI_MC_SpriteSourceList_Load(resourceManager, atlasInfo, &sourceCount);
 
@@ -151,11 +154,11 @@ LIBMATTI_MC_SpriteLoader_Preparations *LIBMATTI_MC_SpriteLoader_LoadAndStitch(
     LIBMATTI_MC_SpriteResourceEntry *entries =
         LIBMATTI_MC_SpriteSourceList_Run(sources, sourceCount, resourceManager, &entryCount);
 
-    // Java: builder.add(p -> MissingTextureAtlasSprite.create()) runs first
+// Java: builder.add(p -> MissingTextureAtlasSprite.create()) runs first
     size_t spriteCount = entryCount + 1;
     LIBMATTI_MC_SpriteContents **contents = calloc(spriteCount, sizeof(LIBMATTI_MC_SpriteContents *));
 
-    // The missing sprite leads the list (Java: the builder adds it first)
+// The missing sprite leads the list (Java: the builder adds it first)
     LIBMATTI_MC_Identifier *missingLocation = LIBMATTI_MC_MissingTextureAtlasSprite_GetLocation();
     contents[0] = LIBMATTI_MC_MissingTextureAtlasSprite_Create();
 
@@ -173,8 +176,9 @@ LIBMATTI_MC_SpriteLoader_Preparations *LIBMATTI_MC_SpriteLoader_LoadAndStitch(
     LIBMATTI_MC_SpriteLoader_Preparations *preparations =
         stitch(loader, contents, decoded, mipLevel, loader->location);
 
-    // The sprites the stitcher rejected (or that were filtered) still own
-    // their images: free everything that did not land in the preparations.
+
+
+
     for (size_t i = 0; i < decoded; i++)
     {
         int used = 0;

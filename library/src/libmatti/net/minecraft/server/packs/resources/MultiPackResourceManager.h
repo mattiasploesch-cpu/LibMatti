@@ -1,6 +1,7 @@
-// Port of net.minecraft.server.packs.resources.MultiPackResourceManager,
-// net.minecraft.server.packs.resources.ReloadableResourceManager and
-// net.minecraft.server.packs.resources.ReloadInstance.
+
+
+
+
 
 #ifndef MATTICRAFT_MC_PACKS_RESOURCES_MULTIPACKRESOURCEMANAGER_H
 #define MATTICRAFT_MC_PACKS_RESOURCES_MULTIPACKRESOURCEMANAGER_H
@@ -20,7 +21,7 @@ typedef struct LIBMATTI_MC_ReloadInstance
 {
     int done;
     int failures;
-    // Java: float getActualProgress()
+// Java: float getActualProgress()
     float progress;
 } LIBMATTI_MC_ReloadInstance;
 
@@ -33,12 +34,12 @@ void LIBMATTI_MC_ReloadInstance_Free(LIBMATTI_MC_ReloadInstance *instance);
 
 typedef struct LIBMATTI_MC_MultiPackResourceManager
 {
-    // Java: private final PackType type
+// Java: private final PackType type
     int type;
-    // Java: private final List<PackResources> packs
+// Java: private final List<PackResources> packs
     LIBMATTI_MC_PackResources **packs;
     size_t packCount;
-    // Java: private final Map<String, FallbackResourceManager> namespacedManagers
+// Java: private final Map<String, FallbackResourceManager> namespacedManagers
     char **namespaces;
     LIBMATTI_MC_FallbackResourceManager **managers;
     size_t managerCount;
@@ -78,14 +79,14 @@ void LIBMATTI_MC_MultiPackResourceManager_Free(LIBMATTI_MC_MultiPackResourceMana
 
 typedef struct LIBMATTI_MC_ReloadableResourceManager
 {
-    // Java: private final PackType type
+// Java: private final PackType type
     int type;
-    // Java: private final List<PreparableReloadListener> listeners
+// Java: private final List<PreparableReloadListener> listeners
     void **listeners;
     size_t listenerCount;
-    // Java: private MultiPackResourceManager resources (the current instance)
+// Java: private MultiPackResourceManager resources (the current instance)
     LIBMATTI_MC_MultiPackResourceManager *resources;
-    // Java: private ReloadInstance reloadInstance
+// Java: private ReloadInstance reloadInstance
     LIBMATTI_MC_ReloadInstance *reloadInstance;
 } LIBMATTI_MC_ReloadableResourceManager;
 
@@ -96,7 +97,8 @@ void LIBMATTI_MC_ReloadableResourceManager_Add(LIBMATTI_MC_ReloadableResourceMan
 // The port runs the (empty) reload synchronously.
 LIBMATTI_MC_ReloadInstance *LIBMATTI_MC_ReloadableResourceManager_CreateReload(
     LIBMATTI_MC_ReloadableResourceManager *manager);
-// Delegated ResourceManager surface
+
+
 LIBMATTI_MC_Resource *LIBMATTI_MC_ReloadableResourceManager_GetResource(
     const LIBMATTI_MC_ReloadableResourceManager *manager, const char *namespace, const char *path);
 void LIBMATTI_MC_ReloadableResourceManager_ListResources(const LIBMATTI_MC_ReloadableResourceManager *manager,

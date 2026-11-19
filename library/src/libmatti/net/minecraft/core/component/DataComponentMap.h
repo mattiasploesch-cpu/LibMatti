@@ -1,7 +1,8 @@
-// Port of net.minecraft.core.component.DataComponentMap (plus DataComponentGetter).
-// Java keys the map by DataComponentType identity (Reference2ObjectArrayMap); the C port
-// keeps a parallel pointer/value array in insertion order - get() is a linear scan, the
-// component counts per item are small. Values stay unowned void* (the map never frees).
+
+
+
+
+
 
 #ifndef MATTICRAFT_MC_CORE_COMPONENT_DATACOMPONENTMAP_H
 #define MATTICRAFT_MC_CORE_COMPONENT_DATACOMPONENTMAP_H
@@ -47,7 +48,8 @@ LIBMATTI_MC_DataComponentType **LIBMATTI_MC_DataComponentMap_KeySet(const LIBMAT
 // Java: static DataComponentMap composite(a, b) - b wins over a
 LIBMATTI_MC_DataComponentMap *LIBMATTI_MC_DataComponentMap_Composite(const LIBMATTI_MC_DataComponentMap *a,
                                                                      const LIBMATTI_MC_DataComponentMap *b);
-// C-port deep copy (Java's PatchedDataComponentMap.copy uses this)
+
+
 LIBMATTI_MC_DataComponentMap *LIBMATTI_MC_DataComponentMap_Copy(const LIBMATTI_MC_DataComponentMap *map);
 void LIBMATTI_MC_DataComponentMap_Free(LIBMATTI_MC_DataComponentMap *map);
 
@@ -55,4 +57,4 @@ void LIBMATTI_MC_DataComponentMap_Free(LIBMATTI_MC_DataComponentMap *map);
 }
 #endif
 
-#endif //MATTICRAFT_MC_CORE_COMPONENT_DATACOMPONENTMAP_H
+#endif

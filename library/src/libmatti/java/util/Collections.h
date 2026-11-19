@@ -1,8 +1,9 @@
-// Port of the java.util.Collections unmodifiable wrappers. Java returns
-// delegate views whose mutators throw UnsupportedOperationException; the C
-// port models the view as a tagged wrapper over the backing collection and
-// the mutators log + abort (the strict Java semantics, minus the exception
-// unwind) so call sites catch violations immediately.
+
+
+
+
+
+
 
 #ifndef MATTICRAFT_JAVA_UTIL_COLLECTIONS_H
 #define MATTICRAFT_JAVA_UTIL_COLLECTIONS_H
@@ -73,4 +74,4 @@ void LIBMATTI_JU_UnmodifiableSet_Remove(LIBMATTI_JU_UnmodifiableSet *set, const 
 }
 #endif
 
-#endif //MATTICRAFT_JAVA_UTIL_COLLECTIONS_H
+#endif

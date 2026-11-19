@@ -1,8 +1,9 @@
-// Port of net.minecraft.client.renderer.block.BlockRenderDispatcher
-// (implementation). Java's renderBatched wraps ModelBlockRenderer.tesselateBlock
-// in the AO decision (Minecraft.useAmbientOcclusion() && no light emission &&
-// the model's useAmbientOcclusion flag) and the CrashReport wrapper; the C
-// port keeps the decision, reports through the log.
+
+
+
+
+
+
 
 #include "libmatti/net/minecraft/client/renderer/block/BlockRenderDispatcher.h"
 
@@ -64,7 +65,7 @@ void LIBMATTI_MC_BlockRenderDispatcher_RenderBatched(
     if (model == NULL)
         return;
 
-    // Java: tesselateBlock - the AO decision over the options flag, the block's
+// Java: tesselateBlock - the AO decision over the options flag, the block's
     // light emission and the model's useAmbientOcclusion flag.
     const LIBMATTI_MC_Block *block = LIBMATTI_MC_BlockState_GetBlock(state);
     int lightEmission = block != NULL && block->properties != NULL ? block->properties->lightEmission : 0;

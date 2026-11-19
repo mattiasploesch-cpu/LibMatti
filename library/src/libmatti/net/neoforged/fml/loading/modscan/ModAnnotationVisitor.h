@@ -1,6 +1,7 @@
-// Port of net.neoforged.fml.loading.modscan.ModAnnotationVisitor.
-// Java's three constructors become the three New functions below; the array element
-// name a ModAnnotationVisitor keeps in a field it never reads is not carried over.
+
+
+
+
 
 #ifndef MATTICRAFT_FML_LOADING_MODSCAN_MODANNOTATIONVISITOR_H
 #define MATTICRAFT_FML_LOADING_MODSCAN_MODANNOTATIONVISITOR_H
@@ -45,4 +46,4 @@ LIBMATTI_FML_ModAnnotationVisitor *LIBMATTI_FML_ModAnnotationVisitor_VisitAnnota
 // Java: public void visitEnd()
 void LIBMATTI_FML_ModAnnotationVisitor_VisitEnd(LIBMATTI_FML_ModAnnotationVisitor *visitor);
 
-#endif //MATTICRAFT_FML_LOADING_MODSCAN_MODANNOTATIONVISITOR_H
+#endif

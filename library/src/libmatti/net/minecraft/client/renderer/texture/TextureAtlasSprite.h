@@ -1,8 +1,9 @@
-// Port of net.minecraft.client.renderer.texture.SpriteContents and
-// net.minecraft.client.renderer.texture.TextureAtlasSprite. The animation
-// frames (AnimatedTexture/AnimationState) stay game-port content for now: the
-// port keeps the first frame and the frame metadata (the animation tick loop
-// needs the RenderPipelines sprite-blit pass, which the GL skeleton has not).
+
+
+
+
+
+
 
 #ifndef MATTICRAFT_MC_CLIENT_RENDERER_TEXTURE_TEXTUREATLASSPRITE_H
 #define MATTICRAFT_MC_CLIENT_RENDERER_TEXTURE_TEXTUREATLASSPRITE_H
@@ -21,21 +22,23 @@ extern "C"
 // Java: public class SpriteContents implements Stitcher.Entry, AutoCloseable
 typedef struct LIBMATTI_MC_SpriteContents
 {
-    // Java: final Identifier name; final int width, height
+// Java: final Identifier name; final int width, height
     LIBMATTI_MC_Identifier *name;
-    int width;  // the frame size (SpriteLoader.FrameSize)
+    int width;
+
     int height;
-    // Java: private final NativeImage originalImage
+// Java: private final NativeImage originalImage
     LIBMATTI_B3D_NativeImage *originalImage;
-    // Java: NativeImage[] byMipLevel
+// Java: NativeImage[] byMipLevel
     LIBMATTI_B3D_NativeImage **byMipLevel;
     size_t mipLevelCount;
-    // Java: the animation metadata (the port keeps the section for the frame count)
-    int isAnimated;   // more than one frame in the source image
+// Java: the animation metadata (the port keeps the section for the frame count)
+    int isAnimated;
+
     int frameCount;
     int defaultFrameTime;
     int interpolatedFrames;
-    // Java: private final MipmapStrategy / alphaCutoffBias
+// Java: private final MipmapStrategy / alphaCutoffBias
     int mipmapStrategy;
     float alphaCutoffBias;
 } LIBMATTI_MC_SpriteContents;
@@ -52,12 +55,13 @@ void LIBMATTI_MC_SpriteContents_Free(LIBMATTI_MC_SpriteContents *contents);
 // Java: public class TextureAtlasSprite
 typedef struct LIBMATTI_MC_TextureAtlasSprite
 {
-    // Java: private final SpriteContents contents; atlas, x, y, width, height
+// Java: private final SpriteContents contents; atlas, x, y, width, height
     LIBMATTI_MC_SpriteContents *contents;
     LIBMATTI_MC_Identifier *atlas;
     int x;
     int y;
-    int width;  // the atlas region width (clipped)
+    int width;
+
     int height;
 } LIBMATTI_MC_TextureAtlasSprite;
 
@@ -74,4 +78,4 @@ void LIBMATTI_MC_TextureAtlasSprite_Free(LIBMATTI_MC_TextureAtlasSprite *sprite)
 }
 #endif
 
-#endif //MATTICRAFT_MC_CLIENT_RENDERER_TEXTURE_TEXTUREATLASSPRITE_H
+#endif

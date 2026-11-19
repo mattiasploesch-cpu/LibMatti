@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.classloading.JarContentsModuleFinder.
+
+
 
 #ifndef MATTICRAFT_FML_CLASSLOADING_JARCONTENTSMODULEFINDER_H
 #define MATTICRAFT_FML_CLASSLOADING_JARCONTENTSMODULEFINDER_H
@@ -11,7 +12,7 @@
 // Java: public final class JarContentsModuleFinder implements ModuleFinder
 typedef struct
 {
-    // Java: Map<String, ModuleReference> jars
+// Java: Map<String, ModuleReference> jars
     char **names;
     LIBMATTI_FML_JarContentsModuleReference **references;
     size_t count;
@@ -29,4 +30,4 @@ LIBMATTI_FML_JarContentsModuleReference *LIBMATTI_FML_JarContentsModuleFinder_Fi
 LIBMATTI_FML_JarContentsModuleReference **LIBMATTI_FML_JarContentsModuleFinder_FindAll(
     const LIBMATTI_FML_JarContentsModuleFinder *finder, size_t *count);
 
-#endif //MATTICRAFT_FML_CLASSLOADING_JARCONTENTSMODULEFINDER_H
+#endif

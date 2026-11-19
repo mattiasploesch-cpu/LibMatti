@@ -15,4 +15,4 @@
 int LIBMATTI_NC_TemporalParser_Parse(const LIBMATTI_NC_CharsWrapper *chars, LIBMATTI_NC_TomlVersion version,
                                      LIBMATTI_NC_TomlParser *parser, LIBMATTI_JT_Temporal *out);
 
-#endif //MATTICRAFT_NC_TOML_TEMPORALPARSER_H
+#endif

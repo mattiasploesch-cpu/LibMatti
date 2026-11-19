@@ -1,5 +1,6 @@
-// Port of java.nio.ByteBuffer (the heap-buffer surface the loader and game
-// need: absolute/relative reads and writes, flip/rewind/clear, slice).
+
+
+
 
 #ifndef MATTICRAFT_JAVA_NIO_BYTEBUFFER_H
 #define MATTICRAFT_JAVA_NIO_BYTEBUFFER_H
@@ -9,11 +10,12 @@
 
 typedef struct LIBMATTI_JN_ByteBuffer
 {
-    unsigned char *array;   // Java: the backing array (hb)
+    unsigned char *array;// Java: the backing array (hb)
     size_t capacity;
     size_t position;
     size_t limit;
-    int ownsArray;          // whether Free() releases array
+    int ownsArray;
+
 } LIBMATTI_JN_ByteBuffer;
 
 // Java: public static ByteBuffer allocate(int capacity)
@@ -71,4 +73,4 @@ int LIBMATTI_JN_ByteBuffer_HasRemaining(const LIBMATTI_JN_ByteBuffer *buffer);
 // Java: public byte[] array() - the backing array without copying
 unsigned char *LIBMATTI_JN_ByteBuffer_Array(const LIBMATTI_JN_ByteBuffer *buffer);
 
-#endif //MATTICRAFT_JAVA_NIO_BYTEBUFFER_H
+#endif

@@ -1,4 +1,5 @@
-// Port of org.objectweb.asm.tree.InsnList.
+
+
 
 #include "libmatti/org/objectweb/asm/tree/InsnList.h"
 
@@ -48,7 +49,7 @@ void LIBMATTI_ASM_InsnList_Insert(LIBMATTI_ASMT_InsnList *list, LIBMATTI_ASMT_Ab
 void LIBMATTI_ASM_InsnList_InsertBefore(LIBMATTI_ASMT_InsnList *list, LIBMATTI_ASMT_AbstractInsnNode *location,
                                         LIBMATTI_ASMT_AbstractInsnNode *node)
 {
-    // Java: insertBefore(location, insn.getPrevious()) - the node is appended before the location
+// Java: insertBefore(location, insn.getPrevious()) - the node is appended before the location
     node->prev = location != NULL ? location->prev : list->last;
     node->next = location;
 

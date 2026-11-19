@@ -16,7 +16,7 @@ void LIBMATTI_B3D_MeshData_Free(LIBMATTI_B3D_MeshData *mesh)
 {
     if (mesh == NULL)
         return;
-    // Java: public void close() - vertex buffer, then the optional index buffer.
+// Java: public void close() - vertex buffer, then the optional index buffer.
     LIBMATTI_B3D_ByteBufferBuilder_Result_Free(mesh->vertexBuffer);
     if (mesh->indexBuffer != NULL)
         LIBMATTI_B3D_ByteBufferBuilder_Result_Free(mesh->indexBuffer);
@@ -52,7 +52,7 @@ static LIBMATTI_B3D_CompactVectorArray *unpack_quad_centroids(const unsigned cha
     int positionOffset = LIBMATTI_B3D_VertexFormat_GetOffset(format, 0);
     (void) vertexBytesSize;
     const float *vertices = (const float *) vertexBytes;
-    // Java: int j = format.getVertexSize() / 4; int k = j * 4; int l = vertexCount / 4;
+// Java: int j = format.getVertexSize() / 4; int k = j * 4; int l = vertexCount / 4;
     int strideFloats = LIBMATTI_B3D_VertexFormat_GetVertexSize(format) / 4;
     int strideBytes = strideFloats * 4;
     int quadCount = vertexCount / 4;
@@ -62,7 +62,7 @@ static LIBMATTI_B3D_CompactVectorArray *unpack_quad_centroids(const unsigned cha
     {
         int first = (i * strideBytes + positionOffset) / 4;
         int third = first + strideFloats * 2;
-        // Java: (f + f3) / 2.0F per component over vertices 0 and 2.
+// Java: (f + f3) / 2.0F per component over vertices 0 and 2.
         float x = (vertices[first + 0] + vertices[third + 0]) / 2.0f;
         float y = (vertices[first + 1] + vertices[third + 1]) / 2.0f;
         float z = (vertices[first + 2] + vertices[third + 2]) / 2.0f;
@@ -97,11 +97,11 @@ LIBMATTI_B3D_ByteBufferBuilder_Result *LIBMATTI_B3D_MeshData_SortState_BuildSort
     const LIBMATTI_B3D_MeshData_SortState *sortState, LIBMATTI_B3D_ByteBufferBuilder *allocator,
     LIBMATTI_B3D_VertexSorting_Sort sorting)
 {
-    // Java: int[] aint = p_342363_.sort(this.centroids);
+// Java: int[] aint = p_342363_.sort(this.centroids);
     size_t orderCount = 0;
     int *order = sorting(sortState->centroids, &orderCount);
     int typeBytes = sortState->indexType == LIBMATTI_B3D_IndexType_INT ? 4 : 2;
-    // Java: long i = p_342323_.reserve(aint.length * 6 * this.indexType.bytes);
+// Java: long i = p_342323_.reserve(aint.length * 6 * this.indexType.bytes);
     // The returned pointer is the base the memPuts write through.
     unsigned char *base = LIBMATTI_B3D_ByteBufferBuilder_Reserve(allocator, (int) (orderCount * 6 * typeBytes));
 
@@ -109,7 +109,7 @@ LIBMATTI_B3D_ByteBufferBuilder_Result *LIBMATTI_B3D_MeshData_SortState_BuildSort
     for (size_t i = 0; i < orderCount; i++)
     {
         int quad = order[i];
-        // Java: quad*4+0, +1, +2, +2, +3, +0.
+// Java: quad*4+0, +1, +2, +2, +3, +0.
         index_writer(base, sortState->indexType, quad * 4 + 0, &cursor);
         index_writer(base, sortState->indexType, quad * 4 + 1, &cursor);
         index_writer(base, sortState->indexType, quad * 4 + 2, &cursor);
@@ -126,7 +126,7 @@ LIBMATTI_B3D_MeshData_SortState *LIBMATTI_B3D_MeshData_SortQuads(
     LIBMATTI_B3D_MeshData *mesh, LIBMATTI_B3D_ByteBufferBuilder *allocator,
     LIBMATTI_B3D_VertexSorting_Sort sorting)
 {
-    // Java: if (this.drawState.mode() != VertexFormat.Mode.QUADS) return null;
+// Java: if (this.drawState.mode() != VertexFormat.Mode.QUADS) return null;
     if (mesh->drawState.mode != LIBMATTI_B3D_Mode_QUADS)
         return NULL;
 

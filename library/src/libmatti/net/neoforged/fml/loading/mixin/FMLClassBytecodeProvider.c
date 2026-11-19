@@ -1,7 +1,8 @@
-// Port of net.neoforged.fml.loading.mixin.FMLClassBytecodeProvider.
-// Java reads ClassNodes through the bytecode provider; the port's "bytecode" for a class is the
-// ELF image the class was registered from, so the provider keeps the BytecodeProvider handle the
-// link context handed over (the close() path releases exactly this).
+
+
+
+
+
 
 #include "libmatti/net/neoforged/fml/loading/mixin/FMLClassBytecodeProvider.h"
 

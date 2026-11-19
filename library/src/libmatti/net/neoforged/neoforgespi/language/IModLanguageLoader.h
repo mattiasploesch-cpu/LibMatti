@@ -1,7 +1,8 @@
-// Port of net.neoforged.neoforgespi.language.IModLanguageLoader.
-// The collaborators (ModContainer, ModFileScanData, ModLoadingException, IModFile,
-// ModuleLayer, IIssueReporting) are all ported; ModContainer and ModFileScanData
-// are passed as opaque pointers because the C interface keeps the Java types abstract.
+
+
+
+
+
 
 #ifndef MATTICRAFT_NEOFORGESPI_LANGUAGE_IMODLANGUAGELOADER_H
 #define MATTICRAFT_NEOFORGESPI_LANGUAGE_IMODLANGUAGELOADER_H
@@ -19,13 +20,13 @@ struct LIBMATTI_NEOFORGESPI_IModLanguageLoader
 {
     void *self;
 
-    // Java: String name()
+// Java: String name()
     const char *(*name)(void *self);
-    // Java: String version()
+// Java: String version()
     const char *(*version)(void *self);
-    // Java: ModContainer loadMod(IModInfo info, ModFileScanData modFileScanResults, ModuleLayer layer)
+// Java: ModContainer loadMod(IModInfo info, ModFileScanData modFileScanResults, ModuleLayer layer)
     void *(*loadMod)(void *self, void *info, void *modFileScanResults, LIBMATTI_JL_ModuleLayer *layer);
-    // Java: default void validate(IModFile file, Collection<ModContainer> loadedContainers, IIssueReporting reporter)
+// Java: default void validate(IModFile file, Collection<ModContainer> loadedContainers, IIssueReporting reporter)
     void (*validate)(void *self, void *file, void **loadedContainers, size_t loadedContainerCount,
                      LIBMATTI_NEOFORGESPI_IIssueReporting *reporter);
 };
@@ -43,4 +44,4 @@ void LIBMATTI_NEOFORGESPI_IModLanguageLoader_Validate(const LIBMATTI_NEOFORGESPI
                                                       void *file, void **loadedContainers, size_t loadedContainerCount,
                                                       LIBMATTI_NEOFORGESPI_IIssueReporting *reporter);
 
-#endif //MATTICRAFT_NEOFORGESPI_LANGUAGE_IMODLANGUAGELOADER_H
+#endif

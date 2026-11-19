@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.loading.progress.Message.
+
+
 
 #ifndef MATTICRAFT_FML_PROGRESS_MESSAGE_H
 #define MATTICRAFT_FML_PROGRESS_MESSAGE_H
@@ -46,4 +47,4 @@ const char *LIBMATTI_FML_Message_MessageType_Name(LIBMATTI_FML_Message_MessageTy
 // Java: System.nanoTime()
 long LIBMATTI_FML_Message_NanoTime(void);
 
-#endif //MATTICRAFT_FML_PROGRESS_MESSAGE_H
+#endif

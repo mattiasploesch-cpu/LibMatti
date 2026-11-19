@@ -1,7 +1,8 @@
-// Port of net.minecraft.server.packs.resources.Resource,
-// net.minecraft.server.packs.resources.ResourceMetadata and
-// net.minecraft.server.packs.resources.ResourceFilterSection (the filter gate
-// lives in FallbackResourceManager).
+
+
+
+
+
 
 #ifndef MATTICRAFT_MC_PACKS_RESOURCES_RESOURCE_H
 #define MATTICRAFT_MC_PACKS_RESOURCES_RESOURCE_H
@@ -20,10 +21,10 @@ typedef struct LIBMATTI_MC_Resource_IoSupplier
 //       IoSupplier<ResourceMetadata> metadataSupplier)
 typedef struct LIBMATTI_MC_Resource
 {
-    // Java: the owning pack (used for the source pack name)
+// Java: the owning pack (used for the source pack name)
     void *source;
     LIBMATTI_MC_Resource_IoSupplier streamSupplier;
-    // Java: ResourceMetadata.EMPTY when no .mcmeta exists
+// Java: ResourceMetadata.EMPTY when no .mcmeta exists
     int hasMetadata;
     unsigned char *metadataBytes;
     size_t metadataLength;

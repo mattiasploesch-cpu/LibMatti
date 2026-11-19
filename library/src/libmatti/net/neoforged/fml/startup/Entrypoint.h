@@ -48,4 +48,4 @@ void *LIBMATTI_FML_Entrypoint_FindThread(const char *threadName);
 // Java: StartupResult.close() { loader.close(); }
 void LIBMATTI_FML_Entrypoint_StartupResult_Close(LIBMATTI_FML_Entrypoint_StartupResult *startupResult);
 
-#endif //MATTICRAFT_FML_ENTRYPOINT_H
+#endif

@@ -1,7 +1,8 @@
-// Port of net.neoforged.fml.javafmlmod.AutomaticEventSubscriber.
-// Java scans a class's declared methods for @SubscribeEvent through reflection; C has neither
-// annotations nor reflection, so a mod registers its handler methods and the subscriber dispatches
-// them exactly like Java does: IModBusEvent events go to the mod's bus, everything else to the game bus.
+
+
+
+
+
 
 #ifndef MATTICRAFT_FML_JAVAFMLMOD_AUTOMATICEVENTSUBSCRIBER_H
 #define MATTICRAFT_FML_JAVAFMLMOD_AUTOMATICEVENTSUBSCRIBER_H
@@ -37,4 +38,4 @@ void LIBMATTI_FML_AutomaticEventSubscriber_Inject(LIBMATTI_FML_ModContainer *mod
 // result would not fit in 'sides' nothing is written.
 size_t LIBMATTI_FML_AutomaticEventSubscriber_GetSides(const char *data, LIBMATTI_DIST_Dist *sides, size_t capacity);
 
-#endif //MATTICRAFT_FML_JAVAFMLMOD_AUTOMATICEVENTSUBSCRIBER_H
+#endif

@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.common.asm.enumextension.RuntimeEnumExtender.
+
+
 
 #include "libmatti/net/neoforged/fml/common/asm/enumextension/RuntimeEnumExtender.h"
 
@@ -195,7 +196,7 @@ static int handles_class(LIBMATTI_NEOFORGESPI_ClassProcessor *self,
     (void) self;
     if (context->empty) return 0;
 
-    // Java: prototypes.containsKey(context.type().getInternalName())
+// Java: prototypes.containsKey(context.type().getInternalName())
     char *internalName = LIBMATTI_ASM_Type_GetInternalName(context->type);
     int found = find_entry(internalName) != NULL;
     free(internalName);
@@ -235,7 +236,7 @@ LIBMATTI_ASMT_MethodInsnNode *LIBMATTI_FML_RuntimeEnumExtender_FindFirstStaticMe
 LIBMATTI_ASMT_AbstractInsnNode *LIBMATTI_FML_RuntimeEnumExtender_FindFirstInstructionBefore(
     const LIBMATTI_ASMT_MethodNode *method, int opCode, long long startIndex)
 {
-    // Java: for (int i = Math.max(method.instructions.size() - 1, startIndex); i >= 0; i--)
+// Java: for (int i = Math.max(method.instructions.size() - 1, startIndex); i >= 0; i--)
     long long start = (long long) method->instructions.size - 1;
     if (startIndex > start) start = startIndex;
 
@@ -268,7 +269,7 @@ static LIBMATTI_ASMT_MethodNode *find_method(const LIBMATTI_ASMT_ClassNode *clas
     LIBMATTI_ASMT_MethodNode *mth = try_find_method(classNode, name, desc);
     if (mth == NULL)
     {
-        // Java: orElseThrow()
+// Java: orElseThrow()
         LIBMATTI_ML_Logger_Error(LOGGER(), NULL, "NoSuchElementException: No method {} in class {}", name,
                                  classNode->name);
     }
@@ -290,7 +291,7 @@ static LIBMATTI_ASMT_FieldNode *find_values_array(const LIBMATTI_ASMT_ClassNode 
 static void clear_method(LIBMATTI_ASMT_MethodNode *mth)
 {
     LIBMATTI_ASM_InsnList_Clear(&mth->instructions);
-    // Java: mth.localVariables.clear(); - the port does not model local variables
+// Java: mth.localVariables.clear(); - the port does not model local variables
     free(mth->tryCatchBlocks);
     mth->tryCatchBlocks = NULL;
     mth->tryCatchBlockCount = 0;
@@ -359,13 +360,13 @@ static LIBMATTI_ASMT_AbstractInsnNode *find_values_array_creation(const LIBMATTI
         LIBMATTI_ASMT_TypeInsnNode *tin = (LIBMATTI_ASMT_TypeInsnNode *) ain;
         if (strcmp(tin->desc, internalName) == 0)
         {
-            // Java: return tin.getPrevious();
+// Java: return tin.getPrevious();
             free(internalName);
             return ain->prev;
         }
     }
     free(internalName);
-    // Java: throw new NoSuchElementException("Failed to locate values array creation in enum " + classType)
+// Java: throw new NoSuchElementException("Failed to locate values array creation in enum " + classType)
     LIBMATTI_ML_Logger_Error(LOGGER(), NULL, "NoSuchElementException: Failed to locate values array creation in enum");
     return NULL;
 }
@@ -375,7 +376,7 @@ static LIBMATTI_ASMT_FieldInsnNode *find_values_array_store(const LIBMATTI_ASM_T
                                                            const LIBMATTI_ASMT_ClassNode *classNode,
                                                            const LIBMATTI_ASMT_MethodNode *mth, const char *owner)
 {
-    // Java: Type.getType("[" + classType.getDescriptor()).getDescriptor()
+// Java: Type.getType("[" + classType.getDescriptor()).getDescriptor()
     const char *typeDescriptor = LIBMATTI_ASM_Type_GetDescriptor(classType);
     size_t arrayLength = strlen(typeDescriptor) + 2;
     char *arrayDescriptor = malloc(arrayLength);
@@ -397,7 +398,7 @@ static LIBMATTI_ASMT_FieldInsnNode *find_values_array_store(const LIBMATTI_ASM_T
             return fin;
         }
     }
-    // Java: throw new NoSuchElementException()
+// Java: throw new NoSuchElementException()
     LIBMATTI_ML_Logger_Error(LOGGER(), NULL, "NoSuchElementException: Failed to locate values array store");
     return NULL;
 }
@@ -406,7 +407,7 @@ static LIBMATTI_ASMT_FieldInsnNode *find_values_array_store(const LIBMATTI_ASM_T
 static int load_constructor_params(LIBMATTI_FML_ListGeneratorAdapter *generator, int idParamIdx, int nameParamIdx,
                                    int ordinal, const LIBMATTI_FML_EnumPrototype *proto)
 {
-    // Java: Type[] argTypes = Type.getType(proto.fullCtorDesc()).getArgumentTypes();
+// Java: Type[] argTypes = Type.getType(proto.fullCtorDesc()).getArgumentTypes();
     LIBMATTI_ASM_Type *methodType = LIBMATTI_ASM_Type_GetType(proto->fullCtorDesc);
     size_t argCount = 0;
     LIBMATTI_ASM_Type **argTypes = LIBMATTI_ASM_Type_GetArgumentTypes(methodType, &argCount);
@@ -483,7 +484,7 @@ static int load_constructor_params(LIBMATTI_FML_ListGeneratorAdapter *generator,
             {
                 if ((int) idx - 2 == idParamIdx)
                 {
-                    // Java: if (!(paramList.get(idx - 2) instanceof Integer i) || i != -1) throw new IllegalArgumentException(...)
+// Java: if (!(paramList.get(idx - 2) instanceof Integer i) || i != -1) throw new IllegalArgumentException(...)
                     if (paramList[idx - 2].type != LIBMATTI_FML_ENUMPARAMETERS_CONSTANT_INTEGER ||
                         paramList[idx - 2].intValue != -1)
                     {
@@ -500,7 +501,7 @@ static int load_constructor_params(LIBMATTI_FML_ListGeneratorAdapter *generator,
 
                 if ((int) idx - 2 == nameParamIdx)
                 {
-                    // Java: if (!(paramList.get(idx - 2) instanceof String str)) throw new IllegalArgumentException(...)
+// Java: if (!(paramList.get(idx - 2) instanceof String str)) throw new IllegalArgumentException(...)
                     if (paramList[idx - 2].type != LIBMATTI_FML_ENUMPARAMETERS_CONSTANT_STRING)
                     {
                         LIBMATTI_ML_Logger_Error(LOGGER(), NULL,
@@ -514,7 +515,7 @@ static int load_constructor_params(LIBMATTI_FML_ListGeneratorAdapter *generator,
                                                                           proto->owningMod);
                 }
 
-                // Java: switch (paramList.get(idx - 2))
+// Java: switch (paramList.get(idx - 2))
                 const LIBMATTI_FML_EnumParameters_Constant *constant = &paramList[idx - 2];
                 switch (constant->type)
                 {
@@ -543,7 +544,7 @@ static int load_constructor_params(LIBMATTI_FML_ListGeneratorAdapter *generator,
                         LIBMATTI_ASM_COMMONS_GeneratorAdapter_PushBool(generator, constant->intValue != 0);
                         break;
                     default:
-                        // Java: default -> throw new IllegalArgumentException("Unsupported constant type ...")
+// Java: default -> throw new IllegalArgumentException("Unsupported constant type ...")
                         LIBMATTI_ML_Logger_Error(LOGGER(), NULL,
                                                  "IllegalArgumentException: Unsupported constant type in parameters for "
                                                  "field '{}' in enum '{}' specified by mod '{}'",
@@ -578,7 +579,7 @@ static LIBMATTI_ASMT_FieldNode **create_enum_entries(const LIBMATTI_ASM_Type *cl
     {
         const LIBMATTI_FML_EnumPrototype *proto = &protos[i];
 
-        // Java: if (!ctors.contains(proto.fullCtorDesc())) throw new IllegalArgumentException(...)
+// Java: if (!ctors.contains(proto.fullCtorDesc())) throw new IllegalArgumentException(...)
         int allowed = 0;
         for (size_t j = 0; j < ctorCount; j++)
             if (strcmp(ctors[j], proto->fullCtorDesc) == 0) { allowed = 1; break; }
@@ -600,7 +601,7 @@ static LIBMATTI_ASMT_FieldNode **create_enum_entries(const LIBMATTI_ASM_Type *cl
                                                                      NULL);
         enumFields[enumFieldCount++] = field;
 
-        // Java: NEW_FIELD = new EnumType(fieldName, ordinal, ...);
+// Java: NEW_FIELD = new EnumType(fieldName, ordinal, ...);
         LIBMATTI_ASM_COMMONS_GeneratorAdapter_NewInstance(generator, classType);
         LIBMATTI_ASM_COMMONS_GeneratorAdapter_Dup(generator);
         LIBMATTI_ASM_COMMONS_GeneratorAdapter_PushString(generator, fieldName);
@@ -640,7 +641,7 @@ static void build_extension_info(const LIBMATTI_ASMT_ClassNode *classNode, const
         {
             if (annotation->values == NULL)
             {
-                // Java: throw new IllegalStateException("Expected values on NetworkedEnum annotation")
+// Java: throw new IllegalStateException("Expected values on NetworkedEnum annotation")
                 LIBMATTI_ML_Logger_Error(LOGGER(), NULL,
                                          "IllegalStateException: Expected values on NetworkedEnum annotation");
                 return;
@@ -650,7 +651,7 @@ static void build_extension_info(const LIBMATTI_ASMT_ClassNode *classNode, const
             {
                 if (strcmp(annotation->valueNames[i], LIBMATTI_FML_NETWORKEDENUM_VALUE) == 0)
                 {
-                    // Java: String[] value = (String[]) anno.values.get(i + 1); return Optional.of(value[1]);
+// Java: String[] value = (String[]) anno.values.get(i + 1); return Optional.of(value[1]);
                     netCheckValue = LIBMATTI_ASMT_AnnotationValue_EnumConst(annotation->values[i]);
                     break;
                 }
@@ -658,7 +659,7 @@ static void build_extension_info(const LIBMATTI_ASMT_ClassNode *classNode, const
 
             if (netCheckValue == NULL)
             {
-                // Java: throw new IllegalStateException("Expected NetworkedEnum.NetworkCheck value on NetworkedEnum annotation")
+// Java: throw new IllegalStateException("Expected NetworkedEnum.NetworkCheck value on NetworkedEnum annotation")
                 LIBMATTI_ML_Logger_Error(LOGGER(), NULL,
                                          "IllegalStateException: Expected NetworkedEnum.NetworkCheck value on "
                                          "NetworkedEnum annotation");
@@ -711,7 +712,7 @@ static void return_values_to_extender(const LIBMATTI_ASM_Type *classType, LIBMAT
 static void append_values_array(const LIBMATTI_ASM_Type *classType, LIBMATTI_FML_ListGeneratorAdapter *generator,
                                 LIBMATTI_ASMT_FieldNode **enumEntries, size_t entryCount)
 {
-    // Java: values = Arrays.copyOf(values, values.length + listSize);
+// Java: values = Arrays.copyOf(values, values.length + listSize);
     LIBMATTI_ASM_COMMONS_GeneratorAdapter_Dup(generator);
     LIBMATTI_ASM_COMMONS_GeneratorAdapter_ArrayLength(generator);
     LIBMATTI_ASM_COMMONS_GeneratorAdapter_PushInt(generator, (int) entryCount);
@@ -721,7 +722,7 @@ static void append_values_array(const LIBMATTI_ASM_Type *classType, LIBMATTI_FML
     LIBMATTI_ASM_COMMONS_GeneratorAdapter_InvokeStatic(generator, ARRAYS(), copyOf);
     LIBMATTI_ASM_COMMONS_Method_Free(copyOf);
 
-    // Java: generator.checkCast(Type.getType("[" + classType.getDescriptor()));
+// Java: generator.checkCast(Type.getType("[" + classType.getDescriptor()));
     const char *typeDescriptor = LIBMATTI_ASM_Type_GetDescriptor(classType);
     size_t arrayLength = strlen(typeDescriptor) + 2;
     char *arrayDescriptor = malloc(arrayLength);
@@ -731,7 +732,7 @@ static void append_values_array(const LIBMATTI_ASM_Type *classType, LIBMATTI_FML
     LIBMATTI_ASM_Type_Free(arrayType);
     free(arrayDescriptor);
 
-    // Java: values[NEW_FIELD.ordinal()] = NEW_FIELD;
+// Java: values[NEW_FIELD.ordinal()] = NEW_FIELD;
     for (size_t i = 0; i < entryCount; i++)
     {
         LIBMATTI_ASMT_FieldNode *entry = enumEntries[i];
@@ -785,7 +786,7 @@ static LIBMATTI_NEOFORGESPI_ClassProcessor_ComputeFlags process_class(
         return LIBMATTI_NEOFORGESPI_ClassProcessor_ComputeFlags_NO_REWRITE;
     }
 
-    // Java: Set<String> ctors = classNode.methods.stream().filter(name.equals("<init>")).filter(isAllowedConstructor).map(desc).collect(toSet());
+// Java: Set<String> ctors = classNode.methods.stream().filter(name.equals("<init>")).filter(isAllowedConstructor).map(desc).collect(toSet());
     const char **ctors = NULL;
     size_t ctorCount = 0;
     for (size_t i = 0; i < classNode->methodCount; i++)
@@ -842,17 +843,17 @@ static LIBMATTI_NEOFORGESPI_ClassProcessor_ComputeFlags process_class(
 
     if (valuesPresent)
     {
-        // Java: javac
+// Java: javac
         LIBMATTI_ASMT_MethodInsnNode *valuesInsn = LIBMATTI_FML_RuntimeEnumExtender_FindFirstStaticMethodCall(
             clinit, internalName, values->name, values->desc);
-        // Java: clinit.instructions.insertBefore($valuesInsn, ...) - the port skips a missing anchor
+// Java: clinit.instructions.insertBefore($valuesInsn, ...) - the port skips a missing anchor
         if (valuesInsn != NULL)
             LIBMATTI_ASM_InsnList_InsertBeforeList(&clinit->instructions,
                                                    (LIBMATTI_ASMT_AbstractInsnNode *) valuesInsn, clinitList);
     }
     else
     {
-        // Java: ECJ
+// Java: ECJ
         LIBMATTI_ASMT_AbstractInsnNode *firstValuesArrayInsn = find_values_array_creation(classType, clinit);
         if (firstValuesArrayInsn != NULL)
             LIBMATTI_ASM_InsnList_InsertBeforeList(&clinit->instructions, firstValuesArrayInsn, clinitList);
@@ -878,7 +879,7 @@ static LIBMATTI_NEOFORGESPI_ClassProcessor_ComputeFlags process_class(
     append_values_array(classType, appendValuesGenerator, enumEntries, enumEntryCount);
     if (valuesPresent)
     {
-        // Java: javac
+// Java: javac
         LIBMATTI_ASMT_AbstractInsnNode *valuesAretInsn = LIBMATTI_FML_RuntimeEnumExtender_FindFirstInstructionBefore(
             values, LIBMATTI_ASM_ARETURN, (long long) values->instructions.size - 1);
         if (valuesAretInsn != NULL)
@@ -886,7 +887,7 @@ static LIBMATTI_NEOFORGESPI_ClassProcessor_ComputeFlags process_class(
     }
     else
     {
-        // Java: ECJ
+// Java: ECJ
         LIBMATTI_ASMT_FieldInsnNode *putStaticInsn = find_values_array_store(classType, classNode, clinit,
                                                                             internalName);
         if (putStaticInsn != NULL)
@@ -931,7 +932,7 @@ void LIBMATTI_FML_RuntimeEnumExtender_LoadEnumPrototypes(const LIBMATTI_NEOFORGE
     prototypes = NULL;
     prototypeCount = 0;
 
-    // Java: paths.entrySet().stream().map(entry -> EnumPrototype.load(...)).flatMap(List::stream).sorted()
+// Java: paths.entrySet().stream().map(entry -> EnumPrototype.load(...)).flatMap(List::stream).sorted()
     LIBMATTI_FML_EnumPrototype *all = NULL;
     size_t allCount = 0;
     for (size_t i = 0; i < count; i++)
@@ -949,7 +950,7 @@ void LIBMATTI_FML_RuntimeEnumExtender_LoadEnumPrototypes(const LIBMATTI_NEOFORGE
         free(loadedPrototypes);
     }
 
-    // Java: a stable sort of Comparable
+// Java: a stable sort of Comparable
     for (size_t i = 1; i < allCount; i++)
     {
         LIBMATTI_FML_EnumPrototype current = all[i];
@@ -962,11 +963,11 @@ void LIBMATTI_FML_RuntimeEnumExtender_LoadEnumPrototypes(const LIBMATTI_NEOFORGE
         all[j] = current;
     }
 
-    // Java: reduce into HashMap<String, List<EnumPrototype>>
+// Java: reduce into HashMap<String, List<EnumPrototype>>
     for (size_t i = 0; i < allCount; i++) entry_add(compute_if_absent(all[i].enumName), &all[i]);
     free(all);
 
-    // Java: the duplicate detection over the map entries
+// Java: the duplicate detection over the map entries
     size_t kept = 0;
     for (size_t i = 0; i < prototypeCount; i++)
     {
@@ -1005,7 +1006,7 @@ void LIBMATTI_FML_RuntimeEnumExtender_LoadEnumPrototypes(const LIBMATTI_NEOFORGE
 
         if (foundDupe)
         {
-            // Java: erroredEnums.forEach(prototypes::remove)
+// Java: erroredEnums.forEach(prototypes::remove)
             for (size_t j = 0; j < entry->count; j++) LIBMATTI_FML_EnumPrototype_Free(&entry->prototypes[j]);
             free(entry->enumName);
             free(entry->prototypes);
@@ -1021,7 +1022,7 @@ void LIBMATTI_FML_RuntimeEnumExtender_LoadEnumPrototypes(const LIBMATTI_NEOFORGE
 // Java: public static String validateNameParameter(String fieldName, String owningMod)
 const char *LIBMATTI_FML_RuntimeEnumExtender_ValidateNameParameter(const char *fieldName, const char *owningMod)
 {
-    // Java: if (!fieldName.startsWith(owningMod + ":")) throw new IllegalArgumentException(...)
+// Java: if (!fieldName.startsWith(owningMod + ":")) throw new IllegalArgumentException(...)
     size_t prefixLength = strlen(owningMod) + 1;
     char *prefix = malloc(prefixLength + 1);
     snprintf(prefix, prefixLength + 1, "%s:", owningMod);

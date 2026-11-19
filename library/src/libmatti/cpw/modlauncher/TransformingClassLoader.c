@@ -1,4 +1,5 @@
-// Port of cpw.mods.modlauncher.TransformingClassLoader.
+
+
 
 #include "libmatti/cpw/modlauncher/TransformingClassLoader.h"
 
@@ -15,7 +16,7 @@ static unsigned char *transforming_maybe_transform(LIBMATTI_CL_ModuleClassLoader
 {
     LIBMATTI_ML_TransformingClassLoader *classLoader = (LIBMATTI_ML_TransformingClassLoader *)self;
 
-    // Java: return classTransformer.transform(bytes, name, context != null ? context : CLASSLOADING_REASON)
+// Java: return classTransformer.transform(bytes, name, context != null ? context : CLASSLOADING_REASON)
     return LIBMATTI_ML_ClassTransformer_Transform(classLoader->classTransformer, bytes, length, name,
                                                  context != NULL
                                                      ? context
@@ -29,14 +30,14 @@ LIBMATTI_ML_TransformingClassLoader *LIBMATTI_ML_TransformingClassLoader_New(
 {
     LIBMATTI_ML_TransformingClassLoader *classLoader = calloc(1, sizeof(LIBMATTI_ML_TransformingClassLoader));
 
-    // Java: super("TRANSFORMER", moduleLayerHandler.getLayer(Layer.GAME).orElseThrow().configuration(),
+// Java: super("TRANSFORMER", moduleLayerHandler.getLayer(Layer.GAME).orElseThrow().configuration(),
     //            List.of(moduleLayerHandler.getLayer(Layer.SERVICE).orElseThrow()))
     LIBMATTI_JL_ModuleLayer *gameLayer = LIBMATTI_MLA_IModuleLayerManager_GetLayer(moduleLayerHandler,
                                                                                    LIBMATTI_MLA_LAYER_GAME);
     LIBMATTI_JL_Configuration *configuration = gameLayer != NULL ? LIBMATTI_JL_ModuleLayer_Configuration(gameLayer)
                                                                  : NULL;
 
-    // Java: extends ModuleClassLoader - the base state is embedded and its heap shell released
+// Java: extends ModuleClassLoader - the base state is embedded and its heap shell released
     LIBMATTI_CL_ModuleClassLoader *base = LIBMATTI_CL_ModuleClassLoader_New("TRANSFORMER", configuration);
     classLoader->base = *base;
     free(base);
@@ -77,7 +78,7 @@ LIBMATTI_ML_TransformingClassLoader *LIBMATTI_ML_TransformingClassLoader_NewWith
     free(base);
     LIBMATTI_CL_ModuleClassLoader_SetMaybeTransformClassBytes(&classLoader->base, transforming_maybe_transform);
 
-    // Java: TransformerAuditTrail tat = new TransformerAuditTrail();
+// Java: TransformerAuditTrail tat = new TransformerAuditTrail();
     //       environment.computePropertyIfAbsent(IEnvironment.Keys.AUDITTRAIL.get(), v -> tat);
     LIBMATTI_ML_TransformerAuditTrail *tat = LIBMATTI_ML_TransformerAuditTrail_New();
     LIBMATTI_ML_Environment_ComputePropertyIfAbsent(environment, LIBMATTI_MLA_IEnvironment_Keys_AuditTrail(),
@@ -105,7 +106,7 @@ unsigned char *LIBMATTI_ML_TransformingClassLoader_MaybeTransformClassBytes(
 void *LIBMATTI_ML_TransformingClassLoader_GetLoadedClass(const LIBMATTI_ML_TransformingClassLoader *classLoader,
                                                          const char *name)
 {
-    // Java: return findLoadedClass(name); // JVM-backed (external)
+// Java: return findLoadedClass(name); // JVM-backed (external)
     (void)classLoader;
     (void)name;
     return NULL;
@@ -114,7 +115,7 @@ void *LIBMATTI_ML_TransformingClassLoader_GetLoadedClass(const LIBMATTI_ML_Trans
 unsigned char *LIBMATTI_ML_TransformingClassLoader_BuildTransformedClassNodeFor(
     LIBMATTI_ML_TransformingClassLoader *classLoader, const char *className, const char *reason, size_t *outLength)
 {
-    // Java: return super.getMaybeTransformedClassBytes(className, reason)
+// Java: return super.getMaybeTransformedClassBytes(className, reason)
     return LIBMATTI_CL_ModuleClassLoader_GetMaybeTransformedClassBytes(&classLoader->base, className, reason,
                                                                      outLength);
 }

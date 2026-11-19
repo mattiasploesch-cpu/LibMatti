@@ -34,17 +34,17 @@
 // Java: public class GeneratorAdapter extends LocalVariablesSorter
 typedef struct LIBMATTI_ASM_COMMONS_GeneratorAdapter
 {
-    // Java: protected MethodVisitor mv - the port's MethodVisitor counterpart is the tree list
+// Java: protected MethodVisitor mv - the port's MethodVisitor counterpart is the tree list
     LIBMATTI_ASMT_InsnList *insnList;
 
-    // Java: private final int access / private final String name / private final String descriptor
+// Java: private final int access / private final String name / private final String descriptor
     int access;
     char *name;
     char *descriptor;
 
-    // Java: LocalVariablesSorter.nextLocal
+// Java: LocalVariablesSorter.nextLocal
     int nextLocal;
-    // Java: LocalVariablesSorter.firstLocal
+// Java: LocalVariablesSorter.firstLocal
     int firstLocal;
 } LIBMATTI_ASM_COMMONS_GeneratorAdapter;
 
@@ -166,4 +166,4 @@ LIBMATTI_ASM_Type *LIBMATTI_ASM_COMMONS_GeneratorAdapter_NUMBER_TYPE(void);
 LIBMATTI_ASM_Type *LIBMATTI_ASM_COMMONS_GeneratorAdapter_BOOLEAN_TYPE(void);
 LIBMATTI_ASM_Type *LIBMATTI_ASM_COMMONS_GeneratorAdapter_CHARACTER_TYPE(void);
 
-#endif //MATTICRAFT_ASM_COMMONS_GENERATORADAPTER_H
+#endif

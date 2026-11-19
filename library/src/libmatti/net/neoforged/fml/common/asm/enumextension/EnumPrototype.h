@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.common.asm.enumextension.EnumPrototype.
+
+
 
 #ifndef MATTICRAFT_FML_COMMON_ASM_ENUMEXTENSION_ENUMPROTOTYPE_H
 #define MATTICRAFT_FML_COMMON_ASM_ENUMEXTENSION_ENUMPROTOTYPE_H
@@ -34,4 +35,4 @@ int LIBMATTI_FML_EnumPrototype_Compare(const LIBMATTI_FML_EnumPrototype *prototy
 
 void LIBMATTI_FML_EnumPrototype_Free(LIBMATTI_FML_EnumPrototype *prototype);
 
-#endif //MATTICRAFT_FML_COMMON_ASM_ENUMEXTENSION_ENUMPROTOTYPE_H
+#endif

@@ -1,7 +1,8 @@
-// Port of net.minecraft.client.KeyMapping (implementation). The statics ALL
-// (name -> mapping) and MAP (key value -> mappings) become flat arrays over a
-// fixed registry: the game creates ~30 mappings, the port caps the table at a
-// bound the vanilla set stays well under.
+
+
+
+
+
 
 #include "libmatti/net/minecraft/client/KeyMapping.h"
 
@@ -89,13 +90,13 @@ static LIBMATTI_MC_KeyMapping *mapping_new(const char *name, LIBMATTI_MC_InputCo
         free(mapping);
         return NULL;
     }
-    // Java: this.key = p_460964_.getOrCreate(p_457112_); this.defaultKey = this.key
+// Java: this.key = p_460964_.getOrCreate(p_457112_); this.defaultKey = this.key
     mapping->key = key;
     mapping->defaultKey = key;
     mapping->keyType = type;
     mapping->category = category;
     mapping->order = order;
-    // Java: ALL.put(p_455154_, this); this.registerMapping(this.key)
+// Java: ALL.put(p_455154_, this); this.registerMapping(this.key)
     allMappings[allMappingCount++] = mapping;
     register_mapping(mapping);
     return mapping;
@@ -124,7 +125,7 @@ LIBMATTI_MC_KeyMapping *LIBMATTI_MC_KeyMapping_NewToggle(const char *name, int k
     LIBMATTI_MC_KeyMapping *mapping = mapping_new(name, LIBMATTI_MC_InputConstants_KEYSYM, key, category, 0);
     if (mapping == NULL)
         return NULL;
-    // Java: ToggleKeyMapping stores the provider; needsToggle defaults to true
+// Java: ToggleKeyMapping stores the provider; needsToggle defaults to true
     mapping->isToggle = true;
     mapping->needsToggle = needsToggle != NULL ? needsToggle : vanilla_toggle_false;
     return mapping;
@@ -134,7 +135,8 @@ void LIBMATTI_MC_KeyMapping_Free(LIBMATTI_MC_KeyMapping *mapping)
 {
     if (mapping == NULL)
         return;
-    // drop the statics' references (the port frees only through explicit calls)
+
+
     for (int i = 0; i < allMappingCount; i++)
     {
         if (allMappings[i] == mapping)
@@ -163,13 +165,13 @@ static void for_all_key_mappings(LIBMATTI_MC_InputConstants_Type type, int key,
 static void click_consumer(LIBMATTI_MC_KeyMapping *mapping, void *userData)
 {
     (void) userData;
-    // Java: p_420622_ -> p_420622_.clickCount++
+// Java: p_420622_ -> p_420622_.clickCount++
     mapping->clickCount++;
 }
 
 static void set_consumer(LIBMATTI_MC_KeyMapping *mapping, void *userData)
 {
-    // Java: p_420621_ -> p_420621_.setDown(p_90839_)
+// Java: p_420621_ -> p_420621_.setDown(p_90839_)
     LIBMATTI_MC_KeyMapping_SetDown(mapping, userData != NULL);
 }
 
@@ -303,7 +305,7 @@ const char *LIBMATTI_MC_KeyMapping_SaveString(const LIBMATTI_MC_KeyMapping *mapp
         return out;
     if (mapping->key == LIBMATTI_MC_InputConstants_UNKNOWN)
     {
-        // Java: InputConstants.UNKNOWN -> "key.keyboard.unknown" / the port's
+// Java: InputConstants.UNKNOWN -> "key.keyboard.unknown" / the port's
         // shared name
         snprintf(out, outSize, "key.keyboard.unknown");
         return out;
@@ -351,31 +353,31 @@ static LIBMATTI_MC_KeyMapping *vanillaHotbar[9];
 void LIBMATTI_MC_KeyMapping_CreateVanillaMappings(void)
 {
     if (vanillaForward != NULL)
-        return; // Java: the fields are final - created once
+        return;// Java: the fields are final - created once
     // Java: Options.java lines 563..567 (the GLFW codes ride the port constants)
     vanillaForward = LIBMATTI_MC_KeyMapping_New("key.forward", 87, LIBMATTI_MC_KeyMappingCategory_MOVEMENT);
     vanillaLeft = LIBMATTI_MC_KeyMapping_New("key.left", 65, LIBMATTI_MC_KeyMappingCategory_MOVEMENT);
     vanillaBack = LIBMATTI_MC_KeyMapping_New("key.back", 83, LIBMATTI_MC_KeyMappingCategory_MOVEMENT);
     vanillaRight = LIBMATTI_MC_KeyMapping_New("key.right", 68, LIBMATTI_MC_KeyMappingCategory_MOVEMENT);
     vanillaJump = LIBMATTI_MC_KeyMapping_New("key.jump", 32, LIBMATTI_MC_KeyMappingCategory_MOVEMENT);
-    // Java: ToggleKeyMapping("key.sneak", 340, MOVEMENT, toggleCrouch, true)
+// Java: ToggleKeyMapping("key.sneak", 340, MOVEMENT, toggleCrouch, true)
     vanillaShift = mapping_new_toggle_typed(LIBMATTI_MC_InputConstants_KEYSYM, "key.sneak", 340,
                                             LIBMATTI_MC_KeyMappingCategory_MOVEMENT, NULL);
-    // Java: ToggleKeyMapping("key.sprint", 341, MOVEMENT, toggleSprint, true)
+// Java: ToggleKeyMapping("key.sprint", 341, MOVEMENT, toggleSprint, true)
     vanillaSprint = mapping_new_toggle_typed(LIBMATTI_MC_InputConstants_KEYSYM, "key.sprint", 341,
                                              LIBMATTI_MC_KeyMappingCategory_MOVEMENT, NULL);
     vanillaInventory = LIBMATTI_MC_KeyMapping_New("key.inventory", 69, LIBMATTI_MC_KeyMappingCategory_INVENTORY);
     vanillaDrop = LIBMATTI_MC_KeyMapping_New("key.drop", 81, LIBMATTI_MC_KeyMappingCategory_INVENTORY);
-    // Java: keyAttack = ToggleKeyMapping("key.attack", MOUSE 0, GAMEPLAY, ...)
+// Java: keyAttack = ToggleKeyMapping("key.attack", MOUSE 0, GAMEPLAY, ...)
     vanillaAttack = mapping_new_toggle_typed(LIBMATTI_MC_InputConstants_MOUSE, "key.attack", 0,
                                              LIBMATTI_MC_KeyMappingCategory_GAMEPLAY, NULL);
-    // Java: keyUse = ToggleKeyMapping("key.use", MOUSE 1, GAMEPLAY, ...)
+// Java: keyUse = ToggleKeyMapping("key.use", MOUSE 1, GAMEPLAY, ...)
     vanillaUse = mapping_new_toggle_typed(LIBMATTI_MC_InputConstants_MOUSE, "key.use", 1,
                                           LIBMATTI_MC_KeyMappingCategory_GAMEPLAY, NULL);
     vanillaPickItem = LIBMATTI_MC_KeyMapping_NewTyped(LIBMATTI_MC_InputConstants_MOUSE, "key.pickItem", 2,
                                                       LIBMATTI_MC_KeyMappingCategory_GAMEPLAY);
     vanillaChat = LIBMATTI_MC_KeyMapping_New("key.chat", 84, LIBMATTI_MC_KeyMappingCategory_MULTIPLAYER);
-    // Java: keyHotbarSlots - "key.hotbar.1".."key.hotbar.9" on the digits 49..57
+// Java: keyHotbarSlots - "key.hotbar.1".."key.hotbar.9" on the digits 49..57
     for (int slot = 0; slot < 9; slot++)
     {
         char name[16];

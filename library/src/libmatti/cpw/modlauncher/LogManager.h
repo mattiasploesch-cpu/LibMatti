@@ -1,9 +1,10 @@
-//
-// Replacement for org.apache.logging.log4j.LogManager / Logger.
-// log4j is an external dependency; this layer keeps the used surface
-// (LogManager.getLogger() + logger.info/debug/error/fatal with a marker and
-// log4j parameterized messages "{}") and writes to stdout/stderr.
-//
+
+
+
+
+
+
+
 
 #ifndef MATTICRAFT_MODLAUNCHER_LOGMANAGER_H
 #define MATTICRAFT_MODLAUNCHER_LOGMANAGER_H
@@ -47,4 +48,4 @@ void LIBMATTI_ML_Logger_Error(const LIBMATTI_ML_Logger *logger, const LIBMATTI_M
 void LIBMATTI_ML_Logger_Fatal(const LIBMATTI_ML_Logger *logger, const LIBMATTI_ML_LogMarker *marker,
                               const char *message, ...);
 
-#endif //MATTICRAFT_MODLAUNCHER_LOGMANAGER_H
+#endif

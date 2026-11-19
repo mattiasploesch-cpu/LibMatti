@@ -1,4 +1,5 @@
-// Port of net.minecraft.nbt.ListTag.
+
+
 
 #include "libmatti/net/minecraft/nbt/ListTag.h"
 

@@ -9,7 +9,7 @@ LIBMATTI_JLR_InvocationTargetException *LIBMATTI_JLR_InvocationTargetException_N
     LIBMATTI_JLR_InvocationTargetException *exception = calloc(1, sizeof(LIBMATTI_JLR_InvocationTargetException));
     exception->base.className = strdup(LIBMATTI_JLR_InvocationTargetException_NAME);
 
-    // Java: public Throwable getCause() { return target; }
+// Java: public Throwable getCause() { return target; }
     exception->base.cause = target;
     return exception;
 }

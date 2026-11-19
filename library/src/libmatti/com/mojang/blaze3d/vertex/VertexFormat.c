@@ -13,7 +13,8 @@
 static int element_slot(const LIBMATTI_B3D_VertexFormatElement *element)
 {
     if (element->usage == LIBMATTI_B3D_VFE_UV)
-        return 2 + element->index;  // UV0 -> 2, UV1 -> 3, UV2 -> 4
+        return 2 + element->index;
+
     switch (element->usage)
     {
         case LIBMATTI_B3D_VFE_POSITION: return 0;
@@ -42,14 +43,14 @@ static LIBMATTI_B3D_VertexFormat *format_create(const LIBMATTI_B3D_VertexFormatE
         format->elements[i] = elements[i];
         format->names[i] = names[i];
         format->offsets[i] = offsets[i];
-        // Java: this.elementsMask = stream.mapToInt(VertexFormatElement::mask).reduce(0, (a, b) -> a | b);
+// Java: this.elementsMask = stream.mapToInt(VertexFormatElement::mask).reduce(0, (a, b) -> a | b);
         mask |= 1 << element_slot(elements[i]);
     }
     format->elements[elementCount] = NULL;
     format->names[elementCount] = NULL;
     format->elementsMask = mask;
 
-    // Java: for every id 0..31, offsetsByElement[id] = offset of the element or
+// Java: for every id 0..31, offsetsByElement[id] = offset of the element or
     // UNKNOWN_ELEMENT (the BY_ID registry order, see element_slot).
     for (int i = 0; i < 32; i++)
         format->offsetsByElement[i] = LIBMATTI_B3D_VERTEXFORMAT_UNKNOWN_ELEMENT;
@@ -59,7 +60,8 @@ static LIBMATTI_B3D_VertexFormat *format_create(const LIBMATTI_B3D_VertexFormatE
     return format;
 }
 
-// ---- Builder ---------------------------------------------------------------
+
+
 
 struct LIBMATTI_B3D_VertexFormat_Builder
 {
@@ -86,13 +88,13 @@ LIBMATTI_B3D_VertexFormat_Builder *LIBMATTI_B3D_VertexFormat_Builder_Add(
         builder->names = realloc(builder->names, (size_t) builder->elementCapacity * sizeof(*builder->names));
         builder->offsets = realloc(builder->offsets, (size_t) builder->elementCapacity * sizeof(*builder->offsets));
     }
-    // Java: ImmutableMap.builder() - duplicate keys throw at build; the port
+// Java: ImmutableMap.builder() - duplicate keys throw at build; the port
     // overwrites nothing and just appends (the callers use unique names).
     builder->elements[builder->elementCount] = element;
     builder->names[builder->elementCount] = strdup(name);
     builder->offsets[builder->elementCount] = builder->offset;
     builder->elementCount++;
-    // Java: this.offset = this.offset + p_345244_.byteSize();
+// Java: this.offset = this.offset + p_345244_.byteSize();
     builder->offset += LIBMATTI_B3D_VertexFormatElement_ByteSize(element);
     return builder;
 }
@@ -100,7 +102,7 @@ LIBMATTI_B3D_VertexFormat_Builder *LIBMATTI_B3D_VertexFormat_Builder_Add(
 LIBMATTI_B3D_VertexFormat_Builder *LIBMATTI_B3D_VertexFormat_Builder_Padding(
     LIBMATTI_B3D_VertexFormat_Builder *builder, int bytes)
 {
-    // Java: this.offset += p_345477_;
+// Java: this.offset += p_345477_;
     builder->offset += bytes;
     return builder;
 }
@@ -109,7 +111,8 @@ LIBMATTI_B3D_VertexFormat *LIBMATTI_B3D_VertexFormat_Builder_Build(LIBMATTI_B3D_
 {
     LIBMATTI_B3D_VertexFormat *format =
         format_create(builder->elements, builder->names, builder->elementCount, builder->offsets, builder->offset);
-    // The format took the names; the builder only owns the arrays.
+
+
     builder->names = NULL;
     LIBMATTI_B3D_VertexFormat_Builder_Free(builder);
     return format;
@@ -130,7 +133,8 @@ void LIBMATTI_B3D_VertexFormat_Builder_Free(LIBMATTI_B3D_VertexFormat_Builder *b
     free(builder);
 }
 
-// ---- Format ----------------------------------------------------------------
+
+
 
 void LIBMATTI_B3D_VertexFormat_Free(LIBMATTI_B3D_VertexFormat *format)
 {
@@ -141,7 +145,7 @@ void LIBMATTI_B3D_VertexFormat_Free(LIBMATTI_B3D_VertexFormat *format)
     free(format->names);
     free(format->elements);
     free(format->offsets);
-    // Java: the immediate buffers are GpuBuffers; close them with the format.
+// Java: the immediate buffers are GpuBuffers; close them with the format.
     if (format->immediateDrawVertexBuffer != NULL)
         LIBMATTI_B3D_GpuBuffer_Free(format->immediateDrawVertexBuffer);
     if (format->immediateDrawIndexBuffer != NULL)
@@ -178,8 +182,9 @@ const int *LIBMATTI_B3D_VertexFormat_GetOffsetsByElement(const LIBMATTI_B3D_Vert
     return format->offsetsByElement;
 }
 
-// Java has no index-based offset access; the port keeps it for the render
-// path (VertexArrayCache/MeshData) - linear scan over the element list.
+
+
+
 int LIBMATTI_B3D_VertexFormat_GetOffset(const LIBMATTI_B3D_VertexFormat *format, int elementIndex)
 {
     if (elementIndex < 0 || elementIndex >= format->elementCount)
@@ -190,7 +195,7 @@ int LIBMATTI_B3D_VertexFormat_GetOffset(const LIBMATTI_B3D_VertexFormat *format,
 int LIBMATTI_B3D_VertexFormat_Contains(const LIBMATTI_B3D_VertexFormat *format,
                                        const LIBMATTI_B3D_VertexFormatElement *element)
 {
-    // Java: (this.elementsMask & p_345196_.mask()) != 0 - the port shifts the
+// Java: (this.elementsMask & p_345196_.mask()) != 0 - the port shifts the
     // element's registry id (see element_slot).
     int slot = element_slot(element);
     return (format->elementsMask & (1 << slot)) != 0;
@@ -212,23 +217,24 @@ const char *LIBMATTI_B3D_VertexFormat_GetElementName(const LIBMATTI_B3D_VertexFo
     return NULL;
 }
 
-// ---- IndexType / Mode ------------------------------------------------------
+
+
 
 int LIBMATTI_B3D_VertexFormat_IndexType_Bytes(LIBMATTI_B3D_VertexFormat_IndexType type)
 {
-    // Java: SHORT(2), INT(4).
+// Java: SHORT(2), INT(4).
     return type == LIBMATTI_B3D_IndexType_INT ? 4 : 2;
 }
 
 LIBMATTI_B3D_VertexFormat_IndexType LIBMATTI_B3D_VertexFormat_IndexType_Least(int vertices)
 {
-    // Java: return (p_166934_ & -65536) != 0 ? INT : SHORT;
+// Java: return (p_166934_ & -65536) != 0 ? INT : SHORT;
     return (vertices & -65536) != 0 ? LIBMATTI_B3D_IndexType_INT : LIBMATTI_B3D_IndexType_SHORT;
 }
 
 int LIBMATTI_B3D_VertexFormat_IndexCount(const LIBMATTI_B3D_VertexFormat *format, int vertices)
 {
-    // Java: Mode.indexCount - LINES/QUADS scale to 6 indices per 4 vertices.
+// Java: Mode.indexCount - LINES/QUADS scale to 6 indices per 4 vertices.
     switch (format->mode)
     {
         case LIBMATTI_B3D_Mode_LINES:
@@ -266,7 +272,7 @@ static LIBMATTI_B3D_GpuBuffer *upload_to_buffer(LIBMATTI_B3D_GpuBuffer *existing
 unsigned int LIBMATTI_B3D_VertexFormat_UploadImmediateVertexBuffer(LIBMATTI_B3D_VertexFormat *format,
                                                                    const unsigned char *data, size_t size)
 {
-    // Java: usage 40 = MAP_WRITE | COPY_DST | VERTEX (32+8).
+// Java: usage 40 = MAP_WRITE | COPY_DST | VERTEX (32+8).
     format->immediateDrawVertexBuffer =
         upload_to_buffer(format->immediateDrawVertexBuffer, data, size,
                          LIBMATTI_B3D_USAGE_MAP_WRITE | LIBMATTI_B3D_USAGE_COPY_DST | LIBMATTI_B3D_USAGE_VERTEX);
@@ -276,7 +282,7 @@ unsigned int LIBMATTI_B3D_VertexFormat_UploadImmediateVertexBuffer(LIBMATTI_B3D_
 unsigned int LIBMATTI_B3D_VertexFormat_UploadImmediateIndexBuffer(LIBMATTI_B3D_VertexFormat *format,
                                                                   const unsigned char *data, size_t size)
 {
-    // Java: usage 72 = MAP_WRITE | COPY_DST | VERTEX | INDEX (32+8+64).
+// Java: usage 72 = MAP_WRITE | COPY_DST | VERTEX | INDEX (32+8+64).
     format->immediateDrawIndexBuffer =
         upload_to_buffer(format->immediateDrawIndexBuffer, data, size,
                          LIBMATTI_B3D_USAGE_MAP_WRITE | LIBMATTI_B3D_USAGE_COPY_DST | LIBMATTI_B3D_USAGE_VERTEX |

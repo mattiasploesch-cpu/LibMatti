@@ -1,6 +1,7 @@
-// Port of net.minecraft.server.packs.metadata.pack.PackFormat.
-// The record and the IntermediaryFormat validate logic are ported 1:1; the Codec
-// plumbing becomes the JSON reader in PackMetadataSection.
+
+
+
+
 
 #ifndef MATTICRAFT_MC_PACKS_REPOSITORY_PACKFORMAT_H
 #define MATTICRAFT_MC_PACKS_REPOSITORY_PACKFORMAT_H
@@ -60,4 +61,4 @@ int LIBMATTI_MC_PackFormat_ValidateHolderList(const LIBMATTI_MC_PackFormat_Inter
                                               const char *const *overlays, size_t count, int lastPreMinorVersion,
                                               LIBMATTI_MC_InclusiveRange *outRanges, char **outError);
 
-#endif //MATTICRAFT_MC_PACKS_REPOSITORY_PACKFORMAT_H
+#endif

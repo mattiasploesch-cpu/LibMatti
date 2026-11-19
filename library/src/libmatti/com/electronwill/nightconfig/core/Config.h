@@ -1,7 +1,8 @@
-// Port of com.electronwill.nightconfig.core.Config and UnmodifiableConfig.
-// Java keeps the values in a Map<String, Object> with nested Configs, Lists (arrays and arrays of
-// tables) and the primitive wrappers; the port keeps the same model with an insertion-ordered
-// key/value array (Java's map creator is a LinkedHashMap).
+
+
+
+
+
 
 #ifndef MATTICRAFT_NC_CORE_CONFIG_H
 #define MATTICRAFT_NC_CORE_CONFIG_H
@@ -24,7 +25,7 @@ typedef enum
     LIBMATTI_NC_VALUE_INT,
     LIBMATTI_NC_VALUE_LONG,
     LIBMATTI_NC_VALUE_DOUBLE,
-    // Java: the config layer also stores java.time Temporals (TOML dates/times)
+// Java: the config layer also stores java.time Temporals (TOML dates/times)
     LIBMATTI_NC_VALUE_TEMPORAL
 } LIBMATTI_NC_ValueType;
 
@@ -36,7 +37,7 @@ struct LIBMATTI_NC_Value
     int integer;
     long long longValue;
     double doubleValue;
-    // Java: the Temporal of a date/time value
+// Java: the Temporal of a date/time value
     LIBMATTI_JT_Temporal temporal;
     LIBMATTI_NC_Config *config;
     LIBMATTI_NC_Value *list;
@@ -52,7 +53,8 @@ struct LIBMATTI_NC_Config
 
 // Java: the value constructors
 LIBMATTI_NC_Value LIBMATTI_NC_Value_OfString(const char *value);
-// the value takes ownership of the string (avoids the copy of Value_OfString)
+
+
 LIBMATTI_NC_Value LIBMATTI_NC_Value_OwnString(char *value);
 // Java: List.add(value), growing the backing array
 void LIBMATTI_NC_Value_ListAppend(LIBMATTI_NC_Value *list, LIBMATTI_NC_Value value);
@@ -98,4 +100,4 @@ const char *LIBMATTI_NC_Config_KeyAt(const LIBMATTI_NC_Config *config, size_t in
 // Java: public Object get(List<String> path) on the last element of an array of tables
 LIBMATTI_NC_Value *LIBMATTI_NC_Value_LastOfList(const LIBMATTI_NC_Value *value);
 
-#endif //MATTICRAFT_NC_CORE_CONFIG_H
+#endif

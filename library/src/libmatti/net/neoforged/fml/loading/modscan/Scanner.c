@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.loading.modscan.Scanner.
+
+
 
 #include "libmatti/net/neoforged/fml/loading/modscan/Scanner.h"
 
@@ -48,7 +49,8 @@ static void scanClass(ScanUserdata *userdata, const char *relativePath, LIBMATTI
 
     if (node->name == NULL)
     {
-        // Java logs the ModFile itself; the port's logger only substitutes strings.
+
+
         LIBMATTI_ML_Logger_Error(LOGGER(), &LIBMATTI_FML_MARKER_SCAN, "Exception scanning {} path {}",
                                  LIBMATTI_NEOFORGESPI_IModFile_GetFilePath(
                                      LIBMATTI_FML_ModFile_AsModFile(userdata->fileToScan)),
@@ -67,7 +69,7 @@ static void scanClass(ScanUserdata *userdata, const char *relativePath, LIBMATTI
 
 static void visit(const char *relativePath, LIBMATTI_FML_JarResource *resource, void *userdata)
 {
-    // Java: if (relativePath.endsWith(".class"))
+// Java: if (relativePath.endsWith(".class"))
     if (!endsWith(relativePath, ".class")) return;
 
     scanClass(userdata, relativePath, resource);
@@ -90,11 +92,11 @@ LIBMATTI_NEOFORGESPI_ModFileScanData *LIBMATTI_FML_Scanner_Scan(const LIBMATTI_F
 {
     LIBMATTI_NEOFORGESPI_ModFileScanData *result = LIBMATTI_NEOFORGESPI_ModFileScanData_New();
 
-    // Java: result.addModFileInfo(fileToScan.getModFileInfo());
+// Java: result.addModFileInfo(fileToScan.getModFileInfo());
     LIBMATTI_NEOFORGESPI_ModFileScanData_AddModFileInfo(
         result, LIBMATTI_FML_ModFile_GetModFileInfo(scanner->fileToScan));
 
-    // Java: fileToScan.getContents().visitContent((relativePath, resource) -> { ... })
+// Java: fileToScan.getContents().visitContent((relativePath, resource) -> { ... })
     ScanUserdata userdata = {result, scanner->fileToScan};
     LIBMATTI_FML_JarContents_VisitContent(LIBMATTI_FML_ModFile_GetContents(scanner->fileToScan), visit, &userdata);
 

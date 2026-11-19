@@ -1,7 +1,8 @@
-// Port of net.neoforged.neoforge.registries.RegistryManager.
-// The vanilla/modded Registry maps live in the game port (BuiltInRegistries is Minecraft);
-// the manager keeps the event lifecycle the loader drives: postNewRegistryEvent, initDataMaps,
-// and the pending-registry bookkeeping mods use to hand their registries over.
+
+
+
+
+
 
 #ifndef MATTICRAFT_NEOFORGE_REGISTRIES_REGISTRYMANAGER_H
 #define MATTICRAFT_NEOFORGE_REGISTRIES_REGISTRYMANAGER_H
@@ -28,4 +29,4 @@ void LIBMATTI_NEOFORGE_RegistryManager_ClearPendingModdedRegistries(void);
 void LIBMATTI_NEOFORGE_RegistryManager_AddVanillaRegistryKey(const char *registryName);
 int LIBMATTI_NEOFORGE_RegistryManager_IsVanillaRegistryKey(const char *registryName);
 
-#endif //MATTICRAFT_NEOFORGE_REGISTRIES_REGISTRYMANAGER_H
+#endif

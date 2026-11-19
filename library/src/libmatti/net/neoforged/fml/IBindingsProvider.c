@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.IBindingsProvider.
+
+
 
 #include "libmatti/net/neoforged/fml/IBindingsProvider.h"
 

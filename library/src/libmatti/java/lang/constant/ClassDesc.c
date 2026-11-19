@@ -9,16 +9,19 @@ static int validate_binary_class_name(const char *name)
 {
     if (name == NULL) return 0;
 
-    // JVMS 4.2.1: an array type is not a binary class name, and ';' is descriptor syntax
+
+
     if (strchr(name, '[') != NULL || strchr(name, ';') != NULL) return 0;
 
-    // Every segment between the '/' separators has to be non-empty
+
+
     const char *segment = name;
     for (const char *p = name;; p++)
     {
         if (*p == '/' || *p == '\0')
         {
-            if (p == segment) return 0; // empty segment (leading, trailing or doubled separator)
+            if (p == segment) return 0;
+
             if (*p == '\0') break;
             segment = p + 1;
         }

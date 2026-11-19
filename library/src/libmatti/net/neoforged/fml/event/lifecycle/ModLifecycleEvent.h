@@ -1,5 +1,6 @@
-// Port of net.neoforged.fml.event.lifecycle.ModLifecycleEvent.
-// Java's Stream<IMCMessage> becomes a consumer callback (see InterModComms).
+
+
+
 
 #ifndef MATTICRAFT_FML_EVENT_LIFECYCLE_MODLIFECYCLEEVENT_H
 #define MATTICRAFT_FML_EVENT_LIFECYCLE_MODLIFECYCLEEVENT_H
@@ -14,9 +15,9 @@ typedef struct LIBMATTI_FML_Event_Lifecycle_ModLifecycleEvent LIBMATTI_FML_Event
 
 struct LIBMATTI_FML_Event_Lifecycle_ModLifecycleEvent
 {
-    // Java: extends Event implements IModBusEvent
+// Java: extends Event implements IModBusEvent
     LIBMATTI_BUS_Event base;
-    // Java: private final ModContainer container;
+// Java: private final ModContainer container;
     LIBMATTI_FML_ModContainer *container;
 };
 
@@ -41,4 +42,4 @@ void LIBMATTI_FML_Event_Lifecycle_ModLifecycleEvent_GetIMCStreamFiltered(
     int (*methodFilter)(const char *method, void *userdata), void *filterUserdata,
     void (*consumer)(const LIBMATTI_FML_InterModComms_IMCMessage *message, void *userdata), void *userdata);
 
-#endif //MATTICRAFT_FML_EVENT_LIFECYCLE_MODLIFECYCLEEVENT_H
+#endif

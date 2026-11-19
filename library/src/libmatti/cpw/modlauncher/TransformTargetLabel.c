@@ -1,4 +1,5 @@
-// Port of cpw.mods.modlauncher.TransformTargetLabel.
+
+
 
 #include "libmatti/cpw/modlauncher/TransformTargetLabel.h"
 
@@ -80,7 +81,7 @@ const LIBMATTI_MLA_TargetType *LIBMATTI_ML_TransformTargetLabel_GetTargetType(
 
 int LIBMATTI_ML_TransformTargetLabel_HashCode(const LIBMATTI_ML_TransformTargetLabel *label)
 {
-    // Java: Objects.hash(className, elementName, elementDescriptor)
+// Java: Objects.hash(className, elementName, elementDescriptor)
     int hash = 1;
     hash = hash * 31 + (int)strlen(LIBMATTI_ASM_Type_GetDescriptor(label->className));
     for (const char *c = label->elementName; *c != '\0'; c++) hash = hash * 31 + *c;

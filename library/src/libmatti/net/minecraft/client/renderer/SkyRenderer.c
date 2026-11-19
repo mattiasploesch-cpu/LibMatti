@@ -1,11 +1,12 @@
-// Port of net.minecraft.client.renderer.SkyRenderer (implementation).
-//
-// The geometry builders mirror the Java lines: the sky disc fan, the
-// sunrise/sunset fan, the sun quad, the eight moon phase quads and the 1500
-// stars over RandomSource(10842L). Java draws each through its own render
-// pass with the DynamicTransforms model-view stack; the port keeps one
-// shader per pass kind (sky disc/celestial/stars/sunrise) and sets the
-// model-view matrix + tint as uniforms.
+
+
+
+
+
+
+
+
+
 
 #include "libmatti/net/minecraft/client/renderer/SkyRenderer.h"
 
@@ -36,15 +37,17 @@ typedef struct SkyBuffer
 {
     unsigned int vbo;
     int vertexCount;
-    int indexCount; // the quads' element count (0 for the fans/drawArrays)
+    int indexCount;
+
 } SkyBuffer;
 
 struct LIBMATTI_MC_SkyRenderer
 {
-    // Java: private final TextureAtlas celestialsAtlas
-    void *celestialsAtlas; // LIBMATTI_MC_TextureAtlas*
+// Java: private final TextureAtlas celestialsAtlas
+    void *celestialsAtlas;
 
-    // Java: private final GpuBuffer starBuffer, topSkyBuffer, bottomSkyBuffer,
+
+// Java: private final GpuBuffer starBuffer, topSkyBuffer, bottomSkyBuffer,
     //       sunBuffer, moonBuffer, sunriseBuffer
     SkyBuffer starBuffer;
     SkyBuffer topSkyBuffer;
@@ -53,19 +56,20 @@ struct LIBMATTI_MC_SkyRenderer
     SkyBuffer moonBuffer;
     SkyBuffer sunriseBuffer;
 
-    // Java: private int starIndexCount
+// Java: private int starIndexCount
     int starIndexCount;
 
-    // The pass programs (Java: RenderPipelines.SKY / CELESTIAL / STARS /
+// The pass programs (Java: RenderPipelines.SKY / CELESTIAL / STARS /
     // SUNRISE_SUNSET). 0 until the first draw with a live context.
     unsigned int skyProgram;
     unsigned int celestialProgram;
     unsigned int starsProgram;
     unsigned int sunriseProgram;
 
-    // The quad index buffer (Java: RenderSystem.getSequentialBuffer(QUADS)).
+// The quad index buffer (Java: RenderSystem.getSequentialBuffer(QUADS)).
     unsigned int quadIbo;
-    int quadIboCapacity; // in quads
+    int quadIboCapacity;
+
 };
 
 // Java: DefaultVertexFormat.POSITION's vertex size
@@ -75,8 +79,9 @@ struct LIBMATTI_MC_SkyRenderer
 // Java: DefaultVertexFormat.POSITION_TEX's vertex size
 #define POS_TEX_VERT_SIZE 20
 
-// The fixed page UV for the sun sprite: the port's celestials page is the
-// 96x96 grid with the sun in cell (0,0) -> the quad covers the full cell.
+
+
+
 static void celestial_quad_uv(float u0, float v0, float u1, float v1, float *out)
 {
     out[0] = u0; out[1] = v0;
@@ -90,7 +95,8 @@ static void celestial_quad_uv(float u0, float v0, float u1, float v1, float *out
 // through the device (the port: one static VBO).
 static int build_celestial_quad(unsigned int *outVbo, const float *uv)
 {
-    float vertices[4 * POS_TEX_VERT_SIZE / 4]; // 4 x (pos 3f + uv 2f)
+    float vertices[4 * POS_TEX_VERT_SIZE / 4];
+
     const float positions[4][3] = {
         {-1.0f, 0.0f, -1.0f}, {1.0f, 0.0f, -1.0f}, {1.0f, 0.0f, 1.0f}, {-1.0f, 0.0f, 1.0f}};
     const float quadUv[4][2] = {{uv[0], uv[1]}, {uv[2], uv[3]}, {uv[4], uv[5]}, {uv[6], uv[7]}};
@@ -121,7 +127,7 @@ static int build_sun_quad(SkyBuffer *buffer, const LIBMATTI_MC_TextureAtlas *atl
     LIBMATTI_MC_Identifier_Free(sun);
     if (sprite == NULL)
         return 0;
-    // Java: the sprite UVs (getU0..getV1 over the atlas page).
+// Java: the sprite UVs (getU0..getV1 over the atlas page).
     float u0 = (float) sprite->x / (float) atlas->width;
     float v0 = (float) sprite->y / (float) atlas->height;
     float u1 = (float) (sprite->x + sprite->width) / (float) atlas->width;
@@ -153,7 +159,8 @@ static int build_moon_phases(SkyBuffer *buffer, const LIBMATTI_MC_TextureAtlas *
         float v0 = (float) sprite->y / (float) atlas->height;
         float u1 = (float) (sprite->x + sprite->width) / (float) atlas->width;
         float v1 = (float) (sprite->y + sprite->height) / (float) atlas->height;
-        // Java's phase quad flips u/v: v1 comes first, then v0.
+
+
         const float quadUv[4][2] = {{u1, v1}, {u0, v1}, {u0, v0}, {u1, v0}};
         for (int i = 0; i < 4; i++)
         {
@@ -186,7 +193,7 @@ static int build_stars(LIBMATTI_MC_SkyRenderer *renderer)
     LIBMATTI_JU_Random_SetSeed(&random, 10842UL);
     const float radius = 100.0f;
 
-    // Java: ByteBufferBuilder.exactlySized(POSITION.size * 1500 * 4)
+// Java: ByteBufferBuilder.exactlySized(POSITION.size * 1500 * 4)
     float *vertices = malloc(sizeof(float) * 5 * 1500 * 4);
     if (vertices == NULL)
         return 0;
@@ -293,7 +300,8 @@ static int build_sunrise_fan(SkyBuffer *buffer)
 {
     const int steps = 16;
     const float radius = 120.0f;
-    float vertices[steps * 3 * 5]; // 16 triangles, 3 vertices, pos+color
+    float vertices[steps * 3 * 5];
+
     float ring[steps + 1][5];
     for (int i = 0; i <= steps; i++)
     {
@@ -302,13 +310,13 @@ static int build_sunrise_fan(SkyBuffer *buffer)
         ring[i][1] = LIBMATTI_MC_Mth_Cos(f) * radius;
         ring[i][2] = -LIBMATTI_MC_Mth_Cos(f) * 40.0f;
         ring[i][3] = 1.0f;
-        ring[i][4] = 0.0f; // Java: ARGB.white(0.0F) -> alpha 0
+        ring[i][4] = 0.0f;// Java: ARGB.white(0.0F) -> alpha 0
     }
     int count = 0;
     for (int i = 0; i < steps; i++)
     {
         vertices[count * 5 + 0] = 0.0f; vertices[count * 5 + 1] = 100.0f; vertices[count * 5 + 2] = 0.0f;
-        vertices[count * 5 + 3] = 1.0f; vertices[count * 5 + 4] = 1.0f; // Java: ARGB.white(1.0F)
+        vertices[count * 5 + 3] = 1.0f; vertices[count * 5 + 4] = 1.0f;// Java: ARGB.white(1.0F)
         count++;
         vertices[count * 5 + 0] = ring[i][0]; vertices[count * 5 + 1] = ring[i][1]; vertices[count * 5 + 2] = ring[i][2];
         vertices[count * 5 + 3] = ring[i][3]; vertices[count * 5 + 4] = ring[i][4];
@@ -430,7 +438,8 @@ static unsigned int link_program(const char *vsSource, const char *fsSource, con
     return program;
 }
 
-// The per-pass VAO over the pass's vertex layout.
+
+
 static unsigned int create_vao(unsigned int vbo, int positionOnly)
 {
     unsigned int vaos[1];
@@ -446,7 +455,8 @@ static unsigned int create_vao(unsigned int vbo, int positionOnly)
     }
     else
     {
-        // POSITION_COLOR: pos 3f + color 4f.
+
+
         LIBMATTI_GL_glEnableVertexAttribArray(0);
         LIBMATTI_GL_glVertexAttribPointer(0, 3, LIBMATTI_GL_GL_FLOAT, 0, 20, NULL);
         LIBMATTI_GL_glEnableVertexAttribArray(1);
@@ -465,7 +475,8 @@ static unsigned int create_celestial_vao(unsigned int vbo)
         return 0;
     LIBMATTI_GL_glBindVertexArray(vaos[0]);
     LIBMATTI_GL_glBindBuffer(LIBMATTI_GL_GL_ARRAY_BUFFER, vbo);
-    // POSITION_TEX: pos 3f + uv 2f.
+
+
     LIBMATTI_GL_glEnableVertexAttribArray(0);
     LIBMATTI_GL_glVertexAttribPointer(0, 3, LIBMATTI_GL_GL_FLOAT, 0, 20, NULL);
     LIBMATTI_GL_glEnableVertexAttribArray(1);
@@ -526,9 +537,10 @@ LIBMATTI_MC_SkyRenderer *LIBMATTI_MC_SkyRenderer_New(void)
     renderer->starsProgram = 0;
     renderer->sunriseProgram = 0;
 
-    // The top/bottom sky discs build even without a GL context (the VBO
-    // uploads degrade to the binding's no-context fallbacks, like the
-    // section path).
+
+
+
+
     build_sky_disc(&renderer->topSkyBuffer, 16.0f);
     build_sky_disc(&renderer->bottomSkyBuffer, -16.0f);
     return renderer;
@@ -573,8 +585,9 @@ void LIBMATTI_MC_SkyRenderer_Free(LIBMATTI_MC_SkyRenderer *renderer)
     free(renderer);
 }
 
-// The lazy program + VAO pairing per pass kind. The VAOs ride the SkyBuffer's
-// vbo handle; the port caches them in small statics keyed by the handle.
+
+
+
 static unsigned int ensure_sky_program(LIBMATTI_MC_SkyRenderer *renderer)
 {
     if (renderer->skyProgram == 0)
@@ -630,8 +643,9 @@ static void set_transform(unsigned int program, const LIBMATTI_JOML_Matrix4f *mo
         LIBMATTI_GL_glUniform4f(colorLocation, r, g, b, a);
 }
 
-// The draw helpers keep the pass structure of the Java class: each renders one
-// buffer through its pipeline with the model-view stack multiplied on.
+
+
+
 void LIBMATTI_MC_SkyRenderer_DrawSkyDisc(LIBMATTI_MC_SkyRenderer *renderer, const LIBMATTI_JOML_Matrix4f *modelView,
                                          const LIBMATTI_JOML_Matrix4f *projection, float r, float g, float b, float a)
 {
@@ -739,7 +753,7 @@ void LIBMATTI_MC_SkyRenderer_DrawMoon(LIBMATTI_MC_SkyRenderer *renderer, const L
         return;
     LIBMATTI_GL_glBindVertexArray(moonVao);
     LIBMATTI_GL_glBindBuffer(LIBMATTI_GL_GL_ELEMENT_ARRAY_BUFFER, ibo);
-    // Java: drawIndexed(i, 0, 6, 1) with i = phase.index() * 4 (in elements: * 6).
+// Java: drawIndexed(i, 0, 6, 1) with i = phase.index() * 4 (in elements: * 6).
     int firstIndex = LIBMATTI_MC_MoonPhase_Index(phase) * 6;
     LIBMATTI_GL_glDrawElementsBaseVertex(LIBMATTI_GL_GL_TRIANGLES, 6, LIBMATTI_GL_GL_UNSIGNED_SHORT,
                                          (const void *) (long) (firstIndex * sizeof(unsigned short)), firstIndex / 6 * 4);
@@ -785,7 +799,7 @@ void LIBMATTI_MC_SkyRenderer_DrawSunriseSunset(LIBMATTI_MC_SkyRenderer *renderer
         return;
     LIBMATTI_JOML_Matrix4f m;
     memcpy(&m, modelView, sizeof(m));
-    // Java: mulPose(Axis.XP.rotationDegrees(90)) then the Z flip by the
+// Java: mulPose(Axis.XP.rotationDegrees(90)) then the Z flip by the
     // sunrise/sunset side, then scale(1, 1, alpha).
     LIBMATTI_JOML_Matrix4f_Rotate(&m, (float) (M_PI / 2.0), 1.0f, 0.0f, 0.0f);
     float flip = LIBMATTI_MC_Mth_Sin(angleRadians) < 0.0f ? 180.0f : 0.0f;
@@ -816,7 +830,7 @@ void LIBMATTI_MC_SkyRenderer_RenderSunMoonAndStars(LIBMATTI_MC_SkyRenderer *rend
 {
     LIBMATTI_JOML_Matrix4f base;
     memcpy(&base, modelView, sizeof(base));
-    // Java: mulPose(Axis.YP.rotationDegrees(-90.0F))
+// Java: mulPose(Axis.YP.rotationDegrees(-90.0F))
     LIBMATTI_JOML_Matrix4f_Rotate(&base, (float) (-90.0 * (M_PI / 180.0)), 0.0f, 1.0f, 0.0f);
 
     LIBMATTI_JOML_Matrix4f sunPose;

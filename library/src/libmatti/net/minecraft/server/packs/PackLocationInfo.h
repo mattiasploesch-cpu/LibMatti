@@ -1,5 +1,6 @@
-// Port of net.minecraft.server.packs.PackLocationInfo and
-// net.minecraft.server.packs.repository.PackSource.
+
+
+
 
 #ifndef MATTICRAFT_MC_PACKS_PACKLOCATIONINFO_H
 #define MATTICRAFT_MC_PACKS_PACKLOCATIONINFO_H
@@ -27,11 +28,11 @@ typedef enum
 struct LIBMATTI_MC_PackSource
 {
     LIBMATTI_MC_PackSourceType type;
-    // Java: Component decorated() - the port keeps the decoration description
+// Java: Component decorated() - the port keeps the decoration description
     const char *decoration;
-    // Java: boolean shouldBePinned()
+// Java: boolean shouldBePinned()
     int shouldBePinned;
-    // Java: boolean isForced()
+// Java: boolean isForced()
     int isForced;
 };
 
@@ -54,14 +55,15 @@ typedef struct LIBMATTI_MC_PackLocationInfo
     char *id;
     char *title;
     const LIBMATTI_MC_PackSource *source;
-    // Java: Optional<KnownPack> - the port keeps the optional fields
+// Java: Optional<KnownPack> - the port keeps the optional fields
     int hasKnownPack;
     char *knownPackNamespace;
     char *knownPackId;
     char *knownPackVersion;
 } LIBMATTI_MC_PackLocationInfo;
 
-// Both malloc the strings; locationInfo must be freed with ..._Free
+
+
 LIBMATTI_MC_PackLocationInfo *LIBMATTI_MC_PackLocationInfo_New(const char *id, const char *title,
                                                                const LIBMATTI_MC_PackSource *source);
 void LIBMATTI_MC_PackLocationInfo_Free(LIBMATTI_MC_PackLocationInfo *info);

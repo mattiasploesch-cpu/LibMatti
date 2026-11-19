@@ -1,4 +1,5 @@
-// Port of net.minecraft.world.item.ToolMaterial.
+
+
 
 #include "libmatti/net/minecraft/world/item/ToolMaterial.h"
 
@@ -20,7 +21,8 @@ static LIBMATTI_MC_ToolMaterial GOLD = {NULL, 32, 12.0f, 0.0f, 22, NULL};
 // Java: NETHERITE = (BlockTags.INCORRECT_FOR_NETHERITE_TOOL, 2031, 9.0F, 4.0F, 15, ItemTags.NETHERITE_TOOL_MATERIALS)
 static LIBMATTI_MC_ToolMaterial NETHERITE = {NULL, 2031, 9.0f, 4.0f, 15, NULL};
 
-// The tag fields are filled lazily once TagKey interning is used elsewhere too.
+
+
 static int tags_ready;
 
 static void ensure_tags(void)
@@ -103,7 +105,7 @@ const LIBMATTI_MC_ToolMaterial *LIBMATTI_MC_ToolMaterial_NETHERITE(void)
 void LIBMATTI_MC_ToolMaterial_ApplyCommonProperties(const LIBMATTI_MC_ToolMaterial *material,
                                                     LIBMATTI_MC_ItemProperties *properties)
 {
-    // Java: p.durability(this.durability).repairable(this.repairItems).enchantable(this.enchantmentValue)
+// Java: p.durability(this.durability).repairable(this.repairItems).enchantable(this.enchantmentValue)
     LIBMATTI_MC_ItemProperties_Durability(properties, material->durability);
     LIBMATTI_MC_ItemProperties_Enchantable(properties, material->enchantmentValue);
 }

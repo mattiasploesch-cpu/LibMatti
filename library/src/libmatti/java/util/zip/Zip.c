@@ -6,9 +6,10 @@
 #include <string.h>
 #include <zlib.h>
 
-// ---------------------------------------------------------------------------
-// ZipException
-// ---------------------------------------------------------------------------
+
+
+
+
 
 // Java: public class ZipException extends IOException
 static const char *ZIP_EXCEPTION_CLASS = "java.util.zip.ZipException";
@@ -22,15 +23,16 @@ int LIBMATTI_JU_ZipException_IsInstance(const struct LIBMATTI_JL_Throwable *thro
 {
     if (throwable == NULL || throwable->className == NULL)
         return 0;
-    // Java: instanceof walks the super chain; IOException/Exception/Throwable all match
+// Java: instanceof walks the super chain; IOException/Exception/Throwable all match
     return strcmp(throwable->className, ZIP_EXCEPTION_CLASS) == 0 ||
            strcmp(throwable->className, "java.io.IOException") == 0 ||
            strcmp(throwable->className, "java.lang.Exception") == 0;
 }
 
-// ---------------------------------------------------------------------------
-// Deflater
-// ---------------------------------------------------------------------------
+
+
+
+
 
 struct LIBMATTI_JU_Deflater
 {
@@ -41,7 +43,7 @@ struct LIBMATTI_JU_Deflater
 LIBMATTI_JU_Deflater *LIBMATTI_JU_Deflater_New(int level, int nowrap)
 {
     LIBMATTI_JU_Deflater *deflater = calloc(1, sizeof(LIBMATTI_JU_Deflater));
-    // Java: setLevel maps directly to zlib's levels
+// Java: setLevel maps directly to zlib's levels
     if (deflateInit2(&deflater->stream, level, Z_DEFLATED, nowrap ? -15 : 15, 8, Z_DEFAULT_STRATEGY) != Z_OK)
     {
         free(deflater);
@@ -66,7 +68,8 @@ void LIBMATTI_JU_Deflater_SetInput(LIBMATTI_JU_Deflater *deflater, const unsigne
 
 void LIBMATTI_JU_Deflater_Finish(LIBMATTI_JU_Deflater *deflater)
 {
-    // zlib signals the end through Z_FINISH on the next deflate call
+
+
     deflater->finished = 0;
 }
 
@@ -87,11 +90,12 @@ size_t LIBMATTI_JU_Deflater_Deflate(LIBMATTI_JU_Deflater *deflater, unsigned cha
 
 unsigned char *LIBMATTI_JU_Deflater_Compress(const unsigned char *input, size_t length, size_t *outLength)
 {
-    // Java: a one-shot uses Deflater with a bound of input + overhead
+// Java: a one-shot uses Deflater with a bound of input + overhead
     uLong bound = compressBound((uLong) length);
     unsigned char *output = malloc(bound);
-    // Java's Deflater() default wraps zlib - no header when nowrap is requested;
-    // the port matches Java's default (zlib header, nowrap=false)
+
+
+
     uLongf compressedLength = bound;
     if (compress2(output, &compressedLength, input, (uLong) length, Z_DEFAULT_COMPRESSION) != Z_OK)
     {
@@ -103,9 +107,10 @@ unsigned char *LIBMATTI_JU_Deflater_Compress(const unsigned char *input, size_t 
     return output;
 }
 
-// ---------------------------------------------------------------------------
-// Inflater
-// ---------------------------------------------------------------------------
+
+
+
+
 
 struct LIBMATTI_JU_Inflater
 {
@@ -156,7 +161,7 @@ size_t LIBMATTI_JU_Inflater_Inflate(LIBMATTI_JU_Inflater *inflater, unsigned cha
     if (result == Z_STREAM_END)
         inflater->finished = 1;
     if (result == Z_DATA_ERROR || result == Z_NEED_DICT)
-        return 0; // Java: throws DataFormatException
+        return 0;// Java: throws DataFormatException
     return outputLength - inflater->stream.avail_out;
 }
 
@@ -180,7 +185,7 @@ unsigned char *LIBMATTI_JU_Inflater_Decompress(const unsigned char *input, size_
         size_t chunk = LIBMATTI_JU_Inflater_Inflate(inflater, output + written, capacity - written);
         if (chunk == 0)
         {
-            // Java: DataFormatException("corrupt stream") / needs more input
+// Java: DataFormatException("corrupt stream") / needs more input
             if (!inflater->finished && !LIBMATTI_JU_Inflater_NeedsInput(inflater))
             {
                 LIBMATTI_JU_Inflater_Free(inflater);

@@ -21,9 +21,10 @@ typedef struct JarFileResource
     LIBMATTI_FML_JarResource base;
     LIBMATTI_UNION_UnionFileSystem *fileSystem;
     char *relativePath;
-    // Java: private final boolean mutable
+// Java: private final boolean mutable
     int mutable;
-    // Set by retain(); tells visitContent that it must not free the resource
+
+
     int retained;
 } JarFileResource;
 
@@ -62,7 +63,7 @@ static unsigned char *readEntry(LIBMATTI_UNION_UnionFileSystem *fileSystem, cons
 {
     *outLength = 0;
     if (relativePath[0] == '\0')
-        return NULL; // Java: throw new IOException("The path refers to the root directory")
+        return NULL;// Java: throw new IOException("The path refers to the root directory")
 
     const char *parts[1] = {relativePath};
     LIBMATTI_UNION_UnionPath *entry = LIBMATTI_UNION_UnionFileSystem_GetPath(fileSystem, parts, 1);
@@ -74,7 +75,7 @@ static unsigned char *readEntry(LIBMATTI_UNION_UnionFileSystem *fileSystem, cons
     LIBMATTI_UNION_UnionPath_Free(entry);
 
     if (!read)
-        return NULL; // Java: return null when the entry was not found
+        return NULL;// Java: return null when the entry was not found
 
     *outLength = length;
     return bytes;
@@ -94,7 +95,7 @@ static void resourceAttributes(void *self, LIBMATTI_FML_JarResourceAttributes *o
     out->lastModifiedMillis = 0;
     out->size = 0;
 
-    // Java: entry.getSize(); the ELF section header carries no timestamp
+// Java: entry.getSize(); the ELF section header carries no timestamp
     const char *parts[1] = {resource->relativePath};
     LIBMATTI_UNION_UnionPath *entry = LIBMATTI_UNION_UnionFileSystem_GetPath(resource->fileSystem, parts, 1);
 
@@ -107,7 +108,8 @@ static void resourceAttributes(void *self, LIBMATTI_FML_JarResourceAttributes *o
 
 static void freeJarFileResource(JarFileResource *resource);
 
-// Java has no release; the port frees the handle a get() allocated.
+
+
 static void resourceFree(void *self)
 {
     freeJarFileResource(self);
@@ -124,7 +126,8 @@ static LIBMATTI_FML_JarResource *resourceRetain(void *self)
     copy->fileSystem = resource->fileSystem;
     copy->relativePath = strdup(resource->relativePath);
     copy->mutable = 0;
-    copy->retained = 1; // the owner releases it together with the contents
+    copy->retained = 1;
+
     copy->base.self = copy;
     copy->base.open = resourceOpen;
     copy->base.attributes = resourceAttributes;
@@ -147,7 +150,7 @@ static int getChecksum(void *self, char **out)
 {
     JarFileContents *contents = self;
 
-    // Java: MessageDigest.getInstance("SHA-256") over DigestInputStream(in).transferTo(nullOutputStream())
+// Java: MessageDigest.getInstance("SHA-256") over DigestInputStream(in).transferTo(nullOutputStream())
     FILE *file = fopen(contents->path, "rb");
     if (file == NULL)
         return 0;
@@ -171,7 +174,7 @@ static int getChecksum(void *self, char **out)
     LIBMATTI_JS_MessageDigest_Free(digest);
     free(bytes);
 
-    // Java: HexFormat.of().formatHex(checksum)
+// Java: HexFormat.of().formatHex(checksum)
     char *hex = malloc(digestLength * 2 + 1);
     for (size_t i = 0; i < digestLength; i++)
         snprintf(hex + i * 2, 3, "%02x", hash[i]);
@@ -243,7 +246,7 @@ static int findFile(void *self, const char *relativePath, LIBMATTI_JN_URI **out)
     int found = 0;
     if (hasEntry(contents->fileSystem, normalized))
     {
-        // Java: URI.create("jar:" + path.toUri() + "!/" + relativePath)
+// Java: URI.create("jar:" + path.toUri() + "!/" + relativePath)
         const char *parts[1] = {normalized};
         LIBMATTI_UNION_UnionPath *entry = LIBMATTI_UNION_UnionFileSystem_GetPath(contents->fileSystem, parts, 1);
         *out = LIBMATTI_UNION_UnionPath_ToUri(entry);
@@ -302,8 +305,9 @@ static int visitEntry(const char *relativePath, int isDirectory, void *userdata)
 
     context->visitor(relativePath, &resource->base, context->userdata);
 
-    // Java reuses one resource object; the port allocates per visit and releases
-    // it again unless the visitor retained a copy.
+
+
+
     if (!resource->retained)
         freeJarFileResource(resource);
 
@@ -318,7 +322,8 @@ static void visitContent(void *self, const char *startingFolder, LIBMATTI_FML_Ja
     char *folderPrefix = LIBMATTI_FML_PathNormalization_NormalizeFolderPrefix(startingFolder);
 
     VisitContext context = {visitor, userdata, contents};
-    (void) folderPrefix; // the walk is rooted at the requested folder already
+    (void) folderPrefix;
+
 
     LIBMATTI_UNION_UnionFileSystem_Walk(contents->fileSystem, folderPrefix, 1, visitEntry, &context);
 
@@ -329,7 +334,7 @@ static void closeContents(void *self)
 {
     JarFileContents *contents = self;
     LIBMATTI_UNION_UnionFileSystem_Close(contents->fileSystem);
-    // Java: the empty manifest is the shared EmptyManifest.INSTANCE
+// Java: the empty manifest is the shared EmptyManifest.INSTANCE
     if (contents->manifest != LIBMATTI_FML_EmptyManifest_Instance())
         LIBMATTI_JU_Manifest_Free(contents->manifest);
     free(contents->path);
@@ -353,7 +358,7 @@ LIBMATTI_FML_JarContents *LIBMATTI_FML_JarFileContents_New(const char *path)
     JarFileContents *contents = calloc(1, sizeof(JarFileContents));
     contents->path = strdup(path);
 
-    // Java: new JarFile(path.toFile(), true, JarFile.OPEN_READ, JarFile.runtimeVersion())
+// Java: new JarFile(path.toFile(), true, JarFile.OPEN_READ, JarFile.runtimeVersion())
     const char *paths[1] = {path};
     contents->fileSystem =
         LIBMATTI_UNION_UnionFileSystem_New(LIBMATTI_UNION_UnionFileSystemProvider_Get(), NULL, path, paths, 1);
@@ -378,7 +383,7 @@ LIBMATTI_FML_JarContents *LIBMATTI_FML_JarFileContents_New(const char *path)
     contents->base.close = closeContents;
     contents->base.toStringImpl = toStringImpl;
 
-    // Java: Objects.requireNonNullElse(jarFile.getManifest(), EmptyManifest.INSTANCE)
+// Java: Objects.requireNonNullElse(jarFile.getManifest(), EmptyManifest.INSTANCE)
     size_t manifestLength = 0;
     unsigned char *manifestBytes = readEntry(contents->fileSystem, MANIFEST_NAME, &manifestLength);
     if (manifestBytes != NULL)

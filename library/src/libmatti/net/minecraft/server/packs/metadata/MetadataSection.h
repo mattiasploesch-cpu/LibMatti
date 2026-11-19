@@ -1,9 +1,10 @@
-// Port of net.minecraft.server.packs.metadata.MetadataSectionSerializer (the
-// registry key) and net.minecraft.server.packs.metadata.pack.PackMetadataSection.
-//
-// Java registers the serializers in PackMetadataSection's static TYPE plus the
-// game's serializer registry; the port uses one shared map keyed by the section
-// name (e.g. "pack", "filter", "feature_flags", "overlays").
+
+
+
+
+
+
+
 
 #ifndef MATTICRAFT_MC_PACKS_METADATA_METADATASECTION_H
 #define MATTICRAFT_MC_PACKS_METADATA_METADATASECTION_H
@@ -16,7 +17,7 @@
 typedef struct LIBMATTI_MC_MetadataSectionSerializer
 {
     const char *name;
-    // Java: T fromJson(JsonElement) - returns malloc'd section, NULL + *outError on failure
+// Java: T fromJson(JsonElement) - returns malloc'd section, NULL + *outError on failure
     void *(*fromJson)(const struct LIBMATTI_MC_MetadataSectionSerializer *self,
                       const LIBMATTI_GSON_JsonElement *element, char **outError);
 } LIBMATTI_MC_MetadataSectionSerializer;

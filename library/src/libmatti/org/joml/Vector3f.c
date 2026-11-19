@@ -152,7 +152,7 @@ LIBMATTI_JOML_Vector3f *LIBMATTI_JOML_Vector3f_Lerp(LIBMATTI_JOML_Vector3f *v, c
 LIBMATTI_JOML_Vector3f *LIBMATTI_JOML_Vector3f_RotateAxis(LIBMATTI_JOML_Vector3f *v, float angle, float ax, float ay,
                                                           float az)
 {
-    // Java: rotateAxisInternal - Rodrigues' rotation formula
+// Java: rotateAxisInternal - Rodrigues' rotation formula
     // fast paths for the unit axes fall through to rotateX/Y/Z
     if (ay == 0.0f && az == 0.0f && (ax == 1.0f || ax == -1.0f))
         return LIBMATTI_JOML_Vector3f_RotateX(v, ax * angle);

@@ -1,4 +1,5 @@
-// Port of net.neoforged.bus.api.IEventClassChecker.
+
+
 
 #include "libmatti/net/neoforged/bus/api/IEventClassChecker.h"
 

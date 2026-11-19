@@ -1,5 +1,6 @@
-// Port of net.neoforged.fml.loading.moddiscovery.locators.InDevFolderLocator.
-// Finds mods and services that are passed as exploded folders on the classpath and are grouped explicitly.
+
+
+
 
 #ifndef MATTICRAFT_FML_LOADING_MODDISCOVERY_LOCATORS_INDEVFOLDERLOCATOR_H
 #define MATTICRAFT_FML_LOADING_MODDISCOVERY_LOCATORS_INDEVFOLDERLOCATOR_H
@@ -23,7 +24,7 @@ typedef struct
 {
     LIBMATTI_NEOFORGESPI_IModFileCandidateLocator locator;
 
-    // Java: Map<File, VirtualJarManifestEntry> virtualJarMemberIndex
+// Java: Map<File, VirtualJarManifestEntry> virtualJarMemberIndex
     char **memberKeys;
     LIBMATTI_FML_VirtualJarManifestEntry **memberValues;
     size_t memberCount;
@@ -42,4 +43,4 @@ int LIBMATTI_FML_InDevFolderLocator_GetPriority(void *self);
 // Java: @Override public String toString() { return "indevfolder"; }
 char *LIBMATTI_FML_InDevFolderLocator_ToString(void *self);
 
-#endif //MATTICRAFT_FML_LOADING_MODDISCOVERY_LOCATORS_INDEVFOLDERLOCATOR_H
+#endif

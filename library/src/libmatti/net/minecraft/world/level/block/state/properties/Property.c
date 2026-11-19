@@ -1,5 +1,6 @@
-// Port of net.minecraft.world.level.block.state.properties.Property and the three
-// concrete subclasses.
+
+
+
 
 #include "libmatti/net/minecraft/world/level/block/state/properties/Property.h"
 
@@ -27,7 +28,7 @@ static LIBMATTI_MC_Property *alloc_property(const char *name, LIBMATTI_MC_Proper
 LIBMATTI_MC_Property *LIBMATTI_MC_BooleanProperty_Create(const char *name)
 {
     LIBMATTI_MC_Property *property = alloc_property(name, LIBMATTI_MC_Property_KIND_BOOLEAN, "Boolean");
-    // Java: List.of(true, false) - true first, false second
+// Java: List.of(true, false) - true first, false second
     property->valueCount = 2;
     property->values = malloc(sizeof(LIBMATTI_MC_Property_Value) * 2);
     property->values[0] = (LIBMATTI_MC_Property_Value){0, 1, "true"};
@@ -40,14 +41,14 @@ LIBMATTI_MC_Property *LIBMATTI_MC_IntegerProperty_Create(const char *name, int m
 {
     if (min < 0)
     {
-        // Java: throw new IllegalArgumentException("Min value of " + name + " must be 0 or greater")
+// Java: throw new IllegalArgumentException("Min value of " + name + " must be 0 or greater")
         LIBMATTI_ML_Logger *logger = LIBMATTI_ML_LogManager_GetLogger();
         LIBMATTI_ML_Logger_Error(logger, NULL, "Min value of {} must be 0 or greater", name);
         exit(1);
     }
     if (max <= min)
     {
-        // Java: throw new IllegalArgumentException("Max value of ... must be greater than min")
+// Java: throw new IllegalArgumentException("Max value of ... must be greater than min")
         LIBMATTI_ML_Logger *logger = LIBMATTI_ML_LogManager_GetLogger();
         LIBMATTI_ML_Logger_Error(logger, NULL, "Max value of {} must be greater than min", name);
         exit(1);
@@ -55,7 +56,7 @@ LIBMATTI_MC_Property *LIBMATTI_MC_IntegerProperty_Create(const char *name, int m
     LIBMATTI_MC_Property *property = alloc_property(name, LIBMATTI_MC_Property_KIND_INTEGER, "Integer");
     property->min = min;
     property->max = max;
-    // Java: IntImmutableList.toList(IntStream.range(min, max + 1))
+// Java: IntImmutableList.toList(IntStream.range(min, max + 1))
     property->valueCount = max - min + 1;
     property->values = malloc(sizeof(LIBMATTI_MC_Property_Value) * property->valueCount);
     for (int i = 0; i < property->valueCount; i++)
@@ -73,7 +74,7 @@ LIBMATTI_MC_Property *LIBMATTI_MC_EnumProperty_Create(const char *name, const ch
 {
     if (count <= 0)
     {
-        // Java: throw new IllegalArgumentException("Trying to make empty EnumProperty '" + name + "'")
+// Java: throw new IllegalArgumentException("Trying to make empty EnumProperty '" + name + "'")
         LIBMATTI_ML_Logger *logger = LIBMATTI_ML_LogManager_GetLogger();
         LIBMATTI_ML_Logger_Error(logger, NULL, "Trying to make empty EnumProperty '{}'", name);
         exit(1);
@@ -107,17 +108,17 @@ const char *LIBMATTI_MC_Property_ValueName(const LIBMATTI_MC_Property *property,
     switch (property->kind)
     {
     case LIBMATTI_MC_Property_KIND_BOOLEAN:
-        // Java: Boolean.toString()
+// Java: Boolean.toString()
         return value.b ? "true" : "false";
     case LIBMATTI_MC_Property_KIND_INTEGER:
     {
-        // Java: Integer.toString()
+// Java: Integer.toString()
         static char buffer[16];
         snprintf(buffer, sizeof(buffer), "%d", value.index);
         return buffer;
     }
     case LIBMATTI_MC_Property_KIND_ENUM:
-        // Java: T.getSerializedName()
+// Java: T.getSerializedName()
         return value.s;
     }
     return "";
@@ -132,7 +133,7 @@ LIBMATTI_MC_Property_Value LIBMATTI_MC_Property_ParseValue(const LIBMATTI_MC_Pro
     switch (property->kind)
     {
     case LIBMATTI_MC_Property_KIND_BOOLEAN:
-        // Java: switch (value): "true" -> true, "false" -> false, default -> empty
+// Java: switch (value): "true" -> true, "false" -> false, default -> empty
         if (strcmp(serialized, "true") == 0)
         {
             if (found != NULL) *found = 1;
@@ -146,7 +147,7 @@ LIBMATTI_MC_Property_Value LIBMATTI_MC_Property_ParseValue(const LIBMATTI_MC_Pro
         break;
     case LIBMATTI_MC_Property_KIND_INTEGER:
     {
-        // Java: Integer.parseInt with the range check
+// Java: Integer.parseInt with the range check
         char *end = NULL;
         long parsed = strtol(serialized, &end, 10);
         if (end != serialized && *end == '\0' && parsed >= property->min && parsed <= property->max)
@@ -157,7 +158,7 @@ LIBMATTI_MC_Property_Value LIBMATTI_MC_Property_ParseValue(const LIBMATTI_MC_Pro
         break;
     }
     case LIBMATTI_MC_Property_KIND_ENUM:
-        // Java: Optional.ofNullable(names.get(value))
+// Java: Optional.ofNullable(names.get(value))
         for (int i = 0; i < property->valueCount; i++)
         {
             if (strcmp(property->values[i].s, serialized) == 0)
@@ -177,13 +178,13 @@ int LIBMATTI_MC_Property_InternalIndex(const LIBMATTI_MC_Property *property, LIB
     switch (property->kind)
     {
     case LIBMATTI_MC_Property_KIND_BOOLEAN:
-        // Java: value ? 0 : 1
+// Java: value ? 0 : 1
         return value.b ? 0 : 1;
     case LIBMATTI_MC_Property_KIND_INTEGER:
-        // Java: value <= max ? value - min : -1
+// Java: value <= max ? value - min : -1
         return value.index <= property->max ? value.index - property->min : -1;
     case LIBMATTI_MC_Property_KIND_ENUM:
-        // Java: ordinalToIndex[ordinal] - the port stores the index directly
+// Java: ordinalToIndex[ordinal] - the port stores the index directly
         return value.index;
     }
     return -1;
@@ -198,7 +199,7 @@ int LIBMATTI_MC_Property_Equals(const LIBMATTI_MC_Property *a, const LIBMATTI_MC
         return 0;
     if (a->kind != b->kind || strcmp(a->name, b->name) != 0)
         return 0;
-    // Java: IntegerProperty/EnumProperty add the values equality
+// Java: IntegerProperty/EnumProperty add the values equality
     if (a->kind == LIBMATTI_MC_Property_KIND_BOOLEAN)
         return 1;
     if (a->valueCount != b->valueCount)
@@ -233,6 +234,7 @@ int LIBMATTI_MC_Property_IndexOf(const LIBMATTI_MC_Property *property, LIBMATTI_
     int internal = LIBMATTI_MC_Property_InternalIndex(property, value);
     if (internal < 0 || internal >= property->valueCount)
         return -1;
-    // The value table is indexed exactly like the internal index in every subclass
+
+
     return internal;
 }

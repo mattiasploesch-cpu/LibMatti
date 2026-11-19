@@ -1,0 +1,244 @@
+{
+  "version": 6,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 20,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "base",
+      "hidden": true,
+      "generator": "Ninja",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+      }
+    },
+    {
+      "name": "linux-x64",
+      "displayName": "Linux x86_64 (Release)",
+      "inherits": "base",
+      "binaryDir": "${sourceDir}/build/linux-x64",
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Linux"
+      },
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    },
+    {
+      "name": "linux-x64-debug",
+      "displayName": "Linux x86_64 (Debug)",
+      "inherits": "linux-x64",
+      "binaryDir": "${sourceDir}/build/linux-x64-debug",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "windows-msvc-x64",
+      "displayName": "Windows x64 (MSVC)",
+      "inherits": "base",
+      "binaryDir": "${sourceDir}/build/windows-msvc-x64",
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Windows"
+      },
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    },
+    {
+      "name": "windows-msvc-arm64",
+      "displayName": "Windows arm64 (MSVC)",
+      "inherits": "base",
+      "binaryDir": "${sourceDir}/build/windows-msvc-arm64",
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Windows"
+      },
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    },
+    {
+      "name": "windows-mingw-x64",
+      "displayName": "Windows x64 (MinGW-w64 cross from Linux)",
+      "inherits": "base",
+      "binaryDir": "${sourceDir}/build/windows-mingw-x64",
+      "toolchainFile": "${sourceDir}/cmake/toolchains/mingw-w64.cmake",
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Linux"
+      },
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "MATTI_MINGW_TRIPLE": "x86_64-w64-mingw32"
+      }
+    },
+    {
+      "name": "windows-mingw-x86",
+      "displayName": "Windows x86 (MinGW-w64 cross from Linux)",
+      "inherits": "windows-mingw-x64",
+      "binaryDir": "${sourceDir}/build/windows-mingw-x86",
+      "cacheVariables": {
+        "MATTI_MINGW_TRIPLE": "i686-w64-mingw32"
+      }
+    },
+    {
+      "name": "macos-osxcross",
+      "displayName": "macOS (osxcross from Linux)",
+      "inherits": "base",
+      "binaryDir": "${sourceDir}/build/macos-osxcross",
+      "toolchainFile": "${sourceDir}/cmake/toolchains/osxcross.cmake",
+      "condition": {
+        "type": "notEquals",
+        "lhs": "$env{OSXCROSS_ROOT}",
+        "rhs": ""
+      },
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    },
+    {
+      "name": "macos-universal",
+      "displayName": "macOS universal (arm64 + x86_64)",
+      "inherits": "base",
+      "binaryDir": "${sourceDir}/build/macos-universal",
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Darwin"
+      },
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_OSX_ARCHITECTURES": "arm64;x86_64",
+        "CMAKE_OSX_DEPLOYMENT_TARGET": "12.0"
+      }
+    },
+    {
+      "name": "android-arm64",
+      "displayName": "Android arm64-v8a",
+      "inherits": "base",
+      "binaryDir": "${sourceDir}/build/android-arm64",
+      "condition": {
+        "type": "notEquals",
+        "lhs": "$env{ANDROID_NDK_HOME}",
+        "rhs": ""
+      },
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_TOOLCHAIN_FILE": "$env{ANDROID_NDK_HOME}/build/cmake/android.toolchain.cmake",
+        "ANDROID_ABI": "arm64-v8a",
+        "ANDROID_PLATFORM": "android-26"
+      }
+    },
+    {
+      "name": "android-x64",
+      "displayName": "Android x86_64 (emulator)",
+      "inherits": "android-arm64",
+      "binaryDir": "${sourceDir}/build/android-x64",
+      "cacheVariables": {
+        "ANDROID_ABI": "x86_64"
+      }
+    },
+    {
+      "name": "freebsd-x64",
+      "displayName": "FreeBSD x86_64 (Release)",
+      "inherits": "base",
+      "binaryDir": "${sourceDir}/build/freebsd-x64",
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "FreeBSD"
+      },
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "linux-x64",
+      "configurePreset": "linux-x64",
+      "targets": ["vulkancraft", "runClient", "matti_shared"]
+    },
+    {
+      "name": "linux-x64-debug",
+      "configurePreset": "linux-x64-debug",
+      "targets": ["vulkancraft", "matti_shared"]
+    },
+    {
+      "name": "windows-msvc-x64",
+      "configurePreset": "windows-msvc-x64",
+      "targets": ["vulkancraft", "runClient", "matti_shared"]
+    },
+    {
+      "name": "windows-msvc-arm64",
+      "configurePreset": "windows-msvc-arm64",
+      "targets": ["vulkancraft", "matti_shared"]
+    },
+    {
+      "name": "windows-mingw-x64",
+      "configurePreset": "windows-mingw-x64",
+      "targets": ["vulkancraft", "runClient", "matti_shared"]
+    },
+    {
+      "name": "windows-mingw-x86",
+      "configurePreset": "windows-mingw-x86",
+      "targets": ["vulkancraft", "matti_shared"]
+    },
+    {
+      "name": "macos-osxcross",
+      "configurePreset": "macos-osxcross",
+      "targets": ["vulkancraft", "matti_shared"]
+    },
+    {
+      "name": "macos-universal",
+      "configurePreset": "macos-universal",
+      "targets": ["vulkancraft", "runClient", "matti_shared"]
+    },
+    {
+      "name": "android-arm64",
+      "configurePreset": "android-arm64"
+    },
+    {
+      "name": "android-x64",
+      "configurePreset": "android-x64"
+    },
+    {
+      "name": "freebsd-x64",
+      "configurePreset": "freebsd-x64",
+      "targets": ["vulkancraft", "runClient", "matti_shared", "launcher"]
+    }
+  ],
+  "testPresets": [
+    {
+      "name": "linux-x64",
+      "configurePreset": "linux-x64",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "linux-x64-debug",
+      "configurePreset": "linux-x64-debug",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "freebsd-x64",
+      "configurePreset": "freebsd-x64",
+      "output": {
+        "outputOnFailure": true
+      }
+    }
+  ]
+}

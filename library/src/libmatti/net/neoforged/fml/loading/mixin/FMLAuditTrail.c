@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.loading.mixin.FMLAuditTrail.
+
+
 
 #include "libmatti/net/neoforged/fml/loading/mixin/FMLAuditTrail.h"
 
@@ -12,9 +13,9 @@
 
 typedef struct
 {
-    // Java: private String currentClass
+// Java: private String currentClass
     char *currentClass;
-    // Java: private BiConsumer<String, String[]> consumer
+// Java: private BiConsumer<String, String[]> consumer
     void (*consumer)(const char *activity, const char **context, size_t contextCount, void *userdata);
     void *userdata;
 } FMLAuditTrail;

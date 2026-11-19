@@ -44,4 +44,4 @@ void LIBMATTI_L4J_ThrowableProxy_FormatExtendedStackTraceTo(LIBMATTI_L4J_Throwab
                                                             LIBMATTI_L4J_TextRenderer *textRenderer,
                                                             const char *suffix, const char *lineSeparator);
 
-#endif //MATTICRAFT_L4J_THROWABLEPROXY_H
+#endif

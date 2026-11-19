@@ -14,10 +14,16 @@
 
 cmake_minimum_required(VERSION 3.20)
 
+# Same NixOS-aware compiler selection as the root project. This project is
+# configured separately (also by the root target "build_mods").
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../cmake")
+include(MattiPlatform)
+
 project(MatticraftMods C)
 
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
+set(CMAKE_C_EXTENSIONS ON)
 
 # The repository root (the folder that contains library/, client/ and mods/).
 get_filename_component(MATTI_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/.." ABSOLUTE)

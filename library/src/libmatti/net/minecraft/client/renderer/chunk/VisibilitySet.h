@@ -1,5 +1,6 @@
-// Port of net.minecraft.client.renderer.chunk.VisibilitySet - the 6-bit face
-// visibility between the two section faces (Direction pairs).
+
+
+
 
 #ifndef MATTICRAFT_MC_CLIENT_RENDERER_CHUNK_VISIBILITYSET_H
 #define MATTICRAFT_MC_CLIENT_RENDERER_CHUNK_VISIBILITYSET_H
@@ -16,7 +17,7 @@ extern "C" {
 // (INNER_INDEX_ACCESSOR stores the per-direction inner index 0..5).
 typedef struct LIBMATTI_MC_VisibilitySet
 {
-    // Java: private long visibilityData
+// Java: private long visibilityData
     uint64_t visibilityData;
 } LIBMATTI_MC_VisibilitySet;
 
@@ -49,4 +50,4 @@ int LIBMATTI_MC_VisibilitySet_BetweenFaces(const LIBMATTI_MC_VisibilitySet *set,
 }
 #endif
 
-#endif //MATTICRAFT_MC_CLIENT_RENDERER_CHUNK_VISIBILITYSET_H
+#endif

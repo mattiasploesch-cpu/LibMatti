@@ -1,7 +1,8 @@
-// Entity harness: the P5.1 core - the EntityType registry (register/byString,
-// dimensions), the Entity base (position/rotation/bounding box, tags, NBT
-// round trip), the vanilla entity constants and the Level entity surface
-// (add/remove/query through the AABB overlap).
+
+
+
+
+
 
 #include "libmatti/net/minecraft/Bootstrap.h"
 #include "libmatti/net/minecraft/core/BlockPos.h"
@@ -32,10 +33,12 @@ static void check(int condition, const char *what)
 
 int main(void)
 {
-    // the registry bootstrap fills BLOCK/ITEM/ENTITY_TYPE and raises the guard
+
+
     LIBMATTI_MC_Bootstrap_BootStrap();
 
-    // ---- the EntityType registry -------------------------------------------------
+
+
     const LIBMATTI_MC_EntityType *zombie = LIBMATTI_MC_EntityType_ZOMBIE();
     check(zombie != NULL, "zombie type registered");
     check(zombie != NULL && strcmp(LIBMATTI_MC_EntityType_GetId(zombie), "minecraft:zombie") == 0, "zombie id round trip");
@@ -56,12 +59,14 @@ int main(void)
     check(item != NULL && LIBMATTI_MC_EntityType_TrackDeltas(item), "item tracks deltas");
     check(player != NULL && !LIBMATTI_MC_EntityType_TrackDeltas(player), "player does not track deltas");
 
-    // ---- MobCategory --------------------------------------------------------------
+
+
     check(LIBMATTI_MC_MobCategory_GetMax(LIBMATTI_MC_MobCategory_MONSTER) == 70, "monster cap 70");
     check(LIBMATTI_MC_MobCategory_GetMaxInstancesPerChunk(LIBMATTI_MC_MobCategory_MISC) == 0, "misc has no cap");
     check(LIBMATTI_MC_MobCategory_ByName("creature") == LIBMATTI_MC_MobCategory_CREATURE, "MobCategory byName");
 
-    // ---- EntityDimensions ----------------------------------------------------------
+
+
     LIBMATTI_MC_EntityDimensions *dims = LIBMATTI_MC_EntityDimensions_Scalable(0.6f, 1.8f);
     check(dims != NULL && fabs(dims->eyeHeight - 1.8f * 0.85f) < 1e-5, "default eye height = height * 0.85");
     LIBMATTI_MC_Vec3 *pos = LIBMATTI_MC_Vec3_New(10.0, 64.0, -3.0);
@@ -75,7 +80,8 @@ int main(void)
     LIBMATTI_MC_EntityDimensions *fixedScaled = LIBMATTI_MC_EntityDimensions_Scale(fixed, 2.0f);
     check(fixedScaled != NULL && fabs(fixedScaled->width - 1.0f) < 1e-5, "fixed dimensions ignore scale");
 
-    // ---- EntityAttachments -----------------------------------------------------------
+
+
     LIBMATTI_MC_EntityAttachmentsBuilder *builder = LIBMATTI_MC_EntityAttachments_Builder();
     LIBMATTI_MC_EntityAttachmentsBuilder_Attach(builder, LIBMATTI_MC_EntityAttachment_PASSENGER, 0.0f, 2.0f, 0.5f);
     LIBMATTI_MC_EntityAttachments *attachments = LIBMATTI_MC_EntityAttachmentsBuilder_Build(builder, 0.6f, 1.8f);
@@ -86,10 +92,12 @@ int main(void)
     LIBMATTI_MC_Vec3 *center = LIBMATTI_MC_EntityAttachments_Get(attachments, LIBMATTI_MC_EntityAttachment_WARDEN_CHEST, 0, 0.0f);
     check(center != NULL && fabs(center->y - 0.9) < 1e-5, "warden chest falls back to center");
     LIBMATTI_MC_Vec3 *rotated = LIBMATTI_MC_EntityAttachments_Get(attachments, LIBMATTI_MC_EntityAttachment_PASSENGER, 0, 90.0f);
-    // yRot(-90deg) turns (0, 2, 0.5): x = z*sin(-90)?? the transform: x = x*c + z*s, z = z*c - x*s with s=sin(90)
+
+
     check(rotated != NULL && fabs(rotated->x + 0.5) < 1e-6 && fabs(rotated->z) < 1e-6, "attachment rotates with yRot");
 
-    // ---- the Entity base over a vanilla subclass -------------------------------------
+
+
     LIBMATTI_MC_Level *level = LIBMATTI_MC_Level_New(-64, 384, LIBMATTI_MC_Level_OVERWORLD, true);
     LIBMATTI_MC_Entity *entity = LIBMATTI_MC_EntityType_CreateAt(zombie, level, LIBMATTI_MC_BlockPos_New(3, 65, 4));
     check(entity != NULL, "zombie spawned through the factory");
@@ -103,20 +111,23 @@ int main(void)
     LIBMATTI_JU_UUID uuid2 = LIBMATTI_MC_Entity_GetUUID(second);
     check(!LIBMATTI_JU_UUID_Equals(&uuid1, &uuid2), "uuids differ per entity");
 
-    // rotation: the % 360 normalisation + the clamp of turn()
+
+
     LIBMATTI_MC_Entity_SetRot(entity, 540.0f, 10.0f);
     check(fabs(LIBMATTI_MC_Entity_GetYRot(entity) - 180.0f) < 1e-5, "setRot normalises yaw (540 -> 180)");
     LIBMATTI_MC_Entity_Turn(entity, 10.0, 0.0);
     check(fabs(LIBMATTI_MC_Entity_GetYRot(entity) - 181.5f) < 1e-5, "turn adds yaw * 0.15");
 
-    // the bounding box follows the position
+
+
     LIBMATTI_MC_Entity_SetPos(entity, 100.0, 70.0, 200.0);
     const LIBMATTI_MC_AABB *entityBox = LIBMATTI_MC_Entity_GetBoundingBox(entity);
     check(entityBox != NULL && fabs(entityBox->minX - 99.7) < 1e-5 && fabs(entityBox->maxX - 100.3) < 1e-5, "bbox refreshes on setPos");
     check(entityBox != NULL && fabs(entityBox->maxY - 71.95) < 1e-5, "bbox height 1.95");
     check(fabs(LIBMATTI_MC_Entity_GetEyeHeight(entity) - 1.74f) < 1e-5, "zombie eye height 1.74");
 
-    // tags: sorted set semantics
+
+
     check(LIBMATTI_MC_Entity_AddTag(entity, "persistent"), "addTag");
     check(!LIBMATTI_MC_Entity_AddTag(entity, "persistent"), "addTag twice fails");
     check(LIBMATTI_MC_Entity_AddTag(entity, "boss") && LIBMATTI_MC_Entity_AddTag(entity, "cull"), "more tags");
@@ -128,12 +139,14 @@ int main(void)
     LIBMATTI_MC_Entity_GetTags(entity, &tagCount);
     check(tagCount == 2, "two tags after remove");
 
-    // the removal lifecycle
+
+
     check(!LIBMATTI_MC_Entity_IsRemoved(entity), "alive after spawn");
     LIBMATTI_MC_Entity_Discard(entity);
     check(LIBMATTI_MC_Entity_IsRemoved(entity), "discard removes");
 
-    // ---- the NBT round trip -----------------------------------------------------------
+
+
     LIBMATTI_MC_Entity *saved = LIBMATTI_MC_EntityType_CreateAt(zombie, level, LIBMATTI_MC_BlockPos_New(1, 70, 2));
     LIBMATTI_MC_Entity_SetPos(saved, 1.5, 70.0, 2.5);
     LIBMATTI_MC_Entity_SetRot(saved, 45.0f, -20.0f);
@@ -144,13 +157,15 @@ int main(void)
     LIBMATTI_MC_Entity_AddTag(saved, "harness_tag");
     LIBMATTI_MC_Nbt_CompoundTag *tag = LIBMATTI_MC_Nbt_CompoundTag_New();
     LIBMATTI_MC_Entity_SaveWithoutId(saved, tag);
-    // the vanilla keys exist
+
+
     check(LIBMATTI_MC_Nbt_CompoundTag_Contains(tag, "Pos"), "save writes Pos");
     check(LIBMATTI_MC_Nbt_CompoundTag_Contains(tag, "Motion"), "save writes Motion");
     check(LIBMATTI_MC_Nbt_CompoundTag_Contains(tag, "Rotation"), "save writes Rotation");
     check(LIBMATTI_MC_Nbt_CompoundTag_Contains(tag, "UUID"), "save writes UUID");
     check(LIBMATTI_MC_Nbt_CompoundTag_GetBooleanOr(tag, "OnGround", false), "save writes OnGround");
-    // load into a fresh entity and compare
+
+
     LIBMATTI_MC_Entity *loaded = LIBMATTI_MC_EntityType_Create(zombie, level);
     LIBMATTI_MC_Entity_Load(loaded, tag);
     check(fabs(LIBMATTI_MC_Entity_GetX(loaded) - 1.5) < 1e-9 && fabs(LIBMATTI_MC_Entity_GetY(loaded) - 70.0) < 1e-9, "load restores Pos");
@@ -167,7 +182,8 @@ int main(void)
     LIBMATTI_MC_Entity_GetTags(loaded, &loadedTags);
     check(loadedTags == 1, "load restores Tags");
 
-    // ---- the Level entity surface -------------------------------------------------------
+
+
     check(LIBMATTI_MC_Level_GetEntityCount(level) == 0, "level starts empty");
     LIBMATTI_MC_Entity *a = LIBMATTI_MC_EntityType_CreateAt(zombie, level, LIBMATTI_MC_BlockPos_New(0, 65, 0));
     LIBMATTI_MC_Entity *b = LIBMATTI_MC_EntityType_CreateAt(zombie, level, LIBMATTI_MC_BlockPos_New(100, 65, 100));
@@ -185,7 +201,8 @@ int main(void)
     check(LIBMATTI_MC_Level_GetEntityCount(level) == 1, "one entity after removal");
     check(!LIBMATTI_MC_Level_RemoveEntity(level, a), "removing twice fails");
 
-    // the fallback spawn path: item + orb + tnt factories
+
+
     LIBMATTI_MC_Entity *orb = LIBMATTI_MC_EntityType_Create(LIBMATTI_MC_EntityType_EXPERIENCE_ORB(), level);
     check(orb != NULL && LIBMATTI_MC_Entity_GetType(orb) == LIBMATTI_MC_EntityType_EXPERIENCE_ORB(), "orb factory");
     LIBMATTI_MC_Entity *itemEntity = LIBMATTI_MC_EntityType_Create(LIBMATTI_MC_EntityType_ITEM(), level);

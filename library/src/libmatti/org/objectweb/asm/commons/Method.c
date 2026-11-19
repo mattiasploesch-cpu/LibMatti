@@ -1,4 +1,5 @@
-// Port of org.objectweb.asm.commons.Method.
+
+
 
 #include "libmatti/org/objectweb/asm/commons/Method.h"
 
@@ -21,7 +22,7 @@ LIBMATTI_ASM_COMMONS_Method *LIBMATTI_ASM_COMMONS_Method_NewWithTypes(const char
                                                                      LIBMATTI_ASM_Type **argumentTypes,
                                                                      size_t argumentCount)
 {
-    // Java: this(name, Type.getMethodDescriptor(returnType, argumentTypes));
+// Java: this(name, Type.getMethodDescriptor(returnType, argumentTypes));
     char *descriptor = LIBMATTI_ASM_Type_GetMethodDescriptor(returnType, argumentTypes, argumentCount);
     LIBMATTI_ASM_COMMONS_Method *method = LIBMATTI_ASM_COMMONS_Method_New(name, descriptor);
     free(descriptor);

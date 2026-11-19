@@ -1,6 +1,7 @@
-// NBT harness: builds a compound covering every tag kind, checks the SNBT round trip
-// (parse -> print -> parse), the binary round trip (write -> read) and the gzip round
-// trip of NbtIo, and the ListTag wrapper/unwrap behaviour.
+
+
+
+
 
 #include "libmatti/net/minecraft/nbt/CompoundTag.h"
 #include "libmatti/net/minecraft/nbt/ListTag.h"
@@ -123,7 +124,8 @@ static void test_gzip_round_trip(void)
     LIBMATTI_MC_Nbt_CompoundTag_FreeEntries(sample);
     free(sample);
 
-    // the file variants
+
+
     check(LIBMATTI_MC_Nbt_NbtIo_WriteCompressedFile(build_sample(), "nbt-test.dat"),
           "NbtIo.writeCompressedFile succeeds");
     LIBMATTI_MC_Nbt_CompoundTag *fromFile = LIBMATTI_MC_Nbt_NbtIo_ReadCompressedFile("nbt-test.dat", NULL);
@@ -139,7 +141,7 @@ static void test_gzip_round_trip(void)
 
 static void test_snbt(void)
 {
-    // Java: TagParser.parseCompoundFully covers the SNBT surface
+// Java: TagParser.parseCompoundFully covers the SNBT surface
     LIBMATTI_MC_Nbt_CompoundTag *parsed = LIBMATTI_MC_Nbt_TagParser_ParseCompoundFully(
         "{byte: 1b, short: 2s, int: 3, long: 4L, float: 0.5f, double: 0.25d, str: \"hi\", flag: true, "
         "list: [1, 2, 3], bytes: [B; 1, 2], ints: [I; 3, 4], longs: [L; 5L], "
@@ -180,7 +182,7 @@ static void test_snbt(void)
     LIBMATTI_MC_Nbt_CompoundTag_FreeEntries(parsed);
     free(parsed);
 
-    // the underscore literals (Java: NumberRunParseRule allows single separators)
+// the underscore literals (Java: NumberRunParseRule allows single separators)
     LIBMATTI_MC_Nbt_CompoundTag *underscores = LIBMATTI_MC_Nbt_TagParser_ParseCompoundFully("{a: 1_0}");
     check(underscores != NULL, "SNBT underscore digits");
     if (underscores != NULL)
@@ -190,15 +192,16 @@ static void test_snbt(void)
         free(underscores);
     }
 
-    // Java: ERROR_UNDESCORE_NOT_ALLOWED - doubled or edge underscores are rejected
+// Java: ERROR_UNDESCORE_NOT_ALLOWED - doubled or edge underscores are rejected
     check(LIBMATTI_MC_Nbt_TagParser_ParseCompoundFully("{a: 1__0}") == NULL, "doubled underscore rejected");
 
-    // Java: ERROR_LEADING_ZERO_NOT_ALLOWED
+// Java: ERROR_LEADING_ZERO_NOT_ALLOWED
     check(LIBMATTI_MC_Nbt_TagParser_ParseCompoundFully("{a: 007}") == NULL, "leading zero rejected");
-    // Java: ERROR_TRAILING_DATA
+// Java: ERROR_TRAILING_DATA
     check(LIBMATTI_MC_Nbt_TagParser_ParseCompoundFully("{a: 1} x") == NULL, "trailing data rejected");
 
-    // the print side: CompoundTag.toString sorts the keys
+
+
     LIBMATTI_MC_Nbt_CompoundTag *sample = build_sample();
     char *plain = LIBMATTI_MC_Nbt_StringTagVisitor_Visit((LIBMATTI_MC_Nbt_Tag *) sample);
     check(plain != NULL && strstr(plain, "nested:") != NULL && plain[0] == '{', "StringTagVisitor prints");
@@ -212,7 +215,8 @@ static void test_snbt(void)
     LIBMATTI_MC_Nbt_CompoundTag_FreeEntries(sample);
     free(sample);
 
-    // the SNBT round trip through the plain printer
+
+
     LIBMATTI_MC_Nbt_CompoundTag *original = build_sample();
     char *printed = LIBMATTI_MC_Nbt_StringTagVisitor_Visit((LIBMATTI_MC_Nbt_Tag *) original);
     LIBMATTI_MC_Nbt_CompoundTag *reparsed = LIBMATTI_MC_Nbt_TagParser_ParseCompoundFully(printed);
@@ -232,7 +236,7 @@ static void test_snbt(void)
 
 static void test_wrappers(void)
 {
-    // Java: a list of bytes stores wrapped compounds on the wire and unwraps on load
+// Java: a list of bytes stores wrapped compounds on the wire and unwraps on load
     LIBMATTI_MC_Nbt_ListTag *list = LIBMATTI_MC_Nbt_ListTag_New();
     LIBMATTI_MC_Nbt_ListTag_Add(list, LIBMATTI_MC_Nbt_StringTag_Of("a"));
     LIBMATTI_MC_Nbt_ListTag_Add(list, LIBMATTI_MC_Nbt_StringTag_Of("b"));
@@ -260,7 +264,7 @@ static void test_wrappers(void)
     LIBMATTI_MC_Nbt_CompoundTag_FreeEntries(holder);
     free(holder);
 
-    // Java: ListTag.equals is order-sensitive, CompoundTag.equals is not
+// Java: ListTag.equals is order-sensitive, CompoundTag.equals is not
     LIBMATTI_MC_Nbt_CompoundTag *a = LIBMATTI_MC_Nbt_CompoundTag_New();
     LIBMATTI_MC_Nbt_CompoundTag *b = LIBMATTI_MC_Nbt_CompoundTag_New();
     LIBMATTI_MC_Nbt_CompoundTag_PutInt(a, "x", 1);
@@ -274,7 +278,7 @@ static void test_wrappers(void)
     LIBMATTI_MC_Nbt_CompoundTag_FreeEntries(b);
     free(b);
 
-    // Java: CompoundTag.merge
+// Java: CompoundTag.merge
     LIBMATTI_MC_Nbt_CompoundTag *base = LIBMATTI_MC_Nbt_CompoundTag_New();
     LIBMATTI_MC_Nbt_CompoundTag *baseNested = LIBMATTI_MC_Nbt_CompoundTag_New();
     LIBMATTI_MC_Nbt_CompoundTag_PutInt(baseNested, "keep", 1);

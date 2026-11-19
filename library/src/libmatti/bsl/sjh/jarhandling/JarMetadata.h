@@ -1,7 +1,8 @@
-//
-// Created by administrator on 09.09.26.
-//
-// Port of cpw.mods.jarhandling.JarMetadata.
+
+
+
+
+
 
 #ifndef MATTICRAFT_JARMETADATA_H
 #define MATTICRAFT_JARMETADATA_H
@@ -31,4 +32,4 @@ LIBMATTI_JH_NameAndVersion *LIBMATTI_JH_JarMetadata_ComputeNameAndVersion(const 
 // Java: static JarMetadata from(JarContents jar)
 LIBMATTI_JH_JarMetadata *LIBMATTI_JH_JarMetadata_From(LIBMATTI_JH_JarContents *contents);
 
-#endif //MATTICRAFT_JARMETADATA_H
+#endif

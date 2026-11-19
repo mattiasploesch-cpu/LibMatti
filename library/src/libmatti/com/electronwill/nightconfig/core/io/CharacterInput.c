@@ -1,4 +1,5 @@
-// Port of com.electronwill.nightconfig.core.io.ReaderInput.
+
+
 
 #include "libmatti/com/electronwill/nightconfig/core/io/CharacterInput.h"
 

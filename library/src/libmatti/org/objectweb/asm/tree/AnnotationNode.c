@@ -1,4 +1,5 @@
-// Port of org.objectweb.asm.tree.AnnotationNode.
+
+
 
 #include "libmatti/org/objectweb/asm/tree/AnnotationNode.h"
 

@@ -21,7 +21,7 @@ static LIBMATTI_ML_Logger *LOGGER(void)
 LIBMATTI_NEOFORGESPI_IModFileInfo *LIBMATTI_FML_ModFileParser_ReadModList(
     LIBMATTI_FML_ModFile *modFile, LIBMATTI_NEOFORGESPI_ModFileInfoParser parser, void *parserUserdata)
 {
-    // Java: return parser.build(modFile);
+// Java: return parser.build(modFile);
     return parser((LIBMATTI_NEOFORGESPI_IModFile *) &modFile->modFile, parserUserdata);
 }
 
@@ -29,12 +29,12 @@ LIBMATTI_NEOFORGESPI_IModFileInfo *LIBMATTI_FML_ModFileParser_ReadModList(
 LIBMATTI_NEOFORGESPI_IModFileInfo *LIBMATTI_FML_ModFileParser_ModsTomlParser(
     LIBMATTI_NEOFORGESPI_IModFile *imodFile)
 {
-    // Java: ModFile modFile = (ModFile) imodFile;
+// Java: ModFile modFile = (ModFile) imodFile;
     LIBMATTI_FML_ModFile *modFile = (LIBMATTI_FML_ModFile *) imodFile;
     LIBMATTI_ML_Logger_Debug(LOGGER(), &LIBMATTI_FML_MARKER_LOADING, "Considering mod file candidate {}",
                              LIBMATTI_NEOFORGESPI_IModFile_GetFilePath(imodFile));
 
-    // Java: var modsjson = modFile.getContents().get(JarModsDotTomlModFileReader.MODS_TOML);
+// Java: var modsjson = modFile.getContents().get(JarModsDotTomlModFileReader.MODS_TOML);
     LIBMATTI_FML_JarResource *modsjson =
         LIBMATTI_FML_JarContents_Get(LIBMATTI_FML_ModFile_GetContents(modFile), LIBMATTI_FML_MODS_TOML);
     if (modsjson == NULL)
@@ -44,7 +44,7 @@ LIBMATTI_NEOFORGESPI_IModFileInfo *LIBMATTI_FML_ModFileParser_ModsTomlParser(
         return NULL;
     }
 
-    // Java: config = TomlFormat.instance().createParser().parse(reader).unmodifiable();
+// Java: config = TomlFormat.instance().createParser().parse(reader).unmodifiable();
     size_t length = 0;
     unsigned char *bytes = LIBMATTI_FML_JarResource_ReadAllBytes(modsjson, &length);
     LIBMATTI_FML_JarResource_Free(modsjson);
@@ -74,7 +74,8 @@ LIBMATTI_NEOFORGESPI_IModFileInfo *LIBMATTI_FML_ModFileParser_ModsTomlParser(
         LIBMATTI_FML_NightConfigWrapper_SetFileConsumer, configWrapper));
     if (modFileInfo == NULL)
     {
-        // the file was rejected, so nothing keeps the parsed configuration alive
+
+
         LIBMATTI_FML_NightConfigWrapper_Free(configWrapper);
         LIBMATTI_NC_Config_Free(config);
         return NULL;
@@ -94,7 +95,7 @@ LIBMATTI_FML_ModFileParser_MixinConfig *LIBMATTI_FML_ModFileParser_GetMixinConfi
     LIBMATTI_NEOFORGESPI_IModFileInfo *modFileInfo, size_t *count)
 {
     *count = 0;
-    // Java: try { ... } catch (Exception exception) { LOGGER.error("Failed to load mixin configs from mod file"); return List.of(); }
+// Java: try { ... } catch (Exception exception) { LOGGER.error("Failed to load mixin configs from mod file"); return List.of(); }
     LIBMATTI_NEOFORGESPI_IConfigurable *config = LIBMATTI_NEOFORGESPI_IModFileInfo_GetConfig(modFileInfo);
     if (config == NULL) return NULL;
 
@@ -120,7 +121,7 @@ LIBMATTI_FML_ModFileParser_MixinConfig *LIBMATTI_FML_ModFileParser_GetMixinConfi
         LIBMATTI_FML_ModFileParser_MixinConfig mixin = {0};
         mixin.config = strdup(name.string);
 
-        // Java: mixinsEntry.<List<String>>getConfigElement("requiredMods").orElse(List.of())
+// Java: mixinsEntry.<List<String>>getConfigElement("requiredMods").orElse(List.of())
         LIBMATTI_NEOFORGESPI_IConfigurable_Value requiredMods;
         if (LIBMATTI_NEOFORGESPI_IConfigurable_GetElement(entries[i], "requiredMods", &requiredMods) &&
             requiredMods.type == LIBMATTI_NEOFORGESPI_IConfigurable_STRING_LIST)
@@ -130,7 +131,7 @@ LIBMATTI_FML_ModFileParser_MixinConfig *LIBMATTI_FML_ModFileParser_GetMixinConfi
             for (size_t j = 0; j < requiredMods.listCount; j++) mixin.requiredMods[j] = strdup(requiredMods.list[j]);
         }
 
-        // Java: mixinsEntry.<String>getConfigElement("behaviorVersion").map(DefaultArtifactVersion::new).orElse(null)
+// Java: mixinsEntry.<String>getConfigElement("behaviorVersion").map(DefaultArtifactVersion::new).orElse(null)
         LIBMATTI_NEOFORGESPI_IConfigurable_Value behaviorVersion;
         if (LIBMATTI_NEOFORGESPI_IConfigurable_GetElement(entries[i], "behaviorVersion", &behaviorVersion) &&
             behaviorVersion.type == LIBMATTI_NEOFORGESPI_IConfigurable_STRING)
@@ -149,7 +150,7 @@ int LIBMATTI_FML_ModFileParser_GetAccessTransformers(LIBMATTI_NEOFORGESPI_IModFi
                                                      size_t *count)
 {
     *count = 0;
-    // Java: try { ... } catch (Exception exception) { LOGGER.error("Failed to load access transformers from mod file"); return Optional.of(List.of()); }
+// Java: try { ... } catch (Exception exception) { LOGGER.error("Failed to load access transformers from mod file"); return Optional.of(List.of()); }
     LIBMATTI_NEOFORGESPI_IConfigurable *config = LIBMATTI_NEOFORGESPI_IModFileInfo_GetConfig(modFileInfo);
     if (config == NULL) return 0;
 

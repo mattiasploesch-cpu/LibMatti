@@ -1,6 +1,7 @@
-//
-// Port of cpw.mods.modlauncher.Environment.
-//
+
+
+
+
 
 #ifndef MATTICRAFT_MODLAUNCHER_ENVIRONMENT_H
 #define MATTICRAFT_MODLAUNCHER_ENVIRONMENT_H
@@ -25,4 +26,4 @@ void *LIBMATTI_ML_Environment_ComputePropertyIfAbsent(LIBMATTI_ML_Environment *e
                                                       void *(*valueFunction)(LIBMATTI_MLA_Key *key, void *userdata),
                                                       void *userdata);
 
-#endif //MATTICRAFT_MODLAUNCHER_ENVIRONMENT_H
+#endif

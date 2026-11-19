@@ -1,4 +1,5 @@
-// Port of net.minecraft.world.level.levelgen.Heightmap.
+
+
 
 #ifndef MATTICRAFT_MC_WORLD_LEVEL_LEVELGEN_HEIGHTMAP_H
 #define MATTICRAFT_MC_WORLD_LEVEL_LEVELGEN_HEIGHTMAP_H
@@ -32,11 +33,11 @@ typedef enum LIBMATTI_MC_HeightmapTypes
 // negative min exceed a byte)
 typedef struct LIBMATTI_MC_Heightmap
 {
-    // Java: private final BitStorage data - heights relative to chunk min
+// Java: private final BitStorage data - heights relative to chunk min
     uint16_t data[256];
-    // Java: private final ChunkAccess chunk
+// Java: private final ChunkAccess chunk
     struct LIBMATTI_MC_ChunkAccess *chunk;
-    // Java: the Types predicate - NOT_AIR vs MATERIAL_MOTION_BLOCKING
+// Java: the Types predicate - NOT_AIR vs MATERIAL_MOTION_BLOCKING
     LIBMATTI_MC_HeightmapTypes type;
 } LIBMATTI_MC_Heightmap;
 
@@ -63,4 +64,4 @@ void LIBMATTI_MC_Heightmap_PrimeHeightmaps(struct LIBMATTI_MC_ChunkAccess *chunk
 }
 #endif
 
-#endif //MATTICRAFT_MC_WORLD_LEVEL_LEVELGEN_HEIGHTMAP_H
+#endif

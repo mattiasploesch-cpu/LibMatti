@@ -7,7 +7,7 @@
 // Java: static JarModuleInfo from(JarContents jar)
 LIBMATTI_FML_JarModuleInfo *LIBMATTI_FML_JarModuleInfo_From(LIBMATTI_FML_JarContents *jar)
 {
-    // Java: var moduleInfoResource = jar.get("module-info.class")
+// Java: var moduleInfoResource = jar.get("module-info.class")
     LIBMATTI_FML_JarResource *moduleInfoResource = LIBMATTI_FML_JarContents_Get(jar, "module-info.class");
     if (moduleInfoResource != NULL)
         return LIBMATTI_FML_ModuleJarModuleInfo_New(moduleInfoResource);

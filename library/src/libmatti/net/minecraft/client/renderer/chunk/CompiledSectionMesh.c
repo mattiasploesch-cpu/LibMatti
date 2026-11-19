@@ -1,4 +1,5 @@
-// Port of net.minecraft.client.renderer.chunk.CompiledSectionMesh (implementation).
+
+
 
 #include "libmatti/net/minecraft/client/renderer/chunk/CompiledSectionMesh.h"
 

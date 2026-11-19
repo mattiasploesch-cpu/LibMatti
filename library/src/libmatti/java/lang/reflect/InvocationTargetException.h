@@ -19,4 +19,4 @@ void LIBMATTI_JLR_InvocationTargetException_Free(LIBMATTI_JLR_InvocationTargetEx
 LIBMATTI_JL_Throwable *LIBMATTI_JLR_InvocationTargetException_GetTargetException(
     const LIBMATTI_JLR_InvocationTargetException *exception);
 
-#endif //MATTICRAFT_JAVA_LANG_REFLECT_INVOCATIONTARGETEXCEPTION_H
+#endif

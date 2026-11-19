@@ -1,5 +1,6 @@
-// Port of net.neoforged.fml.loading.LanguageProviderLoader.
-// The FMLJavaModLanguageProvider and moddiscovery.ModFile are ported.
+
+
+
 
 #ifndef MATTICRAFT_FML_LOADING_LANGUAGEPROVIDERLOADER_H
 #define MATTICRAFT_FML_LOADING_LANGUAGEPROVIDERLOADER_H
@@ -34,4 +35,4 @@ LIBMATTI_NEOFORGESPI_IModLanguageLoader *LIBMATTI_FML_LanguageProviderLoader_Fin
 
 void LIBMATTI_FML_LanguageProviderLoader_Free(LIBMATTI_FML_LanguageProviderLoader *loader);
 
-#endif //MATTICRAFT_FML_LOADING_LANGUAGEPROVIDERLOADER_H
+#endif

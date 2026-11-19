@@ -31,4 +31,4 @@ char *LIBMATTI_FML_ClasspathResourceUtils_FindFileSystemRootOfFileOnClasspathFro
 char **LIBMATTI_FML_ClasspathResourceUtils_GetAllClasspathItems(const LIBMATTI_JL_ClassLoader *loader,
                                                                 size_t *count);
 
-#endif //MATTICRAFT_FML_UTIL_CLASSPATHRESOURCEUTILS_H
+#endif

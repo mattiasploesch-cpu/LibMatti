@@ -1,8 +1,9 @@
-// Port of net.minecraft.world.entity.player.Abilities (the player capability
-// record: invulnerable/flying/mayfly/instabuild/mayBuild + the walk/fly speeds
-// the movement uses). Java's codec becomes the NBT read/write on the Player
-// save path (the keys "invulnerable"/"mayfly"/"instabuild"/"mayBuild"/
-// "flySpeed"/"walkSpeed" of the "abilities" sub-tag).
+
+
+
+
+
+
 
 #ifndef MATTICRAFT_MC_WORLD_ENTITY_PLAYER_ABILITIES_H
 #define MATTICRAFT_MC_WORLD_ENTITY_PLAYER_ABILITIES_H
@@ -39,4 +40,4 @@ void LIBMATTI_MC_Abilities_SetWalkingSpeed(LIBMATTI_MC_Abilities *abilities, flo
 }
 #endif
 
-#endif //MATTICRAFT_MC_WORLD_ENTITY_PLAYER_ABILITIES_H
+#endif

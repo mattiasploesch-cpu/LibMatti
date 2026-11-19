@@ -35,7 +35,8 @@ static int parse_modifier(const char *modifier, LIBMATTI_AT_Modifier *out)
 // Java: the class name validation - dot-separated java identifiers
 static int is_valid_class_name(const char *name)
 {
-    int lastWasDot = 1; // start behaves like "after a dot"
+    int lastWasDot = 1;
+
     for (const char *c = name; *c != '\0'; c++)
     {
         if (lastWasDot)
@@ -96,7 +97,7 @@ LIBMATTI_AT_AtEntry **LIBMATTI_AT_AtParser_Parse(const char *text, const char *o
     const char *cursor = text;
     while (*cursor != '\0')
     {
-        // Java: LineNumberReader.readLine()
+// Java: LineNumberReader.readLine()
         size_t lineLength = strcspn(cursor, "\n");
         char *line = malloc(lineLength + 1);
         memcpy(line, cursor, lineLength);
@@ -104,7 +105,7 @@ LIBMATTI_AT_AtEntry **LIBMATTI_AT_AtParser_Parse(const char *text, const char *o
         cursor += lineLength + (cursor[lineLength] == '\n' ? 1 : 0);
         lineNumber++;
 
-        // Java: strip comments ('#') and split on whitespace runs
+// Java: strip comments ('#') and split on whitespace runs
         char *parts[8];
         size_t partCount = 0;
         char *builder = malloc(lineLength + 1);
@@ -139,7 +140,8 @@ LIBMATTI_AT_AtEntry **LIBMATTI_AT_AtParser_Parse(const char *text, const char *o
         free(line);
 
         if (partCount == 0)
-            continue; // empty or comment-only line
+            continue;
+
 
         if (partCount < 2)
         {
@@ -147,7 +149,7 @@ LIBMATTI_AT_AtEntry **LIBMATTI_AT_AtParser_Parse(const char *text, const char *o
             return NULL;
         }
 
-        // Java: the -f / +f suffixes on the modifier
+// Java: the -f / +f suffixes on the modifier
         char *modifierString = parts[0];
         LIBMATTI_AT_FinalState finalState = LIBMATTI_AT_FinalState_LEAVE;
         size_t modifierLength = strlen(modifierString);
@@ -193,7 +195,7 @@ LIBMATTI_AT_AtEntry **LIBMATTI_AT_AtParser_Parse(const char *text, const char *o
                 target = LIBMATTI_AT_Target_WildcardMethod(className);
             else if (strchr(member, '(') != NULL)
             {
-                // Java: name = before '(', desc = from '(' with '.' replaced by '/'
+// Java: name = before '(', desc = from '(' with '.' replaced by '/'
                 char *paren = strchr(member, '(');
                 size_t nameLength = (size_t) (paren - member);
                 char name[256];
@@ -228,7 +230,7 @@ LIBMATTI_AT_AtEntry **LIBMATTI_AT_AtParser_Parse(const char *text, const char *o
             }
             else
             {
-                // Java: validateIdentifier(member, "field", line)
+// Java: validateIdentifier(member, "field", line)
                 for (const char *n = member; *n != '\0'; n++)
                 {
                     if ((n == member && !is_identifier_start((unsigned char) *n)) ||
@@ -253,7 +255,8 @@ LIBMATTI_AT_AtEntry **LIBMATTI_AT_AtParser_Parse(const char *text, const char *o
 
     LIBMATTI_AT_AtEntry **result = (LIBMATTI_AT_AtEntry **) entries->elements;
     *count = entries->size;
-    free(entries->elements); // the array moves to the caller
+    free(entries->elements);
+
     free(entries);
     return result;
 }

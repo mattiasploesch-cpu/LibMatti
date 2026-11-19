@@ -1,4 +1,5 @@
-// Port of java.util.Random (the 48-bit LCG, bit-compatible with Java).
+
+
 
 #ifndef MATTICRAFT_JAVA_UTIL_RANDOM_H
 #define MATTICRAFT_JAVA_UTIL_RANDOM_H
@@ -8,7 +9,7 @@
 
 typedef struct LIBMATTI_JU_Random
 {
-    uint64_t seed; // Java: private long seed (48 bits used)
+    uint64_t seed;// Java: private long seed (48 bits used)
     int haveNextNextGaussian;
     double nextNextGaussian;
 } LIBMATTI_JU_Random;
@@ -37,4 +38,4 @@ double LIBMATTI_JU_Random_NextDouble(LIBMATTI_JU_Random *random);
 // Java: public double nextGaussian()
 double LIBMATTI_JU_Random_NextGaussian(LIBMATTI_JU_Random *random);
 
-#endif //MATTICRAFT_JAVA_UTIL_RANDOM_H
+#endif

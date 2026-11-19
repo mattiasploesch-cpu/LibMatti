@@ -31,4 +31,4 @@ int LIBMATTI_MC_ModelBaker_Bake(const LIBMATTI_MC_BlockModel *model, LIBMATTI_MC
 }
 #endif
 
-#endif //MATTICRAFT_MC_CLIENT_RESOURCES_MODEL_MODELBAKER_H
+#endif
