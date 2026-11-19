@@ -105,12 +105,14 @@ jobs:
           submodules: recursive
       - name: Install MinGW-w64 and Rust
         run: |
-          APT_OPTS=(-o Acquire::Retries=2 -o Acquire::http::Timeout=20 -o Acquire::https::Timeout=20)
-          # wixl is a separate Ubuntu package and provides the MSI builder;
-          # keep the apt call bounded so a slow mirror cannot hang the job.
-          PACKAGES=(cmake ninja-build mingw-w64 msitools wixl nsis zip libz-mingw-w64-dev)
-          sudo timeout 240 apt-get "${APT_OPTS[@]}" update
-          sudo timeout 300 env DEBIAN_FRONTEND=noninteractive apt-get "${APT_OPTS[@]}" install -y "${PACKAGES[@]}"
+          APT_OPTS=(-o Acquire::Retries=4 -o Acquire::http::Timeout=60 -o Acquire::https::Timeout=60)
+          # Only the x86_64 toolchain is needed. The mingw-w64 metapackage also
+          # pulls the i686 and win32 variants (293 MB) and repeatedly stalled
+          # on the runner's slow archive mirror.
+          PACKAGES=(cmake ninja-build gcc-mingw-w64-x86-64 libz-mingw-w64-dev wixl)
+          sudo timeout 300 apt-get "${APT_OPTS[@]}" update
+          sudo timeout 900 env DEBIAN_FRONTEND=noninteractive apt-get "${APT_OPTS[@]}" \
+            install -y --no-install-recommends "${PACKAGES[@]}"
       - uses: dtolnay/rust-toolchain@stable
         with:
           targets: x86_64-pc-windows-gnu
