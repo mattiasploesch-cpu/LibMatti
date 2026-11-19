@@ -94,7 +94,7 @@ jobs:
       - name: Install MinGW-w64, wixl and Rust
         run: |
           sudo apt-get update
-          sudo apt-get install -y cmake ninja-build mingw-w64 msitools nsis zip \
+          sudo apt-get install -y cmake ninja-build mingw-w64 msitools wixl nsis zip \
             libz-mingw-w64-dev
       - uses: dtolnay/rust-toolchain@stable
         with:
