@@ -106,9 +106,9 @@ jobs:
       - name: Install MinGW-w64 and Rust
         run: |
           APT_OPTS=(-o Acquire::Retries=2 -o Acquire::http::Timeout=20 -o Acquire::https::Timeout=20)
-          # wixl is part of msitools on Ubuntu; listing it as a package made
-          # apt resolve an impossible name and retry the whole index forever.
-          PACKAGES=(cmake ninja-build mingw-w64 msitools nsis zip libz-mingw-w64-dev)
+          # wixl is a separate Ubuntu package and provides the MSI builder;
+          # keep the apt call bounded so a slow mirror cannot hang the job.
+          PACKAGES=(cmake ninja-build mingw-w64 msitools wixl nsis zip libz-mingw-w64-dev)
           sudo timeout 240 apt-get "${APT_OPTS[@]}" update
           sudo timeout 300 env DEBIAN_FRONTEND=noninteractive apt-get "${APT_OPTS[@]}" install -y "${PACKAGES[@]}"
       - uses: dtolnay/rust-toolchain@stable
