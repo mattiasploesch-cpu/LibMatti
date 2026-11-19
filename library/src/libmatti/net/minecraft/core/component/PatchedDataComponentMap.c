@@ -4,6 +4,7 @@
 #include "libmatti/net/minecraft/core/component/PatchedDataComponentMap.h"
 
 #include <stdlib.h>
+#include <sys/types.h>
 
 
 

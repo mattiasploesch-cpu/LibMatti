@@ -97,9 +97,12 @@ jobs:
           submodules: recursive
       - name: Install MinGW-w64, wixl and Rust
         run: |
-          sudo apt-get update
-          sudo apt-get install -y cmake ninja-build mingw-w64 msitools wixl nsis zip \
-            libz-mingw-w64-dev
+          APT_OPTS=(-o Acquire::Retries=3 -o Acquire::http::Timeout=30 -o Acquire::https::Timeout=30)
+          PACKAGES=(cmake ninja-build mingw-w64 msitools wixl nsis zip libz-mingw-w64-dev)
+          if ! sudo env DEBIAN_FRONTEND=noninteractive apt-get "${APT_OPTS[@]}" install -y "${PACKAGES[@]}"; then
+            sudo timeout 120 apt-get "${APT_OPTS[@]}" update
+            sudo env DEBIAN_FRONTEND=noninteractive apt-get "${APT_OPTS[@]}" install -y "${PACKAGES[@]}"
+          fi
       - uses: dtolnay/rust-toolchain@stable
         with:
           targets: x86_64-pc-windows-gnu
