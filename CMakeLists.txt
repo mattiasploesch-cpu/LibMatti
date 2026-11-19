@@ -40,24 +40,30 @@ add_subdirectory(library)
 if(NOT MATTI_MOBILE_ONLY)
 add_subdirectory(client)
 add_subdirectory(vulkan_client)
-add_subdirectory(tests)
 
-# The mods are a separate project: they only include the library headers, the
-# running game provides the symbols. This target configures and builds the mods
-# project (cmake -S mods -B mods/build && cmake --build mods/build); the built
-# .so files land in mods/, the folder --gameDir <repo root> scans.
-add_custom_target(build_mods
-        COMMAND ${CMAKE_COMMAND} -S "${CMAKE_CURRENT_SOURCE_DIR}/mods" -B "${CMAKE_CURRENT_SOURCE_DIR}/mods/build"
-        COMMAND ${CMAKE_COMMAND} --build "${CMAKE_CURRENT_SOURCE_DIR}/mods/build"
-        COMMENT "Building the mods project (output: mods/*.so)"
-        VERBATIM
-)
+# The test fixtures and mods use ELF sections (objcopy/ELF section injection),
+# which Mach-O cannot represent. The macOS release still builds the game and
+# launcher; only the ELF-only development targets are omitted there.
+if(NOT APPLE)
+    add_subdirectory(tests)
 
-# One target for everything: building "matticraft" builds the library, the
-# game, every test harness with its fixture mods and the mods project. Running
-# it executes the selftest phase (every harness) and then the launcher.
-add_dependencies(matticraft build_mods
-        test_modscan test_soscan test_mixinfacade test_m4proof)
+    # The mods are a separate project: they only include the library headers, the
+    # running game provides the symbols. This target configures and builds the mods
+    # project (cmake -S mods -B mods/build && cmake --build mods/build); the built
+    # .so files land in mods/, the folder --gameDir <repo root> scans.
+    add_custom_target(build_mods
+            COMMAND ${CMAKE_COMMAND} -S "${CMAKE_CURRENT_SOURCE_DIR}/mods" -B "${CMAKE_CURRENT_SOURCE_DIR}/mods/build"
+            COMMAND ${CMAKE_COMMAND} --build "${CMAKE_CURRENT_SOURCE_DIR}/mods/build"
+            COMMENT "Building the mods project (output: mods/*.so)"
+            VERBATIM
+    )
+
+    # One target for everything: building "matticraft" builds the library, the
+    # game, every test harness with its fixture mods and the mods project. Running
+    # it executes the selftest phase (every harness) and then the launcher.
+    add_dependencies(matticraft build_mods
+            test_modscan test_soscan test_mixinfacade test_m4proof)
+endif()
 
 # The plain client run (run configuration "runClient"): the same binary as
 # matticraft but without the test harnesses as dependencies - the selftest
@@ -116,8 +122,12 @@ matti_embed_native_bundle(vulkanClient)
 matti_embed_ui_assets(vulkanClient)
 matti_embed_rust_artifacts(vulkanClient matti_rust ".matti_rust")
 
-# The demo mods come with the client.
-add_dependencies(runClient vulkanClient demo_app demo_lib build_mods)
+# The demo mods come with the client. build_mods is ELF-only.
+if(APPLE)
+    add_dependencies(runClient vulkanClient demo_app demo_lib)
+else()
+    add_dependencies(runClient vulkanClient demo_app demo_lib build_mods)
+endif()
 
 # Install rules used by packaging/ (tar.zst, deb, rpm, AppImage, Flatpak, MSI,
 # DMG/PKG). Assets are embedded in the binaries, so the staging tree only

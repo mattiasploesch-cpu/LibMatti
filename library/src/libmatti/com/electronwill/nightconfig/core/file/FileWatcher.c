@@ -16,9 +16,16 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/inotify.h>
+#include <sys/stat.h>
 #include <time.h>
 #include <unistd.h>
+
+#if defined(HAVE_SYS_INOTIFY_H) && HAVE_SYS_INOTIFY_H
+#include <sys/inotify.h>
+#define MATTI_FILE_WATCHER_INOTIFY 1
+#else
+#define MATTI_FILE_WATCHER_INOTIFY 0
+#endif
 
 // Java: private static final Duration DEFAULT_DEBOUNCE_TIME = Duration.ofMillis(500)
 #define DEFAULT_DEBOUNCE_MILLIS 500
@@ -31,6 +38,9 @@ typedef struct WatchedFile
 {
     char *path;
     int watchDescriptor;
+    long long lastWriteMillis;
+    long long lastSize;
+    int hasSnapshot;
 // Java: the handler runnable
     void (*changeHandler)(void *self, void *userdata);
     void *handlerSelf;
@@ -46,6 +56,7 @@ struct LIBMATTI_NC_FileWatcher
     int running;
     long long debounceMillis;
     int inotifyFd;
+    int useInotify;
     pthread_t thread;
     int threadStarted;
     WatchedFile *files;
@@ -58,6 +69,28 @@ static long long now_millis(void)
     struct timespec now;
     clock_gettime(CLOCK_MONOTONIC, &now);
     return (long long) now.tv_sec * 1000 + now.tv_nsec / 1000000;
+}
+
+static long long file_write_millis(const struct stat *status)
+{
+#if defined(__APPLE__)
+    return (long long) status->st_mtimespec.tv_sec * 1000 + status->st_mtimespec.tv_nsec / 1000000;
+#elif defined(_WIN32)
+    return (long long) status->st_mtime * 1000;
+#else
+    return (long long) status->st_mtim.tv_sec * 1000 + status->st_mtim.tv_nsec / 1000000;
+#endif
+}
+
+// Java: WatchService events mark the file dirty; the polling fallback compares the
+// file metadata on every service poll instead.
+static void remember_file_state(WatchedFile *file)
+{
+    struct stat status;
+    file->hasSnapshot = stat(file->path, &status) == 0;
+    if (!file->hasSnapshot) return;
+    file->lastWriteMillis = file_write_millis(&status);
+    file->lastSize = (long long) status.st_size;
 }
 
 static WatchedFile *find_file(LIBMATTI_NC_FileWatcher *watcher, const char *path)
@@ -106,19 +139,27 @@ LIBMATTI_NC_FileWatcher_WatchingException *LIBMATTI_NC_FileWatcher_AddWatch(
     }
 
 // Java: WatchService.register(path) - the inotify watch on the file itself
-    int watchDescriptor = inotify_add_watch(watcher->inotifyFd, file, IN_MODIFY | IN_CREATE | IN_DELETE | IN_ATTRIB);
-    if (watchDescriptor < 0)
+    int watchDescriptor = -1;
+#if MATTI_FILE_WATCHER_INOTIFY
+    if (watcher->useInotify)
     {
-        pthread_mutex_unlock(&watcher->lock);
-        LIBMATTI_NC_FileWatcher_WatchingException *exception = calloc(1, sizeof(*exception));
-        exception->message = malloc(strlen(file) + 64);
-        sprintf(exception->message, "Failed to watch %s: %s", file, strerror(errno));
-        return exception;
+        watchDescriptor = inotify_add_watch(watcher->inotifyFd, file,
+                                            IN_MODIFY | IN_CREATE | IN_DELETE | IN_ATTRIB);
+        if (watchDescriptor < 0)
+        {
+            pthread_mutex_unlock(&watcher->lock);
+            LIBMATTI_NC_FileWatcher_WatchingException *exception = calloc(1, sizeof(*exception));
+            exception->message = malloc(strlen(file) + 64);
+            sprintf(exception->message, "Failed to watch %s: %s", file, strerror(errno));
+            return exception;
+        }
     }
+#endif
 
     WatchedFile *watched = calloc(1, sizeof(*watched));
     watched->path = strdup(file);
     watched->watchDescriptor = watchDescriptor;
+    remember_file_state(watched);
     watched->changeHandler = changeHandler;
     watched->handlerSelf = changeHandlerSelf;
     watched->handlerUserdata = changeHandlerUserdata;
@@ -143,7 +184,10 @@ void LIBMATTI_NC_FileWatcher_RemoveWatch(LIBMATTI_NC_FileWatcher *watcher, const
         if (strcmp(file_entry->path, file) == 0)
         {
             *link = file_entry->next;
-            inotify_rm_watch(watcher->inotifyFd, file_entry->watchDescriptor);
+#if MATTI_FILE_WATCHER_INOTIFY
+            if (watcher->useInotify)
+                inotify_rm_watch(watcher->inotifyFd, file_entry->watchDescriptor);
+#endif
             free(file_entry->path);
             free(file_entry);
             continue;
@@ -157,20 +201,37 @@ void LIBMATTI_NC_FileWatcher_RemoveWatch(LIBMATTI_NC_FileWatcher *watcher, const
 static void *watcher_thread(void *userdata)
 {
     LIBMATTI_NC_FileWatcher *watcher = userdata;
+#if MATTI_FILE_WATCHER_INOTIFY
     char buffer[sizeof(struct inotify_event) + 4096];
+#endif
 
     long long lastPoll = now_millis();
     while (watcher->running)
     {
 // Java: WatchService.poll(servicePollTimeout) - the control channel timeout
-        struct pollfd fds = {.fd = watcher->inotifyFd, .events = POLLIN};
-        int ready = poll(&fds, 1, SERVICE_POLL_TIMEOUT_MILLIS);
+        int ready = 0;
+#if !MATTI_FILE_WATCHER_INOTIFY
+        (void) ready;
+#endif
+#if MATTI_FILE_WATCHER_INOTIFY
+        if (watcher->useInotify)
+        {
+            struct pollfd fds = {.fd = watcher->inotifyFd, .events = POLLIN};
+            ready = poll(&fds, 1, SERVICE_POLL_TIMEOUT_MILLIS);
+        }
+        else
+#endif
+        {
+            struct timespec timeout = {0, SERVICE_POLL_TIMEOUT_MILLIS * 1000000L};
+            nanosleep(&timeout, NULL);
+        }
         long long now = now_millis();
         long long elapsed = now - lastPoll;
         lastPoll = now;
 
         pthread_mutex_lock(&watcher->lock);
-        if (ready > 0)
+#if MATTI_FILE_WATCHER_INOTIFY
+        if (watcher->useInotify && ready > 0)
         {
             ssize_t length = read(watcher->inotifyFd, buffer, sizeof(buffer));
             for (ssize_t offset = 0; watcher->running && length > 0 && offset < length;)
@@ -182,6 +243,27 @@ static void *watcher_thread(void *userdata)
                 for (WatchedFile *file = watcher->files; file != NULL; file = file->next)
                     if (file->watchDescriptor == event->wd)
                         file->debounceRemainingMillis = watcher->debounceMillis;
+            }
+        }
+#endif
+
+        if (!watcher->useInotify)
+        {
+            for (WatchedFile *file = watcher->files; file != NULL; file = file->next)
+            {
+                struct stat status;
+                int exists = stat(file->path, &status) == 0;
+                long long modified = exists ? file_write_millis(&status) : 0;
+                long long size = exists ? (long long) status.st_size : 0;
+                if (exists != file->hasSnapshot ||
+                    (exists && (modified != file->lastWriteMillis || size != file->lastSize)))
+                {
+                    file->hasSnapshot = exists;
+                    file->lastWriteMillis = modified;
+                    file->lastSize = size;
+// Java: any modification resets the countdown of the watched file
+                    file->debounceRemainingMillis = watcher->debounceMillis;
+                }
             }
         }
 
@@ -214,12 +296,15 @@ LIBMATTI_NC_FileWatcher *LIBMATTI_NC_FileWatcher_NewWithDebounce(long long debou
     LIBMATTI_NC_FileWatcher *watcher = calloc(1, sizeof(*watcher));
     watcher->running = 1;
     watcher->debounceMillis = debounceMillis;
+    watcher->inotifyFd = -1;
+#if MATTI_FILE_WATCHER_INOTIFY
     watcher->inotifyFd = inotify_init1(IN_NONBLOCK | IN_CLOEXEC);
+    watcher->useInotify = watcher->inotifyFd >= 0;
+#endif
     pthread_mutex_init(&watcher->lock, NULL);
 
 // Java: the watcher thread starts with the instance (the thread group "watchers-<id>")
-    if (watcher->inotifyFd >= 0)
-        watcher->threadStarted = pthread_create(&watcher->thread, NULL, watcher_thread, watcher) == 0;
+    watcher->threadStarted = pthread_create(&watcher->thread, NULL, watcher_thread, watcher) == 0;
     return watcher;
 }
 

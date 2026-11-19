@@ -19,6 +19,96 @@
 
 #include "libmatti/matti/mixin/MixinHookTable.h"
 
+#if defined(__APPLE__)
+
+// macOS has no ELF loader and the release does not build the mod targets.
+// Keep the API linkable for the shared library, but no mixins are registered.
+LIBMATTI_MIXIN_HookTable *LIBMATTI_MIXIN_HookTable_New(void)
+{
+    return NULL;
+}
+
+LIBMATTI_MIXIN_HookTable *LIBMATTI_MIXIN_HookTable_Default(void)
+{
+    return NULL;
+}
+
+size_t LIBMATTI_MIXIN_HookTable_AddObject(LIBMATTI_MIXIN_HookTable *table, const char *path,
+                                          const char *modId)
+{
+    (void) table;
+    (void) path;
+    (void) modId;
+    return 0;
+}
+
+void LIBMATTI_MIXIN_HookTable_RegisterTarget(LIBMATTI_MIXIN_HookTable *table, const char *target,
+                                             void *original)
+{
+    (void) table;
+    (void) target;
+    (void) original;
+}
+
+void LIBMATTI_MIXIN_HookTable_AddHook(LIBMATTI_MIXIN_HookTable *table, const char *target,
+                                      MattiMixinHandler handler, void *userdata, MattiMixinAt at,
+                                      int priority, const char *modId)
+{
+    (void) table;
+    (void) target;
+    (void) handler;
+    (void) userdata;
+    (void) at;
+    (void) priority;
+    (void) modId;
+}
+
+const LIBMATTI_MIXIN_Target *LIBMATTI_MIXIN_Lookup(const LIBMATTI_MIXIN_HookTable *table,
+                                                   const char *target)
+{
+    (void) table;
+    (void) target;
+    return NULL;
+}
+
+int LIBMATTI_MIXIN_Invoke(const LIBMATTI_MIXIN_HookTable *table, const char *target, void *owner,
+                          void **args, size_t argCount, MattiMixinResult *result)
+{
+    (void) table;
+    (void) target;
+    (void) owner;
+    (void) args;
+    (void) argCount;
+    if (result != NULL) *result = MATTI_MIXIN_PASS;
+    return 1;
+}
+
+size_t LIBMATTI_MIXIN_GotPatch(const char *path, const char *const *symbolNames, size_t symbolCount,
+                               MattiMixinHandler hook, void *userdata, const char *modId)
+{
+    (void) path;
+    (void) symbolNames;
+    (void) symbolCount;
+    (void) hook;
+    (void) userdata;
+    (void) modId;
+    return 0;
+}
+
+void *LIBMATTI_MIXIN_GotOriginal(const char *path, const char *symbolName)
+{
+    (void) path;
+    (void) symbolName;
+    return NULL;
+}
+
+void LIBMATTI_MIXIN_HookTable_Free(LIBMATTI_MIXIN_HookTable *table)
+{
+    (void) table;
+}
+
+#else
+
 #include "libmatti/cpw/modlauncher/LogManager.h"
 #include "libmatti/net/neoforged/fml/Logging.h"
 
@@ -78,12 +168,46 @@ static void *object_handle(const char *path)
 
 // The load bias of the object the handle belongs to (Java: none - the JVM relocates in memory).
 // Bias 0 is valid (a non-PIE executable); only a missing link map is a failure.
-static int object_load_bias(void *handle, unsigned char **outBias)
+#if defined(__ANDROID__)
+typedef struct ObjectBiasSearch
 {
+    const char *path;
+    uintptr_t bias;
+    int found;
+} ObjectBiasSearch;
+
+static int find_object_bias(struct dl_phdr_info *info, size_t size, void *data)
+{
+    (void) size;
+    ObjectBiasSearch *search = data;
+    const char *name = info->dlpi_name != NULL ? info->dlpi_name : "";
+    if (search->path == NULL || strcmp(search->path, "/proc/self/exe") == 0)
+    {
+        if (name[0] != '\0') return 0;
+    }
+    else if (strcmp(name, search->path) != 0)
+        return 0;
+
+    search->bias = (uintptr_t) info->dlpi_addr;
+    search->found = 1;
+    return 1;
+}
+#endif
+
+static int object_load_bias(void *handle, const char *path, unsigned char **outBias)
+{
+#if defined(__ANDROID__)
+    (void) handle;
+    ObjectBiasSearch search = {path, 0, 0};
+    if (!dl_iterate_phdr(find_object_bias, &search) || !search.found) return 0;
+    *outBias = (unsigned char *) search.bias;
+    return 1;
+#else
     struct link_map *map = NULL;
     if (dlinfo(handle, RTLD_DI_LINKMAP, &map) != 0 || map == NULL) return 0;
     *outBias = (unsigned char *) map->l_addr;
     return 1;
+#endif
 }
 
 
@@ -199,7 +323,7 @@ size_t LIBMATTI_MIXIN_HookTable_AddObject(LIBMATTI_MIXIN_HookTable *table, const
     void *handle = object_handle(path);
     if (handle == NULL) return 0;
     unsigned char *base = NULL;
-    if (!object_load_bias(handle, &base))
+    if (!object_load_bias(handle, path, &base))
     {
         dlclose(handle);
         return 0;
@@ -449,7 +573,7 @@ size_t LIBMATTI_MIXIN_GotPatch(const char *path, const char *const *symbolNames,
     void *handle = object_handle(path);
     if (handle == NULL) return 0;
     unsigned char *base = NULL;
-    if (!object_load_bias(handle, &base))
+    if (!object_load_bias(handle, path, &base))
     {
         dlclose(handle);
         return 0;
@@ -511,3 +635,5 @@ size_t LIBMATTI_MIXIN_GotPatch(const char *path, const char *const *symbolNames,
     dlclose(handle);
     return rewritten;
 }
+
+#endif

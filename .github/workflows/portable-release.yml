@@ -58,10 +58,12 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: recursive
       - name: Install build dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y cmake ninja-build clang libsdl3-dev libvulkan-dev \
+          sudo apt-get install -y cmake ninja-build clang libvulkan-dev \
             libglfw3-dev zlib1g-dev libgl1-mesa-dev pkg-config zstd rpm msitools \
             genisoimage libfuse2 patchelf zip
       - name: Install nfpm
@@ -87,10 +89,12 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: recursive
       - name: Install MinGW-w64, wixl and Rust
         run: |
           sudo apt-get update
-          sudo apt-get install -y cmake ninja-build mingw-w64 msitools nsis zip \
+          sudo apt-get install -y cmake ninja-build mingw-w64 msitools wixl nsis zip \
             libz-mingw-w64-dev
       - uses: dtolnay/rust-toolchain@stable
         with:
@@ -119,9 +123,11 @@ jobs:
           if-no-files-found: error
 
   macos:
-    runs-on: macos-14
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: recursive
       - name: Install build dependencies
         run: |
           brew update
@@ -148,21 +154,31 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: recursive
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: "17"
-      - uses: android-actions/setup-android@v3
       - name: Install NDK and Android SDK packages
         run: |
-          yes | sdkmanager --licenses >/dev/null || true
-          sdkmanager "ndk;27.0.12077973" "platforms;android-35" "build-tools;35.0.0"
+          SDK_ROOT="${ANDROID_SDK_ROOT:-${ANDROID_HOME:-/usr/local/lib/android/sdk}}"
+          SDKMANAGER="$SDK_ROOT/cmdline-tools/latest/bin/sdkmanager"
+          if [ ! -x "$SDKMANAGER" ]; then
+            SDKMANAGER="$(find "$SDK_ROOT/cmdline-tools" -type f -name sdkmanager | sort -V | tail -n 1)"
+          fi
+          test -x "$SDKMANAGER"
+          yes | "$SDKMANAGER" --licenses >/dev/null || true
+          "$SDKMANAGER" --install "ndk;27.0.12077973" "platforms;android-35" "build-tools;35.0.0"
       - uses: dtolnay/rust-toolchain@stable
         with:
           targets: aarch64-linux-android,x86_64-linux-android
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: "8.10.2"
+          # The vendor submodules ship unrelated historical wrapper JARs;
+          # this job runs the pinned Gradle distribution, not those wrappers.
+          validate-wrappers: false
       - name: Build APK and AAB
         env:
           ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
@@ -190,6 +206,8 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: recursive
       - uses: dtolnay/rust-toolchain@stable
       - name: Test and lint the window crate
         run: |
@@ -202,6 +220,8 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: recursive
       - uses: actions/download-artifact@v4
         with:
           path: artifacts

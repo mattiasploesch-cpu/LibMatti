@@ -39,8 +39,6 @@ extern "C" {
         fullscreen: *mut c_int,
     ) -> c_int;
 
-
-
     fn LIBMATTI_UI_WindowWidth() -> c_int;
     fn LIBMATTI_UI_WindowHeight() -> c_int;
     fn LIBMATTI_UI_BackendName() -> *const c_char;
@@ -62,7 +60,13 @@ fn string_from(pointer: *const c_char) -> String {
     unsafe { CStr::from_ptr(pointer).to_string_lossy().into_owned() }
 }
 
-pub fn window_open(width: i32, height: i32, fullscreen: bool, selection: &str, title: &str) -> bool {
+pub fn window_open(
+    width: i32,
+    height: i32,
+    fullscreen: bool,
+    selection: &str,
+    title: &str,
+) -> bool {
     let selection = CString::new(selection).unwrap_or_default();
     let title = CString::new(title).unwrap_or_default();
     let config = WindowConfig {
@@ -102,7 +106,6 @@ pub fn time() -> f64 {
 
 pub fn save_screenshot(path: &str) -> bool {
     let path = CString::new(path).unwrap_or_default();
-
 
     unsafe { LIBMATTI_UI_SaveScreenshot(path.as_ptr()) == 0 }
 }
@@ -163,14 +166,5 @@ pub fn fill_rect(x: i32, y: i32, width: i32, height: i32, argb: u32) {
 #[allow(dead_code)]
 pub fn draw_text(text: &str, x: i32, y: i32, argb: u32, scale: i32, shadow: bool) {
     let text = CString::new(text).unwrap_or_default();
-    unsafe {
-        LIBMATTI_UI_DrawText(
-            text.as_ptr(),
-            x,
-            y,
-            argb,
-            scale,
-            if shadow { 1 } else { 0 },
-        )
-    }
+    unsafe { LIBMATTI_UI_DrawText(text.as_ptr(), x, y, argb, scale, if shadow { 1 } else { 0 }) }
 }

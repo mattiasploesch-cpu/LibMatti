@@ -193,6 +193,13 @@ function(matti_add_rust_staticlib target)
     add_library(${target} STATIC IMPORTED GLOBAL)
     set_target_properties(${target} PROPERTIES
             IMPORTED_LOCATION "${_matti_rust_lib}")
+    if(WIN32)
+        # Rust's std uses the NT API, the user-profile API and the Windows 8
+        # synchronization primitives; a C linker does not inherit those link
+        # directives from a Rust staticlib.
+        set_property(TARGET ${target} PROPERTY INTERFACE_LINK_LIBRARIES
+                ntdll userenv synchronization)
+    endif()
     add_dependencies(${target} ${target}_build)
 
     # Every artifact that travels with the client: the staticlib, an rlib or
