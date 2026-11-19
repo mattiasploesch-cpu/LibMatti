@@ -38,7 +38,7 @@
             <File Id="RunClientExe" Source="runClient.exe" KeyPath="yes" />
           </Component>
           <Component Id="SharedLibrary" Guid="A1B2C3D4-1111-4A2B-9C3D-000000000003">
-            <File Id="MattiDll" Source="matti.dll" KeyPath="yes" />
+            <File Id="MattiDll" Source="libmatti.dll" KeyPath="yes" />
           </Component>
           <Component Id="ThemeFont" Guid="A1B2C3D4-1111-4A2B-9C3D-000000000007">
             <File Id="MonocraftTtf" Source="Monocraft.ttf" KeyPath="yes" />

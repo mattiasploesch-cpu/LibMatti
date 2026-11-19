@@ -65,7 +65,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y cmake ninja-build clang libvulkan-dev \
             libglfw3-dev zlib1g-dev libgl1-mesa-dev pkg-config zstd rpm msitools \
-            genisoimage libfuse2 patchelf zip squashfs-tools
+            genisoimage libfuse2 patchelf zip squashfs-tools desktop-file-utils
       - name: Install release packaging tools
         run: |
           set -euo pipefail
