@@ -47,18 +47,22 @@ jobs:
 
       - name: Client smoke test
         run: |
-          # The client must reach the running game skeleton without a
-          # hanging window: the run is time-boxed and the log is scanned
-          # for the milestone (FML up, window created, skeleton running).
-          # The timeout kill is the expected end of the run.
+          # The client must initialize FML and open the game window without a
+          # hanging display. --ui-once draws one frame and exits, so a timeout
+          # is a real failure rather than the normal end of the run.
           run_client() {
-            timeout -k 5 40 env CI=1 xvfb-run -a -s "-screen 0 1280x1024x24" \
+            timeout -k 5 40 env CI=1 MATTI_RENDERER=native:opengl LIBGL_ALWAYS_SOFTWARE=1 \
+              xvfb-run -a -s "-screen 0 1280x1024x24" \
               ./build/client/matticraft --launchTarget neoforge --gameDir "$1" \
-              --version 1.21.11 > client-run.log 2>&1 || true
+              --version 1.21.11 --no-tests --ui-once > client-run.log 2>&1
           }
-          run_client "$(mktemp -d)"
-          grep -q "Running Minecraft (skeleton)" client-run.log || {
-            echo "client did not reach the game skeleton:"; tail -40 client-run.log; exit 1; }
+          if ! run_client "$(mktemp -d)"; then
+            echo "client did not finish a frame:"; tail -60 client-run.log; exit 1
+          fi
+          grep -q "DEBUG: Client payload handlers registered" client-run.log || {
+            echo "FML client handlers did not initialize:"; tail -60 client-run.log; exit 1; }
+          grep -q "\[ui\].*backend=opengl" client-run.log || {
+            echo "client did not open the OpenGL window:"; tail -60 client-run.log; exit 1; }
           echo "client smoke test passed"
 
       - name: Upload the client log
