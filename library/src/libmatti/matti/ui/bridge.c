@@ -11,14 +11,14 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "stb_truetype.h"
+#include "libmatti/org/lwjgl/stb/stb_truetype.h"
 
 
 
 
 #define UI_FONT_SECTION ".matti_font_monocraft"
 #define UI_FONT_RESOURCE \
-    MATTI_SOURCE_DIR "/vendor/FancyModLoader/earlydisplay/src/main/resources/net/neoforged/fml/earlydisplay/theme/Monocraft.ttf"
+    MATTI_SOURCE_DIR "/library/src/libmatti/matti/ui/Monocraft.ttf"
 
 #define UI_FONT_PIXEL_HEIGHT 8
 #define UI_FONT_MAX_SCALE 12

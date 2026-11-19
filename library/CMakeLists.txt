@@ -6,8 +6,8 @@ file(GLOB_RECURSE LIBMATTI_SOURCES
 # the source tree (src/mobile/matti-kotlin/.cxx); never compile those objects.
 list(FILTER LIBMATTI_SOURCES EXCLUDE REGEX "/\\.cxx/|/CMakeFiles/")
 
-# The vendored stb_truetype (used by the LWJGL STBTruetype port) instantiates
-# in exactly one translation unit, like the upstream "easy to use" section says.
+# stb_truetype (used by the LWJGL STBTruetype port) instantiates in exactly
+# one translation unit, like the upstream "easy to use" section says.
 list(APPEND LIBMATTI_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/libmatti/org/lwjgl/stb/stb_truetype_impl.c")
 
 # Java: loader/build.gradle generates FMLVersionProperties with the gradle project version
@@ -112,11 +112,6 @@ target_include_directories(matti_objects
         PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
-# the vendored stb headers (the stb submodule, see .gitmodules)
-target_include_directories(matti_objects
-        SYSTEM PUBLIC
-        ${CMAKE_CURRENT_SOURCE_DIR}/../vendor/stb
-)
 
 target_compile_definitions(matti_objects
         PRIVATE
@@ -129,8 +124,6 @@ target_compile_definitions(matti_objects
 # library links them transitively.
 # find_package(stb)
 # target_link_libraries(matti_objects PUBLIC stb::stb_truetype)
-
-target_include_directories(matti_objects PRIVATE ${CMAKE_SOURCE_DIR}/vendor/stb)
 
 find_package(ZLIB QUIET)
 if(ZLIB_FOUND)

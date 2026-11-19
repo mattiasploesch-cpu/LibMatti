@@ -7,6 +7,7 @@ not submitted by this repository.
 
 - `pkgs/by-name/li/libmatti/package.nix` — library in `out`, headers in `dev`
 - `pkgs/by-name/ma/matticraft/package.nix` — client binary
+- `pkgs/by-name/ma/matticraft-launcher/package.nix` — Rust/egui launcher
 
 The development headers are the standard nixpkgs `dev` output of `libmatti`:
 `libmatti.dev`. Nixpkgs does not normally publish a second package named
@@ -30,6 +31,7 @@ Build before submitting:
 ```bash
 nix-build -A libmatti
 nix-build -A matticraft
+nix-build -A matticraft-launcher
 nix-build -A libmatti.dev
 ```
 

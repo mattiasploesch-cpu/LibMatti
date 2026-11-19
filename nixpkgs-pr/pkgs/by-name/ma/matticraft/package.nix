@@ -1,6 +1,5 @@
 { lib
 , stdenv
-, fetchurl
 , libmatti
 , cmake
 , ninja
@@ -16,21 +15,6 @@
 , makeWrapper
 }:
 
-let
-  # The game embeds the font and texture files into the executable.
-  stbTruetype = fetchurl {
-    url = "https://raw.githubusercontent.com/nothings/stb/2c980bb59875b0d32144a71867fbdebb2f77cd20/stb_truetype.h";
-    hash = "sha256-7NMLBeDdT+o6E8JoEN2eGZLcN5BJSCw5PVoZ5rUJCqs=";
-  };
-  stbImage = fetchurl {
-    url = "https://raw.githubusercontent.com/nothings/stb/2c980bb59875b0d32144a71867fbdebb2f77cd20/stb_image.h";
-    hash = "sha256-WUwv411JSItDgtv67I+YNm3vyoGdkWrJW+zz519CALM=";
-  };
-  monocraft = fetchurl {
-    url = "https://raw.githubusercontent.com/neoforged/FancyModLoader/666fa649f1cb8edd7d21665f60423ecd8081620c/earlydisplay/src/main/resources/net/neoforged/fml/earlydisplay/theme/Monocraft.ttf";
-    hash = "sha256-th7jJW9EnpYUD1RRWBlUCEDvDK3oJxHro1mlhkx3kHY=";
-  };
-in
 stdenv.mkDerivation (finalAttrs: {
   pname = "matticraft";
   version = "0.1.0";
@@ -41,11 +25,6 @@ stdenv.mkDerivation (finalAttrs: {
   nativeBuildInputs = [ cmake ninja pkg-config rustc cargo makeWrapper ];
   buildInputs = [ zlib sdl3 vulkan-loader vulkan-headers glfw libGL ];
 
-  postUnpack = ''
-    install -Dm644 ${stbTruetype} "$sourceRoot/vendor/stb/stb_truetype.h"
-    install -Dm644 ${stbImage} "$sourceRoot/vendor/stb/stb_image.h"
-    install -Dm644 ${monocraft} "$sourceRoot/vendor/FancyModLoader/earlydisplay/src/main/resources/net/neoforged/fml/earlydisplay/theme/Monocraft.ttf"
-  '';
 
   cmakeFlags = [
     "-DMATTI_BUILD_LAUNCHER=OFF"
@@ -70,11 +49,8 @@ stdenv.mkDerivation (finalAttrs: {
     if [ -d ../library/src/libmatti/matti/ui/assets ]; then
       cp -a ../library/src/libmatti/matti/ui/assets "$out/share/matticraft/"
     fi
-    if [ -f ../vendor/FancyModLoader/earlydisplay/src/main/resources/net/neoforged/fml/earlydisplay/theme/Monocraft.ttf ]; then
-      install -Dm644 \
-        ../vendor/FancyModLoader/earlydisplay/src/main/resources/net/neoforged/fml/earlydisplay/theme/Monocraft.ttf \
-        "$out/share/matticraft/Monocraft.ttf"
-    fi
+    install -Dm644 ../library/src/libmatti/matti/ui/Monocraft.ttf \
+      "$out/share/matticraft/Monocraft.ttf"
     install -Dm644 ../README.md "$out/share/doc/matticraft/README.md"
     install -Dm644 ../planported.MD "$out/share/doc/matticraft/planported.MD"
 

@@ -10,35 +10,14 @@
         nixpkgs.lib.genAttrs systems
           (system: f system (import nixpkgs { inherit system; }));
     in {
-      packages = forAllSystems (system: pkgs:
-        let
-          # These files live in git submodules. Fetch only the pinned files so
-          # `nix build` does not depend on the checkouts being initialised.
-          stbTruetype = pkgs.fetchurl {
-            url = "https://raw.githubusercontent.com/nothings/stb/2c980bb59875b0d32144a71867fbdebb2f77cd20/stb_truetype.h";
-            hash = "sha256-7NMLBeDdT+o6E8JoEN2eGZLcN5BJSCw5PVoZ5rUJCqs=";
-          };
-          stbImage = pkgs.fetchurl {
-            url = "https://raw.githubusercontent.com/nothings/stb/2c980bb59875b0d32144a71867fbdebb2f77cd20/stb_image.h";
-            hash = "sha256-WUwv411JSItDgtv67I+YNm3vyoGdkWrJW+zz519CALM=";
-          };
-          monocraft = pkgs.fetchurl {
-            url = "https://raw.githubusercontent.com/neoforged/FancyModLoader/666fa649f1cb8edd7d21665f60423ecd8081620c/earlydisplay/src/main/resources/net/neoforged/fml/earlydisplay/theme/Monocraft.ttf";
-            hash = "sha256-th7jJW9EnpYUD1RRWBlUCEDvDK3oJxHro1mlhkx3kHY=";
-          };
-        in {
-          libmatti = pkgs.callPackage ./nix/libmatti.nix {
-            src = self;
-            inherit stbTruetype stbImage monocraft;
-          };
+      packages = forAllSystems (system: pkgs: {
+          libmatti = pkgs.callPackage ./nix/libmatti.nix { src = self; };
           libmatti-dev = pkgs.runCommand "libmatti-0.1.0-dev" { } ''
             mkdir -p "$out"
             cp -a ${self.packages.${system}.libmatti.dev}/. "$out/"
           '';
-          matticraft = pkgs.callPackage ./nix/matticraft.nix {
-            src = self;
-            inherit stbTruetype stbImage monocraft;
-          };
+          matticraft = pkgs.callPackage ./nix/matticraft.nix { src = self; };
+          matticraft-launcher = pkgs.callPackage ./nix/launcher.nix { src = self; };
           default = self.packages.${system}.matticraft;
         });
 

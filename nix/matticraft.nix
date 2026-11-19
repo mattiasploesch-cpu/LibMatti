@@ -12,9 +12,6 @@
 , glfw
 , libGL
 , makeWrapper
-, stbTruetype
-, stbImage
-, monocraft
 , src ? ../.
 }:
 
@@ -26,11 +23,6 @@ stdenv.mkDerivation (finalAttrs: {
   nativeBuildInputs = [ cmake ninja pkg-config rustc cargo makeWrapper ];
   buildInputs = [ zlib sdl3 vulkan-loader vulkan-headers glfw libGL ];
 
-  postUnpack = ''
-    install -Dm644 ${stbTruetype} source/vendor/stb/stb_truetype.h
-    install -Dm644 ${stbImage} source/vendor/stb/stb_image.h
-    install -Dm644 ${monocraft} source/vendor/FancyModLoader/earlydisplay/src/main/resources/net/neoforged/fml/earlydisplay/theme/Monocraft.ttf
-  '';
 
   cmakeFlags = [
     "-DMATTI_BUILD_LAUNCHER=OFF"
@@ -55,11 +47,8 @@ stdenv.mkDerivation (finalAttrs: {
     if [ -d "${finalAttrs.src}/library/src/libmatti/matti/ui/assets" ]; then
       cp -a "${finalAttrs.src}/library/src/libmatti/matti/ui/assets" "$out/share/matticraft/"
     fi
-    if [ -f ../vendor/FancyModLoader/earlydisplay/src/main/resources/net/neoforged/fml/earlydisplay/theme/Monocraft.ttf ]; then
-      install -Dm644 \
-        ../vendor/FancyModLoader/earlydisplay/src/main/resources/net/neoforged/fml/earlydisplay/theme/Monocraft.ttf \
-        "$out/share/matticraft/Monocraft.ttf"
-    fi
+    install -Dm644 "${finalAttrs.src}/library/src/libmatti/matti/ui/Monocraft.ttf" \
+      "$out/share/matticraft/Monocraft.ttf"
     install -Dm644 "${finalAttrs.src}/README.md" "$out/share/doc/matticraft/README.md"
     install -Dm644 "${finalAttrs.src}/planported.MD" "$out/share/doc/matticraft/planported.MD"
 

@@ -1,5 +1,5 @@
 // Port of org.lwjgl.stb.STBTruetype (the slice the earlydisplay font path uses).
-// The calls map 1:1 onto the vendored stb_truetype.h (vendor/stb); the wrapper
+// The calls map 1:1 onto the bundled stb_truetype.h next to this header; the wrapper
 // only mirrors LWJGL's Java-facing shape so ports of LWJGL consumers stay 1:1.
 //
 // Java: stbtt_InitFont(info, buffer) / stbtt_PackBegin / stbtt_PackFontRanges /
@@ -14,7 +14,7 @@
 
 
 
-#include <stb_truetype.h>
+#include "stb_truetype.h"
 
 #ifdef __cplusplus
 extern "C"

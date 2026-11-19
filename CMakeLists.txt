@@ -167,7 +167,7 @@ install(FILES README.md planported.MD DESTINATION ${CMAKE_INSTALL_DOCDIR})
 install(DIRECTORY library/src/libmatti/matti/ui/assets/
         DESTINATION ${CMAKE_INSTALL_DATADIR}/matticraft/assets)
 install(FILES
-        vendor/FancyModLoader/earlydisplay/src/main/resources/net/neoforged/fml/earlydisplay/theme/Monocraft.ttf
+        library/src/libmatti/matti/ui/Monocraft.ttf
         DESTINATION ${CMAKE_INSTALL_DATADIR}/matticraft)
 
 # Launcher (Rust/egui) and its desktop entry. The library and the game are

@@ -120,11 +120,13 @@ library installed by the module.
 The flake exposes the standalone library and the client directly from source:
 
 ```bash
-nix build .#matticraft        # client binaries in ./result/bin
-nix build .#libmatti          # libmatti.so* in ./result/lib
-nix build .#libmatti-dev      # public headers in ./result/include
+nix build .#matticraft          # client binaries in ./result/bin
+nix build .#matticraft-launcher # Rust/egui launcher in ./result/bin
+nix build .#libmatti            # libmatti.so* in ./result/lib
+nix build .#libmatti-dev        # public headers in ./result/include
 
 nix profile install .#matticraft
+nix profile install .#matticraft-launcher
 nix profile install .#libmatti
 
 nix develop                   # CMake, Rust and the runtime libraries
