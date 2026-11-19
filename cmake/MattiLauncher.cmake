@@ -100,6 +100,11 @@ function(matti_add_launcher)
         install(FILES packaging/linux/matticraft.svg
                 DESTINATION ${CMAKE_INSTALL_DATADIR}/icons/hicolor/scalable/apps
                 RENAME org.matticraft.Matticraft.svg)
+        install(FILES packaging/linux/matticraft.png
+                DESTINATION ${CMAKE_INSTALL_DATADIR}/icons/hicolor/256x256/apps
+                RENAME org.matticraft.Matticraft.png)
+        install(FILES packaging/linux/org.matticraft.Matticraft.appdata.xml
+                DESTINATION ${CMAKE_INSTALL_DATADIR}/metainfo)
     endif()
 
     message(STATUS "Matticraft launcher: ${_binary}")

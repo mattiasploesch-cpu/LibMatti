@@ -48,7 +48,9 @@ fi
 
 cp "$ROOT/packaging/linux/matticraft.desktop" "$APPDIR/org.matticraft.Matticraft.desktop"
 cp "$ROOT/packaging/linux/matticraft.svg" "$APPDIR/org.matticraft.Matticraft.svg"
-cp "$ROOT/packaging/linux/matticraft.svg" "$APPDIR/.DirIcon"
+# appimagetool wants a real image file at .DirIcon; an SVG symlink/copy is
+# reported as invalid and will be refused by future releases.
+cp "$ROOT/packaging/linux/matticraft.png" "$APPDIR/.DirIcon"
 ln -sf usr/bin/matticraft-launcher "$APPDIR/AppRun"
 chmod +x "$APPDIR/AppRun"
 
