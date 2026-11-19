@@ -103,14 +103,14 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
-      - name: Install MinGW-w64, wixl and Rust
+      - name: Install MinGW-w64 and Rust
         run: |
-          APT_OPTS=(-o Acquire::Retries=3 -o Acquire::http::Timeout=30 -o Acquire::https::Timeout=30)
-          PACKAGES=(cmake ninja-build mingw-w64 msitools wixl nsis zip libz-mingw-w64-dev)
-          if ! sudo env DEBIAN_FRONTEND=noninteractive apt-get "${APT_OPTS[@]}" install -y "${PACKAGES[@]}"; then
-            sudo timeout 120 apt-get "${APT_OPTS[@]}" update
-            sudo env DEBIAN_FRONTEND=noninteractive apt-get "${APT_OPTS[@]}" install -y "${PACKAGES[@]}"
-          fi
+          APT_OPTS=(-o Acquire::Retries=2 -o Acquire::http::Timeout=20 -o Acquire::https::Timeout=20)
+          # wixl is part of msitools on Ubuntu; listing it as a package made
+          # apt resolve an impossible name and retry the whole index forever.
+          PACKAGES=(cmake ninja-build mingw-w64 msitools nsis zip libz-mingw-w64-dev)
+          sudo timeout 240 apt-get "${APT_OPTS[@]}" update
+          sudo timeout 300 env DEBIAN_FRONTEND=noninteractive apt-get "${APT_OPTS[@]}" install -y "${PACKAGES[@]}"
       - uses: dtolnay/rust-toolchain@stable
         with:
           targets: x86_64-pc-windows-gnu
@@ -153,8 +153,10 @@ jobs:
           submodules: recursive
       - name: Install build dependencies
         run: |
-          brew update
-          brew install cmake ninja pkg-config glfw sdl3 vulkan-loader molten-vk zlib
+          # Homebrew's auto-update was taking >25 minutes on the Intel runner.
+          # Vulkan/MoltenVK are optional here; the macOS default is SDL + OpenGL.
+          export HOMEBREW_NO_AUTO_UPDATE=1
+          brew install cmake ninja pkg-config glfw sdl3 zlib
       - uses: dtolnay/rust-toolchain@stable
       - name: Configure and build
         run: |
