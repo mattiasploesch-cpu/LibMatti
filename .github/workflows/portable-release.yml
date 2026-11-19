@@ -68,8 +68,12 @@ jobs:
             genisoimage libfuse2 patchelf zip
       - name: Install nfpm
         run: |
-          sudo apt-get install -y golang-go
-          sudo env "PATH=$PATH" GOBIN=/usr/local/bin go install github.com/goreleaser/nfpm/v2/cmd/nfpm@latest
+          set -euo pipefail
+          NFPM_VERSION=2.49.0
+          curl -fsSL --retry 5 --retry-all-errors --connect-timeout 15 --max-time 180 \
+            "https://github.com/goreleaser/nfpm/releases/download/v${NFPM_VERSION}/nfpm_${NFPM_VERSION}_Linux_x86_64.tar.gz" |
+            sudo tar -xz -C /usr/local/bin nfpm
+          nfpm --version
       - name: Configure and build
         run: |
           cmake --preset linux-x64

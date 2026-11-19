@@ -16,7 +16,11 @@
 // the jar contents reader exposes as "META-INF/MANIFEST.MF". ModLauncher reads
 // its own artifact metadata from it (Java: IEnvironment.class.getPackage()
 // .getSpecificationVersion() / .getImplementationVersion()).
+#if defined(__APPLE__)
+__attribute__((used))
+#else
 __attribute__((used, section(".matti_manifest")))
+#endif
 const char MATTICRAFT_MANIFEST[] =
     "Manifest-Version: 1.0\n"
     "Implementation-Version: 11.0\n"

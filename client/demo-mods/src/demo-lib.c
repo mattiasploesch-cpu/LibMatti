@@ -5,7 +5,11 @@
 //
 #include <stddef.h>
 
+#if defined(__APPLE__)
+__attribute__((used))
+#else
 __attribute__((used, section(".matti_manifest")))
+#endif
 const char LIBMATTI_MOD_MANIFEST[] =
     "Manifest-Version: 1.0\n"
     "Automatic-Module-Name: com.demo.lib\n"
