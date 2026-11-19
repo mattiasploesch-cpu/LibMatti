@@ -42,6 +42,13 @@ endfunction()
 # cannot carry, for example entry names without an ELF-safe shape or content
 # that only exists after the link.
 function(matti_add_section target entry file)
+    # Mach-O has no ELF section injection. The release build still compiles the
+    # test fixtures; only the ELF-specific scan tests need the appended entry.
+    if(APPLE)
+        message(STATUS "matti_add_section(${target}): skipping ${entry} on Mach-O")
+        return()
+    endif()
+
     get_filename_component(file "${file}" ABSOLUTE)
     find_program(OBJCOPY_EXE objcopy REQUIRED)
     add_custom_command(TARGET ${target} POST_BUILD

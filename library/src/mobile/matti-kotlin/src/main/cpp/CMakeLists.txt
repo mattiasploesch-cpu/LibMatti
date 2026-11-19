@@ -5,6 +5,9 @@ project(matti_mobile C)
 # project builds the one libmatti (C) plus the Rust window staticlib for the
 # Android ABI; the platform/bit-width dispatch happens inside that library.
 set(LIBMATTI_ROOT "${CMAKE_CURRENT_LIST_DIR}/../../../../../../.." CACHE PATH "LibMatti root")
+# The root project sets this path; the mobile wrapper includes the root
+# CMakeLists.txt directly, so it must provide the helper modules itself.
+list(APPEND CMAKE_MODULE_PATH "${LIBMATTI_ROOT}/cmake")
 if(EXISTS "${LIBMATTI_ROOT}/CMakeLists.txt")
     add_subdirectory("${LIBMATTI_ROOT}" "${CMAKE_CURRENT_BINARY_DIR}/libmatti")
 endif()
