@@ -21,3 +21,14 @@ if(TARGET matti)
         target_link_libraries(matti_mobile PRIVATE matti_rust)
     endif()
 endif()
+
+if(ANDROID)
+    # EGL/GLES3 are loaded from the NDK platform libraries, not dlopen'ed.
+    target_link_libraries(matti_mobile PRIVATE EGL GLESv3 android log)
+endif()
+
+# The Android package has no source tree at runtime: embed Monocraft and the
+# GUI PNGs into the JNI library exactly like the desktop executables do.
+if(COMMAND matti_embed_ui_assets)
+    matti_embed_ui_assets(matti_mobile)
+endif()

@@ -68,3 +68,6 @@
 [submodule "vendor/MinecraftC"]
 	path = vendor/MinecraftC
 	url = https://github.com/johnpayne-dev/MinecraftC.git
+[submodule "vendor/horizon"]
+	path = vendor/horizon
+	url = https://github.com/horizon-rust/horizon.git

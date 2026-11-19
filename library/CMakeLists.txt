@@ -161,6 +161,12 @@ if(UNIX AND NOT APPLE)
     target_link_libraries(matti_objects PUBLIC m)
 endif()
 
+# Android's renderer talks EGL/GLES3 directly and uses the NDK's native window
+# bridge; no GLFW or SDL is loaded on this platform.
+if(ANDROID)
+    target_link_libraries(matti_objects PUBLIC EGL GLESv3 android log)
+endif()
+
 # Rust: the UI lives in library/src/libmatti/rs and is reached through the C
 # API only (libmatti/rs/matti_rs.h). The crate builds as a staticlib and is
 # linked into matti, so every client gets it without extra wiring.

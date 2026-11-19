@@ -48,12 +48,13 @@ fi
 
 cp "$ROOT/packaging/linux/matticraft.desktop" "$APPDIR/org.matticraft.Matticraft.desktop"
 cp "$ROOT/packaging/linux/matticraft.svg" "$APPDIR/org.matticraft.Matticraft.svg"
-ln -sf org.matticraft.Matticraft.svg "$APPDIR/.DirIcon"
+cp "$ROOT/packaging/linux/matticraft.svg" "$APPDIR/.DirIcon"
 ln -sf usr/bin/matticraft-launcher "$APPDIR/AppRun"
 chmod +x "$APPDIR/AppRun"
 
 mkdir -p "$DIST"
-ARCH="$ARCH" "$APPIMAGETOOL" "$APPDIR" "$DIST/Matticraft-${VERSION}-${ARCH}.AppImage"
+APPIMAGE="$DIST/Matticraft-${VERSION}-linux-${ARCH}.AppImage"
+ARCH="$ARCH" "$APPIMAGETOOL" "$APPDIR" "$APPIMAGE"
 
-( cd "$DIST" && sha256sum ./*.AppImage > SHA256SUMS.appimage )
+( cd "$DIST" && sha256sum "$(basename "$APPIMAGE")" > SHA256SUMS.appimage )
 echo "AppImage written to $DIST"

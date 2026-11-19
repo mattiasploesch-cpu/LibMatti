@@ -7,6 +7,7 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 BUILD_DIR="${BUILD_DIR:-$ROOT/build/macos-osxcross}"
 VERSION="${VERSION:-0.1.0}"
+ARCH="${ARCH:-$(uname -m)}"
 DIST="${DIST:-$ROOT/dist}"
 STAGE="$(mktemp -d)"
 trap 'rm -rf "$STAGE"' EXIT
@@ -33,7 +34,7 @@ cp "$STAGE/usr/share/matticraft/Monocraft.ttf" "$APP/Contents/Resources/Monocraf
 sed "s/__VERSION__/$VERSION/g" "$ROOT/packaging/macos/Info.plist" > "$APP/Contents/Info.plist"
 mkdir -p "$DIST"
 
-DMG="$DIST/Matticraft-${VERSION}-universal.dmg"
+DMG="$DIST/Matticraft-${VERSION}-macos-${ARCH}.dmg"
 if command -v genisoimage >/dev/null 2>&1; then
     genisoimage -quiet -V "Matticraft" -D -R -apple -no-pad -o "$DMG" "$DIST"
 elif command -v mkisofs >/dev/null 2>&1; then

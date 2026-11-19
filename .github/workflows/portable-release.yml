@@ -138,7 +138,15 @@ jobs:
           if-no-files-found: error
 
   macos:
-    runs-on: macos-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: macos-15
+            arch: arm64
+          - runner: macos-15-intel
+            arch: x86_64
+    runs-on: ${{ matrix.runner }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -152,17 +160,25 @@ jobs:
         run: |
           cmake -S . -B build/macos -G Ninja \
             -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_OSX_ARCHITECTURES="${{ matrix.arch }}" \
             -DCMAKE_PREFIX_PATH="$(brew --prefix)"
           cmake --build build/macos -j "$(sysctl -n hw.ncpu)"
-      - name: Build the app bundle and DMG
+      - name: Build the app bundle, ZIP and DMG
         run: |
-          BUILD_DIR=build/macos VERSION="$MATTI_VERSION" packaging/macos/dmg.sh
+          BUILD_DIR=build/macos VERSION="$MATTI_VERSION" ARCH="${{ matrix.arch }}" \
+            packaging/macos/dmg.sh
           ditto -c -k --keepParent dist/Matticraft.app \
-            "dist/Matticraft-${MATTI_VERSION}-macos.zip"
+            "dist/Matticraft-${MATTI_VERSION}-macos-${{ matrix.arch }}.zip"
+          # The .app directory is a build input, not a release asset. Keeping it
+          # in dist/ made actions/upload-artifact flatten every binary, PNG and
+          # TTF inside the bundle into the release root.
+          rm -rf dist/Matticraft.app
       - uses: actions/upload-artifact@v4
         with:
-          name: macos-packages
-          path: dist/*
+          name: macos-packages-${{ matrix.arch }}
+          path: |
+            dist/*.zip
+            dist/*.dmg
           if-no-files-found: error
 
   android:
@@ -205,12 +221,12 @@ jobs:
             -PmattiVersion="${MATTI_VERSION#v}" \
             :mobile_client:assembleRelease :mobile_client:bundleRelease --no-daemon
           mkdir -p dist
-          find library/src/mobile/mobile_client/build/outputs/apk/release \
-            -name '*.apk' -exec cp {} dist/ \;
-          find library/src/mobile/mobile_client/build/outputs/bundle/release \
-            -name '*.aab' -exec cp {} dist/ \;
-          test -n "$(find dist -name '*.apk' -print -quit)"
-          test -n "$(find dist -name '*.aab' -print -quit)"
+          APK="$(find library/src/mobile/mobile_client/build/outputs/apk/release -name '*.apk' -print -quit)"
+          AAB="$(find library/src/mobile/mobile_client/build/outputs/bundle/release -name '*.aab' -print -quit)"
+          test -n "$APK"
+          test -n "$AAB"
+          cp "$APK" "dist/Matticraft-${MATTI_VERSION}-android.apk"
+          cp "$AAB" "dist/Matticraft-${MATTI_VERSION}-android.aab"
       - uses: actions/upload-artifact@v4
         with:
           name: android-packages
@@ -245,7 +261,18 @@ jobs:
           RELEASE_VERSION="${MATTI_VERSION#v}"
           echo "RELEASE_VERSION=$RELEASE_VERSION" >> "$GITHUB_ENV"
           mkdir -p dist
+          # Artifacts are downloaded as artifacts/<name>/<file>. macОS used to
+          # upload the whole .app tree, which flattened Mach-O binaries and
+          # image/font resources into the release root. Only real packages are
+          # release assets now.
+          find artifacts -type d -name 'Matticraft.app' -exec rm -rf {} +
           find artifacts -type f -exec cp {} dist/ \;
+          for loose in '*.png' '*.ttf' '*.dylib' 'Info.plist' 'Matticraft' 'vulkancraft'; do
+            if find artifacts -type f -name "$loose" | grep -q .; then
+              echo "refusing loose macOS payload in release: $loose" >&2
+              exit 1
+            fi
+          done
           (cd dist && sha256sum * > SHA256SUMS)
           cat > dist/latest.json <<EOF
           {"version":"$RELEASE_VERSION","channel":"$MATTI_CHANNEL","commit":"$GITHUB_SHA","artifacts":[]}

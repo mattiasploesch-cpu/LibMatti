@@ -53,7 +53,7 @@ cp "$ROOT/README.md" "$STAGE/usr/share/doc/matticraft/" 2>/dev/null || true
 cp "$ROOT/planported.MD" "$STAGE/usr/share/doc/matticraft/" 2>/dev/null || true
 
 mkdir -p "$DIST"
-ARTIFACT="$DIST/matticraft-${VERSION}-linux-${ARCH}.tar.zst"
+ARTIFACT="$DIST/Matticraft-${VERSION}-linux-${ARCH}.tar.zst"
 if tar --help 2>/dev/null | grep -q -- '--zstd'; then
     tar --zstd -cf "$ARTIFACT" -C "$STAGE" .
 else

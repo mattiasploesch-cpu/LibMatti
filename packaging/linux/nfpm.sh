@@ -8,10 +8,11 @@ VERSION="${VERSION:-0.1.0}"
 ARCH="${ARCH:-$(uname -m)}"
 # nfpm/Debian/RPM use amd64/arm64/386, not the uname spellings.
 case "$ARCH" in
-    x86_64|amd64) ARCH=amd64 ;;
-    aarch64|arm64) ARCH=arm64 ;;
-    i386|i486|i586|i686|x86) ARCH=386 ;;
-    armv7l|armhf) ARCH=armhf ;;
+    x86_64|amd64) ARCH=amd64; LABEL=x86_64 ;;
+    aarch64|arm64) ARCH=arm64; LABEL=arm64 ;;
+    i386|i486|i586|i686|x86) ARCH=386; LABEL=i386 ;;
+    armv7l|armhf) ARCH=armhf; LABEL=armhf ;;
+    *) LABEL="$ARCH" ;;
 esac
 DIST="${DIST:-$ROOT/dist}"
 STAGE="${PACKAGE_STAGE:-$(mktemp -d)}"
@@ -57,10 +58,10 @@ sed -e "s|\${PACKAGE_STAGE}|$STAGE|g" \
     -e "s|\${VERSION}|$VERSION|g" \
     "$ROOT/packaging/linux/nfpm.yaml" > "$CONFIG"
 
-nfpm package --config "$CONFIG" --packager deb \
-    --target "$DIST/matticraft_${VERSION}_${ARCH}.deb"
-nfpm package --config "$CONFIG" --packager rpm \
-    --target "$DIST/matticraft-${VERSION}.${ARCH}.rpm"
+DEB="$DIST/Matticraft-${VERSION}-linux-${LABEL}.deb"
+RPM="$DIST/Matticraft-${VERSION}-linux-${LABEL}.rpm"
+nfpm package --config "$CONFIG" --packager deb --target "$DEB"
+nfpm package --config "$CONFIG" --packager rpm --target "$RPM"
 
-( cd "$DIST" && sha256sum matticraft_"${VERSION}"_"${ARCH}".deb matticraft-"${VERSION}"."${ARCH}".rpm > SHA256SUMS.packages )
+( cd "$DIST" && sha256sum "$(basename "$DEB")" "$(basename "$RPM")" > SHA256SUMS.packages )
 echo "packages written to $DIST"

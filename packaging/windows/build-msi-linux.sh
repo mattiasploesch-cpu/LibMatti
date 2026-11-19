@@ -7,6 +7,7 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 BUILD_DIR="${BUILD_DIR:-$ROOT/build/windows-mingw-x64}"
 VERSION="${VERSION:-0.1.0}"
 DIST="${DIST:-$ROOT/dist}"
+ARCH="${ARCH:-x64}"
 STAGE="${PACKAGE_STAGE:-$(mktemp -d)}"
 trap '[ -n "${PACKAGE_STAGE:-}" ] || rm -rf "$STAGE"' EXIT
 
@@ -64,6 +65,7 @@ fi
 cp "$LAUNCHER_BIN" "$BIN_DIR/matticraft-launcher.exe"
 mkdir -p "$DIST"
 DIST="$(cd "$DIST" && pwd)"
+MSI="$DIST/Matticraft-${VERSION}-windows-${ARCH}.msi"
 
 # wixl resolves File Source relative to its working directory. Running from the
 # staging bin tree keeps the paths portable across wixl versions (the old
@@ -72,9 +74,9 @@ DIST="$(cd "$DIST" && pwd)"
     cd "$BIN_DIR"
     wixl -v \
         -D "Version=$VERSION" \
-        -o "$DIST/Matticraft-${VERSION}-x64.msi" \
+        -o "$MSI" \
         "$ROOT/packaging/windows/matticraft-wixl.wxs"
 )
 
-( cd "$DIST" && sha256sum "Matticraft-${VERSION}-x64.msi" > SHA256SUMS.msi )
+( cd "$DIST" && sha256sum "$(basename "$MSI")" > SHA256SUMS.msi )
 echo "MSI written to $DIST"
