@@ -152,7 +152,9 @@ git -C "$NIXPKGS" add "${FILES[@]}"
 if git -C "$NIXPKGS" diff --cached --quiet; then
   echo "no package changes to commit"
 else
-  git -C "$NIXPKGS" commit -m "libmatti, matticraft, matticraft-launcher: update to ${VERSION}"
+  git -C "$NIXPKGS" commit \
+    -m "libmatti, matticraft, matticraft-launcher: update to ${VERSION}" \
+    -m "Assisted-by: Codebuff (DeepSeek V4.1 Flash Fast)"
 fi
 git -C "$NIXPKGS" push -u "$REMOTE" "$BRANCH"
 
