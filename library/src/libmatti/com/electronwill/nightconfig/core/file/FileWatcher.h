@@ -1,9 +1,10 @@
-// Port of com.electronwill.nightconfig.core.file.FileWatcher.
-// Java watches files asynchronously on a WatchService thread with a debounce time;
-// every modification resets the countdown and the change handler runs after the calm
-// period. The port implements the same lifecycle over inotify (Linux): one watcher
-// thread, one watch per file, one debounce timer per file, handlers invoked on the
-// watcher thread exactly like Java's watchers-<id> thread group.
+
+
+
+
+
+
+
 
 #ifndef MATTICRAFT_NC_FILEWATCHER_H
 #define MATTICRAFT_NC_FILEWATCHER_H
@@ -44,4 +45,4 @@ void LIBMATTI_NC_FileWatcher_Free(LIBMATTI_NC_FileWatcher *watcher);
 // Java: public static class WatchingException
 void LIBMATTI_NC_FileWatcher_WatchingException_Free(LIBMATTI_NC_FileWatcher_WatchingException *exception);
 
-#endif //MATTICRAFT_NC_FILEWATCHER_H
+#endif

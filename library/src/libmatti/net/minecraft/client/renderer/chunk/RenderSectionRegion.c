@@ -43,7 +43,7 @@ LIBMATTI_MC_BlockState *LIBMATTI_MC_RenderSectionRegion_GetBlockState(const LIBM
     if (region == NULL || pos == NULL)
         return NULL;
 
-    // Java: int i = SectionPos.blockToSectionCoord(pos.getX()) - centerX + 1;
+// Java: int i = SectionPos.blockToSectionCoord(pos.getX()) - centerX + 1;
     int sx = LIBMATTI_MC_SectionPos_BlockToSectionCoord(pos->base.x) - region->centerX + 1;
     int sy = LIBMATTI_MC_SectionPos_BlockToSectionCoord(pos->base.y) - region->centerY + 1;
     int sz = LIBMATTI_MC_SectionPos_BlockToSectionCoord(pos->base.z) - region->centerZ + 1;
@@ -58,6 +58,6 @@ LIBMATTI_MC_BlockState *LIBMATTI_MC_RenderSectionRegion_GetBlockState(const LIBM
                 LIBMATTI_MC_SectionPos_SectionRelative(pos->base.z));
         }
     }
-    // Java: Blocks.VOID_AIR outside the window / missing sections.
+// Java: Blocks.VOID_AIR outside the window / missing sections.
     return LIBMATTI_MC_Block_DefaultBlockState(LIBMATTI_MC_VanillaBlocks_AIR());
 }

@@ -1,9 +1,10 @@
-// Port of net.minecraft.nbt.Tag (the id constants) and the concrete tag types the
-// C port keeps in one tagged union per tag object: EndTag, the primitive tags
-// (ByteTag/ShortTag/IntTag/LongTag/FloatTag/DoubleTag/StringTag) and the array tags
-// (ByteArrayTag/IntArrayTag/LongArrayTag). CompoundTag and ListTag are separate
-// headers (they carry the container APIs); they embed the same header so every tag
-// flows through the shared binary reader/writer.
+
+
+
+
+
+
+
 
 #ifndef MATTICRAFT_NET_MINECRAFT_NBT_TAG_H
 #define MATTICRAFT_NET_MINECRAFT_NBT_TAG_H
@@ -32,33 +33,33 @@ typedef struct LIBMATTI_MC_Nbt_Tag
     uint8_t id;
     union
     {
-        // Java: ByteTag(byte value) - id 1
+// Java: ByteTag(byte value) - id 1
         int8_t byteValue;
-        // Java: ShortTag(short value) - id 2
+// Java: ShortTag(short value) - id 2
         int16_t shortValue;
-        // Java: IntTag(int value) - id 3
+// Java: IntTag(int value) - id 3
         int32_t intValue;
-        // Java: LongTag(long value) - id 4
+// Java: LongTag(long value) - id 4
         int64_t longValue;
-        // Java: FloatTag(float value) - id 5
+// Java: FloatTag(float value) - id 5
         float floatValue;
-        // Java: DoubleTag(double value) - id 6
+// Java: DoubleTag(double value) - id 6
         double doubleValue;
-        // Java: StringTag(String value) - id 8; owned by the tag
+// Java: StringTag(String value) - id 8; owned by the tag
         char *stringValue;
-        // Java: ByteArrayTag(byte[] value) - id 7; owned by the tag
+// Java: ByteArrayTag(byte[] value) - id 7; owned by the tag
         struct
         {
             int8_t *data;
             size_t length;
         } byteArray;
-        // Java: IntArrayTag(int[] value) - id 11; owned by the tag
+// Java: IntArrayTag(int[] value) - id 11; owned by the tag
         struct
         {
             int32_t *data;
             size_t length;
         } intArray;
-        // Java: LongArrayTag(long[] value) - id 12; owned by the tag
+// Java: LongArrayTag(long[] value) - id 12; owned by the tag
         struct
         {
             int64_t *data;
@@ -83,11 +84,13 @@ LIBMATTI_MC_Nbt_Tag *LIBMATTI_MC_Nbt_LongArrayTag_Of(const int64_t *data, size_t
 // Java: EndTag.INSTANCE - a shared singleton (never freed)
 LIBMATTI_MC_Nbt_Tag *LIBMATTI_MC_Nbt_EndTag_Instance(void);
 
-// allocate an empty tag of the primitive/array kinds
+
+
 LIBMATTI_MC_Nbt_Tag *LIBMATTI_MC_Nbt_Tag_New(uint8_t id);
 // deep copy (Java: Tag.copy()); compounds/lists dispatch into their own copy
 LIBMATTI_MC_Nbt_Tag *LIBMATTI_MC_Nbt_Tag_Copy(const LIBMATTI_MC_Nbt_Tag *tag);
-// free a tag owned by the caller (compound/list free their children)
+
+
 void LIBMATTI_MC_Nbt_Tag_Free(LIBMATTI_MC_Nbt_Tag *tag);
 
 // Java: NumericTag.byteValue()/shortValue()/... - the widening casts of Java; -1/0/NaN when the
@@ -113,8 +116,9 @@ char *LIBMATTI_MC_Nbt_StringTag_QuoteAndEscape(const char *value);
 // Java: StringTag.escapeWithoutQuotes(String) - the caller frees the string
 char *LIBMATTI_MC_Nbt_StringTag_EscapeWithoutQuotes(const char *value);
 
-// The container dispatch Tag.c needs; CompoundTag.h/ListTag.h provide the bodies and the
-// full struct definitions
+
+
+
 typedef struct LIBMATTI_MC_Nbt_CompoundTag LIBMATTI_MC_Nbt_CompoundTag;
 typedef struct LIBMATTI_MC_Nbt_ListTag LIBMATTI_MC_Nbt_ListTag;
 
@@ -123,4 +127,4 @@ int LIBMATTI_MC_Nbt_Tag_EqualsContainer(const LIBMATTI_MC_Nbt_Tag *a, const LIBM
 void LIBMATTI_MC_Nbt_CompoundTag_FreeEntries(LIBMATTI_MC_Nbt_CompoundTag *compound);
 void LIBMATTI_MC_Nbt_ListTag_FreeEntries(LIBMATTI_MC_Nbt_ListTag *list);
 
-#endif //MATTICRAFT_NET_MINECRAFT_NBT_TAG_H
+#endif

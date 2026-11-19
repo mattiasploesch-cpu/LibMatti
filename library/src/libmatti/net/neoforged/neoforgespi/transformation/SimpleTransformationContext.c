@@ -1,4 +1,5 @@
-// Port of net.neoforged.neoforgespi.transformation.SimpleTransformationContext.
+
+
 
 #include "libmatti/net/neoforged/neoforgespi/transformation/SimpleTransformationContext.h"
 

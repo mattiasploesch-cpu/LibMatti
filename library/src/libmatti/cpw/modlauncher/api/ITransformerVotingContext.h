@@ -1,4 +1,5 @@
-// Port of cpw.mods.modlauncher.api.ITransformerVotingContext.
+
+
 
 #ifndef MATTICRAFT_MODLAUNCHER_ITRANSFORMERVOTINGCONTEXT_H
 #define MATTICRAFT_MODLAUNCHER_ITRANSFORMERVOTINGCONTEXT_H
@@ -49,4 +50,4 @@ int LIBMATTI_MLA_ITransformerVotingContext_ApplyInstructionPredicate(
     LIBMATTI_MLA_ITransformerVotingContext *context,
     LIBMATTI_MLA_ITransformerVotingContext_InsnPredicate predicate, void *userdata);
 
-#endif //MATTICRAFT_MODLAUNCHER_ITRANSFORMERVOTINGCONTEXT_H
+#endif

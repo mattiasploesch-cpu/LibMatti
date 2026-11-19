@@ -11,4 +11,4 @@
 // Java: IModBusEvent.class
 LIBMATTI_JL_Class *LIBMATTI_FML_Event_IModBusEvent_Class(void);
 
-#endif //MATTICRAFT_FML_EVENT_IMODBUSEVENT_H
+#endif

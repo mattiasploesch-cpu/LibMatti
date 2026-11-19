@@ -1,6 +1,7 @@
-//
-// Port of the Layer enum members of cpw.mods.modlauncher.api.IModuleLayerManager.
-//
+
+
+
+
 
 #include "IModuleLayerManager.h"
 

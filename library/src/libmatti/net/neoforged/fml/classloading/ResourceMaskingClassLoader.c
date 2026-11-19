@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.classloading.ResourceMaskingClassLoader.
+
+
 
 #include "libmatti/net/neoforged/fml/classloading/ResourceMaskingClassLoader.h"
 
@@ -11,10 +12,10 @@ LIBMATTI_FML_ResourceMaskingClassLoader *LIBMATTI_FML_ResourceMaskingClassLoader
     LIBMATTI_JL_ClassLoader *parent, const char **maskedClasspathElements, size_t maskedClasspathElementCount)
 {
     LIBMATTI_FML_ResourceMaskingClassLoader *classLoader = calloc(1, sizeof(LIBMATTI_FML_ResourceMaskingClassLoader));
-    // Java: super(Objects.requireNonNull(parent, "parent"))
+// Java: super(Objects.requireNonNull(parent, "parent"))
     classLoader->base.parent = parent;
 
-    // Java: private final Set<Path> maskedClasspathElements - the port takes ownership of a copy
+// Java: private final Set<Path> maskedClasspathElements - the port takes ownership of a copy
     char **elements = calloc(maskedClasspathElementCount > 0 ? maskedClasspathElementCount : 1, sizeof(*elements));
     for (size_t i = 0; i < maskedClasspathElementCount; i++)
         elements[i] = strdup(maskedClasspathElements[i]);
@@ -50,7 +51,7 @@ static LIBMATTI_JN_URL **filter_masked(LIBMATTI_FML_ResourceMaskingClassLoader *
     *count = 0;
     for (size_t i = 0; i < delegateCount; i++)
     {
-        // Java: Path root = ClasspathResourceUtils.getRootFromResourceUrl(relativePath, el);
+// Java: Path root = ClasspathResourceUtils.getRootFromResourceUrl(relativePath, el);
         //       if (!maskedClasspathElements.contains(root)) nextElement = el;
         char *root = LIBMATTI_FML_ClasspathResourceUtils_GetRootFromResourceUrl(relativePath, delegate[i]);
         int masked = is_masked(classLoader, root);
@@ -64,7 +65,7 @@ static LIBMATTI_JN_URL **filter_masked(LIBMATTI_FML_ResourceMaskingClassLoader *
 LIBMATTI_JN_URL **LIBMATTI_FML_ResourceMaskingClassLoader_GetResources(
     LIBMATTI_FML_ResourceMaskingClassLoader *classLoader, const char *name, size_t *count)
 {
-    // Java: return new FilteringEnumeration(super.getResources(name), name);
+// Java: return new FilteringEnumeration(super.getResources(name), name);
     size_t delegateCount = 0;
     LIBMATTI_JN_URL **delegate = LIBMATTI_JL_ClassLoader_FindResources(classLoader->base.parent, name,
                                                                        &delegateCount);
@@ -76,11 +77,11 @@ LIBMATTI_JN_URL **LIBMATTI_FML_ResourceMaskingClassLoader_GetResources(
 LIBMATTI_JN_URL *LIBMATTI_FML_ResourceMaskingClassLoader_GetResource(
     LIBMATTI_FML_ResourceMaskingClassLoader *classLoader, const char *name)
 {
-    // Java: var resource = getParent().getResource(name); if (resource == null) return null;
+// Java: var resource = getParent().getResource(name); if (resource == null) return null;
     LIBMATTI_JN_URL *resource = LIBMATTI_JL_ClassLoader_GetResource(classLoader->base.parent, name);
     if (resource == NULL) return NULL;
 
-    // Java: var resourceRoot = ClasspathResourceUtils.getRootFromResourceUrl(name, resource);
+// Java: var resourceRoot = ClasspathResourceUtils.getRootFromResourceUrl(name, resource);
     //       if (maskedClasspathElements.contains(resourceRoot)) { var resources = getResources(name);
     //           resource = resources.hasMoreElements() ? resources.nextElement() : null; }
     char *resourceRoot = LIBMATTI_FML_ClasspathResourceUtils_GetRootFromResourceUrl(name, resource);

@@ -1,5 +1,6 @@
-// Port of net.neoforged.fml.loading.moddiscovery.locators.RequiredSystemFiles.
-// Models the required files for opening a valid Minecraft and NeoForge jar from the classpath.
+
+
+
 
 #ifndef MATTICRAFT_FML_LOADING_MODDISCOVERY_LOCATORS_REQUIREDSYSTEMFILES_H
 #define MATTICRAFT_FML_LOADING_MODDISCOVERY_LOCATORS_REQUIREDSYSTEMFILES_H
@@ -81,4 +82,4 @@ int LIBMATTI_FML_RequiredSystemFiles_IsNeoForgeManifest(const LIBMATTI_JU_Manife
 // Java: @Override public void close()
 void LIBMATTI_FML_RequiredSystemFiles_Close(LIBMATTI_FML_RequiredSystemFiles *files);
 
-#endif //MATTICRAFT_FML_LOADING_MODDISCOVERY_LOCATORS_REQUIREDSYSTEMFILES_H
+#endif

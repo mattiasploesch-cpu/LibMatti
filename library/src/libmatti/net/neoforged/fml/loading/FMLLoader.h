@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.loading.FMLLoader.
+
+
 
 #ifndef MATTICRAFT_FMLLOADER_H
 #define MATTICRAFT_FMLLOADER_H
@@ -32,13 +33,13 @@ typedef struct LIBMATTI_FML_FMLLoader LIBMATTI_FML_FMLLoader;
 //         List<ModFile> gameLibraryContent, List<ModLoadingIssue> discoveryIssues)
 typedef struct
 {
-    // Java: List<ModFile> pluginContent (the ported moddiscovery.ModFile, kept as concrete pointers)
+// Java: List<ModFile> pluginContent (the ported moddiscovery.ModFile, kept as concrete pointers)
     void **pluginContent;
     size_t pluginContentCount;
-    // Java: List<ModFile> gameContent
+// Java: List<ModFile> gameContent
     void **gameContent;
     size_t gameContentCount;
-    // Java: List<ModFile> gameLibraryContent
+// Java: List<ModFile> gameLibraryContent
     void **gameLibraryContent;
     size_t gameLibraryContentCount;
     LIBMATTI_FML_ModLoadingIssue **discoveryIssues;
@@ -48,9 +49,9 @@ typedef struct
 // Java: private class LaunchContextAdapter implements ILaunchContext
 typedef struct LIBMATTI_FML_FMLLoader_LaunchContextAdapter
 {
-    // Java: the implicit outer FMLLoader instance
+// Java: the implicit outer FMLLoader instance
     LIBMATTI_FML_FMLLoader *loader;
-    // Java: the adapter is an ILaunchContext; the port keeps the vtable on it
+// Java: the adapter is an ILaunchContext; the port keeps the vtable on it
     LIBMATTI_NEOFORGESPI_ILaunchContext context;
 } LIBMATTI_FML_FMLLoader_LaunchContextAdapter;
 
@@ -59,35 +60,35 @@ struct LIBMATTI_FML_FMLLoader
 {
     LIBMATTI_JL_ClassLoader *originalClassLoader;
     LIBMATTI_JL_ClassLoader *currentClassLoader;
-    // Java: private final List<AutoCloseable> ownedResources
+// Java: private final List<AutoCloseable> ownedResources
     LIBMATTI_JL_AutoCloseable *ownedResources;
     size_t ownedResourceCount;
-    // Java: private final List<AutoCloseable> closeCallbacks
+// Java: private final List<AutoCloseable> closeCallbacks
     LIBMATTI_JL_AutoCloseable *closeCallbacks;
     size_t closeCallbackCount;
     LIBMATTI_FML_ProgramArgs *programArgs;
-    // Java: private final LanguageProviderLoader languageProviderLoader (ported)
+// Java: private final LanguageProviderLoader languageProviderLoader (ported)
     void *languageProviderLoader;
     LIBMATTI_DIST_Dist dist;
-    // Java: private final LoadingModList loadingModList (ported)
+// Java: private final LoadingModList loadingModList (ported)
     void *loadingModList;
     const char *gameDir;
-    // Java: private final Set<Path> locatedPaths
+// Java: private final Set<Path> locatedPaths
     char **locatedPaths;
     size_t locatedPathCount;
     LIBMATTI_FML_VersionInfo *versionInfo;
-    // Java: private final VersionSupportMatrix versionSupportMatrix (ported)
+// Java: private final VersionSupportMatrix versionSupportMatrix (ported)
     void *versionSupportMatrix;
-    // Java: private final BackgroundScanHandler backgroundScanHandler (ported)
+// Java: private final BackgroundScanHandler backgroundScanHandler (ported)
     void *backgroundScanHandler;
     int production;
     LIBMATTI_JL_ModuleLayer *gameLayer;
-    // Java: private final List<ModFile> earlyServicesJars
+// Java: private final List<ModFile> earlyServicesJars
     void **earlyServicesJars;
     size_t earlyServicesJarCount;
     LIBMATTI_FML_FMLLoader_DiscoveryResult *discoveryResult;
     LIBMATTI_FML_ClassProcessorAuditLog *classTransformerAuditLog;
-    // Java: private IBindingsProvider bindings
+// Java: private IBindingsProvider bindings
     LIBMATTI_FML_IBindingsProvider *bindings;
 };
 
@@ -126,7 +127,8 @@ void LIBMATTI_FML_FMLLoader_AddCloseCallback(LIBMATTI_FML_FMLLoader *loader, LIB
 // Java: public void close()
 void LIBMATTI_FML_FMLLoader_Close(LIBMATTI_FML_FMLLoader *loader);
 
-// Java has no destructor; the C port releases what the constructor allocated.
+
+
 void LIBMATTI_FML_FMLLoader_Free(LIBMATTI_FML_FMLLoader *loader);
 
 // Java: public ClassLoader getCurrentClassLoader()
@@ -250,4 +252,4 @@ LIBMATTI_FML_VersionInfo *LIBMATTI_FML_FMLLoader_LaunchContextAdapter_GetVersion
 
 void LIBMATTI_FML_FMLLoader_LaunchContextAdapter_Free(LIBMATTI_FML_FMLLoader_LaunchContextAdapter *adapter);
 
-#endif //MATTICRAFT_FMLLOADER_H
+#endif

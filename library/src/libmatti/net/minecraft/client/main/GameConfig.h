@@ -1,5 +1,6 @@
-// Port of net.minecraft.client.main.GameConfig (and the blaze3d DisplayData it carries).
-// Java's nested classes become plain structs; OptionalInt becomes a value plus a has flag.
+
+
+
 
 #ifndef MATTICRAFT_NET_MINECRAFT_CLIENT_MAIN_GAMECONFIG_H
 #define MATTICRAFT_NET_MINECRAFT_CLIENT_MAIN_GAMECONFIG_H
@@ -60,4 +61,4 @@ typedef struct LIBMATTI_MC_GameConfig
     const char *quickPlayWorld;
 } LIBMATTI_MC_GameConfig;
 
-#endif //MATTICRAFT_NET_MINECRAFT_CLIENT_MAIN_GAMECONFIG_H
+#endif

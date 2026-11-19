@@ -1,6 +1,7 @@
-// Port of net.neoforged.neoforgespi.language.IModFileInfo.
-// getFileProperties() carries the ported java.util.HashMap; VersionRange resolves
-// through the ported MavenVersionAdapter. IConfigurable is implemented by ModFileInfo.
+
+
+
+
 
 #ifndef MATTICRAFT_NEOFORGESPI_LANGUAGE_IMODFILEINFO_H
 #define MATTICRAFT_NEOFORGESPI_LANGUAGE_IMODFILEINFO_H
@@ -15,8 +16,8 @@ typedef struct LIBMATTI_NEOFORGESPI_IModInfo LIBMATTI_NEOFORGESPI_IModInfo;
 // Java: record LanguageSpec(@Nullable String languageName, @Nullable VersionRange acceptedVersions) {}
 typedef struct
 {
-    char *languageName; // Java: @Nullable String languageName
-    LIBMATTI_NEOFORGESPI_VersionRange *acceptedVersions; // Java: @Nullable VersionRange acceptedVersions
+    char *languageName;// Java: @Nullable String languageName
+    LIBMATTI_NEOFORGESPI_VersionRange *acceptedVersions;// Java: @Nullable VersionRange acceptedVersions
 } LIBMATTI_NEOFORGESPI_IModFileInfo_LanguageSpec;
 
 // Java: public interface IModFileInfo
@@ -26,27 +27,27 @@ struct LIBMATTI_NEOFORGESPI_IModFileInfo
 {
     void *self;
 
-    // Java: List<IModInfo> getMods()
+// Java: List<IModInfo> getMods()
     LIBMATTI_NEOFORGESPI_IModInfo **(*getMods)(void *self, size_t *count);
-    // Java: List<LanguageSpec> requiredLanguageLoaders()
+// Java: List<LanguageSpec> requiredLanguageLoaders()
     LIBMATTI_NEOFORGESPI_IModFileInfo_LanguageSpec *(*requiredLanguageLoaders)(void *self, size_t *count);
-    // Java: boolean showAsResourcePack()
+// Java: boolean showAsResourcePack()
     int (*showAsResourcePack)(void *self);
-    // Java: boolean showAsDataPack()
+// Java: boolean showAsDataPack()
     int (*showAsDataPack)(void *self);
-    // Java: Map<String, Object> getFileProperties()
+// Java: Map<String, Object> getFileProperties()
     void *(*getFileProperties)(void *self);
-    // Java: String getLicense()
+// Java: String getLicense()
     const char *(*getLicense)(void *self);
-    // Java: String versionString()
+// Java: String versionString()
     const char *(*versionString)(void *self);
-    // Java: List<String> usesServices()
+// Java: List<String> usesServices()
     char **(*usesServices)(void *self, size_t *count);
-    // Java: IModFile getFile()
+// Java: IModFile getFile()
     LIBMATTI_NEOFORGESPI_IModFile *(*getFile)(void *self);
-    // Java: IConfigurable getConfig()
+// Java: IConfigurable getConfig()
     void *(*getConfig)(void *self);
-    // Java: the GC - the port releases the implementation explicitly
+// Java: the GC - the port releases the implementation explicitly
     void (*free)(void *self);
 };
 
@@ -77,4 +78,4 @@ void *LIBMATTI_NEOFORGESPI_IModFileInfo_GetConfig(const LIBMATTI_NEOFORGESPI_IMo
 // Java: the GC - releases the implementation
 void LIBMATTI_NEOFORGESPI_IModFileInfo_Free(LIBMATTI_NEOFORGESPI_IModFileInfo *modFileInfo);
 
-#endif //MATTICRAFT_NEOFORGESPI_LANGUAGE_IMODFILEINFO_H
+#endif

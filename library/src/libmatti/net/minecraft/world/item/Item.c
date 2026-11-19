@@ -1,4 +1,5 @@
-// Port of net.minecraft.world.item.Item (the data part).
+
+
 
 #include "libmatti/net/minecraft/world/item/Item.h"
 
@@ -17,13 +18,14 @@
 LIBMATTI_MC_ItemProperties *LIBMATTI_MC_ItemProperties_New(void)
 {
     LIBMATTI_MC_ItemProperties *properties = calloc(1, sizeof(LIBMATTI_MC_ItemProperties));
-    // Java: DataComponentMap.builder().addAll(DataComponents.COMMON_ITEM_COMPONENTS)
+// Java: DataComponentMap.builder().addAll(DataComponents.COMMON_ITEM_COMPONENTS)
     properties->components = LIBMATTI_MC_DataComponentMap_Copy(LIBMATTI_MC_DataComponents_CommonItemComponents());
     return properties;
 }
 
-// Java autoboxes every int component value; the port boxes into the properties'
-// own arena so the value outlives the call and stays per-properties
+
+
+
 static int *box_int(LIBMATTI_MC_ItemProperties *properties, int value)
 {
     if (properties->boxedIntCount == properties->boxedIntCapacity)
@@ -114,7 +116,8 @@ LIBMATTI_MC_ItemProperties *LIBMATTI_MC_ItemProperties_Rarity(LIBMATTI_MC_ItemPr
 // Java: public Properties fireResistant() = component(DAMAGE_RESISTANT, new DamageResistant(DamageTypeTags.IS_FIRE))
 LIBMATTI_MC_ItemProperties *LIBMATTI_MC_ItemProperties_FireResistant(LIBMATTI_MC_ItemProperties *properties)
 {
-    // The DamageResistant record wraps exactly one tag; the port carries the tag location
+
+
     return LIBMATTI_MC_ItemProperties_Component(properties, LIBMATTI_MC_DataComponents_DAMAGE_RESISTANT(),
                                                 (void *) "minecraft:is_fire");
 }
@@ -208,7 +211,7 @@ LIBMATTI_MC_Item *LIBMATTI_MC_Item_New(LIBMATTI_MC_ItemProperties *properties)
         item->components = LIBMATTI_MC_DataComponentMap_Empty();
     item->key = properties != NULL ? properties->id : NULL;
 
-    // Java: descriptionId defaults through ITEM_DESCRIPTION_ID / BLOCK_DESCRIPTION_ID
+// Java: descriptionId defaults through ITEM_DESCRIPTION_ID / BLOCK_DESCRIPTION_ID
     // (Util.makeDescriptionId("item"/"block", key.identifier()))
     if (properties != NULL && properties->descriptionId != NULL)
     {

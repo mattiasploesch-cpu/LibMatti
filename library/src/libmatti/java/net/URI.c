@@ -1,6 +1,7 @@
-//
-// Created by administrator on 09.09.26.
-//
+
+
+
+
 
 #include "URI.h"
 
@@ -18,7 +19,7 @@ static char *uri_substr(const char *start, const char *end)
 
 LIBMATTI_JN_URI *LIBMATTI_JN_URI_Create(const char *uri)
 {
-    if (uri == NULL) return NULL; // Java: new URI(null) -> NullPointerException
+    if (uri == NULL) return NULL;// Java: new URI(null) -> NullPointerException
 
     LIBMATTI_JN_URI *result = calloc(1, sizeof(LIBMATTI_JN_URI));
     result->raw = strdup(uri);
@@ -27,12 +28,14 @@ LIBMATTI_JN_URI *LIBMATTI_JN_URI_Create(const char *uri)
     const char *end = uri + strlen(uri);
     const char *rest = uri;
 
-    // fragment: everything after '#'
+
+
     const char *fragment = strchr(rest, '#');
     if (fragment != NULL)
         result->fragment = uri_substr(fragment + 1, end);
 
-    // query: '?' before the fragment
+
+
     const char *queryEnd = fragment != NULL ? fragment : end;
     const char *query = rest;
     while (query < queryEnd && *query != '?') query++;
@@ -41,7 +44,8 @@ LIBMATTI_JN_URI *LIBMATTI_JN_URI_Create(const char *uri)
 
     const char *mainEnd = query < queryEnd ? query : queryEnd;
 
-    // scheme: up to the first ':' before any '/', '?' or '#'
+
+
     const char *colon = rest;
     while (colon < mainEnd && *colon != ':' && *colon != '/' && *colon != '?' && *colon != '#') colon++;
 
@@ -52,7 +56,8 @@ LIBMATTI_JN_URI *LIBMATTI_JN_URI_Create(const char *uri)
         authorityStart = colon + 1;
     }
 
-    // authority: '//' up to the next '/', '?' or '#'
+
+
     const char *pathStart = authorityStart;
     if (authorityStart + 1 < mainEnd && authorityStart[0] == '/' && authorityStart[1] == '/')
     {
@@ -73,7 +78,7 @@ LIBMATTI_JN_URI *LIBMATTI_JN_URI_Create(const char *uri)
         if (portSep < authEnd)
         {
             result->host = uri_substr(auth, portSep);
-            // port must be digits, otherwise invalid (Java: URISyntaxException)
+// port must be digits, otherwise invalid (Java: URISyntaxException)
             for (const char *p = portSep + 1; p < authEnd; p++)
             {
                 if (*p < '0' || *p > '9')

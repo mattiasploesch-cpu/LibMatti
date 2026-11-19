@@ -1,4 +1,5 @@
-// Port of com.mojang.brigadier.context.StringRange.
+
+
 
 #include "libmatti/com/mojang/brigadier/context/StringRange.h"
 

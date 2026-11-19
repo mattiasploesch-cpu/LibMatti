@@ -1,6 +1,7 @@
-// Port of net.minecraft.world.level.material.MapColor.
-// Java registers every colour into a static MATERIAL_COLORS[64] table in the
-// constructor; the C port keeps the same table built at first use.
+
+
+
+
 
 #ifndef MATTICRAFT_MC_WORLD_LEVEL_MATERIAL_MAPCOLOR_H
 #define MATTICRAFT_MC_WORLD_LEVEL_MATERIAL_MAPCOLOR_H
@@ -13,9 +14,9 @@ extern "C" {
 // equality) against the constants works like Java
 typedef struct LIBMATTI_MC_MapColor
 {
-    // Java: public final int col
+// Java: public final int col
     int col;
-    // Java: public final int id
+// Java: public final int id
     int id;
 } LIBMATTI_MC_MapColor;
 
@@ -94,4 +95,4 @@ const LIBMATTI_MC_MapColor *LIBMATTI_MC_MapColor_Create(int id, int col);
 }
 #endif
 
-#endif //MATTICRAFT_MC_WORLD_LEVEL_MATERIAL_MAPCOLOR_H
+#endif

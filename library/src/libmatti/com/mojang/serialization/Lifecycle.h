@@ -1,5 +1,6 @@
-// Port of com.mojang.serialization.Lifecycle (the subset the registries use).
-// Java's singleton instances become the enum-like constants; Deprecated carries its since.
+
+
+
 
 #ifndef MATTICRAFT_MOJANG_SERIALIZATION_LIFECYCLE_H
 #define MATTICRAFT_MOJANG_SERIALIZATION_LIFECYCLE_H
@@ -15,7 +16,7 @@ typedef enum LIBMATTI_MJS_LifecycleKind
 typedef struct LIBMATTI_MJS_Lifecycle
 {
     LIBMATTI_MJS_LifecycleKind kind;
-    // Java: Deprecated.since
+// Java: Deprecated.since
     int since;
 } LIBMATTI_MJS_Lifecycle;
 
@@ -28,4 +29,4 @@ LIBMATTI_MJS_Lifecycle LIBMATTI_MJS_Lifecycle_Deprecated(int since);
 // Java: public Lifecycle add(Lifecycle other)
 LIBMATTI_MJS_Lifecycle LIBMATTI_MJS_Lifecycle_Add(LIBMATTI_MJS_Lifecycle lifecycle, LIBMATTI_MJS_Lifecycle other);
 
-#endif //MATTICRAFT_MOJANG_SERIALIZATION_LIFECYCLE_H
+#endif

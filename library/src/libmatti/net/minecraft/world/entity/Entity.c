@@ -1,4 +1,5 @@
-// Port of net.minecraft.world.entity.Entity (the base-class core).
+
+
 
 #include "libmatti/net/minecraft/world/entity/Entity.h"
 
@@ -27,12 +28,12 @@ void LIBMATTI_MC_Entity_Init(LIBMATTI_MC_Entity *entity, const LIBMATTI_MC_Entit
     entity->type = type;
     entity->level = level;
     entity->id = LIBMATTI_MC_Entity_NextEntityCounter();
-    // Java: this.uuid = UUID.randomUUID(); this.stringUUID = this.uuid.toString()
+// Java: this.uuid = UUID.randomUUID(); this.stringUUID = this.uuid.toString()
     entity->uuid = LIBMATTI_JU_UUID_RandomUUID();
-    // Java: this.position = Vec3.ZERO; this.deltaMovement = Vec3.ZERO
+// Java: this.position = Vec3.ZERO; this.deltaMovement = Vec3.ZERO
     entity->x = entity->y = entity->z = 0.0;
     entity->dx = entity->dy = entity->dz = 0.0;
-    entity->airSupply = 300; // Java: getMaxAirSupply() base value
+    entity->airSupply = 300;// Java: getMaxAirSupply() base value
     entity->firstTick = true;
     entity->bb = LIBMATTI_MC_EntityDimensions_MakeBoundingBoxAt(LIBMATTI_MC_EntityType_GetDimensions(type), entity->x, entity->y, entity->z);
 }
@@ -50,8 +51,9 @@ void LIBMATTI_MC_Entity_Free(LIBMATTI_MC_Entity *entity)
 {
     if (entity == NULL)
         return;
-    // the AABB port returns heap objects the caller frees (no AABB_Free helper
-    // exists - the plain free matches the allocation)
+
+
+
     free(entity->bb);
     entity->bb = NULL;
     for (int i = 0; i < entity->tagCount; i++)
@@ -115,7 +117,7 @@ LIBMATTI_MC_Vec3 *LIBMATTI_MC_Entity_Position(const LIBMATTI_MC_Entity *entity)
 
 LIBMATTI_MC_BlockPos LIBMATTI_MC_Entity_BlockPosition(const LIBMATTI_MC_Entity *entity)
 {
-    // Java: BlockPos.containing(x, y, z) - the floor of the position
+// Java: BlockPos.containing(x, y, z) - the floor of the position
     LIBMATTI_MC_BlockPos blockPos;
     blockPos.base.x = entity != NULL ? (int) floor(entity->x) : 0;
     blockPos.base.y = entity != NULL ? (int) floor(entity->y) : 0;
@@ -144,11 +146,11 @@ void LIBMATTI_MC_Entity_SetPosRaw(LIBMATTI_MC_Entity *entity, double x, double y
 {
     if (entity == NULL)
         return;
-    // Java: the raw position write (the bbox refresh is the caller's part)
+// Java: the raw position write (the bbox refresh is the caller's part)
     entity->x = x;
     entity->y = y;
     entity->z = z;
-    // Java: this.requiresPrecisePosition stays a sync-layer concern
+// Java: this.requiresPrecisePosition stays a sync-layer concern
 }
 
 float LIBMATTI_MC_Entity_GetYRot(const LIBMATTI_MC_Entity *entity)
@@ -197,7 +199,7 @@ void LIBMATTI_MC_Entity_SetOldPosAndRot(LIBMATTI_MC_Entity *entity)
 
 float LIBMATTI_MC_Entity_GetYHeadRot(const LIBMATTI_MC_Entity *entity)
 {
-    // Java: the base Entity mirrors yRot through yHeadRot
+// Java: the base Entity mirrors yRot through yHeadRot
     return LIBMATTI_MC_Entity_GetYRot(entity);
 }
 
@@ -252,7 +254,7 @@ void LIBMATTI_MC_Entity_RefreshDimensions(LIBMATTI_MC_Entity *entity)
 {
     if (entity == NULL)
         return;
-    // Java: refreshDimensions - the bbox rebuilds from the (possibly changed) type
+// Java: refreshDimensions - the bbox rebuilds from the (possibly changed) type
     LIBMATTI_MC_AABB *bb = LIBMATTI_MC_Entity_MakeBoundingBox(entity);
     LIBMATTI_MC_Entity_SetBoundingBox(entity, bb);
 }
@@ -391,20 +393,20 @@ void LIBMATTI_MC_Entity_SetRemoved(LIBMATTI_MC_Entity *entity, LIBMATTI_MC_Entit
 {
     if (entity == NULL || entity->removed)
         return;
-    // Java: if (this.removalReason == null) this.removalReason = reason
+// Java: if (this.removalReason == null) this.removalReason = reason
     entity->removed = true;
     entity->removalReason = reason;
 }
 
 void LIBMATTI_MC_Entity_Discard(LIBMATTI_MC_Entity *entity)
 {
-    // Java: this.remove(Entity.RemovalReason.DISCARDED)
+// Java: this.remove(Entity.RemovalReason.DISCARDED)
     LIBMATTI_MC_Entity_SetRemoved(entity, LIBMATTI_MC_EntityRemovalReason_DISCARDED);
 }
 
 void LIBMATTI_MC_Entity_Kill(LIBMATTI_MC_Entity *entity)
 {
-    // Java: this.remove(Entity.RemovalReason.KILLED)
+// Java: this.remove(Entity.RemovalReason.KILLED)
     LIBMATTI_MC_Entity_SetRemoved(entity, LIBMATTI_MC_EntityRemovalReason_KILLED);
 }
 
@@ -417,10 +419,11 @@ bool LIBMATTI_MC_Entity_AddTag(LIBMATTI_MC_Entity *entity, const char *tag)
     {
         int cmp = strcmp(entity->tags[i], tag);
         if (cmp == 0)
-            return false; // Java: the set add returns false on presence
+            return false;// Java: the set add returns false on presence
         if (cmp > 0)
         {
-            // insert sorted
+
+
             if (entity->tagCount >= entity->tagCapacity)
             {
                 int next = entity->tagCapacity > 0 ? entity->tagCapacity * 2 : 4;
@@ -489,14 +492,16 @@ static void axis_step_order(const LIBMATTI_MC_Vec3 *movement, int *axes)
 {
     if (fabs(movement->x) < fabs(movement->z))
     {
-        // YZX_AXIS_ORDER
+
+
         axes[0] = 1;
         axes[1] = 2;
         axes[2] = 0;
     }
     else
     {
-        // YXZ_AXIS_ORDER
+
+
         axes[0] = 1;
         axes[1] = 0;
         axes[2] = 2;
@@ -520,11 +525,11 @@ static double collide_axis(int axis, const LIBMATTI_MC_AABB *box, LIBMATTI_MC_AA
 {
     for (int i = 0; i < shapeCount; i++)
     {
-        // Java: if (Math.abs(p_193139_) < 1.0E-7) return 0.0
+// Java: if (Math.abs(p_193139_) < 1.0E-7) return 0.0
         if (fabs(movement) < COLLIDE_EPSILON)
             return 0.0;
         const LIBMATTI_MC_AABB *shape = shapes[i];
-        // Java: VoxelShape.collideX - the other two axes must overlap first
+// Java: VoxelShape.collideX - the other two axes must overlap first
         int axisA = (axis + 1) % 3;
         int axisB = (axis + 2) % 3;
         if (box_max(shape, axisA) <= box_min(box, axisA) + COLLIDE_EPSILON
@@ -533,7 +538,7 @@ static double collide_axis(int axis, const LIBMATTI_MC_AABB *box, LIBMATTI_MC_AA
         if (box_max(shape, axisB) <= box_min(box, axisB) + COLLIDE_EPSILON
             || box_min(shape, axisB) >= box_max(box, axisB) - COLLIDE_EPSILON)
             continue;
-        // Java: the positive walk - the nearest shape face ahead of box.max(axis)
+// Java: the positive walk - the nearest shape face ahead of box.max(axis)
         if (movement > 0.0)
         {
             double d2 = box_min(shape, axis) - box_max(box, axis);
@@ -542,7 +547,7 @@ static double collide_axis(int axis, const LIBMATTI_MC_AABB *box, LIBMATTI_MC_AA
         }
         else if (movement < 0.0)
         {
-            // Java: the negative walk - the nearest face behind box.min(axis)
+// Java: the negative walk - the nearest face behind box.min(axis)
             double d3 = box_max(shape, axis) - box_min(box, axis);
             if (d3 <= COLLIDE_EPSILON)
                 movement = fmax(movement, d3);
@@ -564,13 +569,14 @@ void LIBMATTI_MC_Entity_CollideBoundingBox(const LIBMATTI_MC_Entity *entity, con
     if (movement == NULL || box == NULL || level == NULL)
         return;
 
-    // Java: collectColliders - the swept box expandTowards(movement) bounds the
+// Java: collectColliders - the swept box expandTowards(movement) bounds the
     // block scan (the entity/world-border collisions ride later phases)
     LIBMATTI_MC_AABB *swept = LIBMATTI_MC_AABB_ExpandTowards(box, movement);
     if (swept == NULL)
         return;
-    // the scan bounds grow one block over the swept box (the epsilon slack of
-    // the BlockCollisions walk)
+
+
+
     LIBMATTI_MC_AABB *shapes[128];
     int shapeCount = LIBMATTI_MC_Level_GetBlockCollisions(level, swept->minX - 1.0, swept->minY - 1.0, swept->minZ - 1.0,
                                                           swept->maxX + 1.0, swept->maxY + 1.0, swept->maxZ + 1.0,
@@ -578,12 +584,12 @@ void LIBMATTI_MC_Entity_CollideBoundingBox(const LIBMATTI_MC_Entity *entity, con
     free(swept);
     if (shapeCount == 0)
     {
-        // Java: collideWithShapes returns the movement when the list is empty
+// Java: collideWithShapes returns the movement when the list is empty
         *out = *movement;
         return;
     }
 
-    // Java: collideWithShapes - vec3 accumulates the per-axis clip over the moved
+// Java: collideWithShapes - vec3 accumulates the per-axis clip over the moved
     // box (the box rides the already-clipped axes)
     int axes[3];
     axis_step_order(movement, axes);
@@ -623,7 +629,7 @@ void LIBMATTI_MC_Entity_Collide(const LIBMATTI_MC_Entity *entity, const LIBMATTI
     out->z = 0.0;
     if (entity == NULL || movement == NULL)
         return;
-    // Java: vec3 = p_20273_.lengthSqr() == 0.0 ? p_20273_ : collideBoundingBox(...)
+// Java: vec3 = p_20273_.lengthSqr() == 0.0 ? p_20273_ : collideBoundingBox(...)
     if (movement->x == 0.0 && movement->y == 0.0 && movement->z == 0.0)
     {
         *out = *movement;
@@ -639,7 +645,7 @@ void LIBMATTI_MC_Entity_Move(LIBMATTI_MC_Entity *entity, LIBMATTI_MC_MoverType m
     if (entity == NULL || movement == NULL)
         return;
     (void) moverType;
-    // Java: if (this.noPhysics) setPos(x + dx, y + dy, z + dz) + the flags false
+// Java: if (this.noPhysics) setPos(x + dx, y + dy, z + dz) + the flags false
     if (entity->noPhysics)
     {
         LIBMATTI_MC_Entity_SetPos(entity, entity->x + movement->x, entity->y + movement->y, entity->z + movement->z);
@@ -650,29 +656,29 @@ void LIBMATTI_MC_Entity_Move(LIBMATTI_MC_Entity *entity, LIBMATTI_MC_MoverType m
         return;
     }
 
-    // Java: Vec3 vec3 = this.collide(p_19974_) - the clipped movement
+// Java: Vec3 vec3 = this.collide(p_19974_) - the clipped movement
     LIBMATTI_MC_Vec3 clipped;
     LIBMATTI_MC_Entity_Collide(entity, movement, &clipped);
     double lengthSqr = clipped.x * clipped.x + clipped.y * clipped.y + clipped.z * clipped.z;
-    // Java: if (d0 > 1.0E-7 || p_19974_.lengthSqr() - d0 < 1.0E-7) setPos(position.add(vec3))
+// Java: if (d0 > 1.0E-7 || p_19974_.lengthSqr() - d0 < 1.0E-7) setPos(position.add(vec3))
     double moveSqr = movement->x * movement->x + movement->y * movement->y + movement->z * movement->z;
     if (lengthSqr > 1.0e-7 || moveSqr - lengthSqr < 1.0e-7)
         LIBMATTI_MC_Entity_SetPos(entity, entity->x + clipped.x, entity->y + clipped.y, entity->z + clipped.z);
 
-    // Java: boolean flag = !Mth.equal(p_19974_.x, vec3.x); flag1 = !equal(z)
+// Java: boolean flag = !Mth.equal(p_19974_.x, vec3.x); flag1 = !equal(z)
     bool flag = fabs(movement->x - clipped.x) >= 1.0e-5;
     bool flag1 = fabs(movement->z - clipped.z) >= 1.0e-5;
     entity->horizontalCollision = flag || flag1;
-    // Java: if (Math.abs(p_19974_.y) > 0.0 || authoritative) - the vertical flags
+// Java: if (Math.abs(p_19974_.y) > 0.0 || authoritative) - the vertical flags
     if (fabs(movement->y) > 0.0)
     {
         entity->verticalCollision = movement->y != clipped.y;
         entity->verticalCollisionBelow = entity->verticalCollision && movement->y < 0.0;
-        // Java: setOnGroundWithMovement(verticalCollisionBelow, horizontalCollision, vec3)
+// Java: setOnGroundWithMovement(verticalCollisionBelow, horizontalCollision, vec3)
         LIBMATTI_MC_Entity_SetOnGround(entity, entity->verticalCollisionBelow);
     }
 
-    // Java: if (this.horizontalCollision) setDeltaMovement(flag ? 0 : dx, dy, flag1 ? 0 : dz)
+// Java: if (this.horizontalCollision) setDeltaMovement(flag ? 0 : dx, dy, flag1 ? 0 : dz)
     if (entity->horizontalCollision)
     {
         LIBMATTI_MC_Vec3 motion;
@@ -688,7 +694,7 @@ void LIBMATTI_MC_Entity_ComputeSpeed(LIBMATTI_MC_Entity *entity)
 {
     if (entity == NULL)
         return;
-    // Java: the walkDistance/walkAnimation bookkeeping rides the position delta;
+// Java: the walkDistance/walkAnimation bookkeeping rides the position delta;
     // the port keeps the delta-movement length as the visible speed
     (void) entity;
 }
@@ -705,7 +711,7 @@ void LIBMATTI_MC_Entity_BaseTick(LIBMATTI_MC_Entity *entity)
     if (entity == NULL)
         return;
     LIBMATTI_MC_Entity_ComputeSpeed(entity);
-    // Java: the vehicle-removed stopRiding, the fire ticks, the head rotation
+// Java: the vehicle-removed stopRiding, the fire ticks, the head rotation
     // update, the portal checks - each arrives with its system. The port keeps
     // the fire tick decay and the old-rotation anchors.
     entity->yRotO = entity->yRot;
@@ -713,12 +719,13 @@ void LIBMATTI_MC_Entity_BaseTick(LIBMATTI_MC_Entity *entity)
     if (entity->remainingFireTicks > 0)
     {
         if (entity->remainingFireTicks % 20 == 0 && !LIBMATTI_MC_EntityType_FireImmune(entity->type))
-            entity->invulnerable = entity->invulnerable; // the damage path is game content
+            entity->invulnerable = entity->invulnerable;
+
         entity->remainingFireTicks--;
         if (entity->remainingFireTicks < 0)
             entity->remainingFireTicks = 0;
     }
-    // Java: if (this.isRemoved()) { this.stopRiding(); ... } - the level removes
+// Java: if (this.isRemoved()) { this.stopRiding(); ... } - the level removes
     // the entity through its own list (P5's tick loop)
 }
 
@@ -783,7 +790,7 @@ void LIBMATTI_MC_Entity_SaveWithoutId(LIBMATTI_MC_Entity *entity, LIBMATTI_MC_Nb
 {
     if (entity == NULL || tag == NULL)
         return;
-    // Java: p_409187_.store("Pos", Vec3.CODEC, this.position()) - the list of
+// Java: p_409187_.store("Pos", Vec3.CODEC, this.position()) - the list of
     // three doubles
     {
         double pos[3] = {entity->x, entity->y, entity->z};
@@ -794,7 +801,7 @@ void LIBMATTI_MC_Entity_SaveWithoutId(LIBMATTI_MC_Entity *entity, LIBMATTI_MC_Nb
         put_double_list(tag, "Motion", motion, 3);
     }
     {
-        // Java: store("Rotation", Vec2.CODEC, new Vec2(yRot, xRot)) - floats
+// Java: store("Rotation", Vec2.CODEC, new Vec2(yRot, xRot)) - floats
         float rot[2] = {entity->yRot, entity->xRot};
         put_float_list(tag, "Rotation", rot, 2);
     }
@@ -804,7 +811,7 @@ void LIBMATTI_MC_Entity_SaveWithoutId(LIBMATTI_MC_Entity *entity, LIBMATTI_MC_Nb
     LIBMATTI_MC_Nbt_CompoundTag_PutBoolean(tag, "OnGround", entity->onGround);
     LIBMATTI_MC_Nbt_CompoundTag_PutBoolean(tag, "Invulnerable", entity->invulnerable);
     LIBMATTI_MC_Nbt_CompoundTag_PutInt(tag, "PortalCooldown", entity->portalCooldown);
-    // Java: store("UUID", UUIDUtil.CODEC, this.getUUID()) - the int-array form
+// Java: store("UUID", UUIDUtil.CODEC, this.getUUID()) - the int-array form
     // (four ints, big-endian over the two words)
     {
         uint64_t most = LIBMATTI_JU_UUID_GetMostSignificantBits(&entity->uuid);
@@ -825,7 +832,7 @@ void LIBMATTI_MC_Entity_SaveWithoutId(LIBMATTI_MC_Entity *entity, LIBMATTI_MC_Nb
         LIBMATTI_MC_Nbt_CompoundTag_PutBoolean(tag, "Glowing", true);
     if (entity->tagCount > 0)
     {
-        // Java: the Tags list of strings
+// Java: the Tags list of strings
         LIBMATTI_MC_Nbt_ListTag *list = LIBMATTI_MC_Nbt_ListTag_New();
         for (int i = 0; i < entity->tagCount; i++)
             LIBMATTI_MC_Nbt_ListTag_Add(list, LIBMATTI_MC_Nbt_StringTag_Of(entity->tags[i]));
@@ -843,7 +850,7 @@ void LIBMATTI_MC_Entity_Load(LIBMATTI_MC_Entity *entity, LIBMATTI_MC_Nbt_Compoun
         double pos[3] = {0.0, 0.0, 0.0};
         if (get_double_list(tag, "Pos", pos, 3))
         {
-            // Java: the world-border clamps (3.0000512E7 / 2.0E7)
+// Java: the world-border clamps (3.0000512E7 / 2.0E7)
             double x = LIBMATTI_MC_Mth_ClampD(pos[0], -3.0000512e7, 3.0000512e7);
             double y = LIBMATTI_MC_Mth_ClampD(pos[1], -2.0e7, 2.0e7);
             double z = LIBMATTI_MC_Mth_ClampD(pos[2], -3.0000512e7, 3.0000512e7);
@@ -854,7 +861,7 @@ void LIBMATTI_MC_Entity_Load(LIBMATTI_MC_Entity *entity, LIBMATTI_MC_Nbt_Compoun
         double motion[3] = {0.0, 0.0, 0.0};
         if (get_double_list(tag, "Motion", motion, 3))
         {
-            // Java: components above 10 clamp to zero
+// Java: components above 10 clamp to zero
             entity->dx = fabs(motion[0]) > 10.0 ? 0.0 : motion[0];
             entity->dy = fabs(motion[1]) > 10.0 ? 0.0 : motion[1];
             entity->dz = fabs(motion[2]) > 10.0 ? 0.0 : motion[2];
@@ -876,7 +883,7 @@ void LIBMATTI_MC_Entity_Load(LIBMATTI_MC_Entity *entity, LIBMATTI_MC_Nbt_Compoun
     entity->invulnerable = LIBMATTI_MC_Nbt_CompoundTag_GetBooleanOr(tag, "Invulnerable", false);
     entity->portalCooldown = LIBMATTI_MC_Nbt_CompoundTag_GetIntOr(tag, "PortalCooldown", 0);
     {
-        // Java: read("UUID", UUIDUtil.CODEC) - the int-array form
+// Java: read("UUID", UUIDUtil.CODEC) - the int-array form
         const int32_t *uuid = NULL;
         size_t uuidLength = 0;
         if (LIBMATTI_MC_Nbt_CompoundTag_GetIntArray(tag, "UUID", &uuid, &uuidLength) && uuidLength == 4)
@@ -890,7 +897,7 @@ void LIBMATTI_MC_Entity_Load(LIBMATTI_MC_Entity *entity, LIBMATTI_MC_Nbt_Compoun
     entity->silent = LIBMATTI_MC_Nbt_CompoundTag_GetBooleanOr(tag, "Silent", false);
     entity->glowing = LIBMATTI_MC_Nbt_CompoundTag_GetBooleanOr(tag, "Glowing", false);
     {
-        // Java: this.tag = read("Tags") - the sorted string list clears + refills
+// Java: this.tag = read("Tags") - the sorted string list clears + refills
         LIBMATTI_MC_Nbt_ListTag *tagList = NULL;
         if (LIBMATTI_MC_Nbt_CompoundTag_GetList(tag, "Tags", &tagList))
         {
@@ -905,7 +912,7 @@ void LIBMATTI_MC_Entity_Load(LIBMATTI_MC_Entity *entity, LIBMATTI_MC_Nbt_Compoun
             }
         }
     }
-    // Java: this.reapplyPosition(); this.setRot(getYRot(), getXRot()) - the bbox
+// Java: this.reapplyPosition(); this.setRot(getYRot(), getXRot()) - the bbox
     // rebuilds from the loaded position
     LIBMATTI_MC_AABB *bb = LIBMATTI_MC_Entity_MakeBoundingBox(entity);
     LIBMATTI_MC_Entity_SetBoundingBox(entity, bb);

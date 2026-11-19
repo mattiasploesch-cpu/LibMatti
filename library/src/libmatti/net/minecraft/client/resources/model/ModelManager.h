@@ -18,7 +18,7 @@ extern "C" {
 typedef struct LIBMATTI_MC_ModelManager
 {
     LIBMATTI_MC_TextureAtlas *blockAtlas;
-    // Java: Map<ModelResourceLocation, BakedModel> - the port stores the
+// Java: Map<ModelResourceLocation, BakedModel> - the port stores the
     // baked quads per model id ("block/stone" etc.), insertion ordered.
     size_t modelCount;
     char **modelIds;
@@ -45,7 +45,8 @@ const LIBMATTI_MC_QuadCollection *LIBMATTI_MC_ModelManager_GetModel(const LIBMAT
 int LIBMATTI_MC_ModelManager_RegisterBaked(LIBMATTI_MC_ModelManager *manager, const char *modelId,
                                            LIBMATTI_MC_QuadCollection *collection);
 
-// The block atlas (the renderers bind it before drawing quads).
+
+
 LIBMATTI_MC_TextureAtlas *LIBMATTI_MC_ModelManager_GetAtlas(const LIBMATTI_MC_ModelManager *manager);
 
 // Java: close() - frees the baked models, keeps the atlas (the TextureManager owns it).
@@ -55,4 +56,4 @@ void LIBMATTI_MC_ModelManager_Free(LIBMATTI_MC_ModelManager *manager);
 }
 #endif
 
-#endif //MATTICRAFT_MC_CLIENT_RESOURCES_MODEL_MODELMANAGER_H
+#endif

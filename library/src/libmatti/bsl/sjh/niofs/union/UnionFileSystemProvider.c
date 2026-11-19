@@ -1,6 +1,7 @@
-//
-// Created by administrator on 09.09.26.
-//
+
+
+
+
 
 #include "UnionFileSystemProvider.h"
 
@@ -44,7 +45,7 @@ LIBMATTI_UNION_UnionFileSystem *LIBMATTI_UNION_UnionFileSystemProvider_NewFileSy
                                                                                      LIBMATTI_UNION_UnionPathFilter *pathFilter,
                                                                                      const char **paths, size_t pathCount)
 {
-    // Java: newFileSystem(pathfilter, paths...) - need at least one path
+// Java: newFileSystem(pathfilter, paths...) - need at least one path
     if (pathCount == 0) return NULL;
 
     char *key = make_key(paths[0]);
@@ -53,7 +54,7 @@ LIBMATTI_UNION_UnionFileSystem *LIBMATTI_UNION_UnionFileSystemProvider_NewFileSy
 
     if (fileSystem == NULL) return NULL;
 
-    // Java: fileSystems.put(key, ufs)
+// Java: fileSystems.put(key, ufs)
     provider->keys = realloc(provider->keys, sizeof(char *) * (provider->count + 1));
     provider->fileSystems = realloc(provider->fileSystems, sizeof(LIBMATTI_UNION_UnionFileSystem *) * (provider->count + 1));
     provider->keys[provider->count] = strdup(fileSystem->key);

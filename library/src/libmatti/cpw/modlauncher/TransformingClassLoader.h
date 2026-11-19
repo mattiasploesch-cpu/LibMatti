@@ -1,6 +1,7 @@
-// Port of cpw.mods.modlauncher.TransformingClassLoader.
-// It extends cpw.mods.cl.ModuleClassLoader and overrides maybeTransformClassBytes,
-// which the C port expresses through the base class' function pointer hook.
+
+
+
+
 
 #ifndef MATTICRAFT_MODLAUNCHER_TRANSFORMINGCLASSLOADER_H
 #define MATTICRAFT_MODLAUNCHER_TRANSFORMINGCLASSLOADER_H
@@ -53,4 +54,4 @@ void *LIBMATTI_ML_TransformingClassLoader_GetLoadedClass(const LIBMATTI_ML_Trans
 unsigned char *LIBMATTI_ML_TransformingClassLoader_BuildTransformedClassNodeFor(
     LIBMATTI_ML_TransformingClassLoader *classLoader, const char *className, const char *reason, size_t *outLength);
 
-#endif //MATTICRAFT_MODLAUNCHER_TRANSFORMINGCLASSLOADER_H
+#endif

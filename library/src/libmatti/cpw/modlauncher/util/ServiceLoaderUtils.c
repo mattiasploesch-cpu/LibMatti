@@ -1,4 +1,5 @@
-// Port of cpw.mods.modlauncher.util.ServiceLoaderUtils.
+
+
 
 #include "libmatti/cpw/modlauncher/util/ServiceLoaderUtils.h"
 
@@ -22,7 +23,7 @@ void **LIBMATTI_MLU_ServiceLoaderUtils_StreamServiceLoader(
     {
         if (providers[i].provider == NULL)
         {
-            // Java: catch (ServiceConfigurationError sce) { errorConsumer.accept(sce); return null; }
+// Java: catch (ServiceConfigurationError sce) { errorConsumer.accept(sce); return null; }
             if (errorConsumer != NULL)
             {
                 char message[256];
@@ -44,7 +45,7 @@ void **LIBMATTI_MLU_ServiceLoaderUtils_StreamServiceLoader(
 
 char *LIBMATTI_MLU_ServiceLoaderUtils_FileNameFor(const char *providerClassName)
 {
-    // Java: clazz.getModule().getLayer().configuration().findModule(...)
+// Java: clazz.getModule().getLayer().configuration().findModule(...)
     //           .flatMap(rm -> rm.reference().location()).map(...).orElse("MISSING FILE")
     const char *location = LIBMATTI_JU_ServiceLoader_LocationForClass(providerClassName);
     if (location == NULL) return strdup("MISSING FILE");

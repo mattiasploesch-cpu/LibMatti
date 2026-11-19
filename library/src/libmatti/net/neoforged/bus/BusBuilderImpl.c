@@ -1,4 +1,5 @@
-// Port of net.neoforged.bus.BusBuilderImpl.
+
+
 
 #include "libmatti/net/neoforged/bus/BusBuilderImpl.h"
 
@@ -71,7 +72,7 @@ LIBMATTI_BUS_BusBuilderImpl *LIBMATTI_BUS_BusBuilderImpl_New(void)
     impl->base.setExceptionHandler = impl_set_exception_handler;
     impl->base.startShutdown = impl_start_shutdown;
     impl->base.checkTypesOnDispatch = impl_check_types_on_dispatch;
-    // Java: markerType is a default method - it calls back into classChecker
+// Java: markerType is a default method - it calls back into classChecker
     impl->base.markerType = impl_marker_type;
     impl->base.classChecker = impl_class_checker;
     impl->base.allowPerPhasePost = impl_allow_per_phase_post;

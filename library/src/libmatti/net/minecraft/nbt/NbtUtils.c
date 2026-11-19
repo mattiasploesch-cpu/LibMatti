@@ -1,5 +1,6 @@
-// Port of net.minecraft.nbt.StringTagVisitor (plain) and net.minecraft.nbt
-// .TextComponentTagVisitor (pretty, without the chat colors).
+
+
+
 
 #include "libmatti/net/minecraft/nbt/NbtUtils.h"
 
@@ -11,9 +12,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-// ---------------------------------------------------------------------------
-// shared low-level appenders
-// ---------------------------------------------------------------------------
+
+
+
+
 
 typedef struct
 {
@@ -62,7 +64,7 @@ static void builder_append_long(Builder *builder, long long value)
 
 static void builder_append_double(Builder *builder, double value)
 {
-    // Java: StringBuilder.append(double) - the shortest repr; %g comes close for the
+// Java: StringBuilder.append(double) - the shortest repr; %g comes close for the
     // game's value ranges
     char buffer[64];
     int length = snprintf(buffer, sizeof(buffer), "%g", value);
@@ -89,21 +91,24 @@ static void builder_append_byte(Builder *builder, int8_t value)
     builder_append_long(builder, value);
 }
 
-// ---------------------------------------------------------------------------
-// StringTagVisitor (the plain toString form)
-// ---------------------------------------------------------------------------
+
+
+
+
 
 // Java: private static final Pattern UNQUOTED_KEY_MATCH =
 //       Pattern.compile("[A-Za-z._]+[A-Za-z0-9._+-]*")
 static int unquoted_key_matches(const char *key)
 {
-    // first part: one or more of [A-Za-z._]
+
+
     const char *c = key;
     while (*c != '\0' && (isalpha((unsigned char) *c) || *c == '.' || *c == '_'))
         c++;
     if (c == key)
         return 0;
-    // rest: zero or more of [A-Za-z0-9._+-]
+
+
     while (*c != '\0' && (isalnum((unsigned char) *c) || *c == '.' || *c == '_' || *c == '+' || *c == '-'))
         c++;
     return *c == '\0';
@@ -216,7 +221,7 @@ static void visit_plain(Builder *builder, const LIBMATTI_MC_Nbt_Tag *tag)
     {
         const LIBMATTI_MC_Nbt_CompoundTag *compound = (const LIBMATTI_MC_Nbt_CompoundTag *) tag;
         builder_append_char(builder, '{');
-        // Java: new ArrayList<>(entrySet()) sorted with Entry.comparingByKey()
+// Java: new ArrayList<>(entrySet()) sorted with Entry.comparingByKey()
         size_t *order = malloc(sizeof(size_t) * (compound->count > 0 ? compound->count : 1));
         for (size_t i = 0; i < compound->count; i++)
             order[i] = i;
@@ -263,9 +268,10 @@ char *LIBMATTI_MC_Nbt_StringTagVisitor_Print(const LIBMATTI_MC_Nbt_Tag *tag)
     return LIBMATTI_MC_Nbt_StringTagVisitor_Visit(tag);
 }
 
-// ---------------------------------------------------------------------------
-// TextComponentTagVisitor (the pretty form)
-// ---------------------------------------------------------------------------
+
+
+
+
 
 #define PRETTY_MAX_DEPTH 64
 #define PRETTY_MAX_LENGTH 128
@@ -307,7 +313,8 @@ static void visit_key_pretty(PrettyVisitor *visitor, const char *key)
     else
     {
         char *quoted = LIBMATTI_MC_Nbt_StringTag_QuoteAndEscape(key);
-        // the quoted form is "content" or 'content'; the port prints it as-is
+
+
         builder_append(&visitor->builder, quoted);
         free(quoted);
     }
@@ -480,7 +487,8 @@ static void visit_pretty(PrettyVisitor *visitor, const LIBMATTI_MC_Nbt_Tag *tag)
             int indented = visitor->indentation[0] != '\0';
             if (indented)
                 builder_append(builder, "\n");
-            // Java iterates the map's key order; the port keeps the insertion order
+
+
             for (size_t i = 0; i < compound->count; i++)
             {
                 repeat_indent(visitor, visitor->indentDepth + 1);

@@ -29,15 +29,15 @@ typedef struct LIBMATTI_MC_BlockElementFace_UVs
 //           int tintIndex, String texture, @Nullable UVs uvs, Quadrant rotation)
 typedef struct LIBMATTI_MC_BlockElementFace
 {
-    // Java: the face this face culls against (NULL = never culled).
+// Java: the face this face culls against (NULL = never culled).
     LIBMATTI_MC_Direction *cullForDirection;
     int tintIndex;
-    // Java: the texture slot reference ("#all" etc.) - owned by the struct.
+// Java: the texture slot reference ("#all" etc.) - owned by the struct.
     char *texture;
-    // Java: UVs uvs - NULL derives them from the element corners.
+// Java: UVs uvs - NULL derives them from the element corners.
     bool uvsPresent;
     LIBMATTI_MC_BlockElementFace_UVs uvs;
-    // Java: Quadrant rotation - the 90-degree UV rotation steps (0..3).
+// Java: Quadrant rotation - the 90-degree UV rotation steps (0..3).
     int rotation;
 } LIBMATTI_MC_BlockElementFace;
 
@@ -57,4 +57,4 @@ float LIBMATTI_MC_BlockElementFace_UVs_GetVertexV(const LIBMATTI_MC_BlockElement
 }
 #endif
 
-#endif //MATTICRAFT_MC_CLIENT_RENDERER_BLOCK_MODEL_BLOCKELEMENTFACE_H
+#endif

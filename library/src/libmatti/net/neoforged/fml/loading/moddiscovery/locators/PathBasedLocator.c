@@ -12,7 +12,7 @@ void LIBMATTI_FML_PathBasedLocator_FindCandidates(void *self, LIBMATTI_NEOFORGES
     LIBMATTI_FML_PathBasedLocator *locator = self;
     (void) context;
 
-    // Java: for (var path : paths) pipeline.addPath(path, ModFileDiscoveryAttributes.DEFAULT, IncompatibleFileReporting.ERROR);
+// Java: for (var path : paths) pipeline.addPath(path, ModFileDiscoveryAttributes.DEFAULT, IncompatibleFileReporting.ERROR);
     for (size_t i = 0; i < locator->pathCount; i++)
     {
         LIBMATTI_NEOFORGESPI_ModFileDiscoveryAttributes attributes =

@@ -11,14 +11,14 @@ const LIBMATTI_B3D_VertexFormatElement LIBMATTI_B3D_VFE_ELEMENT_LINE_WIDTH = {LI
 
 int LIBMATTI_B3D_VertexFormatElement_ByteSize(const LIBMATTI_B3D_VertexFormatElement *element)
 {
-    // Java: Type.BYTE_SIZE - the per-component byte size times the count.
+// Java: Type.BYTE_SIZE - the per-component byte size times the count.
     static const int byteSize[] = {4, 1, 1, 2, 2, 4, 4};
     return byteSize[element->type] * element->count;
 }
 
 unsigned int LIBMATTI_B3D_VertexFormatElement_GlType(const LIBMATTI_B3D_VertexFormatElement *element)
 {
-    // Java: GlConst.toGl(VertexFormatElement.Type) - the GL_* type enums.
+// Java: GlConst.toGl(VertexFormatElement.Type) - the GL_* type enums.
     static const unsigned int glType[] = {5126, 5121, 5120, 5122, 5123, 5124, 5125};
     return glType[element->type];
 }

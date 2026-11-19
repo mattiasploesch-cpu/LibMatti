@@ -1,4 +1,5 @@
-// Port of net.minecraft.util.Mth.
+
+
 
 #include "libmatti/net/minecraft/util/Mth.h"
 
@@ -356,7 +357,7 @@ int LIBMATTI_MC_Mth_SmallestSquareSide(int itemCount)
 {
     if (itemCount < 0)
     {
-        // Java: throw new IllegalArgumentException("itemCount must be greater than or equal to zero")
+// Java: throw new IllegalArgumentException("itemCount must be greater than or equal to zero")
         return 0;
     }
     return LIBMATTI_MC_Mth_CeilD(sqrt((double) itemCount));

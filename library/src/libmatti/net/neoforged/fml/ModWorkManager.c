@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.ModWorkManager.
+
+
 
 #include "libmatti/net/neoforged/fml/ModWorkManager.h"
 
@@ -31,7 +32,7 @@ LIBMATTI_FML_ModWorkManager_Executor LIBMATTI_FML_ModWorkManager_SyncExecutor(vo
 // Java: public static Executor parallelExecutor()
 LIBMATTI_FML_ModWorkManager_Executor LIBMATTI_FML_ModWorkManager_ParallelExecutor(void)
 {
-    // Java: LOGGER.debug(LOADING, "Using {} threads for parallel mod-loading", loadingThreadCount);
+// Java: LOGGER.debug(LOADING, "Using {} threads for parallel mod-loading", loadingThreadCount);
     char threadCount[32];
     snprintf(threadCount, sizeof(threadCount), "%d",
              LIBMATTI_FML_FMLConfig_GetIntConfigValue(LIBMATTI_FML_FMLConfig_MAX_THREADS));

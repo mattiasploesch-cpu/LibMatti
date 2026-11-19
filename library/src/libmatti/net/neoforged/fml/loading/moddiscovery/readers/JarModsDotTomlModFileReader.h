@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.loading.moddiscovery.readers.JarModsDotTomlModFileReader.
+
+
 
 #ifndef MATTICRAFT_FML_LOADING_MODDISCOVERY_READERS_JARMODSDOTTOMLMODFILEREADER_H
 #define MATTICRAFT_FML_LOADING_MODDISCOVERY_READERS_JARMODSDOTTOMLMODFILEREADER_H
@@ -38,4 +39,4 @@ LIBMATTI_NEOFORGESPI_IModFile *LIBMATTI_FML_JarModsDotTomlModFileReader_Read(
 // Java: @Override public String toString() { return "mod manifest"; }
 const char *LIBMATTI_FML_JarModsDotTomlModFileReader_ToString(void);
 
-#endif //MATTICRAFT_FML_LOADING_MODDISCOVERY_READERS_JARMODSDOTTOMLMODFILEREADER_H
+#endif

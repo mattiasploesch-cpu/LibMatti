@@ -1,5 +1,6 @@
-// Port of net.minecraft.client.renderer.block.model.FaceBakery (implementation).
-// Every formula follows the vendored 1.21.11 source.
+
+
+
 
 #include "libmatti/net/minecraft/client/renderer/block/model/FaceBakery.h"
 
@@ -32,37 +33,37 @@ typedef struct FaceVertexInfo
 } FaceVertexInfo;
 
 static const FaceVertexInfo FACE_INFO[6][4] = {
-    // Java: DOWN(new VertexInfo(MIN_X, MIN_Y, MAX_Z), (MIN_X, MIN_Y, MIN_Z),
+// Java: DOWN(new VertexInfo(MIN_X, MIN_Y, MAX_Z), (MIN_X, MIN_Y, MIN_Z),
     //            (MAX_X, MIN_Y, MIN_Z), (MAX_X, MIN_Y, MAX_Z))
     {{FACE_EXTENT_MIN_X, FACE_EXTENT_MIN_Y, FACE_EXTENT_MAX_Z},
      {FACE_EXTENT_MIN_X, FACE_EXTENT_MIN_Y, FACE_EXTENT_MIN_Z},
      {FACE_EXTENT_MAX_X, FACE_EXTENT_MIN_Y, FACE_EXTENT_MIN_Z},
      {FACE_EXTENT_MAX_X, FACE_EXTENT_MIN_Y, FACE_EXTENT_MAX_Z}},
-    // Java: UP(new VertexInfo(MIN_X, MAX_Y, MIN_Z), (MIN_X, MAX_Y, MAX_Z),
+// Java: UP(new VertexInfo(MIN_X, MAX_Y, MIN_Z), (MIN_X, MAX_Y, MAX_Z),
     //          (MAX_X, MAX_Y, MAX_Z), (MAX_X, MAX_Y, MIN_Z))
     {{FACE_EXTENT_MIN_X, FACE_EXTENT_MAX_Y, FACE_EXTENT_MIN_Z},
      {FACE_EXTENT_MIN_X, FACE_EXTENT_MAX_Y, FACE_EXTENT_MAX_Z},
      {FACE_EXTENT_MAX_X, FACE_EXTENT_MAX_Y, FACE_EXTENT_MAX_Z},
      {FACE_EXTENT_MAX_X, FACE_EXTENT_MAX_Y, FACE_EXTENT_MIN_Z}},
-    // Java: NORTH(new VertexInfo(MAX_X, MAX_Y, MIN_Z), (MAX_X, MIN_Y, MIN_Z),
+// Java: NORTH(new VertexInfo(MAX_X, MAX_Y, MIN_Z), (MAX_X, MIN_Y, MIN_Z),
     //             (MIN_X, MIN_Y, MIN_Z), (MIN_X, MAX_Y, MIN_Z))
     {{FACE_EXTENT_MAX_X, FACE_EXTENT_MAX_Y, FACE_EXTENT_MIN_Z},
      {FACE_EXTENT_MAX_X, FACE_EXTENT_MIN_Y, FACE_EXTENT_MIN_Z},
      {FACE_EXTENT_MIN_X, FACE_EXTENT_MIN_Y, FACE_EXTENT_MIN_Z},
      {FACE_EXTENT_MIN_X, FACE_EXTENT_MAX_Y, FACE_EXTENT_MIN_Z}},
-    // Java: SOUTH(new VertexInfo(MIN_X, MAX_Y, MAX_Z), (MIN_X, MIN_Y, MAX_Z),
+// Java: SOUTH(new VertexInfo(MIN_X, MAX_Y, MAX_Z), (MIN_X, MIN_Y, MAX_Z),
     //             (MAX_X, MIN_Y, MAX_Z), (MAX_X, MAX_Y, MAX_Z))
     {{FACE_EXTENT_MIN_X, FACE_EXTENT_MAX_Y, FACE_EXTENT_MAX_Z},
      {FACE_EXTENT_MIN_X, FACE_EXTENT_MIN_Y, FACE_EXTENT_MAX_Z},
      {FACE_EXTENT_MAX_X, FACE_EXTENT_MIN_Y, FACE_EXTENT_MAX_Z},
      {FACE_EXTENT_MAX_X, FACE_EXTENT_MAX_Y, FACE_EXTENT_MAX_Z}},
-    // Java: WEST(new VertexInfo(MIN_X, MAX_Y, MIN_Z), (MIN_X, MIN_Y, MIN_Z),
+// Java: WEST(new VertexInfo(MIN_X, MAX_Y, MIN_Z), (MIN_X, MIN_Y, MIN_Z),
     //            (MIN_X, MIN_Y, MAX_Z), (MIN_X, MAX_Y, MAX_Z))
     {{FACE_EXTENT_MIN_X, FACE_EXTENT_MAX_Y, FACE_EXTENT_MIN_Z},
      {FACE_EXTENT_MIN_X, FACE_EXTENT_MIN_Y, FACE_EXTENT_MIN_Z},
      {FACE_EXTENT_MIN_X, FACE_EXTENT_MIN_Y, FACE_EXTENT_MAX_Z},
      {FACE_EXTENT_MIN_X, FACE_EXTENT_MAX_Y, FACE_EXTENT_MAX_Z}},
-    // Java: EAST(new VertexInfo(MAX_X, MAX_Y, MAX_Z), (MAX_X, MIN_Y, MAX_Z),
+// Java: EAST(new VertexInfo(MAX_X, MAX_Y, MAX_Z), (MAX_X, MIN_Y, MAX_Z),
     //            (MAX_X, MIN_Y, MIN_Z), (MAX_X, MAX_Y, MIN_Z))
     {{FACE_EXTENT_MAX_X, FACE_EXTENT_MAX_Y, FACE_EXTENT_MAX_Z},
      {FACE_EXTENT_MAX_X, FACE_EXTENT_MIN_Y, FACE_EXTENT_MAX_Z},
@@ -87,8 +88,9 @@ static float extent_select(FaceExtent extent, const float from[3], const float t
     }
 }
 
-// The vertex position from the FaceInfo row: one extent per axis.
-// (unused placeholder removed - extent_select drives every axis directly)
+
+
+
 
 // Java: static BlockElementFace.UVs defaultFaceUV(Vector3fc, Vector3fc, Direction)
 void LIBMATTI_MC_FaceBakery_DefaultFaceUVModelSpace(const float from[3], const float to[3],
@@ -148,17 +150,20 @@ static void rotate_vertex_by(float v[3], const float origin[3], const LIBMATTI_M
     float out[3];
     switch (rotation->axis)
     {
-        case 0: // X
+        case 0:
+
             out[0] = rel[0];
             out[1] = rel[1] * c - rel[2] * s;
             out[2] = rel[1] * s + rel[2] * c;
             break;
-        case 1: // Y
+        case 1:
+
             out[0] = rel[0] * c + rel[2] * s;
             out[1] = rel[1];
             out[2] = -rel[0] * s + rel[2] * c;
             break;
-        default: // Z
+        default:
+
             out[0] = rel[0] * c - rel[1] * s;
             out[1] = rel[0] * s + rel[1] * c;
             out[2] = rel[2];
@@ -166,7 +171,7 @@ static void rotate_vertex_by(float v[3], const float origin[3], const LIBMATTI_M
     }
     if (rotation->rescale)
     {
-        // Java: the rescale for 22.5-degree steps - scale = 1/cos, clamped to
+// Java: the rescale for 22.5-degree steps - scale = 1/cos, clamped to
         // the two rotated axes (ModelRotation's legacy behaviour).
         float scale = 1.0f / c;
         out[0] *= scale;
@@ -182,7 +187,7 @@ static void rotate_vertex_by(float v[3], const float origin[3], const LIBMATTI_M
 // the normal of the first triangle snapped to the closest direction.
 static int calculate_facing(const float positions[4][3])
 {
-    // Java: GeometryUtils.normal(p0, p1, p2, dest) = (p1-p0) x (p2-p0)
+// Java: GeometryUtils.normal(p0, p1, p2, dest) = (p1-p0) x (p2-p0)
     float ax = positions[1][0] - positions[0][0];
     float ay = positions[1][1] - positions[0][1];
     float az = positions[1][2] - positions[0][2];
@@ -263,7 +268,8 @@ static void recalculate_winding(float positions[4][3], float uvs[4][2], LIBMATTI
         float z = extent_select(row[k].z, &minZ, &maxZ);
         int j = find_vertex(positions, k, x, y, z);
         if (j == -1)
-            return; // Java throws; the port keeps the quad as-is.
+            return;
+
         if (j != k)
         {
             swap_positions(positions, j, k);
@@ -279,7 +285,7 @@ void LIBMATTI_MC_FaceBakery_BakeQuad(const float from[3], const float to[3],
                                      const LIBMATTI_MC_BlockElementRotation *rotation,
                                      int tintIndex, int shade, LIBMATTI_MC_BakedQuad *out)
 {
-    // Java: UVs uvs = face.uvs(); if (uvs == null) uvs = defaultFaceUV(from, to, direction);
+// Java: UVs uvs = face.uvs(); if (uvs == null) uvs = defaultFaceUV(from, to, direction);
     LIBMATTI_MC_BlockElementFace_UVs uvs;
     if (face->uvsPresent)
         uvs = face->uvs;
@@ -289,17 +295,17 @@ void LIBMATTI_MC_FaceBakery_BakeQuad(const float from[3], const float to[3],
     const FaceVertexInfo *row = FACE_INFO[direction];
     for (int i = 0; i < 4; i++)
     {
-        // Java: Vector3f pos = faceinfo$vertexinfo.select(from, to).div(16.0F)
+// Java: Vector3f pos = faceinfo$vertexinfo.select(from, to).div(16.0F)
         float pos[3];
         pos[0] = extent_select(row[i].x, from, to) / 16.0f;
         pos[1] = extent_select(row[i].y, from, to) / 16.0f;
         pos[2] = extent_select(row[i].z, from, to) / 16.0f;
 
-        // Java: if (elementRotation != null) rotateVertexBy(pos, origin, transform)
+// Java: if (elementRotation != null) rotateVertexBy(pos, origin, transform)
         if (rotation != NULL)
             rotate_vertex_by(pos, &rotation->originX, rotation);
 
-        // Java: float u = BlockElementFace.getU(uvs, quadrant, i) / 16 ...
+// Java: float u = BlockElementFace.getU(uvs, quadrant, i) / 16 ...
         // the port folds the /16 into the sprite rect (it is already 0..1).
         float fu = LIBMATTI_MC_BlockElementFace_GetU(&uvs, face->rotation, i) * 16.0f / 16.0f;
         float fv = LIBMATTI_MC_BlockElementFace_GetV(&uvs, face->rotation, i) * 16.0f / 16.0f;
@@ -307,13 +313,13 @@ void LIBMATTI_MC_FaceBakery_BakeQuad(const float from[3], const float to[3],
         out->pos[i][0] = pos[0];
         out->pos[i][1] = pos[1];
         out->pos[i][2] = pos[2];
-        // Java: sprite.getU(f3), sprite.getV(f2) - the rect maps 0..1 into
+// Java: sprite.getU(f3), sprite.getV(f2) - the rect maps 0..1 into
         // the atlas space.
         out->uv[i][0] = spriteUvRect[0] + fu * (spriteUvRect[2] - spriteUvRect[0]);
         out->uv[i][1] = spriteUvRect[1] + fv * (spriteUvRect[3] - spriteUvRect[1]);
     }
 
-    // Java: Direction facing = calculateFacing(...); if (rotation == null && facing != null)
+// Java: Direction facing = calculateFacing(...); if (rotation == null && facing != null)
     //          recalculateWinding(...)
     int facing = calculate_facing(out->pos);
     if (rotation == NULL && facing >= 0)

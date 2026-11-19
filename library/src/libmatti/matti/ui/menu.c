@@ -1,9 +1,10 @@
-// The C menus, ported from the vanilla screens (TitleScreen, OptionsScreen,
-// PauseScreen) and the layout Horizon uses for them.
-//
-// Everything visible is drawn here: the rotating cube panorama, the dirt
-// background, the widget sheet buttons (widgets.png), the logo (minecraft.png
-// + edition.png) and the labels. Rust only opens the window and pumps frames.
+
+
+
+
+
+
+
 
 #include "libmatti/matti/ui/menu.h"
 
@@ -29,7 +30,8 @@
 #define GUI_TEXT_YELLOW 0xFFFFFF55u
 #define GUI_TEXT_RED 0xFFFF5555u
 
-// widgets.png button sprites (classic layout).
+
+
 #define WIDGETS_NORMAL_Y 66
 #define WIDGETS_HOVER_Y 86
 #define WIDGETS_DISABLED_Y 46
@@ -55,9 +57,10 @@ static LIBMATTI_UI_Texture *edition_texture = NULL;
 static LIBMATTI_UI_Texture *panorama[6];
 static int menu_assets_loaded = 0;
 
-// ---------------------------------------------------------------------------
-// Layout helpers
-// ---------------------------------------------------------------------------
+
+
+
+
 
 int LIBMATTI_UI_GuiScale(void)
 {
@@ -132,9 +135,10 @@ static void ensure_assets(void)
     }
 }
 
-// ---------------------------------------------------------------------------
-// Primitives
-// ---------------------------------------------------------------------------
+
+
+
+
 
 void LIBMATTI_UI_DrawLabel(const char *text, int x, int y, uint32_t argb, int scale, int shadow)
 {
@@ -186,8 +190,9 @@ void LIBMATTI_UI_DrawMenuBackground(void)
 
     if (dirt_texture != NULL)
     {
-        // Vanilla tiles the 16x16 dirt at 32x32 and darkens it with a
-        // top-to-bottom gradient.
+
+
+
         LIBMATTI_UI_DrawTextureTiled(dirt_texture, 0, 0, width, height, 32);
     }
     else
@@ -201,9 +206,10 @@ void LIBMATTI_UI_DrawMenuBackground(void)
     }
 }
 
-// The rotating title cube: six faces sampled through a perspective camera, the
-// vanilla PanoramaRenderer (85 degree FOV, pitched 10 degrees, 0.1 degrees per
-// tick clockwise).
+
+
+
+
 void LIBMATTI_UI_DrawPanorama(double time)
 {
     ensure_assets();
@@ -239,7 +245,8 @@ void LIBMATTI_UI_DrawPanorama(double time)
         {
             float ndx = (2.0f * ((float) x + 0.5f) / (float) width - 1.0f) * tan_half * aspect;
 
-            // Ray through the pixel, then pitch and yaw.
+
+
             float dx = ndx, dy = ndy, dz = -1.0f;
             float dy1 = dy * cp - dz * sp;
             float dz1 = dy * sp + dz * cp;
@@ -287,9 +294,10 @@ void LIBMATTI_UI_DrawPanorama(double time)
     }
 }
 
-// ---------------------------------------------------------------------------
-// Screens
-// ---------------------------------------------------------------------------
+
+
+
+
 
 static void draw_title(double time)
 {
@@ -298,8 +306,9 @@ static void draw_title(double time)
     int width = LIBMATTI_UI_GuiWidth();
     int height = LIBMATTI_UI_GuiHeight();
 
-    // LogoRenderer: the logo's top 44 of 64 rows, then the edition banner
-    // overlapping its bottom by 7 pixels.
+
+
+
     if (logo_texture != NULL)
     {
         int logo_w = 256 * gui;
@@ -407,9 +416,10 @@ static void draw_world(void)
     LIBMATTI_UI_DrawLabelCentered("ESC opens the game menu", LIBMATTI_UI_GuiHeight() / 2 + 10, GUI_TEXT_WHITE, 1, 1);
 }
 
-// ---------------------------------------------------------------------------
-// State / input
-// ---------------------------------------------------------------------------
+
+
+
+
 
 void LIBMATTI_UI_MainWindow_Reset(void)
 {
@@ -522,8 +532,9 @@ static void click_options(int x, int y)
         }
         else if (i == 2)
         {
-            // Layer first, then the API inside it. DirectX exists only on
-            // Windows and only below the SDL layer.
+
+
+
             static const char *const choices[] = {
                 "native:opengl", "native:vulkan", "sdl:opengl", "sdl:vulkan", "sdl:auto",
                 "sdl:directx", "sdl:metal",

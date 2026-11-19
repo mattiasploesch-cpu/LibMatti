@@ -1,6 +1,7 @@
-//
-// Created by administrator on 09.09.26.
-//
+
+
+
+
 
 #include "UnionFileSystem.h"
 
@@ -14,29 +15,35 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-// ---------------------------------------------------------------------------
-// .so parsing (in Java the JDK zip filesystem reads the artifact; here the ELF
-// section reader below reads the .so).
-// A mod is an ELF shared object; its manifest lives in the ELF section
-// ".matti_manifest" and is exposed as the entry "META-INF/MANIFEST.MF".
-// ---------------------------------------------------------------------------
 
-// The ELF section holding the mod manifest
+
+
+
+
+
+
+
+
+
 static const char *MANIFEST_SECTION = ".matti_manifest";
-// The entry name the section is exposed under
+
+
 static const char *MANIFEST_ENTRY = "META-INF/MANIFEST.MF";
 
 typedef struct
 {
-    char *name;                // entry name, e.g. "META-INF/MANIFEST.MF"
-    const unsigned char *data; // points into the file buffer
+    char *name;
+
+    const unsigned char *data;
+
     size_t size;
     int isDirectory;
 } ElfEntry;
 
 struct LIBMATTI_UNION_EmbeddedElf
 {
-    char *path; // the base path of the .so file
+    char *path;
+
     unsigned char *data;
     size_t dataLength;
     ElfEntry *entries;
@@ -63,7 +70,8 @@ static uint64_t elf_rd64(const unsigned char *p, int bigEndian)
     return ((uint64_t)elf_rd32(p + 4, 0) << 32) | elf_rd32(p, 0);
 }
 
-// Bounded copy of a section name; returns its length, or 0 when the offset is out of range.
+
+
 static size_t elf_section_name(const unsigned char *names, uint64_t tableSize, uint32_t offset, char *buffer,
                                size_t bufferSize)
 {
@@ -90,7 +98,8 @@ static LIBMATTI_UNION_EmbeddedElf *embedded_elf_open(const char *path)
     long fileLength = ftell(file);
     fseek(file, 0, SEEK_SET);
 
-    // smallest possible ELF header (32 bit)
+
+
     if (fileLength < 52)
     {
         fclose(file);
@@ -106,15 +115,18 @@ static LIBMATTI_UNION_EmbeddedElf *embedded_elf_open(const char *path)
     }
     fclose(file);
 
-    // ELF magic 0x7f 'E' 'L' 'F'
+
+
     if (data[0] != 0x7f || data[1] != 'E' || data[2] != 'L' || data[3] != 'F')
     {
         free(data);
         return NULL;
     }
 
-    int is64 = data[4] == 2;      // EI_CLASS: 1 = 32 bit, 2 = 64 bit
-    int bigEndian = data[5] == 2; // EI_DATA: 1 = little endian, 2 = big endian
+    int is64 = data[4] == 2;
+
+    int bigEndian = data[5] == 2;
+
 
     if (is64 && fileLength < 64)
     {
@@ -137,7 +149,8 @@ static LIBMATTI_UNION_EmbeddedElf *embedded_elf_open(const char *path)
 
     const unsigned char *sections = data + sectionHeaderOffset;
 
-    // the section header string table
+
+
     const unsigned char *nameTableHeader = sections + (uint64_t)nameTableIndex * sectionHeaderSize;
     uint64_t nameTableOffset = is64 ? elf_rd64(nameTableHeader + 24, bigEndian) : elf_rd32(nameTableHeader + 16, bigEndian);
     uint64_t nameTableSize = is64 ? elf_rd64(nameTableHeader + 32, bigEndian) : elf_rd32(nameTableHeader + 20, bigEndian);
@@ -167,9 +180,10 @@ static LIBMATTI_UNION_EmbeddedElf *embedded_elf_open(const char *path)
         if (elf_section_name(nameTable, nameTableSize, nameOffset, sectionName, sizeof(sectionName)) == 0) continue;
         if (sectionOffset + sectionSize > (uint64_t)fileLength) continue;
 
-        // The manifest section is exposed under its jar entry name.
-        // Every other section whose name is not a toolchain name (".text", ".rodata", ...)
-        // is exposed as the entry of exactly that path ("META-INF/services/x.Y", "mods.toml", ...).
+
+
+
+
         const char *entryName;
         if (strcmp(sectionName, MANIFEST_SECTION) == 0)
             entryName = MANIFEST_ENTRY;
@@ -204,7 +218,8 @@ static void embedded_elf_free(LIBMATTI_UNION_EmbeddedElf *elf)
     free(elf);
 }
 
-// Exact entry lookup by relative name ("META-INF/MANIFEST.MF")
+
+
 static ElfEntry *embedded_elf_find(LIBMATTI_UNION_EmbeddedElf *elf, const char *name)
 {
     for (size_t i = 0; i < elf->entryCount; i++)
@@ -242,7 +257,8 @@ static int embedded_elf_attributes(LIBMATTI_UNION_EmbeddedElf *elf, const char *
         return 1;
     }
 
-    // directory implied by a prefix of other entries
+
+
     size_t len = strlen(name);
     if (len > 0 && name[len - 1] != '/')
     {
@@ -275,8 +291,9 @@ static int embedded_elf_read(LIBMATTI_UNION_EmbeddedElf *elf, ElfEntry *entry,
     return 1;
 }
 
-// Collect the names of the entries under dirName (immediate children, or all
-// descendants when recursive). Names are relative to the mod root.
+
+
+
 static void embedded_elf_collect(LIBMATTI_UNION_EmbeddedElf *elf, const char *dirName, int recursive,
                                  char ***outNames, int **outIsDir, size_t *outCount)
 {
@@ -288,7 +305,8 @@ static void embedded_elf_collect(LIBMATTI_UNION_EmbeddedElf *elf, const char *di
         const char *entryName = elf->entries[i].name;
         int isDir = elf->entries[i].isDirectory;
 
-        // skip the directory itself
+
+
         if (hasPrefix && strcmp(entryName, dirName) == 0) continue;
 
         int under = 0;
@@ -304,7 +322,8 @@ static void embedded_elf_collect(LIBMATTI_UNION_EmbeddedElf *elf, const char *di
 
         if (!recursive)
         {
-            // immediate children only: no further '/' after the prefix
+
+
             const char *slash = strchr(entryName + dirLength, '/');
             if (slash != NULL && slash[1] != '\0') continue;
         }
@@ -317,9 +336,10 @@ static void embedded_elf_collect(LIBMATTI_UNION_EmbeddedElf *elf, const char *di
     }
 }
 
-// ---------------------------------------------------------------------------
-// UnionFileSystem
-// ---------------------------------------------------------------------------
+
+
+
+
 
 static int path_is_directory(const char *path)
 {
@@ -357,7 +377,8 @@ static char *to_real_path(const LIBMATTI_UNION_UnionFileSystem *fileSystem, cons
 
     if (find_embedded_elf(fileSystem, basePath) != NULL)
     {
-        // .so base: the resolve path is the entry name
+
+
         return resolvePath;
     }
 
@@ -408,7 +429,8 @@ static int fast_path_exists(const LIBMATTI_UNION_UnionFileSystem *fileSystem, co
     return path_exists_real(realPath);
 }
 
-// Fetch attributes of a real path (mod entry or file system entry)
+
+
 static int real_attributes(const LIBMATTI_UNION_UnionFileSystem *fileSystem, const char *basePath,
                            const char *realPath, LIBMATTI_UNION_BasicFileAttributes *out)
 {
@@ -437,7 +459,7 @@ LIBMATTI_UNION_UnionFileSystem *LIBMATTI_UNION_UnionFileSystem_New(LIBMATTI_UNIO
     fileSystem->key = strdup(key);
     fileSystem->pathFilter = pathFilter;
 
-    // Java: flip the list so later elements are first in search order, filter exists
+// Java: flip the list so later elements are first in search order, filter exists
     char **basePaths = calloc(pathCount, sizeof(char *));
     size_t baseCount = 0;
 
@@ -451,7 +473,7 @@ LIBMATTI_UNION_UnionFileSystem *LIBMATTI_UNION_UnionFileSystem_New(LIBMATTI_UNIO
     fileSystem->basePathCount = baseCount;
     fileSystem->lastElementIndex = (int)baseCount - 1;
 
-    // Java: open embedded file systems for non-directory base paths
+// Java: open embedded file systems for non-directory base paths
     fileSystem->embeddedElfs = calloc(baseCount, sizeof(LIBMATTI_UNION_EmbeddedElf *));
     for (size_t i = 0; i < baseCount; i++)
     {
@@ -460,7 +482,7 @@ LIBMATTI_UNION_UnionFileSystem *LIBMATTI_UNION_UnionFileSystem_New(LIBMATTI_UNIO
             LIBMATTI_UNION_EmbeddedElf *elf = embedded_elf_open(basePaths[i]);
             if (elf == NULL)
             {
-                // Java: UncheckedIOException - propagate as failure
+// Java: UncheckedIOException - propagate as failure
                 for (size_t j = 0; j < fileSystem->embeddedElfCount; j++) embedded_elf_free(fileSystem->embeddedElfs[j]);
                 free(fileSystem->embeddedElfs);
                 for (size_t j = 0; j < baseCount; j++) free(basePaths[j]);
@@ -499,7 +521,7 @@ void LIBMATTI_UNION_UnionFileSystem_Close(LIBMATTI_UNION_UnionFileSystem *fileSy
 
 const char *LIBMATTI_UNION_UnionFileSystem_GetPrimaryPath(const LIBMATTI_UNION_UnionFileSystem *fileSystem)
 {
-    // Java: basepaths.get(basepaths.size() - 1) - the first of the original input paths
+// Java: basepaths.get(basepaths.size() - 1) - the first of the original input paths
     return fileSystem->basePaths[fileSystem->basePathCount - 1];
 }
 
@@ -552,7 +574,7 @@ static long find_first_filtered(const LIBMATTI_UNION_UnionFileSystem *fileSystem
         int isElfBase = find_embedded_elf(fileSystem, basePath) != NULL;
         char *realPath = to_real_path(fileSystem, basePath, path);
 
-        // filter only, no existence check (Java: "without checking its existence")
+// filter only, no existence check (Java: "without checking its existence")
         if (test_filter(fileSystem, basePath, realPath, isElfBase, 0))
         {
             *outRealPath = realPath;
@@ -650,7 +672,7 @@ int LIBMATTI_UNION_UnionFileSystem_Walk(const LIBMATTI_UNION_UnionFileSystem *fi
                                         int (*callback)(const char *relativePath, int isDirectory, void *userdata),
                                         void *userdata)
 {
-    // Collect candidates across all base paths, then filter + deduplicate
+// Collect candidates across all base paths, then filter + deduplicate
     // (Java: newDirStream merges with stream.distinct())
     char **candidates = NULL;
     int *candidateIsDir = NULL;
@@ -671,7 +693,8 @@ int LIBMATTI_UNION_UnionFileSystem_Walk(const LIBMATTI_UNION_UnionFileSystem *fi
         }
         else
         {
-            // walk the directory tree
+
+
             size_t baseLength = strlen(basePath);
             char *dirPath = malloc(baseLength + 1 + strlen(dirRel) + 1);
             snprintf(dirPath, baseLength + 1 + strlen(dirRel) + 1, "%s/%s", basePath, dirRel);
@@ -709,7 +732,8 @@ int LIBMATTI_UNION_UnionFileSystem_Walk(const LIBMATTI_UNION_UnionFileSystem *fi
                         }
                         else
                         {
-                            // relative name
+
+
                             const char *rel = child + baseLength;
                             while (*rel == '/') rel++;
 
@@ -735,7 +759,8 @@ int LIBMATTI_UNION_UnionFileSystem_Walk(const LIBMATTI_UNION_UnionFileSystem *fi
         }
     }
 
-    // filter + deduplicate + call the callback
+
+
     char **visited = NULL;
     size_t visitedCount = 0;
 
@@ -748,7 +773,7 @@ int LIBMATTI_UNION_UnionFileSystem_Walk(const LIBMATTI_UNION_UnionFileSystem *fi
         }
         if (seen) continue;
 
-        // Java: filter(p -> testFilter(p, bp, null))
+// Java: filter(p -> testFilter(p, bp, null))
         int isElfBase = find_embedded_elf(fileSystem, candidateBase[i]) != NULL;
 
         char *realPath;

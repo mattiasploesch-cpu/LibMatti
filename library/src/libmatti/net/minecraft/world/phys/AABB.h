@@ -1,6 +1,7 @@
-// Port of net.minecraft.world.phys.AABB (the immutable axis aligned bounding box).
-// Every mutating method returns a fresh box like Java; the clip ray-cast carries the
-// hit direction so the BlockHitResult side can be built on top.
+
+
+
+
 
 #ifndef MATTICRAFT_NET_MINECRAFT_WORLD_PHYS_AABB_H
 #define MATTICRAFT_NET_MINECRAFT_WORLD_PHYS_AABB_H
@@ -16,7 +17,7 @@ extern "C" {
 // Java: public class AABB
 typedef struct LIBMATTI_MC_AABB
 {
-    // Java: public final double minX / minY / minZ / maxX / maxY / maxZ
+// Java: public final double minX / minY / minZ / maxX / maxY / maxZ
     double minX;
     double minY;
     double minZ;
@@ -109,4 +110,4 @@ LIBMATTI_MC_Vec3 *LIBMATTI_MC_AABB_GetMaxPosition(const LIBMATTI_MC_AABB *box);
 }
 #endif
 
-#endif //MATTICRAFT_NET_MINECRAFT_WORLD_PHYS_AABB_H
+#endif

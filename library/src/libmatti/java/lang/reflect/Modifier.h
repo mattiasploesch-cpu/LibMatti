@@ -1,4 +1,5 @@
-// Port of java.lang.reflect.Modifier.
+
+
 
 #ifndef MATTICRAFT_JAVA_LANG_REFLECT_MODIFIER_H
 #define MATTICRAFT_JAVA_LANG_REFLECT_MODIFIER_H
@@ -39,4 +40,4 @@ int LIBMATTI_JL_Modifier_IsAbstract(int mod);
 // Java: public static boolean isInterface(int mod)
 int LIBMATTI_JL_Modifier_IsInterface(int mod);
 
-#endif //MATTICRAFT_JAVA_LANG_REFLECT_MODIFIER_H
+#endif

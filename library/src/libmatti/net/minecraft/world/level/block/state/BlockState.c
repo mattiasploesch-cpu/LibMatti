@@ -1,4 +1,5 @@
-// Port of net.minecraft.world.level.block.state.BlockState.
+
+
 
 #include "libmatti/net/minecraft/world/level/block/state/BlockState.h"
 

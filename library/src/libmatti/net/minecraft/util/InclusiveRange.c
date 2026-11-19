@@ -1,4 +1,5 @@
-// Port of net.minecraft.util.InclusiveRange.
+
+
 
 #include "libmatti/net/minecraft/util/InclusiveRange.h"
 
@@ -6,7 +7,7 @@
 
 LIBMATTI_MC_InclusiveRange LIBMATTI_MC_InclusiveRange_Of(int minInclusive, int maxInclusive)
 {
-    // Java: Preconditions.checkState(min <= max) - the port reports and aborts
+// Java: Preconditions.checkState(min <= max) - the port reports and aborts
     if (minInclusive > maxInclusive)
     {
         abort();

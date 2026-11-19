@@ -38,7 +38,8 @@ LIBMATTI_FML_ModLoadingIssue *LIBMATTI_FML_ModLoadingIssue_New(LIBMATTI_FML_ModL
     issue->cause = cause;
     issue->affectedPath = affectedPath != NULL ? strdup(affectedPath) : NULL;
     issue->affectedModFile = affectedModFile;
-    // the struct field is not const; the const parameter is the API contract only
+
+
     issue->affectedMod = (void *) (uintptr_t) affectedMod;
 
     return issue;
@@ -122,13 +123,13 @@ LIBMATTI_FML_ModLoadingIssue *LIBMATTI_FML_ModLoadingIssue_WithSeverity(const LI
 // Java: @Override public String toString()
 char *LIBMATTI_FML_ModLoadingIssue_ToString(const LIBMATTI_FML_ModLoadingIssue *issue)
 {
-    // Java: var result = new StringBuilder(severity + ": " + translationKey);
+// Java: var result = new StringBuilder(severity + ": " + translationKey);
     LIBMATTI_JL_StringBuilder *result = LIBMATTI_JL_StringBuilder_NewFromString(
         issue->severity == LIBMATTI_FML_ModLoadingIssue_SEVERITY_ERROR ? "ERROR" : "WARNING");
     LIBMATTI_JL_StringBuilder_Append(result, ": ");
     LIBMATTI_JL_StringBuilder_Append(result, issue->translationKey);
 
-    // Java: if (!translationArgs.isEmpty()) { result.append(" ["); ... result.append("]"); }
+// Java: if (!translationArgs.isEmpty()) { result.append(" ["); ... result.append("]"); }
     if (issue->translationArgCount > 0)
     {
         LIBMATTI_JL_StringBuilder_Append(result, " [");
@@ -140,7 +141,7 @@ char *LIBMATTI_FML_ModLoadingIssue_ToString(const LIBMATTI_FML_ModLoadingIssue *
         LIBMATTI_JL_StringBuilder_Append(result, "]");
     }
 
-    // Java: if (cause != null) { result.append(" caused by ").append(cause); }
+// Java: if (cause != null) { result.append(" caused by ").append(cause); }
     if (issue->cause != NULL)
     {
         LIBMATTI_JL_StringBuilder_Append(result, " caused by ");

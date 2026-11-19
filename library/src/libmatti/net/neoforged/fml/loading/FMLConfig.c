@@ -86,7 +86,7 @@ static size_t dependencyOverrideModCount = 0;
 // Java: private static Object maxThreads(Object value)
 static int max_threads(int value)
 {
-    // Java: int val = (Integer) value; if (val <= 0) return Runtime.getRuntime().availableProcessors(); else return val;
+// Java: int val = (Integer) value; if (val <= 0) return Runtime.getRuntime().availableProcessors(); else return val;
     return value <= 0 ? LIBMATTI_JL_Runtime_AvailableProcessors() : value;
 }
 
@@ -115,7 +115,7 @@ const char *LIBMATTI_FML_FMLConfig_ConfigValue_Comment(LIBMATTI_FML_FMLConfig_Co
 // Java: public String getMessage()
 char *LIBMATTI_FML_FMLConfig_DependencyOverride_GetMessage(const LIBMATTI_FML_FMLConfig_DependencyOverride *override)
 {
-    // Java: (remove ? "softening dependency constraints against" : "adding explicit AFTER ordering against") + " '" + modId + "'"
+// Java: (remove ? "softening dependency constraints against" : "adding explicit AFTER ordering against") + " '" + modId + "'"
     const char *prefix = override->remove ? "softening dependency constraints against"
                                           : "adding explicit AFTER ordering against";
     size_t length = strlen(prefix) + strlen(override->modId) + 4;
@@ -153,9 +153,10 @@ static void save_config(const char *configFile)
                 break;
         }
         LIBMATTI_NC_Config_Set(config, path, 1, &value);
-        // Config_Set copies the value into the config; the temporary must not be freed here
-        // (freeing the string leaves a dangling pointer inside the config and aborts in
-        // LIBMATTI_NC_Config_Free). The config owns the copy and releases it.
+
+
+
+
     }
 
     LIBMATTI_NC_TomlWriter *writer = LIBMATTI_NC_TomlWriter_New();
@@ -170,11 +171,11 @@ static void save_config(const char *configFile)
 // Java: private void loadFrom(Path configFile)
 static void load_from(const char *configFile)
 {
-    // Java: this.configData = CommentedConfig.of(LinkedHashMap::new, TomlFormat.instance());
+// Java: this.configData = CommentedConfig.of(LinkedHashMap::new, TomlFormat.instance());
     free(configData);
     configData = calloc(LIBMATTI_FML_FMLCONFIG_CONFIG_VALUE_COUNT, sizeof(ConfigEntry));
 
-    // Java: configSpec.correct(this.configData) first fills the defaults, then the file's
+// Java: configSpec.correct(this.configData) first fills the defaults, then the file's
     //       values replace them (ParsingMode.REPLACE); the port mirrors that order.
     for (int i = 0; i < LIBMATTI_FML_FMLCONFIG_CONFIG_VALUE_COUNT; i++)
     {
@@ -186,7 +187,7 @@ static void load_from(const char *configFile)
     LIBMATTI_NC_Config *loaded = NULL;
     if (LIBMATTI_JNF_Files_Exists(configFile))
     {
-        // Java: new TomlParser().parse(configStream, configData, ParsingMode.REPLACE);
+// Java: new TomlParser().parse(configStream, configData, ParsingMode.REPLACE);
         size_t length = 0;
         unsigned char *content = LIBMATTI_JNF_Files_ReadAllBytes(configFile, &length);
         if (content != NULL)
@@ -198,7 +199,7 @@ static void load_from(const char *configFile)
         }
         if (loaded == NULL)
         {
-            // Java: a broken config aborts the load with the parser's exception
+// Java: a broken config aborts the load with the parser's exception
             LIBMATTI_ML_Logger_Error(LOGGER(), &LIBMATTI_FML_MARKER_CORE, "Failed to parse the FML config {}",
                                      configFile);
         }
@@ -206,7 +207,7 @@ static void load_from(const char *configFile)
 
     if (loaded != NULL)
     {
-        // Java: configSpec.isCorrect(configData) corrections happen implicitly: unknown keys
+// Java: configSpec.isCorrect(configData) corrections happen implicitly: unknown keys
         //       are ignored and absent keys keep the defaults set above.
         for (int i = 0; i < LIBMATTI_FML_FMLCONFIG_CONFIG_VALUE_COUNT; i++)
         {
@@ -232,20 +233,20 @@ static void load_from(const char *configFile)
         LIBMATTI_NC_Config_Free(loaded);
     }
 
-    // Java: if (!configSpec.isCorrect(configData)) { ... saveConfig(configFile); }
+// Java: if (!configSpec.isCorrect(configData)) { ... saveConfig(configFile); }
     save_config(configFile);
 }
 void LIBMATTI_FML_FMLConfig_Load(void)
 {
-    // Java: Path configFile = FMLPaths.FMLCONFIG.get(); INSTANCE.loadFrom(configFile);
+// Java: Path configFile = FMLPaths.FMLCONFIG.get(); INSTANCE.loadFrom(configFile);
     const char *configFile = LIBMATTI_FML_FMLPaths_Get(LIBMATTI_FML_FMLPaths_FMLCONFIG);
     load_from(configFile);
 
-    // Java: if (LOGGER.isTraceEnabled(CORE)) { LOGGER.trace(CORE, "Loaded FML config from {}", ...); for (ConfigValue cv : values()) LOGGER.trace(CORE, "FMLConfig {} is {}", cv.entry, cv.getConfigValue(INSTANCE.configData)); }
+// Java: if (LOGGER.isTraceEnabled(CORE)) { LOGGER.trace(CORE, "Loaded FML config from {}", ...); for (ConfigValue cv : values()) LOGGER.trace(CORE, "FMLConfig {} is {}", cv.entry, cv.getConfigValue(INSTANCE.configData)); }
     LIBMATTI_ML_Logger_Trace(LOGGER(), &LIBMATTI_FML_MARKER_CORE, "Loaded FML config from {}", configFile);
     for (int i = 0; i < LIBMATTI_FML_FMLCONFIG_CONFIG_VALUE_COUNT; i++)
     {
-        // Java: getConfigValue returns the typed value; the port renders each type like
+// Java: getConfigValue returns the typed value; the port renders each type like
         //       Java's String.valueOf so the trace shows the real config, not null.
         char rendered[32];
         const char *renderedValue;
@@ -266,13 +267,13 @@ void LIBMATTI_FML_FMLConfig_Load(void)
                                  renderedValue);
     }
 
-    // Java: FMLPaths.getOrCreateGameRelativePath(Paths.get(FMLConfig.getConfigValue(ConfigValue.DEFAULT_CONFIG_PATH)));
+// Java: FMLPaths.getOrCreateGameRelativePath(Paths.get(FMLConfig.getConfigValue(ConfigValue.DEFAULT_CONFIG_PATH)));
     char *defaultConfigPath =
         LIBMATTI_FML_FMLPaths_GetOrCreateGameRelativePath(LIBMATTI_FML_FMLConfig_GetConfigValue(
             LIBMATTI_FML_FMLConfig_DEFAULT_CONFIG_PATH));
     free(defaultConfigPath);
 
-    // Java: var overridesObject = INSTANCE.configData.get("dependencyOverrides");
+// Java: var overridesObject = INSTANCE.configData.get("dependencyOverrides");
     //       if (overridesObject instanceof Config overrides) overrides.valueMap().forEach((key, value) -> {
     //           var list = (List<?>) value; ... dependencyOverrides.put(key, list.stream().map(...).toList()); });
     // The TOML form is: [dependencyOverrides.<modId>]
@@ -302,7 +303,8 @@ void LIBMATTI_FML_FMLConfig_Load(void)
                 LIBMATTI_NC_Value *overridesValue = LIBMATTI_NC_Config_GetKey(overrideRoot, "dependencyOverrides");
                 if (overridesValue != NULL && overridesValue->type == LIBMATTI_NC_VALUE_CONFIG)
                 {
-                    // shallow-copy the override tables so the root config can be freed
+
+
                     LIBMATTI_NC_Config *overrides = overridesValue->config;
                     for (size_t i = 0; i < overrides->count; i++)
                     {
@@ -319,7 +321,7 @@ void LIBMATTI_FML_FMLConfig_Load(void)
     LIBMATTI_NC_Config_ValueMap(overridesConfig, &overrideEntryCount);
     if (overrideEntryCount > 0)
     {
-        // Java: the map maps a target mod id to its override list; the port stores a parallel
+// Java: the map maps a target mod id to its override list; the port stores a parallel
         //       target-name array next to the flat override array so getOverrides can group.
         LIBMATTI_FML_FMLConfig_DependencyOverride **flattened = NULL;
         char **targets = NULL;
@@ -383,7 +385,7 @@ void LIBMATTI_FML_FMLConfig_Load(void)
 // Java: public static String getConfigValue(ConfigValue v)
 const char *LIBMATTI_FML_FMLConfig_GetConfigValue(LIBMATTI_FML_FMLConfig_ConfigValue value)
 {
-    // Java: return (T) this.entryFunction.apply(config != null ? config.get(this.entry) : this.defaultValue);
+// Java: return (T) this.entryFunction.apply(config != null ? config.get(this.entry) : this.defaultValue);
     if (configData == NULL) return DESCRIPTORS[value].stringValue;
     return configData[value].stringValue;
 }
@@ -405,7 +407,7 @@ int LIBMATTI_FML_FMLConfig_GetIntConfigValue(LIBMATTI_FML_FMLConfig_ConfigValue 
 // Java: public static <A> List<A> getListConfigValue(ConfigValue v)
 char **LIBMATTI_FML_FMLConfig_GetListConfigValue(LIBMATTI_FML_FMLConfig_ConfigValue value, size_t *count)
 {
-    // Java: none of the ConfigValue constants is a List in this version, so getConfigValue is cast instead.
+// Java: none of the ConfigValue constants is a List in this version, so getConfigValue is cast instead.
     (void) value;
     *count = 0;
     return NULL;
@@ -414,7 +416,7 @@ char **LIBMATTI_FML_FMLConfig_GetListConfigValue(LIBMATTI_FML_FMLConfig_ConfigVa
 // Java: public static <T> void updateConfig(ConfigValue v, T value)
 void LIBMATTI_FML_FMLConfig_UpdateConfigBool(LIBMATTI_FML_FMLConfig_ConfigValue value, int newValue)
 {
-    // Java: if (INSTANCE.configData != null) { v.setConfigValue(INSTANCE.configData, value); INSTANCE.saveConfig(FMLPaths.FMLCONFIG.get()); }
+// Java: if (INSTANCE.configData != null) { v.setConfigValue(INSTANCE.configData, value); INSTANCE.saveConfig(FMLPaths.FMLCONFIG.get()); }
     if (configData == NULL) return;
 
     configData[value].boolValue = newValue;
@@ -448,7 +450,7 @@ const char *LIBMATTI_FML_FMLConfig_DefaultConfigPath(void)
 // Returns the internal array of the entries whose target is modId, do not free.
 LIBMATTI_FML_FMLConfig_DependencyOverride **LIBMATTI_FML_FMLConfig_GetOverrides(const char *modId, size_t *count)
 {
-    // Java: var ov = dependencyOverrides.get(modId); if (ov == null) return List.of(); return ov;
+// Java: var ov = dependencyOverrides.get(modId); if (ov == null) return List.of(); return ov;
     *count = 0;
     if (modId == NULL) return NULL;
     static LIBMATTI_FML_FMLConfig_DependencyOverride **group = NULL;

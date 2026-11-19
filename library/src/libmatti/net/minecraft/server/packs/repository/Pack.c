@@ -1,4 +1,5 @@
-// Port of net.minecraft.server.packs.repository.Pack.
+
+
 
 #include "libmatti/net/minecraft/server/packs/repository/Pack.h"
 
@@ -22,7 +23,7 @@ Pack *LIBMATTI_MC_Pack_ReadMetaAndCreate(LIBMATTI_MC_PackLocationInfo *location,
                                          LIBMATTI_MC_InclusiveRange supportedFormats,
                                          LIBMATTI_MC_PackSelectionConfig config)
 {
-    // Java: try (PackResources packresources = supplier.open(location)) {
+// Java: try (PackResources packresources = supplier.open(location)) {
     //           PackMetadataSection metadata = packresources.getMetadataSection(PackMetadataSection.TYPE)
     //               .orElseThrow(() -> new IllegalArgumentException(...));
     LIBMATTI_MC_PackResources *resources = supplier->open(supplier, location);
@@ -40,12 +41,12 @@ Pack *LIBMATTI_MC_Pack_ReadMetaAndCreate(LIBMATTI_MC_PackLocationInfo *location,
 
     if (metadata == NULL)
     {
-        // Java: orElseThrow IllegalArgumentException("Missing metadata for pack %s".formatted(id))
+// Java: orElseThrow IllegalArgumentException("Missing metadata for pack %s".formatted(id))
         LIBMATTI_MC_PackLocationInfo_Free(location);
         return NULL;
     }
 
-    // Java: IntermediaryFormat.build from the supportedFormats fallback when missing
+// Java: IntermediaryFormat.build from the supportedFormats fallback when missing
     if (!metadata->descriptionFormat.hasSupported && !metadata->descriptionFormat.hasMin)
     {
         metadata->descriptionFormat.hasSupported = 1;
@@ -82,7 +83,7 @@ int LIBMATTI_MC_Pack_IsFixedPosition(const Pack *pack)
 
 LIBMATTI_MC_PackPosition LIBMATTI_MC_Pack_GetFixedPosition(const Pack *pack)
 {
-    // Java: selectionConfig.fixedPosition(); the port stores the position flag
+// Java: selectionConfig.fixedPosition(); the port stores the position flag
     return LIBMATTI_MC_PackPosition_ONLY_FIXED;
 }
 
@@ -98,13 +99,13 @@ LIBMATTI_MC_PackResources *LIBMATTI_MC_Pack_Open(const Pack *pack)
 
 LIBMATTI_MC_PackResources *LIBMATTI_MC_Pack_OpenFull(const Pack *pack, LIBMATTI_MC_PackResources *primary)
 {
-    // Java: openFull(PackResources primary) returns primary when the pack has no extras
+// Java: openFull(PackResources primary) returns primary when the pack has no extras
     return primary;
 }
 
 int LIBMATTI_MC_Pack_CompareTo(const Pack *a, const Pack *b)
 {
-    // Java: COMPARATOR = comparing(Pack::getPackSource::ordering).thenComparing(Pack::getId)
+// Java: COMPARATOR = comparing(Pack::getPackSource::ordering).thenComparing(Pack::getId)
     const LIBMATTI_MC_PackSource *sourceA = a->location->source;
     const LIBMATTI_MC_PackSource *sourceB = b->location->source;
     if (sourceA->type != sourceB->type) return sourceA->type < sourceB->type ? -1 : 1;

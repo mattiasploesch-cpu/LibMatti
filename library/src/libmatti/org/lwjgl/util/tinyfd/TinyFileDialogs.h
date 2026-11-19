@@ -8,4 +8,4 @@ int LIBMATTI_LWJGL_TINYFD_TinyFileDialogs_TinyfdMessageBox(const char *title, co
                                                           const char *dialogType, const char *iconType,
                                                           int defaultButton);
 
-#endif //MATTICRAFT_LWJGL_TINYFD_TINYFILEDIALOGS_H
+#endif

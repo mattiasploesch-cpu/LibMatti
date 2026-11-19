@@ -27,7 +27,7 @@ void LIBMATTI_FML_VersionInfo_Free(LIBMATTI_FML_VersionInfo *versionInfo)
 // Java: public String mcAndNeoFormVersion()
 char *LIBMATTI_FML_VersionInfo_McAndNeoFormVersion(const LIBMATTI_FML_VersionInfo *versionInfo)
 {
-    // Java: return mcVersion + "-" + neoFormVersion;
+// Java: return mcVersion + "-" + neoFormVersion;
     size_t length = strlen(versionInfo->mcVersion) + strlen(versionInfo->neoFormVersion) + 2;
     char *result = malloc(length);
     snprintf(result, length, "%s-%s", versionInfo->mcVersion, versionInfo->neoFormVersion);

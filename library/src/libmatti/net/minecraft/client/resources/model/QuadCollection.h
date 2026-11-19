@@ -1,7 +1,8 @@
-// Port of net.minecraft.client.resources.model.QuadCollection (plus the
-// Builder) - the bake output: unculled quads plus one bucket per cullface
-// direction. Java keeps two lists per direction; the C port stores flat
-// arrays with counts.
+
+
+
+
+
 
 #ifndef MATTICRAFT_MC_CLIENT_RESOURCES_MODEL_QUADCOLLECTION_H
 #define MATTICRAFT_MC_CLIENT_RESOURCES_MODEL_QUADCOLLECTION_H
@@ -15,10 +16,10 @@ extern "C" {
 // Java: QuadCollection.Builder - the flat quad storage (unculled + per-direction).
 typedef struct LIBMATTI_MC_QuadCollection
 {
-    // Java: List<BakedQuad> unculledFaces
+// Java: List<BakedQuad> unculledFaces
     size_t unculledCount;
     LIBMATTI_MC_BakedQuad *unculledFaces;
-    // Java: Map<Direction, List<BakedQuad>> culledFaces - indexed by ordinal.
+// Java: Map<Direction, List<BakedQuad>> culledFaces - indexed by ordinal.
     size_t culledCounts[6];
     LIBMATTI_MC_BakedQuad *culledFaces[6];
 } LIBMATTI_MC_QuadCollection;
@@ -42,4 +43,4 @@ void LIBMATTI_MC_QuadCollection_Free(LIBMATTI_MC_QuadCollection *collection);
 }
 #endif
 
-#endif //MATTICRAFT_MC_CLIENT_RESOURCES_MODEL_QUADCOLLECTION_H
+#endif

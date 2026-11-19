@@ -1,10 +1,12 @@
-// Port of net.minecraft.client.Minecraft (the game skeleton). The constructor
-// opens the GLFW window (Window.java + Window init in the constructor), run()
-// is the while (!stopped) loop of Minecraft.run, runTick() carries the
+
+
+
+
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <unistd.h>
-// advanceTime/tick/render split, destroy() the shutdown path.
+
+
 
 #include "libmatti/net/minecraft/client/Minecraft.h"
 
@@ -52,8 +54,9 @@
 
 #include "libmatti/net/minecraft/client/EmbeddedFont.h"
 
-// The theme resource root (see load_font below); every consumer defines it
-// from CMake (client/src does the same for the selftest fixtures).
+
+
+
 #ifndef MATTI_SOURCE_DIR
 #define MATTI_SOURCE_DIR "."
 #endif
@@ -69,80 +72,81 @@
 
 struct LIBMATTI_MC_Minecraft
 {
-    // Java: private final GameConfig gameConfig values we keep
+// Java: private final GameConfig gameConfig values we keep
     LIBMATTI_MC_GameConfig config;
     char *launchVersion;
     char *versionType;
 
-    // Java: private final Window window (the native GLFW handle)
+// Java: private final Window window (the native GLFW handle)
     long window;
 
-    // Java: private final DeltaTracker.Timer deltaTracker
+// Java: private final DeltaTracker.Timer deltaTracker
     LIBMATTI_MC_DeltaTracker *deltaTracker;
 
-    // Java: private volatile boolean running / public boolean stopped / pause / noRender
+// Java: private volatile boolean running / public boolean stopped / pause / noRender
     int running;
     int stopped;
     int pause;
     int noRender;
 
-    // Java: public int frames; private int fps (framerateLimitTracker keeps the
+// Java: public int frames; private int fps (framerateLimitTracker keeps the
     // real one; the skeleton counts frames over one second)
     int frames;
     int fps;
     double fpsTimerStart;
 
-    // Java: private long frameTimeNs
+// Java: private long frameTimeNs
     long long frameTimeNs;
 
-    // Java: private final TextureManager textureManager = new TextureManager(this.resourceManager)
+// Java: private final TextureManager textureManager = new TextureManager(this.resourceManager)
     LIBMATTI_MC_TextureManager *textureManager;
 
-    // The earlydisplay Monocraft font (Java: MaterializedTheme.fonts["gui"]) the
+// The earlydisplay Monocraft font (Java: MaterializedTheme.fonts["gui"]) the
     // skeleton draws the title line with. NULL when the TTF is unavailable.
     LIBMATTI_FML_SimpleFont *font;
 
-    // The font shader (Java: Theme.SHADER_FONT): screen-space quads tinted by
+// The font shader (Java: Theme.SHADER_FONT): screen-space quads tinted by
     // the GL_RED glyph texture.
     unsigned int fontProgram;
     int fontScreenSizeLocation;
 
-    // Java: private final EarlyFramebuffer framebuffer = new EarlyFramebuffer(
+// Java: private final EarlyFramebuffer framebuffer = new EarlyFramebuffer(
     // LAYOUT_WIDTH, LAYOUT_HEIGHT) - the loading-screen layout is rendered into
     // this offscreen buffer and blitted (vertically flipped) onto the window.
     LIBMATTI_FML_EarlyFramebuffer *framebuffer;
 
-    // The in-memory level the skeleton drives (game port content).
+
+
     void *level;
 
-    // Java: this.levelRenderer = new LevelRenderer - the section dispatcher the
+// Java: this.levelRenderer = new LevelRenderer - the section dispatcher the
     // chunk meshes go through (the P4.1 port).
     LIBMATTI_MC_SectionRenderDispatcher *sectionDispatcher;
 
-    // Java: this.modelManager - the baked block models (the P4.2 port); the
+// Java: this.modelManager - the baked block models (the P4.2 port); the
     // section compiler resolves the block model quads through it.
     LIBMATTI_MC_ModelManager *modelManager;
 
-    // Java: this.blockRenderer = new BlockRenderDispatcher(...) - the P4.4
+// Java: this.blockRenderer = new BlockRenderDispatcher(...) - the P4.4
     // facade (BlockColors + the AO ModelBlockRenderer) the section compiler's
     // renderBatched path runs through.
     LIBMATTI_MC_BlockRenderDispatcher *blockRenderer;
 
-    // Java: private final Camera camera (GameRenderer owns it in Java; the
+// Java: private final Camera camera (GameRenderer owns it in Java; the
     // skeleton keeps it on the Minecraft struct) + the culling frustum the
     // level renderer feeds per frame (the P4.3 port).
     LIBMATTI_MC_Camera camera;
     LIBMATTI_MC_Frustum frustum;
     int frustumInitialized;
 
-    // Java: private SkyRenderer skyRenderer (the P4.5 port) + the CELESTIALS
+// Java: private SkyRenderer skyRenderer (the P4.5 port) + the CELESTIALS
     // atlas the sun/moon quads ride.
     LIBMATTI_MC_SkyRenderer *skyRenderer;
-    // Java: private final CloudRenderer cloudRenderer (LevelRenderer)
+// Java: private final CloudRenderer cloudRenderer (LevelRenderer)
     LIBMATTI_MC_CloudRenderer *cloudRenderer;
     LIBMATTI_MC_TextureAtlas *celestialsAtlas;
 
-    // Java: public LocalPlayer player (the P5.2 port) - the camera rides its
+// Java: public LocalPlayer player (the P5.2 port) - the camera rides its
     // entity position/rotation; the skeleton keeps the mouse-look state here
     // (Java: MouseHandler + the smooth-camera fields)
     LIBMATTI_MC_LocalPlayer *localPlayer;
@@ -169,20 +173,23 @@ void LIBMATTI_MC_GameRenderer_BuildRotationMatrix(const LIBMATTI_MC_Camera *came
     const LIBMATTI_JOML_Vector3f *l = LIBMATTI_MC_Camera_LeftVector(camera);
     float rx = -l->x, ry = -l->y, rz = -l->z;
     float cx = (float) camera->x, cy = (float) camera->y, cz = (float) camera->z;
-    // Column-major view: element (column, row) = m<column><row>.
+
+
     view->m00 = rx; view->m01 = u->x; view->m02 = -f->x; view->m03 = 0.0f;
     view->m10 = ry; view->m11 = u->y; view->m12 = -f->y; view->m13 = 0.0f;
     view->m20 = rz; view->m21 = u->z; view->m22 = -f->z; view->m23 = 0.0f;
-    // The translation column (GL: elements [0][3], [1][3], [2][3]).
+
+
     view->m30 = -(rx * cx + ry * cy + rz * cz);
     view->m31 = -(u->x * cx + u->y * cy + u->z * cz);
     view->m32 = (f->x * cx + f->y * cy + f->z * cz);
     view->m33 = 1.0f;
 }
 
-// The full view for the terrain shader: the rotation above plus the negated
-// rotation*translation column (the world->camera shift the Java path does
-// through the PoseStack translate(-camera) instead).
+
+
+
+
 
 // Java: the ModelManager model lookup the compiler consults per block - the
 // block's registry key path maps onto the model id ("block/<path>").
@@ -192,7 +199,7 @@ static const LIBMATTI_MC_QuadCollection *model_for_block(void *userdata, const L
     LIBMATTI_MC_ResourceKey *key = LIBMATTI_MC_Block_GetKey(block);
     if (key == NULL)
         return NULL;
-    // Java: ResourceKey.location() - the identifier directly (no ToString parse).
+// Java: ResourceKey.location() - the identifier directly (no ToString parse).
     char modelId[128];
     snprintf(modelId, sizeof(modelId), "block/%s", LIBMATTI_MC_Identifier_GetPath(key->identifier));
     const LIBMATTI_MC_QuadCollection *model = LIBMATTI_MC_ModelManager_GetModel(manager, modelId);
@@ -206,11 +213,12 @@ static void sprite_rect_for_block(void *userdata, const LIBMATTI_MC_Block *block
     LIBMATTI_MC_ModelManager *manager = (LIBMATTI_MC_ModelManager *) userdata;
     LIBMATTI_MC_TextureAtlas *atlas = LIBMATTI_MC_ModelManager_GetAtlas(manager);
     if (atlas == NULL)
-        return; // the default full-sprite rect stays.
+        return;
+
     LIBMATTI_MC_ResourceKey *key = LIBMATTI_MC_Block_GetKey(block);
     if (key == NULL)
         return;
-    // Java: ResourceKey.location() - the identifier directly (no ToString parse).
+// Java: ResourceKey.location() - the identifier directly (no ToString parse).
     char textureId[128];
     snprintf(textureId, sizeof(textureId), "block/%s", LIBMATTI_MC_Identifier_GetPath(key->identifier));
     LIBMATTI_MC_SpriteGetter_SpriteRect(atlas, textureId, uv);
@@ -227,7 +235,7 @@ LIBMATTI_MC_Minecraft *LIBMATTI_MC_Minecraft_GetInstance(void)
 
 float LIBMATTI_MC_Minecraft_GetTickTargetMillis(float msPerTick)
 {
-    // Java: getTickTargetMillis returns the mspt override when set; the default
+// Java: getTickTargetMillis returns the mspt override when set; the default
     // run keeps 50 ms.
     (void) msPerTick;
     return msPerTick;
@@ -245,23 +253,25 @@ static char *createTitle(const LIBMATTI_MC_Minecraft *minecraft)
     return title;
 }
 
-// Java (NeoForge Window.java.patch): private long takeOverWindow(
-//       EarlyLoadingScreenController earlyLoadingScreen, String title) -
-// the game takes over the FML early progress window instead of opening a
-// second one; the size/pos come from the existing window.
+
+
+
+
+
 static LIBMATTI_FML_SimpleFont *load_font(void);
 
 static long take_over_window(LIBMATTI_FML_EarlyLoadingScreenController *earlyLoadingScreen, const char *title)
 {
-    // Java: long window = earlyLoadingScreen.takeOverGlfwWindow();
+// Java: long window = earlyLoadingScreen.takeOverGlfwWindow();
     long window = LIBMATTI_FML_EarlyLoadingScreenController_TakeOverGlfwWindow(earlyLoadingScreen);
 
-    // The early window degrades to headless when the graphics system is
-    // unavailable; 0 tells the caller to create the game window itself.
+
+
+
     if (window == 0)
         return 0;
 
-    // Java: GLFW.glfwSetWindowTitle(window, title);
+// Java: GLFW.glfwSetWindowTitle(window, title);
     LIBMATTI_GLFW_glfwSetWindowTitle(window, title);
 
     int x = 0, y = 0;
@@ -269,7 +279,7 @@ static long take_over_window(LIBMATTI_FML_EarlyLoadingScreenController *earlyLoa
 
     int width = 0, height = 0;
     LIBMATTI_GLFW_glfwGetWindowSize(window, &width, &height);
-    // Java: the window height and width can be 0 if minimized
+// Java: the window height and width can be 0 if minimized
     if (width < 1) width = 1;
     if (height < 1) height = 1;
     (void) x;
@@ -280,16 +290,16 @@ static long take_over_window(LIBMATTI_FML_EarlyLoadingScreenController *earlyLoa
 LIBMATTI_MC_Minecraft *LIBMATTI_MC_Minecraft_New(const LIBMATTI_MC_GameConfig *config)
 {
     LIBMATTI_MC_Minecraft *minecraft = calloc(1, sizeof(LIBMATTI_MC_Minecraft));
-    // Java: private volatile boolean running = true (the field initializer).
+// Java: private volatile boolean running = true (the field initializer).
     minecraft->running = 1;
     minecraft->config = *config;
     minecraft->launchVersion = strdup(config->game.launchVersion ? config->game.launchVersion : "");
     minecraft->versionType = strdup(config->game.versionType ? config->game.versionType : "release");
 
-    // Java: this.deltaTracker = new DeltaTracker.Timer(20.0F, 0L, this::getTickTargetMillis);
+// Java: this.deltaTracker = new DeltaTracker.Timer(20.0F, 0L, this::getTickTargetMillis);
     minecraft->deltaTracker = LIBMATTI_MC_DeltaTracker_Timer_New(20.0f, LIBMATTI_MC_Minecraft_GetTickTargetMillis);
 
-    // Java: the Camera field initializer (GameRenderer's camera).
+// Java: the Camera field initializer (GameRenderer's camera).
     // The skeleton spawn: first-person on the platform (eye at feet 65 +
     // 1.62 eye height). Like the old skeleton camera: yaw 180 faces north
     // (-Z), the spawn eye at z=24 looks straight at the platform (z 0..16).
@@ -298,7 +308,7 @@ LIBMATTI_MC_Minecraft *LIBMATTI_MC_Minecraft_New(const LIBMATTI_MC_GameConfig *c
     LIBMATTI_MC_Camera_SetPosition(&minecraft->camera, 8.0, 65.0 + 1.62, 24.0);
     minecraft->frustumInitialized = 0;
 
-    // ---- Window init (com.mojang.blaze3d.platform.Window) -----------------
+// ---- Window init (com.mojang.blaze3d.platform.Window) -----------------
     // Java: Window.init - glfwSetErrorCallback, checkGlfwError
     if (LIBMATTI_GLFW_glfwInit() != LIBMATTI_GLFW_TRUE)
     {
@@ -313,7 +323,7 @@ LIBMATTI_MC_Minecraft *LIBMATTI_MC_Minecraft_New(const LIBMATTI_MC_GameConfig *c
         return NULL;
     }
 
-    // Java: glfwDefaultWindowHints(); Window: client API, context version,
+// Java: glfwDefaultWindowHints(); Window: client API, context version,
     // forward compat, debug context from the options; the skeleton keeps the
     // core-profile hints the game sets.
     LIBMATTI_GLFW_glfwDefaultWindowHints();
@@ -325,9 +335,10 @@ LIBMATTI_MC_Minecraft *LIBMATTI_MC_Minecraft_New(const LIBMATTI_MC_GameConfig *c
 
     const LIBMATTI_MC_DisplayData *display = &config->display;
     char *title = createTitle(minecraft);
-    // Java (NeoForge Window ctor patch): var earlyLoadingScreen =
-    //       EarlyLoadingScreenController.current(); if (earlyLoadingScreen != null)
-    //       this.handle = takeOverWindow(earlyLoadingScreen, title); else glfwCreateWindow
+
+
+
+
     LIBMATTI_FML_EarlyLoadingScreenController *earlyLoadingScreen =
         LIBMATTI_FML_EarlyLoadingScreenController_Current();
     if (earlyLoadingScreen != NULL && earlyLoadingScreen->takeOverGlfwWindow != NULL)
@@ -335,7 +346,7 @@ LIBMATTI_MC_Minecraft *LIBMATTI_MC_Minecraft_New(const LIBMATTI_MC_GameConfig *c
         minecraft->window = take_over_window(earlyLoadingScreen, title);
     }
 
-    // Java: this.window = this.virtualScreen.newWindow(displaydata, ..., this.createTitle());
+// Java: this.window = this.virtualScreen.newWindow(displaydata, ..., this.createTitle());
     // (also the fallback when the early window came up headless)
     if (minecraft->window == 0)
     {
@@ -357,19 +368,19 @@ LIBMATTI_MC_Minecraft *LIBMATTI_MC_Minecraft_New(const LIBMATTI_MC_GameConfig *c
         return NULL;
     }
 
-    // Java: Window.init - the GL context + capabilities; RenderSystem.initRenderer
+// Java: Window.init - the GL context + capabilities; RenderSystem.initRenderer
     // resolves the binding and stores the API description (GlDevice ctor path).
     LIBMATTI_GLFW_glfwMakeContextCurrent(minecraft->window);
     LIBMATTI_B3D_RenderSystem_InitRenderer(minecraft->window);
     LIBMATTI_B3D_RenderSystem_SetupDefaultState();
-    // Java: vsync on by default. On a headless runner the GLX swap with
+// Java: vsync on by default. On a headless runner the GLX swap with
     // interval 1 never returns (xvfb delivers no vblank), so CI gets interval 0
     // and the loop ticks like on a real display.
     LIBMATTI_GLFW_glfwSwapInterval(getenv("CI") != NULL ? 0 : 1);
     LIBMATTI_GLFW_glfwFocusWindow(minecraft->window);
     LIBMATTI_GLFW_glfwShowWindow(minecraft->window);
 
-    // Java: fullscreen handling - Window.setMode(displaydata.isFullscreen);
+// Java: fullscreen handling - Window.setMode(displaydata.isFullscreen);
     if (display->isFullscreen)
     {
         long monitor = LIBMATTI_GLFW_glfwGetPrimaryMonitor();
@@ -380,8 +391,9 @@ LIBMATTI_MC_Minecraft *LIBMATTI_MC_Minecraft_New(const LIBMATTI_MC_GameConfig *c
             && LIBMATTI_GLFW_glfwGetVideoMode(monitor, &width, &height, &redBits, &greenBits, &blueBits,
                                               &refreshRate))
         {
-            // The port keeps windowed mode when the video mode query fails; the
-            // real setMode picks the display mode through glfwSetVideoMode.
+
+
+
             (void) width;
             (void) height;
         }
@@ -389,11 +401,12 @@ LIBMATTI_MC_Minecraft *LIBMATTI_MC_Minecraft_New(const LIBMATTI_MC_GameConfig *c
 
     LOG("Backend library: LWJGL version (port), OpenGL context acquired");
 
-    // Java (Minecraft ctor): this.textureManager = new TextureManager(this.resourceManager);
-    // The ctor registers the missing texture (see TextureManager_New).
+
+
+
     minecraft->textureManager = LIBMATTI_MC_TextureManager_New(NULL);
 
-    // The earlydisplay font + font shader (Java: MaterializedTheme loads the
+// The earlydisplay font + font shader (Java: MaterializedTheme loads the
     // theme fonts; RenderContext binds Theme.SHADER_FONT for text). Both are
     // optional: without them the skeleton still runs, just without the title.
     minecraft->font = load_font();
@@ -402,13 +415,13 @@ LIBMATTI_MC_Minecraft *LIBMATTI_MC_Minecraft_New(const LIBMATTI_MC_GameConfig *c
         minecraft->fontProgram = LIBMATTI_FML_FontShader_Compile(&minecraft->fontScreenSizeLocation);
         if (minecraft->fontProgram == 0)
             LOG("Font shader compile failed; title rendering disabled");
-        // Java: LoadingScreenRenderer ctor - the fixed 854x480 layout buffer
+// Java: LoadingScreenRenderer ctor - the fixed 854x480 layout buffer
         minecraft->framebuffer = LIBMATTI_FML_EarlyFramebuffer_New(854, 480);
     }
 
     instance = minecraft;
 
-    // Java: this.level = new ClientLevel(...) + levelRenderer.setLevel - the
+// Java: this.level = new ClientLevel(...) + levelRenderer.setLevel - the
     // skeleton's demo level: bootstrap the vanilla blocks, one in-memory level
     // and a flat 16x16 stone platform at y=64 the section compiler meshes.
     {
@@ -430,7 +443,8 @@ LIBMATTI_MC_Minecraft *LIBMATTI_MC_Minecraft_New(const LIBMATTI_MC_GameConfig *c
                                                LIBMATTI_MC_Level_UPDATE_CLIENTS);
                 }
             }
-            // Two stone towers to make the geometry visible from the camera.
+
+
             for (int y = 65; y < 70; y++)
             {
                 LIBMATTI_MC_BlockPos a = {{4, y, 4}};
@@ -440,10 +454,11 @@ LIBMATTI_MC_Minecraft *LIBMATTI_MC_Minecraft_New(const LIBMATTI_MC_GameConfig *c
                 LIBMATTI_MC_Level_SetBlock(level, &b, LIBMATTI_MC_Block_DefaultBlockState(stone),
                                            LIBMATTI_MC_Level_UPDATE_CLIENTS);
             }
-            // A second platform four sections east (x 64..79, section 4,4,0):
-            // the frustum-culling proof - it draws when the camera faces east
-            // and is culled otherwise, exactly like Java's
-            // cullingFrustum.isVisible(sectionAABB) gate.
+
+
+
+
+
             for (int x = 64; x < 80; x++)
             {
                 for (int z = 0; z < 16; z++)
@@ -461,7 +476,7 @@ LIBMATTI_MC_Minecraft *LIBMATTI_MC_Minecraft_New(const LIBMATTI_MC_GameConfig *c
         minecraft->level = level;
         minecraft->sectionDispatcher = LIBMATTI_MC_SectionRenderDispatcher_New();
 
-        // Java: the bootstrap order - MODEL_ATLAS (the block textures stitch
+// Java: the bootstrap order - MODEL_ATLAS (the block textures stitch
         // first) then ModelBakery (the models bake against it). The atlas is
         // procedural in the port (VanillaBlockTextures), the models embedded
         // (VanillaModels) - headless-safe, no resource pack on disk.
@@ -474,13 +489,13 @@ LIBMATTI_MC_Minecraft *LIBMATTI_MC_Minecraft_New(const LIBMATTI_MC_GameConfig *c
                 (const LIBMATTI_MC_QuadCollection * (*)(void *, const LIBMATTI_MC_Block *))
                     model_for_block,
                 minecraft->modelManager);
-            // Java: the sprite-rect resolver rides on the same atlas - the
+// Java: the sprite-rect resolver rides on the same atlas - the
             // compiler maps the block's model sprite for the face UVs.
             LIBMATTI_MC_SectionRenderDispatcher_SetSpriteResolver(
                 minecraft->sectionDispatcher, sprite_rect_for_block, minecraft->modelManager);
         }
 
-        // Java: this.blockRenderer = new BlockRenderDispatcher(blockModelShaper,
+// Java: this.blockRenderer = new BlockRenderDispatcher(blockModelShaper,
         // materials, blockColors) - created with the model manager so the
         // compiler's renderBatched path carries AO + tint.
         minecraft->blockRenderer = LIBMATTI_MC_BlockRenderDispatcher_New();
@@ -491,21 +506,21 @@ LIBMATTI_MC_Minecraft *LIBMATTI_MC_Minecraft_New(const LIBMATTI_MC_GameConfig *c
         LIBMATTI_MC_SectionRenderDispatcher_CreateSection(minecraft->sectionDispatcher, 0, 4, 0);
         LIBMATTI_MC_SectionRenderDispatcher_CreateSection(minecraft->sectionDispatcher, 4, 4, 0);
 
-        // Java: the CELESTIALS atlas load + this.skyRenderer = new SkyRenderer(
+// Java: the CELESTIALS atlas load + this.skyRenderer = new SkyRenderer(
         // textureManager, atlasManager) - the sun/moon quads ride the atlas,
         // the stars/sunrise/discs build once.
         minecraft->celestialsAtlas = LIBMATTI_MC_VanillaCelestialTextures_Bootstrap(1024);
         minecraft->skyRenderer = LIBMATTI_MC_SkyRenderer_New();
         LIBMATTI_MC_SkyRenderer_SetAtlas(minecraft->skyRenderer, minecraft->celestialsAtlas);
         LOG("SkyRenderer ready (atlas=%p)", (void *) minecraft->celestialsAtlas);
-        // Java: this.cloudRenderer = new CloudRenderer() (the reload listener
+// Java: this.cloudRenderer = new CloudRenderer() (the reload listener
         // applies the texture cells once).
         minecraft->cloudRenderer = LIBMATTI_MC_CloudRenderer_New();
         LOG("CloudRenderer ready (%d cells)",
             minecraft->cloudRenderer != NULL ? 1 : 0);
     }
 
-    // Java: this.options = new Options(this, ...) - the Options constructor
+// Java: this.options = new Options(this, ...) - the Options constructor
     // creates the vanilla KeyMappings (key.forward/key.left/...) BEFORE the
     // LocalPlayer/KeyboardInput read them through the Options fields. Without
     // this the accessors return NULL and every IsDown() answers false - the
@@ -513,7 +528,7 @@ LIBMATTI_MC_Minecraft *LIBMATTI_MC_Minecraft_New(const LIBMATTI_MC_GameConfig *c
     // not touch the mappings, which is why turning still worked).
     LIBMATTI_MC_KeyMapping_CreateVanillaMappings();
 
-    // Java: this.player = new LocalPlayer(this, this.level, ...) - the session
+// Java: this.player = new LocalPlayer(this, this.level, ...) - the session
     // profile name rides the GameConfig user. The spawn rides the platform
     // centre (the 16x16 slab spans x/z 0..15 at y 64, top face 65) - since the
     // P5.3 physics the player collides, so an off-platform spawn falls into
@@ -548,11 +563,11 @@ static void tick(LIBMATTI_MC_Minecraft *minecraft)
 {
     MattiMixinResult result = MATTI_MIXIN_PASS;
     void *args[1] = {NULL};
-    // Java: the woven call site runs the mod chain, then the body unless cancelled.
+// Java: the woven call site runs the mod chain, then the body unless cancelled.
     if (LIBMATTI_MIXIN_Invoke(LIBMATTI_MIXIN_HookTable_Default(), "matticraft::demo::tick", NULL, args, 1, &result))
         minecraft_demo_tick();
 
-    // Java: LevelRenderer.renderLevel's compile pass - every dirty section is
+// Java: LevelRenderer.renderLevel's compile pass - every dirty section is
     // rebuilt before the frame draws (the port compiles synchronously).
     if (minecraft->sectionDispatcher != NULL && minecraft->level != NULL)
     {
@@ -561,7 +576,7 @@ static void tick(LIBMATTI_MC_Minecraft *minecraft)
                                                          (long long) (LIBMATTI_GLFW_glfwGetTime() * 1000.0));
     }
 
-    // Java: this.tick() runs the player through LocalPlayer.tick -> aiStep ->
+// Java: this.tick() runs the player through LocalPlayer.tick -> aiStep ->
     // travel: the per-TICK input poll + walk/gravity impulse (20 Hz, not the
     // per-frame rate - the tick loop above repeats this body for every
     // accumulated tick).
@@ -617,7 +632,7 @@ static void render_title(LIBMATTI_MC_Minecraft *minecraft, int width, int height
     snprintf(text, sizeof(text), "Matticraft %s", minecraft->launchVersion);
     LIBMATTI_FML_SimpleFont_DisplayText texts[1] = {{text, 0xFFFFFFFFu}};
 
-    // Java: RenderContext.renderText - bind the font texture + shader, draw
+// Java: RenderContext.renderText - bind the font texture + shader, draw
     // the batched glyph quads; GlStateManager routes the state (blend on for
     // the alpha-tested glyphs, like the font shader's premultiplied colour).
     LIBMATTI_B3D_GlStateManager_EnableBlend();
@@ -625,14 +640,14 @@ static void render_title(LIBMATTI_MC_Minecraft *minecraft, int width, int height
                                                   LIBMATTI_GL_GL_ONE_MINUS_SRC_ALPHA,
                                                   LIBMATTI_GL_GL_ONE, LIBMATTI_GL_GL_ONE_MINUS_SRC_ALPHA);
     LIBMATTI_GL_glUseProgram(minecraft->fontProgram);
-    // Java: LoadingScreenRenderer.renderToFramebuffer sets the shader uniforms
+// Java: LoadingScreenRenderer.renderToFramebuffer sets the shader uniforms
     // to the fixed layout size (LAYOUT_WIDTH, LAYOUT_HEIGHT), not the window.
     LIBMATTI_GL_glUniform2f(minecraft->fontScreenSizeLocation, 854.0f, 480.0f);
     LIBMATTI_B3D_GlStateManager_ActiveTexture(LIBMATTI_GL_GL_TEXTURE0);
     LIBMATTI_B3D_GlStateManager_BindTexture((int) LIBMATTI_FML_SimpleFont_TextureId(minecraft->font));
     LIBMATTI_GL_glUniform1i(LIBMATTI_GL_glGetUniformLocation(minecraft->fontProgram, "tex"), 0);
 
-    // Java: renderTextWithShadow(x + 2, y + 2, shadow) then (x, y, text)
+// Java: renderTextWithShadow(x + 2, y + 2, shadow) then (x, y, text)
     LIBMATTI_FML_SimpleFont_DisplayText shadow[1] = {{text, 0x40000000u}};
     LIBMATTI_FML_SimpleFont_DrawTexts(minecraft->font, 10.0f + 2.0f, 10.0f + 2.0f, shadow, 1);
     LIBMATTI_FML_SimpleFont_DrawTexts(minecraft->font, 10.0f, 10.0f, texts, 1);
@@ -641,18 +656,20 @@ static void render_title(LIBMATTI_MC_Minecraft *minecraft, int width, int height
     LIBMATTI_B3D_GlStateManager_DisableBlend();
 }
 
-// Java (Window.java Window ctor / MaterializedTheme): load the theme's
-// "gui" font (the Monocraft.ttf the FML resources carry). The binary embeds
-// the font (release packages do not ship the vendor source tree); the repo
-// checkout stays as the dev-build fallback. No environment or user input
-// reaches fopen - the paths are compile-time constants. NULL leaves the
-// title rendering off.
+
+
+
+
+
+
+
 static LIBMATTI_FML_SimpleFont *load_font(void)
 {
     unsigned char *data = NULL;
     size_t length = 0;
 
-    // 1) the repo checkout (dev builds, the same path the manifest uses).
+
+
     const char *base = MATTI_SOURCE_DIR;
     const char *relative =
         "/vendor/FancyModLoader/earlydisplay/src/main/resources/net/neoforged/fml/earlydisplay/theme/Monocraft.ttf";
@@ -682,7 +699,8 @@ static LIBMATTI_FML_SimpleFont *load_font(void)
         fclose(file);
     }
 
-    // 2) the embedded copy - always present.
+
+
     if (data == NULL)
     {
         length = LIBMATTI_MC_EmbeddedFont_Monocraft_Size;
@@ -730,7 +748,7 @@ static void updateMouseLook(LIBMATTI_MC_Minecraft *minecraft)
     {
         float dx = (float) (cx - minecraft->lastCursorX);
         float dy = (float) (cy - minecraft->lastCursorY);
-        // Java: MouseHandler.turnPlayer -> entity.turn(dx, -dy); the negative
+// Java: MouseHandler.turnPlayer -> entity.turn(dx, -dy); the negative
         // pitch looks UP (the camera convention).
         LIBMATTI_MC_Entity_Turn(&minecraft->localPlayer->player.base.base, (double) dx, (double) -dy);
     }
@@ -750,7 +768,7 @@ static void apply_walk(LIBMATTI_MC_Minecraft *minecraft)
     if (minecraft->window == 0 || minecraft->localPlayer == NULL) return;
     LIBMATTI_MC_Entity *entity = &minecraft->localPlayer->player.base.base;
 
-    // Java: KeyMapping.set(key, glfwGetKey(window, key) == GLFW_PRESS) - the
+// Java: KeyMapping.set(key, glfwGetKey(window, key) == GLFW_PRESS) - the
     // skeleton polls the movement keys before the input tick (the real client
     // feeds the same pair through the key callbacks)
     LIBMATTI_MC_KeyMapping_Set(LIBMATTI_MC_InputConstants_KEYSYM, 87,
@@ -768,11 +786,11 @@ static void apply_walk(LIBMATTI_MC_Minecraft *minecraft)
     LIBMATTI_MC_KeyMapping_Set(LIBMATTI_MC_InputConstants_KEYSYM, 341,
                                LIBMATTI_GLFW_glfwGetKey(minecraft->window, LIBMATTI_GLFW_KEY_LEFT_CONTROL) == LIBMATTI_GLFW_PRESS);
 
-    // Java: LocalPlayer.tick -> input.tick() - the Input record + move vector
+// Java: LocalPlayer.tick -> input.tick() - the Input record + move vector
     LIBMATTI_MC_LocalPlayer_TickInput(minecraft->localPlayer);
     const LIBMATTI_MC_Input *presses = LIBMATTI_MC_LocalPlayer_GetKeyPresses(minecraft->localPlayer);
 
-    // Java: the jump - onGround && keyJump.isDown() -> jumpFromGround() (+0.42
+// Java: the jump - onGround && keyJump.isDown() -> jumpFromGround() (+0.42
     // the vanilla impulse, sprint adds the horizontal boost)
     if (presses->jump && LIBMATTI_MC_Entity_OnGround(entity))
     {
@@ -780,23 +798,24 @@ static void apply_walk(LIBMATTI_MC_Minecraft *minecraft)
         LIBMATTI_MC_Entity_SetDeltaMovement(entity, &jump);
     }
 
-    // the walk: the move vector (x = strafe, +1 = LEFT like Java's input
-    // convention, y = forward impulse) in the player entity's yaw plane, onto
-    // the delta movement (the friction keeps the speed bounded between frames)
+
+
+
+
     LIBMATTI_MC_Vec2 move = LIBMATTI_MC_LocalPlayer_GetMoveVector(minecraft->localPlayer);
     float yawRad = entity->yRot * ((float) M_PI / 180.0f);
-    // forward = (-sin yaw, cos yaw) like the camera basis; the strafe rides the
+// forward = (-sin yaw, cos yaw) like the camera basis; the strafe rides the
     // LEFT vector (Java: getInputVector rotates xxa = +1 into the left)
     float fwdX = -(float) sin(yawRad), fwdZ = (float) cos(yawRad);
     float rightX = -(float) cos(yawRad), rightZ = -(float) sin(yawRad);
-    // Java: the travel speed - 0.1 (the walk speed) * the move vector length;
+// Java: the travel speed - 0.1 (the walk speed) * the move vector length;
     // the sprint rides the 1.3 multiplier
     float speed = 0.1f * (float) LIBMATTI_MC_Mth_Length(move.x, move.y);
     if (presses->sprint)
         speed *= 1.3f;
     float accelX = (fwdX * move.y - rightX * move.x) * speed;
     float accelZ = (fwdZ * move.y - rightZ * move.x) * speed;
-    // Java: LivingEntity.travel - the friction is the move-through block's
+// Java: LivingEntity.travel - the friction is the move-through block's
     // slipperiness (0.6 default) * the entity inertia 0.91 = 0.546 ON THE
     // GROUND, the raw 0.91 in the air; the steady-state walk speed is
     // accel/(1 - friction) = 0.1/0.454 = 0.22 blocks/tick (4.4 m/s, vanilla).
@@ -807,12 +826,13 @@ static void apply_walk(LIBMATTI_MC_Minecraft *minecraft)
                              entity->dz * friction + accelZ};
     LIBMATTI_MC_Entity_SetDeltaMovement(entity, &next);
 
-    // Java: this.move(MoverType.SELF, this.getDeltaMovement()) - the collide
+// Java: this.move(MoverType.SELF, this.getDeltaMovement()) - the collide
     // path clips the motion against the level's blocks (the P5.3 port)
     LIBMATTI_MC_Entity_Move(entity, LIBMATTI_MC_MoverType_SELF, &next);
 
-    // MATTI_DEBUG_POS - the per-second position/onGround trace (the input/
-    // physics smoke runs grep it to prove the walk actually moves the player).
+
+
+
     static int debugPos = -1;
     if (debugPos < 0)
         debugPos = getenv("MATTI_DEBUG_POS") != NULL;
@@ -833,25 +853,25 @@ static void apply_walk(LIBMATTI_MC_Minecraft *minecraft)
 // three statements the loop structure owns: advanceTime, tick, render+swap.
 static void runTick(LIBMATTI_MC_Minecraft *minecraft, int runGameTime)
 {
-    // Java: if (this.window.shouldClose()) this.stop();
+// Java: if (this.window.shouldClose()) this.stop();
     if (LIBMATTI_GLFW_glfwWindowShouldClose(minecraft->window))
         LIBMATTI_MC_Minecraft_Stop(minecraft);
 
     if (!minecraft->running) return;
 
-    // Java: this.textureManager.tick();
+// Java: this.textureManager.tick();
     LIBMATTI_MC_TextureManager_Tick(minecraft->textureManager);
 
-    // Java: int k = this.deltaTracker.advanceTime(Util.getMillis(), renderLevelInMainMenu);
+// Java: int k = this.deltaTracker.advanceTime(Util.getMillis(), renderLevelInMainMenu);
     long long nowMs = LIBMATTI_JL_System_CurrentTimeMillis();
     int ticks = LIBMATTI_MC_DeltaTracker_AdvanceTime(minecraft->deltaTracker, nowMs, runGameTime);
 
-    // Java: MouseHandler - the mouse-look input runs every frame, before
+// Java: MouseHandler - the mouse-look input runs every frame, before
     // the renderer picks the camera up. The walk/gravity impulses ride the
     // per-tick loop below (apply_walk inside tick), not the frame rate.
     updateMouseLook(minecraft);
 
-    // Java: Camera.setup(BlockGetter, Entity, ...) - the camera rides the local
+// Java: Camera.setup(BlockGetter, Entity, ...) - the camera rides the local
     // player's entity: eye position + rotation (the renderer reads it below)
     if (minecraft->localPlayer != NULL)
     {
@@ -860,7 +880,7 @@ static void runTick(LIBMATTI_MC_Minecraft *minecraft, int runGameTime)
         LIBMATTI_MC_Camera_SetPosition(&minecraft->camera, entity->x, entity->y + LIBMATTI_MC_Entity_GetEyeHeight(entity), entity->z);
     }
 
-    // Java: if (renderLevelInMainMenu) { ... for (l = 0; l < min(10, k); l++) tick(); }
+// Java: if (renderLevelInMainMenu) { ... for (l = 0; l < min(10, k); l++) tick(); }
     if (runGameTime)
     {
         int max = ticks < 10 ? ticks : 10;
@@ -868,24 +888,24 @@ static void runTick(LIBMATTI_MC_Minecraft *minecraft, int runGameTime)
             tick(minecraft);
     }
 
-    // Java: profilerfiller.push("gameRenderer"); gameRenderer.render(deltaTracker, ...);
+// Java: profilerfiller.push("gameRenderer"); gameRenderer.render(deltaTracker, ...);
     // The renderer is the game port; the skeleton renders the title line through
     // the LoadingScreenRenderer pipeline (renderToScreen): resize the layout FBO
     // to the window framebuffer, render the layout bottom-up into it, blit it
     // (vertically flipped, aspect-fitted) onto the window, then swap.
     if (!minecraft->noRender)
     {
-        // Java: glfwMakeContextCurrent + the context check like LWJGL requires
+// Java: glfwMakeContextCurrent + the context check like LWJGL requires
         if (LIBMATTI_GLFW_glfwGetCurrentContext() == minecraft->window)
         {
             int width = 0, height = 0;
             LIBMATTI_GLFW_glfwGetFramebufferSize(minecraft->window, &width, &height);
             if (minecraft->framebuffer != NULL)
             {
-                // Java: LoadingScreenRenderer.renderToScreen
+// Java: LoadingScreenRenderer.renderToScreen
                 LIBMATTI_FML_EarlyFramebuffer_Resize(minecraft->framebuffer, width, height);
 
-                // Java: renderToFramebuffer - fit the layout rectangle into the
+// Java: renderToFramebuffer - fit the layout rectangle into the
                 // FBO while maintaining the 854x480 aspect ratio
                 LIBMATTI_FML_EarlyFramebuffer_Activate(minecraft->framebuffer);
                 float desiredAspectRatio = 854.0f / 480.0f;
@@ -910,13 +930,13 @@ static void runTick(LIBMATTI_MC_Minecraft *minecraft, int runGameTime)
                     (void) offsetX;
                     (void) offsetY;
 
-                    // Java: the world pass clears to the sky fog color (the
+// Java: the world pass clears to the sky fog color (the
                     // theme red stays the 2D layout's background).
                     LIBMATTI_B3D_GlStateManager_ClearColor(0.47f, 0.65f, 1.0f, 1.0f);
                     LIBMATTI_B3D_GlStateManager_Clear(LIBMATTI_GL_GL_COLOR_BUFFER_BIT | LIBMATTI_GL_GL_DEPTH_BUFFER_BIT);
                     shot_after(minecraft, "clear");
 
-                    // Java: LevelRenderer.renderLevel - the demo level's section
+// Java: LevelRenderer.renderLevel - the demo level's section
                     // meshes draw behind the loading layout (perspective from a
                     // fixed camera above the platform).
                     if (minecraft->sectionDispatcher != NULL)
@@ -926,7 +946,7 @@ static void runTick(LIBMATTI_MC_Minecraft *minecraft, int runGameTime)
                             terrainProgram = LIBMATTI_MC_SectionShader_Compile(NULL, NULL, NULL);
                         if (terrainProgram != 0)
                         {
-                            // Java: the render pass resets the raster state every
+// Java: the render pass resets the raster state every
                             // frame (RenderSystem.layeredGlState).
                             LIBMATTI_B3D_GlStateManager_Viewport(0, 0, width, height);
                             LIBMATTI_GL_glColorMask(1, 1, 1, 1);
@@ -941,7 +961,7 @@ static void runTick(LIBMATTI_MC_Minecraft *minecraft, int runGameTime)
                             LIBMATTI_B3D_GlStateManager_DepthFunc(LIBMATTI_GL_GL_LEQUAL);
                             LIBMATTI_B3D_GlStateManager_DepthMask(1);
 
-                            // Java: the GameRenderer picks up the camera the
+// Java: the GameRenderer picks up the camera the
                             // player controls - MouseLook wrote yRot/xRot and
                             // WASD walked the eye. The env overrides stay for
                             // the deterministic screenshot/cull sweeps.
@@ -956,19 +976,21 @@ static void runTick(LIBMATTI_MC_Minecraft *minecraft, int runGameTime)
                             LIBMATTI_JOML_Matrix4f proj, view, mvpM;
                             const float aspect = (float) width / (float) height;
                             LIBMATTI_JOML_Matrix4f_SetPerspective(&proj, 1.2217f, aspect, 0.05f, 1000.0f);
-                            // The earlydisplay FBO is blitted vertically flipped
-                            // onto the window (the y-down GUI elements need it).
-                            // The 3D world passes render y-up, so they draw with
-                            // the Y-flipped projection: after the blit flip the
-                            // world lands upright AND the GUI stays consistent.
+
+
+
+
+
+
                             proj.m11 = -proj.m11;
                             LIBMATTI_MC_GameRenderer_BuildRotationMatrix(&minecraft->camera, &view);
-                            // The clip matrix: projection·view (the projection
-                            // applies last - the GL convention the frustum's
-                            // plane extraction and the shader both need).
+
+
+
+
                             LIBMATTI_JOML_Matrix4f_Mul(&proj, &view, &mvpM);
 
-                            // Java: this.cullingFrustum = new Frustum(proj, view)
+// Java: this.cullingFrustum = new Frustum(proj, view)
                             // with the ROTATION-ONLY modelview - prepare() shifts
                             // the box tests by the camera position instead. The
                             // full view (with the translation) rides the shader.
@@ -981,7 +1003,7 @@ static void runTick(LIBMATTI_MC_Minecraft *minecraft, int runGameTime)
                             LIBMATTI_MC_Frustum_Prepare(&minecraft->frustum,
                                                         minecraft->camera.x, minecraft->camera.y, minecraft->camera.z);
 
-                            // Java: LevelRenderer.renderLevel's sky pass (the
+// Java: LevelRenderer.renderLevel's sky pass (the
                             // renderSky section) - the disc, sunrise/sunset,
                             // sun/moon/stars and the dark disc draw through
                             // the SkyRenderer before the sections.
@@ -992,7 +1014,7 @@ static void runTick(LIBMATTI_MC_Minecraft *minecraft, int runGameTime)
                             float dayFraction = timeOfDay / 24000.0f;
                             if (minecraft->skyRenderer != NULL && getenv("MATTI_NO_SKY") == NULL)
                             {
-                                // Java: ClientLevel - timeOfDay = dayTime % 24000
+// Java: ClientLevel - timeOfDay = dayTime % 24000
                                 // over the DAY timeline period; the angles follow
                                 // the 1.21.11 keys (sun/star 0 -> 360, moon 180 ->
                                 // 540 over the day, sunrise color at the edges).
@@ -1001,16 +1023,16 @@ static void runTick(LIBMATTI_MC_Minecraft *minecraft, int runGameTime)
                                 float starAngle = sunAngle;
                                 LIBMATTI_MC_MoonPhase phase = LIBMATTI_MC_MoonPhase_ByIndex(
                                     (int) (((dayTime % (24000L * LIBMATTI_MC_MoonPhase_COUNT)) / 24000L)));
-                                // Java: the rainBrightness multiplier (1 - rain
+// Java: the rainBrightness multiplier (1 - rain
                                 // level) - no weather yet, so 1.
                                 float rainBrightness = 1.0f;
-                                // Java: Timelines.DAY's STAR_BRIGHTNESS keys - 0
+// Java: Timelines.DAY's STAR_BRIGHTNESS keys - 0
                                 // by day, 0.5 over the night plateau.
                                 float starBrightness = 0.0f;
                                 if (dayFraction > 13228.0f / 24000.0f || dayFraction < 92.0f / 24000.0f)
                                     starBrightness = 0.5f;
 
-                                // Java: the sky color (the biome SKY_COLOR through
+// Java: the sky color (the biome SKY_COLOR through
                                 // the DAY timeline's night multiplier; the port
                                 // carries the overworld day curve inline).
                                 float skyR = 0.466f, skyG = 0.709f, skyB = 0.996f;
@@ -1028,7 +1050,7 @@ static void runTick(LIBMATTI_MC_Minecraft *minecraft, int runGameTime)
                                                                               LIBMATTI_GL_GL_ZERO);
                                 LIBMATTI_B3D_GlStateManager_DepthMask(0);
 
-                                // Java: the sky pass renders with the
+// Java: the sky pass renders with the
                                 // rotation-only model view - the disc/celestials
                                 // coordinates are CAMERA-RELATIVE (the disc at
                                 // y=16 is 16 above the EYE, not above world 0).
@@ -1037,7 +1059,7 @@ static void runTick(LIBMATTI_MC_Minecraft *minecraft, int runGameTime)
                                 LIBMATTI_MC_SkyRenderer_DrawSkyDisc(minecraft->skyRenderer, &viewRotOnly, &proj, skyR,
                                                                     skyG, skyB, 1.0f);
 
-                                // Java: renderSunriseAndSunset - the alpha comes
+// Java: renderSunriseAndSunset - the alpha comes
                                 // from the SUNRISE_SUNSET_COLOR track's edges.
                                 float sunriseAlpha = 0.0f;
                                 float edge = dayFraction < 0.5f
@@ -1055,7 +1077,7 @@ static void runTick(LIBMATTI_MC_Minecraft *minecraft, int runGameTime)
                                     minecraft->skyRenderer, &viewRotOnly, &proj, sunAngle, moonAngle, starAngle, phase,
                                     rainBrightness, starBrightness);
 
-                                // Java: shouldRenderDarkDisc - the eye below the
+// Java: shouldRenderDarkDisc - the eye below the
                                 // horizon; the fixed skeleton camera stays above.
 
                                 LIBMATTI_B3D_GlStateManager_DepthMask(1);
@@ -1066,24 +1088,26 @@ static void runTick(LIBMATTI_MC_Minecraft *minecraft, int runGameTime)
                             float mvp[16];
                             memcpy(mvp, &mvpM, sizeof(mvp));
                             float origin[3] = {0.0f, 0.0f, 0.0f};
-                            // Java: renderLevel binds the atlas texture before the
+// Java: renderLevel binds the atlas texture before the
                             // section draws (ShaderInstance.SAMPLER_SOURCE -> the
                             // TextureManager's block atlas on Sampler0). The unit
                             // is set explicitly - the sky pass leaves unit 1 bound.
                             if (minecraft->modelManager != NULL)
                             {
                                 LIBMATTI_MC_TextureAtlas *atlas = LIBMATTI_MC_ModelManager_GetAtlas(minecraft->modelManager);
-                                // The procedural atlas uploads lazily - the GL
-                                // context does not exist at bootstrap time. The
-                                // first terrain draw pushes the 32x16 RGBA page.
+
+
+
+
                                 if (atlas != NULL && atlas->base.texture == 0 && atlas->base.pixels != NULL)
                                 {
                                     atlas->base.texture = LIBMATTI_B3D_GlStateManager_GenTexture();
                                     atlas->base.textureView = atlas->base.texture;
-                                    // Raw-bind on unit 0 BEFORE the upload: the
-                                    // GlStateManager cache may believe another texture
-                                    // is bound and skip the bind inside WriteToTexture,
-                                    // uploading into a foreign object.
+
+
+
+
+
                                     LIBMATTI_GL_glActiveTexture(LIBMATTI_GL_GL_TEXTURE0);
                                     LIBMATTI_GL_glBindTexture(LIBMATTI_GL_GL_TEXTURE_2D, atlas->base.texture);
                                     LIBMATTI_MC_Texture_WriteToTexture(atlas->base.texture, atlas->base.pixels);
@@ -1097,10 +1121,11 @@ static void runTick(LIBMATTI_MC_Minecraft *minecraft, int runGameTime)
                                 }
                                 if (atlas != NULL && atlas->base.texture != 0)
                                 {
-                                    // All raw: any GlStateManager cache state may
-                                    // be stale (the sky pass and FBO binds go around
-                                    // it), so force unit 0 + the atlas + sane filters
-                                    // right before the section draws.
+
+
+
+
+
                                     LIBMATTI_GL_glActiveTexture(LIBMATTI_GL_GL_TEXTURE0);
                                     LIBMATTI_GL_glBindTexture(LIBMATTI_GL_GL_TEXTURE_2D, atlas->base.texture);
                                     LIBMATTI_GL_glTexParameteri(LIBMATTI_GL_GL_TEXTURE_2D, LIBMATTI_GL_GL_TEXTURE_MIN_FILTER, LIBMATTI_GL_GL_NEAREST);
@@ -1110,9 +1135,10 @@ static void runTick(LIBMATTI_MC_Minecraft *minecraft, int runGameTime)
                                     int samplerLocation = LIBMATTI_GL_glGetUniformLocation(terrainProgram, "Sampler0");
                                     if (samplerLocation >= 0)
                                     {
-                                        // glUniform1i requires an active program -
-                                        // RenderLayer's glUseProgram comes later, so
-                                        // activate ours here or the call is a no-op.
+
+
+
+
                                         LIBMATTI_GL_glUseProgram(terrainProgram);
                                         LIBMATTI_GL_glUniform1i(samplerLocation, 0);
                                     }
@@ -1127,7 +1153,7 @@ static void runTick(LIBMATTI_MC_Minecraft *minecraft, int runGameTime)
                                 minecraft->sectionDispatcher, LIBMATTI_MC_ChunkSectionLayer_SOLID,
                                 terrainProgram, mvp, origin, &minecraft->frustum);
 
-                            // Java: addCloudsPass - after the main (terrain)
+// Java: addCloudsPass - after the main (terrain)
                             // pass, before weather. The cloud color is the
                             // CLOUD_COLOR attribute (the overworld curve:
                             // white by day, dimmed at dusk/night), the cloud
@@ -1156,16 +1182,17 @@ static void runTick(LIBMATTI_MC_Minecraft *minecraft, int runGameTime)
                             }
                             shot_after(minecraft, "terrain");
                         }
-                    }                    // The skeleton's title line (Java: the theme's LabelElement
+                    }// The skeleton's title line (Java: the theme's LabelElement
                     // renders the game title inside the layout).
 
                     if (getenv("MATTI_NO_TITLE") == NULL)
                         render_title(minecraft, 854, 480);
 
-                    // The MATTI_SCREENSHOT debug hook: reads the layout FBO's
-                    // back buffer into a PPM once (the renderer verification).
-                    // The FBO carries the window framebuffer's size (Resize
-                    // runs with width/height), the hook reads exactly that.
+
+
+
+
+
                     if (getenv("MATTI_SCREENSHOT") != NULL)
                     {
                         static int shotFrame = 0;
@@ -1177,11 +1204,12 @@ static void runTick(LIBMATTI_MC_Minecraft *minecraft, int runGameTime)
                             return;
                         int fbw = 0, fbh = 0;
                         LIBMATTI_GLFW_glfwGetFramebufferSize(minecraft->window, &fbw, &fbh);
-                        // Default: read the layout FBO itself (the same buffer
-                        // BlitToScreen reads); MATTI_SCREENSHOT_WINDOW=1 reads
-                        // the window's default framebuffer instead. The layout
-                        // FBO's handle is the GlStateManager's bound WRITE target
-                        // right after this frame's draws.
+
+
+
+
+
+
                         if (getenv("MATTI_SCREENSHOT_WINDOW") == NULL)
                             LIBMATTI_B3D_GlStateManager_BindFramebuffer(36008,
                                                                         (unsigned int) LIBMATTI_B3D_GlStateManager_GetFrameBuffer(36009));
@@ -1221,7 +1249,7 @@ static void runTick(LIBMATTI_MC_Minecraft *minecraft, int runGameTime)
                 }
                 LIBMATTI_FML_EarlyFramebuffer_Deactivate(minecraft->framebuffer);
 
-                // Java: GlState.viewport(0, 0, w, h) before the blit
+// Java: GlState.viewport(0, 0, w, h) before the blit
                 LIBMATTI_B3D_GlStateManager_Viewport(0, 0, width, height);
                 LIBMATTI_FML_EarlyFramebuffer_BlitToScreen(minecraft->framebuffer,
                                                            0xef / 255.0f, 0x32 / 255.0f, 0x3d / 255.0f,
@@ -1230,19 +1258,20 @@ static void runTick(LIBMATTI_MC_Minecraft *minecraft, int runGameTime)
             }
             else
             {
-                // No FBO (font unavailable): clear the window directly, like
-                // RenderSystem does at frame start.
+
+
+
                 LIBMATTI_B3D_GlStateManager_Viewport(0, 0, width, height);
                 LIBMATTI_B3D_GlStateManager_ClearColor(0.2f, 0.3f, 0.8f, 1.0f);
                 LIBMATTI_B3D_GlStateManager_Clear(LIBMATTI_GL_GL_COLOR_BUFFER_BIT | LIBMATTI_GL_GL_DEPTH_BUFFER_BIT);
             }
         }
 
-        // Java: this.window.updateDisplay(...) - blitToScreen + swap
+// Java: this.window.updateDisplay(...) - blitToScreen + swap
         LIBMATTI_GLFW_glfwSwapBuffers(minecraft->window);
     }
 
-    // Java: profilerfiller.popPush("yield"); RenderSystem.flipFrame calls
+// Java: profilerfiller.popPush("yield"); RenderSystem.flipFrame calls
     // pollEvents + swap; the loop splits them like Minecraft.runTick does.
     LIBMATTI_B3D_RenderSystem_PollEvents();
 
@@ -1258,25 +1287,26 @@ static void runTick(LIBMATTI_MC_Minecraft *minecraft, int runGameTime)
 
 void LIBMATTI_MC_Minecraft_Run(LIBMATTI_MC_Minecraft *minecraft)
 {
-    // Java: this.gameThread = Thread.currentThread(); priority bump >4 cores.
+// Java: this.gameThread = Thread.currentThread(); priority bump >4 cores.
     LOG("Running Minecraft (skeleton)");
 
-    // Java's run(): boolean flag = false; while (running) { runTick(!flag) } -
-    // the flag only flips inside the OOM catch, so EVERY frame runs
-    // runTick(true) (renderLevelInMainMenu is the first-frame special case;
-    // the old loop-tail flip shape no longer exists in 1.21.11).
+
+
+
+
+
     int flag = 0;
     while (minecraft->running)
     {
         runTick(minecraft, !flag);
     }
 
-    // Java: Minecraft.run falls out of the loop; destroy runs at the caller.
+// Java: Minecraft.run falls out of the loop; destroy runs at the caller.
 }
 
 void LIBMATTI_MC_Minecraft_Stop(LIBMATTI_MC_Minecraft *minecraft)
 {
-    // Java: public void stop() { this.running = false; }
+// Java: public void stop() { this.running = false; }
     minecraft->running = 0;
 }
 
@@ -1289,7 +1319,7 @@ void LIBMATTI_MC_Minecraft_Destroy(LIBMATTI_MC_Minecraft *minecraft)
 {
     if (minecraft == NULL) return;
 
-    // Java: this.player = null - the local player leaves the level list and
+// Java: this.player = null - the local player leaves the level list and
     // frees (the port's level entities are borrowed pointers)
     if (minecraft->localPlayer != NULL)
     {
@@ -1298,10 +1328,10 @@ void LIBMATTI_MC_Minecraft_Destroy(LIBMATTI_MC_Minecraft *minecraft)
         LIBMATTI_MC_LocalPlayer_Free(minecraft->localPlayer);
         minecraft->localPlayer = NULL;
     }
-    // Java: Options - the static KeyMapping table releases
+// Java: Options - the static KeyMapping table releases
     LIBMATTI_MC_KeyMapping_ReleaseAll();
 
-    // Java: this.close() -> levelRenderer.close() -> the section dispatcher's
+// Java: this.close() -> levelRenderer.close() -> the section dispatcher's
     // sections and compiled meshes free with the level.
     if (minecraft->blockRenderer != NULL)
     {
@@ -1314,7 +1344,7 @@ void LIBMATTI_MC_Minecraft_Destroy(LIBMATTI_MC_Minecraft *minecraft)
         minecraft->sectionDispatcher = NULL;
     }
 
-    // Java: the ModelManager closes with the game (the atlas stays with the
+// Java: the ModelManager closes with the game (the atlas stays with the
     // TextureManager path; the port owns it here).
     if (minecraft->modelManager != NULL)
     {
@@ -1322,10 +1352,10 @@ void LIBMATTI_MC_Minecraft_Destroy(LIBMATTI_MC_Minecraft *minecraft)
         minecraft->modelManager = NULL;
     }
 
-    // Java: public void destroy() { LOGGER.info("Stopping!"); ... }
+// Java: public void destroy() { LOGGER.info("Stopping!"); ... }
     LOG("Stopping!");
 
-    // Java: this.close() -> window.close() -> glfwDestroyWindow; then glfwTerminate
+// Java: this.close() -> window.close() -> glfwDestroyWindow; then glfwTerminate
     // in RenderSystem/Window teardown.
     if (minecraft->window != 0)
     {

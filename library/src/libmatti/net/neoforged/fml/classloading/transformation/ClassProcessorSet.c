@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.classloading.transformation.ClassProcessorSet.
+
+
 
 #include "libmatti/net/neoforged/fml/classloading/transformation/ClassProcessorSet.h"
 
@@ -51,7 +52,7 @@ LIBMATTI_FML_ClassProcessorSet *LIBMATTI_FML_ClassProcessorSet_New(
     memcpy(set->generatedPackages, generatedPackages, sizeof(*set->generatedPackages) * generatedPackageCount);
     set->generatedPackageCount = generatedPackageCount;
 
-    // Java: var processors = LinkedHashMap.newLinkedHashMap(...); for (var processor : sortedProcessors) processors.put(processor.name(), processor)
+// Java: var processors = LinkedHashMap.newLinkedHashMap(...); for (var processor : sortedProcessors) processors.put(processor.name(), processor)
     set->processorNames = malloc(sizeof(*set->processorNames) * (sortedCount > 0 ? sortedCount : 1));
     set->processors = malloc(sizeof(*set->processors) * (sortedCount > 0 ? sortedCount : 1));
     set->processorCount = sortedCount;
@@ -67,7 +68,7 @@ LIBMATTI_FML_ClassProcessorSet *LIBMATTI_FML_ClassProcessorSet_New(
            sizeof(*set->allowedToRecomputeFrames) * allowedToRecomputeFramesCount);
     set->allowedToRecomputeFramesCount = allowedToRecomputeFramesCount;
 
-    // Java: CrashReportCallables.registerCrashCallable(...)
+// Java: CrashReportCallables.registerCrashCallable(...)
     LIBMATTI_FML_CrashReportCallables_RegisterCrashCallableSupplier("Class Processors", compute_crash_report_entry,
                                                                    set);
     return set;
@@ -89,7 +90,7 @@ void LIBMATTI_FML_ClassProcessorSet_Free(LIBMATTI_FML_ClassProcessorSet *set)
 LIBMATTI_FML_ClassProcessorSet *LIBMATTI_FML_ClassProcessorSet_Of(LIBMATTI_NEOFORGESPI_ClassProcessor **processors,
                                                                  size_t processorCount)
 {
-    // Java: return ClassProcessorSet.builder().addProcessors(Arrays.asList(processors)).build()
+// Java: return ClassProcessorSet.builder().addProcessors(Arrays.asList(processors)).build()
     LIBMATTI_FML_ClassProcessorSet_Builder *builder = LIBMATTI_FML_ClassProcessorSet_Builder_New();
     LIBMATTI_FML_ClassProcessorSet_Builder_AddProcessors(builder, processors, processorCount);
     LIBMATTI_FML_ClassProcessorSet *set = LIBMATTI_FML_ClassProcessorSet_Builder_Build(builder);
@@ -100,7 +101,7 @@ LIBMATTI_FML_ClassProcessorSet *LIBMATTI_FML_ClassProcessorSet_Of(LIBMATTI_NEOFO
 int LIBMATTI_FML_ClassProcessorSet_CanRecomputeFrames(const LIBMATTI_FML_ClassProcessorSet *set,
                                                      const LIBMATTI_NEOFORGESPI_ProcessorName *name)
 {
-    // Java: return allowedToRecomputeFrames.contains(name)
+// Java: return allowedToRecomputeFrames.contains(name)
     for (size_t i = 0; i < set->allowedToRecomputeFramesCount; i++)
     {
         if (processor_name_equals(set->allowedToRecomputeFrames[i], name)) return 1;
@@ -111,7 +112,7 @@ int LIBMATTI_FML_ClassProcessorSet_CanRecomputeFrames(const LIBMATTI_FML_ClassPr
 int LIBMATTI_FML_ClassProcessorSet_IsMarker(const LIBMATTI_FML_ClassProcessorSet *set,
                                            LIBMATTI_NEOFORGESPI_ClassProcessor *processor)
 {
-    // Java: return markerProcessors.contains(processor.name())
+// Java: return markerProcessors.contains(processor.name())
     LIBMATTI_NEOFORGESPI_ProcessorName *name = LIBMATTI_NEOFORGESPI_ClassProcessor_Name(processor);
     for (size_t i = 0; i < set->markerCount; i++)
     {
@@ -173,7 +174,7 @@ LIBMATTI_NEOFORGESPI_ClassProcessor **LIBMATTI_FML_ClassProcessorSet_Transformer
 
     if (outCount == 1 && includesComputingFrames)
     {
-        // Java: the class does not actually require any transformation, as the only transformer present is
+// Java: the class does not actually require any transformation, as the only transformer present is
         //       the special no-op marker for where class hierarchy computation in frame computation goes up to
         free(out);
         *count = 0;
@@ -189,7 +190,7 @@ int LIBMATTI_FML_ClassProcessorSet_Link(LIBMATTI_FML_ClassProcessorSet *set,
                                             const LIBMATTI_NEOFORGESPI_ProcessorName *name, void *userdata),
                                         void *userdata)
 {
-    // Java: if (linked) throw new IllegalStateException("This set of class processors is already linked.")
+// Java: if (linked) throw new IllegalStateException("This set of class processors is already linked.")
     if (set->linked)
     {
         LIBMATTI_ML_Logger_Error(LOGGER(), NULL, "IllegalStateException: This set of class processors is already linked.");
@@ -201,7 +202,7 @@ int LIBMATTI_FML_ClassProcessorSet_Link(LIBMATTI_FML_ClassProcessorSet *set,
     {
         LIBMATTI_NEOFORGESPI_ClassProcessor *processor = set->sortedProcessors[i];
 
-        // Java: the provider lives for as long as the processor holds it; the port keeps it on the set too
+// Java: the provider lives for as long as the processor holds it; the port keeps it on the set too
         LIBMATTI_NEOFORGESPI_BytecodeProvider *provider =
             bytecodeProviderLookup(LIBMATTI_NEOFORGESPI_ClassProcessor_Name(processor), userdata);
         set->bytecodeProviders = realloc(set->bytecodeProviders,
@@ -312,7 +313,7 @@ static LIBMATTI_NEOFORGESPI_ProcessorName *special_compute_frames_name(LIBMATTI_
 static const LIBMATTI_NEOFORGESPI_ProcessorName **special_compute_frames_runs_after(
     LIBMATTI_NEOFORGESPI_ClassProcessor *self, size_t *count)
 {
-    // Java: return Set.of()
+// Java: return Set.of()
     (void) self;
     *count = 0;
     return NULL;
@@ -321,7 +322,7 @@ static const LIBMATTI_NEOFORGESPI_ProcessorName **special_compute_frames_runs_af
 static LIBMATTI_NEOFORGESPI_ClassProcessor_OrderingHint special_compute_frames_ordering_hint(
     LIBMATTI_NEOFORGESPI_ClassProcessor *self)
 {
-    // Java: return OrderingHint.EARLY
+// Java: return OrderingHint.EARLY
     (void) self;
     return LIBMATTI_NEOFORGESPI_ClassProcessor_OrderingHint_EARLY;
 }
@@ -330,7 +331,7 @@ static int special_compute_frames_handles_class(
     LIBMATTI_NEOFORGESPI_ClassProcessor *self,
     const LIBMATTI_NEOFORGESPI_ClassProcessor_SelectionContext *context)
 {
-    // Java: return false
+// Java: return false
     (void) self;
     (void) context;
     return 0;
@@ -340,7 +341,7 @@ static LIBMATTI_NEOFORGESPI_ClassProcessor_ComputeFlags special_compute_frames_p
     LIBMATTI_NEOFORGESPI_ClassProcessor *self,
     LIBMATTI_NEOFORGESPI_ClassProcessor_TransformationContext *context)
 {
-    // Java: return ComputeFlags.NO_REWRITE
+// Java: return ComputeFlags.NO_REWRITE
     (void) self;
     (void) context;
     return LIBMATTI_NEOFORGESPI_ClassProcessor_ComputeFlags_NO_REWRITE;
@@ -362,7 +363,7 @@ static LIBMATTI_NEOFORGESPI_ClassProcessor **sort_processors(
     LIBMATTI_FML_ClassProcessorSet_Builder *builder, const LIBMATTI_NEOFORGESPI_ProcessorName ***allowedToRecomputeFrames,
     size_t *allowedCount, size_t *sortedCount)
 {
-    // Java: var transformers = new HashMap<ProcessorName, ClassProcessor>()
+// Java: var transformers = new HashMap<ProcessorName, ClassProcessor>()
     LIBMATTI_NEOFORGESPI_ClassProcessor **transformers = NULL;
     size_t transformerCount = 0;
     LIBMATTI_FML_Graph *graph = LIBMATTI_FML_Graph_New(1, 0);
@@ -377,7 +378,7 @@ static LIBMATTI_NEOFORGESPI_ClassProcessor **sort_processors(
         LIBMATTI_NEOFORGESPI_ClassProcessor *transformer = builder->processors[i];
         LIBMATTI_NEOFORGESPI_ProcessorName *name = LIBMATTI_NEOFORGESPI_ClassProcessor_Name(transformer);
 
-        // Java: if (transformers.containsKey(transformer.name())) { LOGGER.error("Duplicate transformers with name {}, of types {} and {}", ...); throw new IllegalStateException(...) }
+// Java: if (transformers.containsKey(transformer.name())) { LOGGER.error("Duplicate transformers with name {}, of types {} and {}", ...); throw new IllegalStateException(...) }
         // TODO: Java also logs the two getClass().getName() values; C processors carry no runtime class name.
         for (size_t t = 0; t < transformerCount; t++)
         {
@@ -401,7 +402,7 @@ static LIBMATTI_NEOFORGESPI_ClassProcessor **sort_processors(
     {
         LIBMATTI_NEOFORGESPI_ClassProcessor *self = transformers[i];
 
-        // Java: for (var targetName : self.runsBefore()) { var target = transformers.get(targetName); if (target == self) continue; if (target != null) graph.putEdge(self, target); }
+// Java: for (var targetName : self.runsBefore()) { var target = transformers.get(targetName); if (target == self) continue; if (target != null) graph.putEdge(self, target); }
         size_t runsBeforeCount = 0;
         const LIBMATTI_NEOFORGESPI_ProcessorName **runsBefore =
             LIBMATTI_NEOFORGESPI_ClassProcessor_RunsBefore(self, &runsBeforeCount);
@@ -418,7 +419,7 @@ static LIBMATTI_NEOFORGESPI_ClassProcessor **sort_processors(
             }
         }
 
-        // Java: for (var targetName : self.runsAfter()) { var target = transformers.get(targetName); if (target == self) continue; if (target != null) graph.putEdge(target, self); }
+// Java: for (var targetName : self.runsAfter()) { var target = transformers.get(targetName); if (target == self) continue; if (target != null) graph.putEdge(target, self); }
         size_t runsAfterCount = 0;
         const LIBMATTI_NEOFORGESPI_ProcessorName **runsAfter =
             LIBMATTI_NEOFORGESPI_ClassProcessor_RunsAfter(self, &runsAfterCount);
@@ -436,12 +437,12 @@ static LIBMATTI_NEOFORGESPI_ClassProcessor **sort_processors(
         }
     }
 
-    // Java: var sorted = TopologicalSort.topologicalSort(graph, Comparator.comparing(ClassProcessor::orderingHint).thenComparing(ClassProcessor::name))
+// Java: var sorted = TopologicalSort.topologicalSort(graph, Comparator.comparing(ClassProcessor::orderingHint).thenComparing(ClassProcessor::name))
     LIBMATTI_FML_CyclePresentException *cycles = NULL;
     size_t count = 0;
     void **sorted = LIBMATTI_FML_TopologicalSort_TopologicalSort(graph, compare_processors, NULL, &count, &cycles);
 
-    // Java: for (var node : Graphs.reachableNodes(graph, specialComputeFramesNode)) allowedToRecomputeFrames.add(node.name())
+// Java: for (var node : Graphs.reachableNodes(graph, specialComputeFramesNode)) allowedToRecomputeFrames.add(node.name())
     size_t reachableCount = 0;
     void **reachable = LIBMATTI_FML_Graph_ReachableNodes(graph, specialComputeFramesNode, &reachableCount);
     *allowedToRecomputeFrames =
@@ -476,7 +477,7 @@ LIBMATTI_FML_ClassProcessorSet *LIBMATTI_FML_ClassProcessorSet_Builder_Build(
         return NULL;
     }
 
-    // Java: var packageNames = new HashSet<String>(); for (var factory : processors) packageNames.addAll(factory.generatesPackages())
+// Java: var packageNames = new HashSet<String>(); for (var factory : processors) packageNames.addAll(factory.generatesPackages())
     const char **packageNames = NULL;
     size_t packageCount = 0;
     for (size_t i = 0; i < builder->processorCount; i++)

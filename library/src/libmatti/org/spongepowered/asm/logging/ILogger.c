@@ -1,4 +1,5 @@
-// Port of org.spongepowered.asm.logging.ILogger - the dispatch helpers.
+
+
 
 #include "libmatti/org/spongepowered/asm/logging/ILogger.h"
 

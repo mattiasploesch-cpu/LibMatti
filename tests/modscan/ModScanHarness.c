@@ -1,5 +1,6 @@
-// Throwaway harness for the modscan port: scans real javac output and checks that
-// getAnnotatedBy(Mod/EventBusSubscriber) and the values the rest of FML reads are right.
+
+
+
 
 #include "libmatti/net/neoforged/fml/javafmlmod/AutomaticEventSubscriber.h"
 #include "libmatti/net/neoforged/fml/javafmlmod/FMLJavaModLanguageProvider.h"
@@ -99,7 +100,7 @@ int main(int argc, char **argv)
         check(strcmp(annotation_value(data, "depends"), "othermod,thirdmod") == 0,
               "@Mod depends is rendered as a comma separated list");
 
-        // Java: getDepends / getSides read the same values the C port hands over
+// Java: getDepends / getSides read the same values the C port hands over
         LIBMATTI_DIST_Dist sides[2];
         check(LIBMATTI_FML_AutomaticEventSubscriber_GetSides(annotation_value(data, "dist"), sides, 2) == 1 &&
                   sides[0] == LIBMATTI_DIST_CLIENT,
@@ -113,7 +114,8 @@ int main(int argc, char **argv)
     }
     free(annotations);
 
-    // A class annotation with a scalar, an enum, an array and a nested annotation
+
+
     annotations = LIBMATTI_NEOFORGESPI_ModFileScanData_GetAnnotatedBy(
         result, "example.Complex", LIBMATTI_NEOFORGESPI_ElementType_TYPE, &count);
     check(count == 1, "one @Complex annotation");
@@ -172,7 +174,8 @@ int main(int argc, char **argv)
     }
     free(annotations);
 
-    // ClassData comes from the same pass
+
+
     size_t classCount = 0;
     LIBMATTI_NEOFORGESPI_ClassData *classes =
         LIBMATTI_NEOFORGESPI_ModFileScanData_GetClasses(result, &classCount);

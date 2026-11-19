@@ -1,7 +1,8 @@
-// Port of org.spongepowered.asm.mixin.transformer.Config.
-// The inner MixinConfig parse (minVersion/refmap/mixins/…) belongs to the bytecode transformer
-// the port replaces with the native hook table; the marshalling handle keeps the name, the
-// environment, the parent chain and the decorations 1:1.
+
+
+
+
+
 
 #include "libmatti/org/spongepowered/asm/mixin/transformer/Config.h"
 
@@ -59,13 +60,13 @@ static void parse_mixin_list(LIBMATTI_GSON_JsonReader *reader, LIBMATTI_SP_Mixin
         LIBMATTI_SP_MixinInfo info = {0};
         if (LIBMATTI_GSON_JsonReader_Peek(reader) == LIBMATTI_GSON_JSON_TOKEN_STRING)
         {
-            // Java: a plain class-name entry
+// Java: a plain class-name entry
             info.className = LIBMATTI_GSON_JsonReader_NextString(reader);
-            info.required = 1; // Java: a plain entry in a required config is required
+            info.required = 1;// Java: a plain entry in a required config is required
         }
         else if (LIBMATTI_GSON_JsonReader_Peek(reader) == LIBMATTI_GSON_JSON_TOKEN_BEGIN_OBJECT)
         {
-            // Java: MixinInfo {"class":..., "required":...}
+// Java: MixinInfo {"class":..., "required":...}
             LIBMATTI_GSON_JsonReader_BeginObject(reader);
             while (LIBMATTI_GSON_JsonReader_HasNext(reader))
             {
@@ -119,7 +120,7 @@ static void parse_injectors(LIBMATTI_GSON_JsonReader *reader, char ***outKeys,
         LIBMATTI_SP_InjectorInfo info = {0};
         info.ordinal = -1;
 
-        // Java: InjectorInfo {"method":..., "ordinal":..., "value":...}
+// Java: InjectorInfo {"method":..., "ordinal":..., "value":...}
         if (LIBMATTI_GSON_JsonReader_Peek(reader) == LIBMATTI_GSON_JSON_TOKEN_BEGIN_OBJECT)
         {
             LIBMATTI_GSON_JsonReader_BeginObject(reader);
@@ -179,7 +180,7 @@ static void parse_config(LIBMATTI_SP_Config *config, const unsigned char *conten
 
         if (strcmp(name, "parent") == 0)
         {
-            // Java: @SerializedName("parent") private String parentName;
+// Java: @SerializedName("parent") private String parentName;
             char *parent = LIBMATTI_GSON_JsonReader_NextString(reader);
             if (parent != NULL)
             {
@@ -189,65 +190,65 @@ static void parse_config(LIBMATTI_SP_Config *config, const unsigned char *conten
         }
         else if (strcmp(name, "package") == 0)
         {
-            // Java: @SerializedName("package") private String pack;
+// Java: @SerializedName("package") private String pack;
             char *value = LIBMATTI_GSON_JsonReader_NextString(reader);
             if (value != NULL)
                 config->packageName = value;
         }
         else if (strcmp(name, "refmap") == 0)
         {
-            // Java: @SerializedName("refmap") private String refMapName;
+// Java: @SerializedName("refmap") private String refMapName;
             char *value = LIBMATTI_GSON_JsonReader_NextString(reader);
             if (value != NULL)
                 config->refMapName = value;
         }
         else if (strcmp(name, "required") == 0)
         {
-            // Java: @SerializedName("required") private boolean required;
+// Java: @SerializedName("required") private boolean required;
             config->required = LIBMATTI_GSON_JsonReader_NextBoolean(reader);
         }
         else if (strcmp(name, "minVersion") == 0)
         {
-            // Java: @SerializedName("minVersion") private float minVersion;
+// Java: @SerializedName("minVersion") private float minVersion;
             config->minVersion = (float) atof(LIBMATTI_GSON_JsonReader_NextString(reader));
         }
         else if (strcmp(name, "compatibilityLevel") == 0)
         {
-            // Java: @SerializedName("compatibilityLevel") private CompatibilityLevel compatibilityLevel;
+// Java: @SerializedName("compatibilityLevel") private CompatibilityLevel compatibilityLevel;
             char *value = LIBMATTI_GSON_JsonReader_NextString(reader);
             if (value != NULL)
                 config->compatibilityLevel = value;
         }
         else if (strcmp(name, "plugin") == 0)
         {
-            // Java: @SerializedName("plugin") private String pluginClass;
+// Java: @SerializedName("plugin") private String pluginClass;
             char *value = LIBMATTI_GSON_JsonReader_NextString(reader);
             if (value != NULL)
                 config->pluginClass = value;
         }
         else if (strcmp(name, "mixins") == 0)
         {
-            // Java: @SerializedName("mixins") private List<MixinInfo> mixins;
+// Java: @SerializedName("mixins") private List<MixinInfo> mixins;
             parse_mixin_list(reader, &config->mixins, &config->mixinCount);
         }
         else if (strcmp(name, "client") == 0)
         {
-            // Java: @SerializedName("client") private List<MixinInfo> clientMixins;
+// Java: @SerializedName("client") private List<MixinInfo> clientMixins;
             parse_mixin_list(reader, &config->clientMixins, &config->clientMixinCount);
         }
         else if (strcmp(name, "server") == 0)
         {
-            // Java: @SerializedName("server") private List<MixinInfo> serverMixins;
+// Java: @SerializedName("server") private List<MixinInfo> serverMixins;
             parse_mixin_list(reader, &config->serverMixins, &config->serverMixinCount);
         }
         else if (strcmp(name, "injectors") == 0)
         {
-            // Java: @SerializedName("injectors") private Map<String,InjectorInfo> injectors;
+// Java: @SerializedName("injectors") private Map<String,InjectorInfo> injectors;
             parse_injectors(reader, &config->injectorKeys, &config->injectorValues, &config->injectorCount);
         }
         else
         {
-            // Java: the remaining transformer fields (overwrites, verbose, showMessageTypes);
+// Java: the remaining transformer fields (overwrites, verbose, showMessageTypes);
             // the native backend keeps them in the config content.
             LIBMATTI_GSON_JsonReader_SkipValue(reader);
         }
@@ -349,7 +350,7 @@ void LIBMATTI_SP_Config_DecorateBehaviorVersion(LIBMATTI_SP_Config *config, int 
 // Java: MixinInfo.getRefName() - the package-qualified mixin class name
 char *LIBMATTI_SP_Config_MixinRefName(const LIBMATTI_SP_Config *config, const LIBMATTI_SP_MixinInfo *mixin)
 {
-    // Java: pack != null ? pack + '.' + name : name
+// Java: pack != null ? pack + '.' + name : name
     if (config->packageName != NULL)
     {
         size_t length = strlen(config->packageName) + strlen(mixin->className) + 2;
@@ -411,7 +412,7 @@ const char *LIBMATTI_SP_Config_GetPluginClass(const LIBMATTI_SP_Config *config)
 const LIBMATTI_SP_InjectorInfo *LIBMATTI_SP_Config_GetInjector(const LIBMATTI_SP_Config *config,
                                                                const char *mixinClassName)
 {
-    // Java: injectors.get(mixinClassName) - the key matches with and without the package prefix
+// Java: injectors.get(mixinClassName) - the key matches with and without the package prefix
     for (size_t i = 0; i < config->injectorCount; i++)
     {
         if (strcmp(config->injectorKeys[i], mixinClassName) == 0)
@@ -419,7 +420,7 @@ const LIBMATTI_SP_InjectorInfo *LIBMATTI_SP_Config_GetInjector(const LIBMATTI_SP
     }
     for (size_t i = 0; i < config->injectorCount; i++)
     {
-        // Java: the key without the package (the JSON often writes the short name)
+// Java: the key without the package (the JSON often writes the short name)
         const char *lastDot = strrchr(config->injectorKeys[i], '.');
         const char *keyShort = lastDot != NULL ? lastDot + 1 : config->injectorKeys[i];
         const char *classShort = strrchr(mixinClassName, '.');
@@ -468,11 +469,11 @@ LIBMATTI_SP_Config *LIBMATTI_SP_Config_Create(const char *configFile, void *oute
 {
     (void) source;
 
-    // Java: Config config = Config.allConfigs.get(configFile); if (config != null) return config;
+// Java: Config config = Config.allConfigs.get(configFile); if (config != null) return config;
     LIBMATTI_SP_Config *existing = all_configs_get(configFile);
     if (existing != NULL) return existing;
 
-    // Java: MixinConfig.create reads the config resource through
+// Java: MixinConfig.create reads the config resource through
     //       MixinService.getService().getResourceAsStream(configFile) - the service carries what
     //       MixinFacade handed over via addMixinConfigContent; an absent resource yields no config.
     LIBMATTI_SP_IMixinService *service = LIBMATTI_SP_MixinService_GetService();
@@ -487,7 +488,7 @@ LIBMATTI_SP_Config *LIBMATTI_SP_Config_Create(const char *configFile, void *oute
 
     all_configs_put(config);
 
-    // Java: String parent = config.get().getParentName();
+// Java: String parent = config.get().getParentName();
     //       if (!Strings.isNullOrEmpty(parent)) { parentConfig = Config.create(parent, outer, source); ... }
     const char *parent = config->parentName;
     if (parent != NULL && parent[0] != '\0')
@@ -495,12 +496,12 @@ LIBMATTI_SP_Config *LIBMATTI_SP_Config_Create(const char *configFile, void *oute
         LIBMATTI_SP_Config *parentConfig = LIBMATTI_SP_Config_Create(parent, outer, source);
         if (parentConfig != NULL)
         {
-            // Java: if (!config.get().assignParent(parentConfig)) config = null;
+// Java: if (!config.get().assignParent(parentConfig)) config = null;
             if (!LIBMATTI_SP_Config_AssignParent(config, parentConfig)) config = NULL;
         }
         else
         {
-            // Java: Config.logger.error("Error encountered initialising mixin config {0}: ...");
+// Java: Config.logger.error("Error encountered initialising mixin config {0}: ...");
             char *msg = malloc(strlen("Error encountered initialising mixin config : The parent  could not be read.")
                                + strlen(configFile) + strlen(parent) + 1);
             sprintf(msg, "Error encountered initialising mixin config %s: The parent %s could not be read.",

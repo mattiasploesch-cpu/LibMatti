@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.loading.VersionSupportMatrix.
+
+
 
 #ifndef MATTICRAFT_FML_VERSIONSUPPORTMATRIX_H
 #define MATTICRAFT_FML_VERSIONSUPPORTMATRIX_H
@@ -30,4 +31,4 @@ int LIBMATTI_FML_VersionSupportMatrix_TestVersionSupportMatrix(
     const char *lookupId, const char *type, LIBMATTI_FML_VersionSupportMatrix_StandardLookup standardLookup,
     void *userdata);
 
-#endif //MATTICRAFT_FML_VERSIONSUPPORTMATRIX_H
+#endif

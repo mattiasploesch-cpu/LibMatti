@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.classloading.transformation.ClassProcessorAuditLog.
+
+
 
 #include "libmatti/net/neoforged/fml/classloading/transformation/ClassProcessorAuditLog.h"
 
@@ -9,7 +10,7 @@
 void LIBMATTI_FML_TransformerActivity_Accept(LIBMATTI_FML_TransformerActivity *activity, const char *name,
                                              const char *const *context, size_t contextCount)
 {
-    // Java: activities.add(activity + (context.length == 0 ? "" : ":" + String.join(":", context)))
+// Java: activities.add(activity + (context.length == 0 ? "" : ":" + String.join(":", context)))
     size_t length = strlen(name) + 1;
     if (contextCount > 0)
     {
@@ -91,7 +92,7 @@ LIBMATTI_FML_TransformerActivity *LIBMATTI_FML_ClassProcessorAuditLog_ForClassPr
     LIBMATTI_FML_ClassProcessorAuditLog *log, const char *clazz,
     LIBMATTI_NEOFORGESPI_ClassProcessor *classProcessor)
 {
-    // Java: var activities = getTransformerActivities(clazz)
+// Java: var activities = getTransformerActivities(clazz)
     //       var activity = new TransformerActivity(classProcessor.name()); activities.add(activity); return activity
     size_t index = get_transformer_activities(log, clazz);
 
@@ -106,7 +107,7 @@ LIBMATTI_FML_TransformerActivity *LIBMATTI_FML_ClassProcessorAuditLog_ForClassPr
 // Java: TransformerActivity - shouldInclude() / getActivityString()
 static char *activity_string(const LIBMATTI_FML_TransformerActivity *activity)
 {
-    // Java: processorName + (activities.isEmpty() ? "" : "[" + String.join(",", activities) + "]")
+// Java: processorName + (activities.isEmpty() ? "" : "[" + String.join(",", activities) + "]")
     char *name = LIBMATTI_NEOFORGESPI_ProcessorName_ToString(activity->processorName);
     if (activity->activityCount == 0) return name;
 
@@ -127,7 +128,7 @@ static char *activity_string(const LIBMATTI_FML_TransformerActivity *activity)
 
 static char *get_audit_string(LIBMATTI_FML_ClassProcessorAuditSource *self, const char *clazz)
 {
-    // Java: audit.getOrDefault(clazz, List.of()).stream().filter(shouldInclude).map(getActivityString).collect(joining(","))
+// Java: audit.getOrDefault(clazz, List.of()).stream().filter(shouldInclude).map(getActivityString).collect(joining(","))
     LIBMATTI_FML_ClassProcessorAuditLog *log = (LIBMATTI_FML_ClassProcessorAuditLog *) self;
 
     size_t count = activity_count_for(log, clazz);
@@ -145,7 +146,7 @@ static char *get_audit_string(LIBMATTI_FML_ClassProcessorAuditSource *self, cons
     size_t length = 0;
     for (size_t i = 0; i < count; i++)
     {
-        // Java: filter(TransformerActivity::shouldInclude)
+// Java: filter(TransformerActivity::shouldInclude)
         if (!activities[i]->include && activities[i]->activityCount == 0) continue;
 
         char *string = activity_string(activities[i]);

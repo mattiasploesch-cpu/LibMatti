@@ -1,8 +1,9 @@
-// Port of com.mojang.blaze3d.platform.NativeImage (the raster behind every
-// texture). Java decodes through STB; the port routes the PNG container through
-// the javax.imageio PngReader port (zlib inflate), the only format the resource
-// pipeline feeds in. Pixels are RGBA, stored in ABGR int order like Java's
-// getPixel/setPixel int layout.
+
+
+
+
+
+
 
 #ifndef MATTICRAFT_BLAZE3D_PLATFORM_NATIVEIMAGE_H
 #define MATTICRAFT_BLAZE3D_PLATFORM_NATIVEIMAGE_H
@@ -28,7 +29,7 @@ typedef struct LIBMATTI_B3D_NativeImage
     LIBMATTI_B3D_NativeImage_Format format;
     int width;
     int height;
-    // Java: private long pixels - the port keeps the C pointer directly
+// Java: private long pixels - the port keeps the C pointer directly
     uint32_t *pixels;
 } LIBMATTI_B3D_NativeImage;
 
@@ -75,4 +76,4 @@ void LIBMATTI_B3D_NativeImage_Free(LIBMATTI_B3D_NativeImage *image);
 }
 #endif
 
-#endif //MATTICRAFT_BLAZE3D_PLATFORM_NATIVEIMAGE_H
+#endif

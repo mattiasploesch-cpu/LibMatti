@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.classloading.transformation.ClassHierarchyRecomputationContext.
+
+
 
 #include "libmatti/net/neoforged/fml/classloading/transformation/ClassHierarchyRecomputationContext.h"
 

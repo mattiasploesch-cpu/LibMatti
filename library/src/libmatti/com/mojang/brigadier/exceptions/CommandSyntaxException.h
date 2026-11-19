@@ -1,10 +1,11 @@
-// Port of com.mojang.brigadier.exceptions.*:
-// CommandExceptionType, CommandSyntaxException, SimpleCommandExceptionType,
-// DynamicCommandExceptionType (the 2/3/4-arg variants fold into the same shape),
-// and BuiltInExceptions.
-//
-// Java throws; the C port returns a malloc'd LIBMATTI_BR_CommandSyntaxException
-// through an out-parameter and the caller frees it.
+
+
+
+
+
+
+
+
 
 #ifndef MATTICRAFT_BR_EXCEPTIONS_COMMANDEXCEPTION_H
 #define MATTICRAFT_BR_EXCEPTIONS_COMMANDEXCEPTION_H
@@ -22,7 +23,7 @@ typedef struct LIBMATTI_BR_CommandSyntaxException
 {
     LIBMATTI_BR_CommandExceptionType *type;
     LIBMATTI_BR_Message *message;
-    // Java: private final String input (NULL when created without context)
+// Java: private final String input (NULL when created without context)
     char *input;
     int cursor;
 } LIBMATTI_BR_CommandSyntaxException;
@@ -59,7 +60,7 @@ LIBMATTI_BR_CommandSyntaxException *LIBMATTI_BR_SimpleCommandExceptionType_Creat
 typedef struct LIBMATTI_BR_DynamicCommandExceptionType
 {
     LIBMATTI_BR_CommandExceptionType type;
-    // Java: Function<Object, Message> function - the port formats a single "%s"
+// Java: Function<Object, Message> function - the port formats a single "%s"
     char *format;
 } LIBMATTI_BR_DynamicCommandExceptionType;
 

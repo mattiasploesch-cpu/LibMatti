@@ -9,8 +9,9 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
-// The fallback copies ship inside the executable as ELF sections; the name is
-// derived from the resource path the same way cmake/MattiNative.cmake does it.
+
+
+
 #define ASSET_SECTION_PREFIX ".matti_asset_"
 #define ASSET_SECTION_MAX 192
 
@@ -68,7 +69,8 @@ static unsigned char *read_file(const char *path, size_t *out_size)
     return data;
 }
 
-// Keep in sync with matti_embed_ui_assets() in cmake/MattiNative.cmake.
+
+
 static void section_name(const char *name, char *out, size_t out_size)
 {
     size_t written = (size_t) snprintf(out, out_size, "%s", ASSET_SECTION_PREFIX);
@@ -118,9 +120,10 @@ static LIBMATTI_UI_Texture *decode(const unsigned char *bytes, size_t size)
     return texture;
 }
 
-// Every place the game may keep vanilla resources: the assets root the
-// launcher passed, the game directory, the working directory, then the
-// bundled fallback.
+
+
+
+
 static LIBMATTI_UI_Texture *load_uncached(const char *name)
 {
     char path[1024];
@@ -139,7 +142,8 @@ static LIBMATTI_UI_Texture *load_uncached(const char *name)
     }
     if (bytes == NULL)
     {
-        // Package layout: <prefix>/share/matticraft/textures.
+
+
         const char *ui_root = getenv("MATTI_UI_ASSETS");
         if (ui_root != NULL && ui_root[0] != '\0')
         {

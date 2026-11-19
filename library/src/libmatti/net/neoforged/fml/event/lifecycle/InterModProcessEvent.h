@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.event.lifecycle.InterModProcessEvent.
+
+
 
 #ifndef MATTICRAFT_FML_EVENT_LIFECYCLE_INTERMODPROCESSEVENT_H
 #define MATTICRAFT_FML_EVENT_LIFECYCLE_INTERMODPROCESSEVENT_H
@@ -10,7 +11,7 @@ typedef struct LIBMATTI_FML_Event_Lifecycle_InterModProcessEvent LIBMATTI_FML_Ev
 // Java: public class InterModProcessEvent extends ParallelDispatchEvent
 struct LIBMATTI_FML_Event_Lifecycle_InterModProcessEvent
 {
-    // Java: extends ParallelDispatchEvent
+// Java: extends ParallelDispatchEvent
     LIBMATTI_FML_Event_Lifecycle_ParallelDispatchEvent base;
 };
 
@@ -22,4 +23,4 @@ LIBMATTI_FML_Event_Lifecycle_InterModProcessEvent *LIBMATTI_FML_Event_Lifecycle_
     LIBMATTI_FML_ModContainer *container, LIBMATTI_FML_DeferredWorkQueue *deferredWorkQueue);
 void LIBMATTI_FML_Event_Lifecycle_InterModProcessEvent_Free(LIBMATTI_FML_Event_Lifecycle_InterModProcessEvent *event);
 
-#endif //MATTICRAFT_FML_EVENT_LIFECYCLE_INTERMODPROCESSEVENT_H
+#endif

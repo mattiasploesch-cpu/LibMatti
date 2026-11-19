@@ -1,7 +1,8 @@
-// Port of net.minecraft.client.renderer.block.model.FaceBakery (the slice the
-// section compiler needs) plus the FaceInfo corner table: the four cube-corner
-// positions per face in Java's winding order and the default per-face UVs.
-// Positions are in the block-model 0..16 space; the compiler divides by 16.
+
+
+
+
+
 
 #ifndef MATTICRAFT_MC_CLIENT_RENDERER_CHUNK_MODELBLOCKRENDERER_H
 #define MATTICRAFT_MC_CLIENT_RENDERER_CHUNK_MODELBLOCKRENDERER_H
@@ -52,4 +53,4 @@ void LIBMATTI_MC_ModelBlockRenderer_BakeCubeFace(LIBMATTI_MC_Direction facing,
 }
 #endif
 
-#endif //MATTICRAFT_MC_CLIENT_RENDERER_CHUNK_MODELBLOCKRENDERER_H
+#endif

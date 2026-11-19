@@ -8,4 +8,4 @@
 // Java: the Class<T> used to look up an extension point
 typedef const char *LIBMATTI_FML_IExtensionPoint;
 
-#endif //MATTICRAFT_FML_IEXTENSIONPOINT_H
+#endif

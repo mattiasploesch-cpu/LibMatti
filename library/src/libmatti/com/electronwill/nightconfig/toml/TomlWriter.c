@@ -115,7 +115,8 @@ static void ValueWriter_writeInlineTable(const LIBMATTI_NC_Config *config, Outpu
     output_write_char(out, '{');
     for (size_t i = 0; i < config->count; i++)
     {
-        // Comments aren't written in an inline table
+
+
         writeKey(writer, config->keys[i], out);
         output_write_str(out, " = ");
         ValueWriter_write(&config->values[i], out, writer);
@@ -130,14 +131,14 @@ static void ValueWriter_write(const LIBMATTI_NC_Value *value, Output *out, LIBMA
     switch (value->type)
     {
     case LIBMATTI_NC_VALUE_CONFIG:
-        // Java: TableWriter.writeInline((Config) value, output, writer)
+// Java: TableWriter.writeInline((Config) value, output, writer)
         ValueWriter_writeInlineTable(value->config, out, writer);
         break;
     case LIBMATTI_NC_VALUE_LIST:
         ArrayWriter_write(value->list, value->listCount, out, writer);
         break;
     case LIBMATTI_NC_VALUE_STRING:
-        // Java: writesLiteral is false and the multiline predicate needs a newline in the middle;
+// Java: writesLiteral is false and the multiline predicate needs a newline in the middle;
         // plain single-line basic strings cover the strings the config layer writes.
         StringWriter_writeBasic(value->string, out);
         break;
@@ -159,12 +160,12 @@ static void ValueWriter_write(const LIBMATTI_NC_Value *value, Output *out, LIBMA
         break;
     }
     case LIBMATTI_NC_VALUE_TEMPORAL:
-        // Java: TemporalWriter.write((Temporal) value, output)
+// Java: TemporalWriter.write((Temporal) value, output)
         TemporalWriter_write(&value->temporal, out);
         break;
     case LIBMATTI_NC_VALUE_NULL:
     default:
-        // Java: throw new WritingException("TOML doesn't support null values")
+// Java: throw new WritingException("TOML doesn't support null values")
         break;
     }
 }
@@ -190,7 +191,7 @@ static void write_padded_and_trimmed(Output *out, int value, int numberOfDigits)
     int length = snprintf(str, sizeof(str), "%d", value);
     for (int i = length; i < numberOfDigits; i++)
         output_write(out, "0", 1);
-    // Java: trailing zeros are trimmed, at least one digit stays
+// Java: trailing zeros are trimmed, at least one digit stays
     int trimmed = length;
     for (int i = length - 1; i >= 1; i--)
     {
@@ -237,7 +238,7 @@ static void TemporalWriter_write(const LIBMATTI_JT_Temporal *temporal, Output *o
             TemporalWriter_writeHour(temporal, out);
             if (LIBMATTI_JT_Temporal_SupportsOffsetSeconds(temporal))
             {
-                // Java: output.write(ZoneOffset.ofTotalSeconds(offsetSeconds).getId()) - Z or +HH:MM
+// Java: output.write(ZoneOffset.ofTotalSeconds(offsetSeconds).getId()) - Z or +HH:MM
                 int offsetSeconds = temporal->offsetSeconds;
                 if (offsetSeconds == 0)
                 {
@@ -291,7 +292,7 @@ static void ArrayWriter_write(const LIBMATTI_NC_Value *values, size_t count, Out
 
 typedef struct
 {
-    // Java: List<Entry> simples, subTables, arraysOfTables - the port keeps the indexes instead
+// Java: List<Entry> simples, subTables, arraysOfTables - the port keeps the indexes instead
     size_t *simples;
     size_t simplesCount;
     size_t *subTables;
@@ -316,7 +317,7 @@ static void writeIndentedComment(LIBMATTI_NC_TomlWriter *writer, const char *com
 {
     if (commentString == NULL) return;
 
-    // Java: List<String> comments = StringUtils.splitLines(commentString)
+// Java: List<String> comments = StringUtils.splitLines(commentString)
     const char *start = commentString;
     for (const char *p = commentString;; p++)
     {
@@ -384,7 +385,7 @@ static void prepareTable(const LIBMATTI_NC_Config *config, OrganizedTable *table
         }
         else if (value->type == LIBMATTI_NC_VALUE_LIST && value->listCount > 0)
         {
-            // Java: list.stream().allMatch(UnmodifiableConfig.class::isInstance)
+// Java: list.stream().allMatch(UnmodifiableConfig.class::isInstance)
             int allConfigs = 1;
             for (size_t j = 0; j < value->listCount; j++)
                 if (value->list[j].type != LIBMATTI_NC_VALUE_CONFIG) allConfigs = 0;
@@ -422,7 +423,7 @@ static int canBeSkipped(const OrganizedTable *table)
 
 typedef struct
 {
-    // Java: List<String> configPath
+// Java: List<String> configPath
     const char **parts;
     size_t count;
     size_t capacity;
@@ -443,7 +444,7 @@ static void configPath_pop(ConfigPath *path)
 static void writeTableName(LIBMATTI_NC_TomlWriter *writer, const ConfigPath *name, Output *out,
                            const char *begin, const char *end)
 {
-    // Java: if (name.isEmpty()) throw new WritingException("Invalid empty table name.")
+// Java: if (name.isEmpty()) throw new WritingException("Invalid empty table name.")
     writeIndent(writer, out);
     output_write_str(out, begin);
     for (size_t i = 0; i < name->count; i++)
@@ -467,7 +468,8 @@ static void writeWithHeader(LIBMATTI_NC_TomlWriter *writer, const LIBMATTI_NC_Co
     {
         writer->currentIndentLevel++;
 
-        // subtables, but first header if in array of tables
+
+
         if (inArrayOfTables)
         {
             writeTableName(writer, configPath, out, "[[", "]]");
@@ -485,7 +487,8 @@ static void writeWithHeader(LIBMATTI_NC_TomlWriter *writer, const LIBMATTI_NC_Co
         }
         if (inArrayOfTables) writer->currentIndentLevel--;
 
-        // sub arrays of tables
+
+
         for (size_t i = 0; i < table.arraysOfTablesCount; i++)
         {
             size_t index = table.arraysOfTables[i];
@@ -501,7 +504,8 @@ static void writeWithHeader(LIBMATTI_NC_TomlWriter *writer, const LIBMATTI_NC_Co
     }
     else
     {
-        // header
+
+
         if (inArrayOfTables)
         {
             writeTableName(writer, configPath, out, "[[", "]]");
@@ -513,7 +517,8 @@ static void writeWithHeader(LIBMATTI_NC_TomlWriter *writer, const LIBMATTI_NC_Co
             writeNewline(writer, out);
         }
 
-        // body
+
+
         writer->currentIndentLevel++;
         for (size_t i = 0; i < table.simplesCount; i++)
         {
@@ -546,7 +551,8 @@ static void writeWithHeader(LIBMATTI_NC_TomlWriter *writer, const LIBMATTI_NC_Co
             if (i + 1 < table.arraysOfTablesCount) writeNewline(writer, out);
         }
         writer->currentIndentLevel--;
-        // end of body
+
+
     }
 
     free(table.simples);
@@ -554,9 +560,10 @@ static void writeWithHeader(LIBMATTI_NC_TomlWriter *writer, const LIBMATTI_NC_Co
     free(table.arraysOfTables);
 }
 
-// ---------------------------------------------------------------------------
-// TomlWriter
-// ---------------------------------------------------------------------------
+
+
+
+
 
 LIBMATTI_NC_TomlWriter *LIBMATTI_NC_TomlWriter_New(void)
 {
@@ -564,7 +571,7 @@ LIBMATTI_NC_TomlWriter *LIBMATTI_NC_TomlWriter_New(void)
     writer->lenientBareKeys = 0;
     writer->hideRedundantLevels = 1;
     writer->indent = "\t";
-    writer->newline = "\n"; // Java: NewlineStyle.system()
+    writer->newline = "\n";// Java: NewlineStyle.system()
     writer->currentIndentLevel = 0;
     return writer;
 }
@@ -579,7 +586,7 @@ char *LIBMATTI_NC_TomlWriter_WriteToString(LIBMATTI_NC_TomlWriter *writer, const
     Output out;
     output_init(&out);
 
-    // Java: currentIndentLevel = -1 to make the root entries not indented; the port never indents
+// Java: currentIndentLevel = -1 to make the root entries not indented; the port never indents
     // the root level (level 0 entries go through writeWithHeader without a header), so 0 is enough.
     writer->currentIndentLevel = 0;
 
@@ -595,7 +602,7 @@ int LIBMATTI_NC_TomlWriter_WriteFile(LIBMATTI_NC_TomlWriter *writer, const LIBMA
 {
     char *data = LIBMATTI_NC_TomlWriter_WriteToString(writer, config);
 
-    // Java: WritingMode.REPLACE_ATOMIC writes to a temp file and moves it; the port writes in place.
+// Java: WritingMode.REPLACE_ATOMIC writes to a temp file and moves it; the port writes in place.
     FILE *stream = fopen(file, "wb");
     if (stream == NULL)
     {

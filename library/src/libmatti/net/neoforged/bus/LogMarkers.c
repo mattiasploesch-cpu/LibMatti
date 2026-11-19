@@ -1,4 +1,5 @@
-// Port of net.neoforged.bus.LogMarkers.
+
+
 
 #include "libmatti/net/neoforged/bus/LogMarkers.h"
 

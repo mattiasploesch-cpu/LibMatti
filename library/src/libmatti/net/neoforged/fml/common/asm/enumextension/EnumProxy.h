@@ -27,12 +27,12 @@
 // Java: public final class EnumProxy<T extends Enum<T> & IExtensibleEnum>
 typedef struct LIBMATTI_FML_EnumProxy
 {
-    // Java: private final Class<T> enumClass
+// Java: private final Class<T> enumClass
     char *enumClassName;
-    // Java: private final List<Object> parameters - the port cannot hold arbitrary Java objects
+// Java: private final List<Object> parameters - the port cannot hold arbitrary Java objects
     void **parameters;
     size_t parameterCount;
-    // Java: private volatile T enumValue
+// Java: private volatile T enumValue
     void *enumValue;
 } LIBMATTI_FML_EnumProxy;
 
@@ -46,4 +46,4 @@ void *LIBMATTI_FML_EnumProxy_GetParameter(const LIBMATTI_FML_EnumProxy *proxy, i
 // Java: @ApiStatus.Internal public void setValue(T value)
 void LIBMATTI_FML_EnumProxy_SetValue(LIBMATTI_FML_EnumProxy *proxy, void *value);
 
-#endif //MATTICRAFT_FML_COMMON_ASM_ENUMEXTENSION_ENUMPROXY_H
+#endif

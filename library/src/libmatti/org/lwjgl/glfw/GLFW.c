@@ -1,6 +1,7 @@
-// Port of org.lwjgl.glfw.GLFW. The binding resolves the native libglfw at
-// runtime with dlopen, exactly like the tinyfd binding does for tinyfiledialogs.
-// A missing or unloaded library means "not available" instead of a hard link error.
+
+
+
+
 
 #include "libmatti/org/lwjgl/glfw/GLFW.h"
 
@@ -213,7 +214,8 @@ void LIBMATTI_GLFW_glfwSetWindowSizeCallback(long window, LIBMATTI_GLFW_WindowSi
     if (glfw_lib == NULL) return;
     GLFW_DLSYM(set_window_size_callback, "glfwSetWindowSizeCallback");
     if (glfw_set_window_size_callback == NULL) return;
-    // The native callback signature matches the port's callback signature.
+
+
     glfw_set_window_size_callback((unsigned long) window, (void *) callback);
 }
 
@@ -352,8 +354,9 @@ void LIBMATTI_GLFW_glfwSetInputMode(long window, int mode, int value)
 
 void LIBMATTI_GLFW_glfwGetCursorPos(long window, double *xpos, double *ypos)
 {
-    // A dead binding or window leaves the cursor at (0, 0) - the polling
-    // caller treats that as "no movement".
+
+
+
     if (xpos != NULL) *xpos = 0.0;
     if (ypos != NULL) *ypos = 0.0;
     ensure_library();

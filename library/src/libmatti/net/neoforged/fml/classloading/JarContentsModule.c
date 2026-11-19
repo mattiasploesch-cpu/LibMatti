@@ -7,7 +7,7 @@
 // Java: public JarContentsModule(JarContents contents)
 LIBMATTI_FML_JarContentsModule *LIBMATTI_FML_JarContentsModule_New(const LIBMATTI_FML_JarContents *contents)
 {
-    // Java: this(contents, JarModuleInfo.from(contents).createDescriptor(contents))
+// Java: this(contents, JarModuleInfo.from(contents).createDescriptor(contents))
     LIBMATTI_FML_JarModuleInfo *moduleInfo = LIBMATTI_FML_JarModuleInfo_From((LIBMATTI_FML_JarContents *)contents);
     LIBMATTI_JL_ModuleDescriptor *descriptor =
         LIBMATTI_FML_JarModuleInfo_CreateDescriptor(moduleInfo, (LIBMATTI_FML_JarContents *)contents);

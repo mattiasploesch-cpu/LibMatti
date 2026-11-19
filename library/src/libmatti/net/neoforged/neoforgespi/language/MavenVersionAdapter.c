@@ -1,4 +1,5 @@
-// Port of net.neoforged.neoforgespi.language.MavenVersionAdapter.
+
+
 
 #include "libmatti/net/neoforged/neoforgespi/language/MavenVersionAdapter.h"
 
@@ -17,13 +18,13 @@ static LIBMATTI_ML_Logger *LOGGER(void)
 // Java: public static VersionRange createFromVersionSpec(String spec)
 LIBMATTI_NEOFORGESPI_VersionRange *LIBMATTI_NEOFORGESPI_MavenVersionAdapter_CreateFromVersionSpec(const char *spec)
 {
-    // Java: try { return VersionRange.createFromVersionSpec(spec); }
+// Java: try { return VersionRange.createFromVersionSpec(spec); }
     //       catch (InvalidVersionSpecificationException e) { LOGGER.fatal("Failed to parse version spec {}", spec, e);
     //                                                       throw new RuntimeException("Failed to parse spec", e); }
     LIBMATTI_NEOFORGESPI_VersionRange *range = LIBMATTI_MAVEN_VersionRange_CreateFromVersionSpec(spec);
     if (range == NULL)
     {
-        // Java: LOGGER.fatal(...); throw new RuntimeException("Failed to parse spec", e);
+// Java: LOGGER.fatal(...); throw new RuntimeException("Failed to parse spec", e);
         LIBMATTI_ML_Logger_Fatal(LOGGER(), NULL, "Failed to parse version spec {}", spec);
         LIBMATTI_JL_Throwable *exception =
             LIBMATTI_JL_Throwable_NewNamed("java.lang.RuntimeException", "Failed to parse spec");

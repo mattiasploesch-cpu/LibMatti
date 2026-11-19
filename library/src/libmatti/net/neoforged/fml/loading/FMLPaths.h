@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.loading.FMLPaths.
+
+
 
 #ifndef MATTICRAFT_FML_FMLPATHS_H
 #define MATTICRAFT_FML_FMLPATHS_H
@@ -32,4 +33,4 @@ const char *LIBMATTI_FML_FMLPaths_Relative(LIBMATTI_FML_FMLPaths path);
 // Java: public Path get()
 const char *LIBMATTI_FML_FMLPaths_Get(LIBMATTI_FML_FMLPaths path);
 
-#endif //MATTICRAFT_FML_FMLPATHS_H
+#endif

@@ -34,7 +34,7 @@ void LIBMATTI_FML_ModsFolderLocator_FindCandidates(void *self, LIBMATTI_NEOFORGE
     LIBMATTI_ML_Logger_Debug(LOGGER(), &LIBMATTI_FML_MARKER_SCAN, "Scanning mods dir {} for mods",
                              locator->modFolder);
 
-    // Java: Files.list(modFolder).filter(p -> StringUtils.toLowerCase(p.getFileName().toString()).endsWith(SUFFIX)).sorted(comparing(...)).toList();
+// Java: Files.list(modFolder).filter(p -> StringUtils.toLowerCase(p.getFileName().toString()).endsWith(SUFFIX)).sorted(comparing(...)).toList();
     size_t entryCount = 0;
     char **entries = LIBMATTI_JNF_Files_List(locator->modFolder, &entryCount);
     char **directoryContent = malloc(sizeof(char *) * (entryCount > 0 ? entryCount : 1));
@@ -52,7 +52,7 @@ void LIBMATTI_FML_ModsFolderLocator_FindCandidates(void *self, LIBMATTI_NEOFORGE
             continue;
         }
 
-        // Java: .sorted(Comparator.comparing(path -> StringUtils.toLowerCase(path.getFileName().toString())))
+// Java: .sorted(Comparator.comparing(path -> StringUtils.toLowerCase(path.getFileName().toString())))
         size_t index = contentCount;
         while (index > 0 && strcasecmp(directoryContent[index - 1], entries[i]) > 0)
         {
@@ -66,7 +66,7 @@ void LIBMATTI_FML_ModsFolderLocator_FindCandidates(void *self, LIBMATTI_NEOFORGE
 
     for (size_t i = 0; i < contentCount; i++)
     {
-        // Java: if (!Files.isRegularFile(file)) { pipeline.addIssue(ModLoadingIssue.warning("fml.modloadingissue.brokenfile.unknown").withAffectedPath(file)); continue; }
+// Java: if (!Files.isRegularFile(file)) { pipeline.addIssue(ModLoadingIssue.warning("fml.modloadingissue.brokenfile.unknown").withAffectedPath(file)); continue; }
         if (!LIBMATTI_JNF_Files_IsRegularFile(directoryContent[i]))
         {
             LIBMATTI_FML_ModLoadingIssue *issue = LIBMATTI_FML_ModLoadingIssue_Warning(
@@ -77,7 +77,7 @@ void LIBMATTI_FML_ModsFolderLocator_FindCandidates(void *self, LIBMATTI_NEOFORGE
             continue;
         }
 
-        // Java: pipeline.addPath(file, ModFileDiscoveryAttributes.DEFAULT, IncompatibleFileReporting.WARN_ALWAYS);
+// Java: pipeline.addPath(file, ModFileDiscoveryAttributes.DEFAULT, IncompatibleFileReporting.WARN_ALWAYS);
         LIBMATTI_NEOFORGESPI_ModFileDiscoveryAttributes attributes =
             LIBMATTI_NEOFORGESPI_ModFileDiscoveryAttributes_Default();
         LIBMATTI_NEOFORGESPI_IModFile *added = NULL;
@@ -93,7 +93,7 @@ void LIBMATTI_FML_ModsFolderLocator_FindCandidates(void *self, LIBMATTI_NEOFORGE
 // Java: public ModsFolderLocator()
 LIBMATTI_FML_ModsFolderLocator *LIBMATTI_FML_ModsFolderLocator_New(void)
 {
-    // Java: this(FMLPaths.MODSDIR.get());
+// Java: this(FMLPaths.MODSDIR.get());
     return LIBMATTI_FML_ModsFolderLocator_NewWithFolder(LIBMATTI_FML_FMLPaths_Get(LIBMATTI_FML_FMLPaths_MODSDIR),
                                                         "mods folder");
 }

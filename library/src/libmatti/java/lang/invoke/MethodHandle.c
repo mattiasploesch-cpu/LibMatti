@@ -1,11 +1,12 @@
-// Port of java.lang.invoke.MethodHandle (the invocation side).
-//
-// Java's MethodHandle is strongly typed: the handle's MethodType fixes the
-// return type, and invokeExact throws when the caller's expectations do not
-// match. The C port has no signature checks at the call site, so the contract
-// lives in the typedef: the resolved function returns intptr_t, which lets a
-// main-method handle (int main(int, char*[])) propagate its exit status and a
-// void method simply return 0.
+
+
+
+
+
+
+
+
+
 
 #include "libmatti/java/lang/invoke/MethodHandle.h"
 

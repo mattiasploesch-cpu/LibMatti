@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.event.lifecycle.ModLifecycleEvent.
+
+
 
 #include "libmatti/net/neoforged/fml/event/lifecycle/ModLifecycleEvent.h"
 
@@ -37,7 +38,7 @@ void LIBMATTI_FML_Event_Lifecycle_ModLifecycleEvent_GetIMCStream(
     const LIBMATTI_FML_Event_Lifecycle_ModLifecycleEvent *event,
     void (*consumer)(const LIBMATTI_FML_InterModComms_IMCMessage *message, void *userdata), void *userdata)
 {
-    // Java: return InterModComms.getMessages(this.container.getModId());
+// Java: return InterModComms.getMessages(this.container.getModId());
     LIBMATTI_FML_InterModComms_GetMessagesAll(LIBMATTI_FML_ModContainer_GetModId(event->container), consumer,
                                               userdata);
 }
@@ -48,7 +49,7 @@ void LIBMATTI_FML_Event_Lifecycle_ModLifecycleEvent_GetIMCStreamFiltered(
     int (*methodFilter)(const char *method, void *userdata), void *filterUserdata,
     void (*consumer)(const LIBMATTI_FML_InterModComms_IMCMessage *message, void *userdata), void *userdata)
 {
-    // Java: return InterModComms.getMessages(this.container.getModId(), methodFilter);
+// Java: return InterModComms.getMessages(this.container.getModId(), methodFilter);
     LIBMATTI_FML_InterModComms_GetMessages(LIBMATTI_FML_ModContainer_GetModId(event->container), methodFilter,
                                            filterUserdata, consumer, userdata);
 }

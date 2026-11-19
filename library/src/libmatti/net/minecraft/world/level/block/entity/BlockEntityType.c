@@ -1,6 +1,7 @@
-// Port of net.minecraft.world.level.block.entity.BlockEntityType.
-// Generated from the vendor Java sources (BlockEntityType.java): one entry per
-// register(...) with the exact valid-block set.
+
+
+
+
 
 #include "libmatti/net/minecraft/world/level/block/entity/BlockEntityType.h"
 
@@ -13,8 +14,9 @@
 static LIBMATTI_MC_BlockEntityType TYPES[49];
 static int initialized;
 
-// the BlockEntitySupplier side: every vanilla type creates the base BlockEntity
-// (the typed data subclasses are game-port content)
+
+
+
 static void *base_factory(const LIBMATTI_MC_BlockEntityType *type, const LIBMATTI_MC_BlockPos *pos, LIBMATTI_MC_BlockState *state);
 
 static const void *validBlocks_FURNACE[1];
@@ -712,7 +714,7 @@ static void initialize(void)
 
 bool LIBMATTI_MC_BlockEntityType_IsValid(const LIBMATTI_MC_BlockEntityType *type, LIBMATTI_MC_BlockState *state)
 {
-    // Java: this.validBlocks.contains(state.getBlock())
+// Java: this.validBlocks.contains(state.getBlock())
     const void *block = LIBMATTI_MC_BlockState_GetBlock(state);
     for (size_t i = 0; i < type->validBlockCount; i++)
     {

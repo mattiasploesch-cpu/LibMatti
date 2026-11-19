@@ -43,15 +43,17 @@ typedef struct LIBMATTI_FML_MixinFacade LIBMATTI_FML_MixinFacade;
 
 struct LIBMATTI_FML_MixinFacade
 {
-    // Java's processors weave bytecode (external); the port collects hook-table descriptors.
+
+
     void *classProcessor;
     void *generatingClassProcessor;
-    // TODO: net.neoforged.fml.loading.mixin.FMLMixinService
+// TODO: net.neoforged.fml.loading.mixin.FMLMixinService
     void *service;
-    // Java: Mixins.getConfigs()
+// Java: Mixins.getConfigs()
     LIBMATTI_FML_MixinFacade_MixinConfig *configs;
     size_t configCount;
-    // The native mixin backend: the target/hook chain of the process
+
+
     struct LIBMATTI_MIXIN_HookTable *hookTable;
 };
 
@@ -74,11 +76,12 @@ void LIBMATTI_FML_MixinFacade_FinishInitialization(LIBMATTI_FML_MixinFacade *fac
 // Java: private static int calculateBehaviorVersion(ArtifactVersion behaviorVersion)
 int LIBMATTI_FML_MixinFacade_CalculateBehaviorVersion(const LIBMATTI_NEOFORGESPI_ArtifactVersion *behaviorVersion);
 
-// The native mixin backend the facade collects into (M4 hook table + M2 GOT patches)
+
+
 struct LIBMATTI_MIXIN_HookTable *LIBMATTI_FML_MixinFacade_GetHookTable(const LIBMATTI_FML_MixinFacade *facade);
 
 // Java: public void close()
 void LIBMATTI_FML_MixinFacade_Close(LIBMATTI_FML_MixinFacade *facade);
 void LIBMATTI_FML_MixinFacade_Free(LIBMATTI_FML_MixinFacade *facade);
 
-#endif //MATTICRAFT_FML_LOADING_MIXIN_MIXINFACADE_H
+#endif

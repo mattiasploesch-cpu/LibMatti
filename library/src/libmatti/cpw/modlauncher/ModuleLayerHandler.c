@@ -1,6 +1,7 @@
-//
-// Port of cpw.mods.modlauncher.ModuleLayerHandler.
-//
+
+
+
+
 
 #include "ModuleLayerHandler.h"
 
@@ -34,7 +35,7 @@ struct LIBMATTI_ML_ModuleLayerHandler
     LIBMATTI_ML_ModuleLayerHandler_LayerInfo completedLayers[4];
     LIBMATTI_JL_ModuleLayerController *layerControllers[4];
     int completedFlags[4];
-    // Java: the BOOT class loader may come from getClass().getClassLoader()
+// Java: the BOOT class loader may come from getClass().getClassLoader()
     int bootClassLoaderOwned;
 };
 
@@ -83,7 +84,7 @@ LIBMATTI_ML_ModuleLayerHandler *LIBMATTI_ML_ModuleLayerHandler_New(void)
     LIBMATTI_ML_ModuleLayerHandler *handler = calloc(1, sizeof(LIBMATTI_ML_ModuleLayerHandler));
     if (handler == NULL) return NULL;
 
-    // Java: ClassLoader classLoader = getClass().getClassLoader();
+// Java: ClassLoader classLoader = getClass().getClassLoader();
     //       ModuleClassLoader cl = classLoader instanceof ModuleClassLoader moduleCl ? moduleCl
     //           : new ModuleClassLoader("BOOT", ModuleLayer.boot().configuration(), List.of());
     LIBMATTI_CL_ModuleClassLoader *classLoader = bootClassLoader;
@@ -95,7 +96,7 @@ LIBMATTI_ML_ModuleLayerHandler *LIBMATTI_ML_ModuleLayerHandler_New(void)
         handler->bootClassLoaderOwned = 1;
     }
 
-    // Java: completedLayers.put(Layer.BOOT, new LayerInfo(getClass().getModule().getLayer(), cl))
+// Java: completedLayers.put(Layer.BOOT, new LayerInfo(getClass().getModule().getLayer(), cl))
     handler->completedLayers[LIBMATTI_MLA_LAYER_BOOT].layer = LIBMATTI_JL_ModuleLayer_Boot();
     handler->completedLayers[LIBMATTI_MLA_LAYER_BOOT].cl = classLoader;
     handler->completedFlags[LIBMATTI_MLA_LAYER_BOOT] = 1;
@@ -111,7 +112,7 @@ void LIBMATTI_ML_ModuleLayerHandler_Free(LIBMATTI_ML_ModuleLayerHandler *handler
     {
         for (size_t i = 0; i < handler->layers[layer].count; i++)
         {
-            // Java: PathOrJar owns the NamedPath/Jar it was created from
+// Java: PathOrJar owns the NamedPath/Jar it was created from
             LIBMATTI_MLA_NamedPath *path = handler->layers[layer].items[i].path;
             if (path != NULL)
             {
@@ -127,7 +128,8 @@ void LIBMATTI_ML_ModuleLayerHandler_Free(LIBMATTI_ML_ModuleLayerHandler *handler
         free(handler->layers[layer].items);
     }
 
-    // the BOOT layer is the JVM's boot layer and is not released
+
+
     for (size_t layer = LIBMATTI_MLA_LAYER_BOOT; layer < 4; layer++)
     {
         if (!handler->completedFlags[layer]) continue;
@@ -152,7 +154,7 @@ void LIBMATTI_ML_ModuleLayerHandler_Free(LIBMATTI_ML_ModuleLayerHandler *handler
 void LIBMATTI_ML_ModuleLayerHandler_AddToLayer(LIBMATTI_ML_ModuleLayerHandler *handler, LIBMATTI_MLA_Layer layer,
                                                LIBMATTI_JH_SecureJar *jar)
 {
-    // Java: if (completedLayers.containsKey(layer)) throw new IllegalStateException("Layer already populated")
+// Java: if (completedLayers.containsKey(layer)) throw new IllegalStateException("Layer already populated")
     if (handler->completedFlags[layer])
     {
         LIBMATTI_ML_Logger_Error(LIBMATTI_ML_LogManager_GetLogger(), &LIBMATTI_ML_MARKER_MODLAUNCHER,
@@ -160,7 +162,7 @@ void LIBMATTI_ML_ModuleLayerHandler_AddToLayer(LIBMATTI_ML_ModuleLayerHandler *h
         return;
     }
 
-    // Java: layers.computeIfAbsent(layer, l -> new ArrayList<>()).add(PathOrJar.from(jar))
+// Java: layers.computeIfAbsent(layer, l -> new ArrayList<>()).add(PathOrJar.from(jar))
     PathOrJarList *list = &handler->layers[layer];
     list->items = realloc(list->items, sizeof(PathOrJar) * (list->count + 1));
     list->items[list->count].path = NULL;
@@ -196,16 +198,16 @@ LIBMATTI_ML_ModuleLayerHandler_LayerInfo LIBMATTI_ML_ModuleLayerHandler_BuildLay
 {
     LIBMATTI_ML_ModuleLayerHandler_LayerInfo empty = {NULL, NULL};
 
-    // Java: layers.getOrDefault(layer, List.of()).stream().map(PathOrJar::build).toArray(SecureJar[]::new)
+// Java: layers.getOrDefault(layer, List.of()).stream().map(PathOrJar::build).toArray(SecureJar[]::new)
     PathOrJarList *list = &handler->layers[layer];
     LIBMATTI_JH_SecureJar **jars = calloc(list->count > 0 ? list->count : 1, sizeof(*jars));
     for (size_t i = 0; i < list->count; i++) jars[i] = path_or_jar_build(&list->items[i]);
 
-    // Java: targets = Arrays.stream(finder).map(SecureJar::name).toList()
+// Java: targets = Arrays.stream(finder).map(SecureJar::name).toList()
     char **targets = calloc(list->count > 0 ? list->count : 1, sizeof(*targets));
     for (size_t i = 0; i < list->count; i++) targets[i] = strdup(LIBMATTI_JH_SecureJar_Name(jars[i]));
 
-    // Java: Configuration.resolveAndBind(JarModuleFinder.of(finder), <parent configurations>,
+// Java: Configuration.resolveAndBind(JarModuleFinder.of(finder), <parent configurations>,
     //                                     ModuleFinder.of(), targets)
     LIBMATTI_CL_JarModuleFinder *jarFinder = LIBMATTI_CL_JarModuleFinder_Of(jars, list->count);
     size_t referenceCount = 0;
@@ -216,13 +218,13 @@ LIBMATTI_ML_ModuleLayerHandler_LayerInfo LIBMATTI_ML_ModuleLayerHandler_BuildLay
 
     if (newConf == NULL)
     {
-        // Java: catch (ResolutionException e) { LOGGER.error("Error while resolving modules.", e); throw e; }
+// Java: catch (ResolutionException e) { LOGGER.error("Error while resolving modules.", e); throw e; }
         LIBMATTI_ML_Logger_Error(LIBMATTI_ML_LogManager_GetLogger(), &LIBMATTI_ML_MARKER_MODLAUNCHER,
                                  "Error while resolving modules.");
         return empty;
     }
 
-    // Java: allParents = layer.getParent().map(completedLayers::get).map(LayerInfo::layer)
+// Java: allParents = layer.getParent().map(completedLayers::get).map(LayerInfo::layer)
     //                       .mapMulti((moduleLayer, comp) -> { comp.accept(moduleLayer); moduleLayer.parents().forEach(comp); })
     size_t parentLayerCount = 0;
     const LIBMATTI_MLA_Layer *parents = LIBMATTI_MLA_Layer_GetParent(layer, &parentLayerCount);
@@ -250,21 +252,21 @@ LIBMATTI_ML_ModuleLayerHandler_LayerInfo LIBMATTI_ML_ModuleLayerHandler_BuildLay
         }
     }
 
-    // Java: classLoader = classLoaderSupplier.apply(newConf, allParents)
+// Java: classLoader = classLoaderSupplier.apply(newConf, allParents)
     LIBMATTI_CL_ModuleClassLoader *classLoader =
         classLoaderSupplier(newConf, allParents, allParentCount, userdata);
 
-    // Java: ModuleLayer.defineModules(newConf, parents, f -> classLoader)
+// Java: ModuleLayer.defineModules(newConf, parents, f -> classLoader)
     LIBMATTI_JL_ModuleLayerController *controller = LIBMATTI_JL_ModuleLayer_DefineModules(
         newConf, allParents, allParentCount, class_loader_for_module, classLoader);
 
-    // Java: completedLayers.put(layer, new LayerInfo(modController.layer(), classLoader))
+// Java: completedLayers.put(layer, new LayerInfo(modController.layer(), classLoader))
     handler->completedLayers[layer].layer = LIBMATTI_JL_ModuleLayerController_Layer(controller);
     handler->completedLayers[layer].cl = classLoader;
     handler->layerControllers[layer] = controller;
     handler->completedFlags[layer] = 1;
 
-    // Java: classLoader.setFallbackClassLoader(completedLayers.get(Layer.BOOT).cl())
+// Java: classLoader.setFallbackClassLoader(completedLayers.get(Layer.BOOT).cl())
     LIBMATTI_CL_ModuleClassLoader_SetFallbackClassLoader(
         classLoader, (LIBMATTI_CL_ClassLoader *)handler->completedLayers[LIBMATTI_MLA_LAYER_BOOT].cl);
 
@@ -282,7 +284,7 @@ LIBMATTI_ML_ModuleLayerHandler_LayerInfo LIBMATTI_ML_ModuleLayerHandler_BuildLay
 LIBMATTI_ML_ModuleLayerHandler_LayerInfo LIBMATTI_ML_ModuleLayerHandler_BuildLayer(
     LIBMATTI_ML_ModuleLayerHandler *handler, LIBMATTI_MLA_Layer layer)
 {
-    // Java: (cf, p) -> new ModuleClassLoader("LAYER " + layer.name(), cf, p)
+// Java: (cf, p) -> new ModuleClassLoader("LAYER " + layer.name(), cf, p)
     return LIBMATTI_ML_ModuleLayerHandler_BuildLayerWith(handler, layer, default_class_loader_supplier,
                                                          (void *)(size_t)layer);
 }
@@ -301,7 +303,7 @@ void LIBMATTI_ML_ModuleLayerHandler_UpdateLayer(LIBMATTI_ML_ModuleLayerHandler *
                                                                void *userdata),
                                                 void *userdata)
 {
-    // Java: action.accept(completedLayers.get(layer))
+// Java: action.accept(completedLayers.get(layer))
     if (action != NULL) action(&handler->completedLayers[layer], userdata);
 }
 

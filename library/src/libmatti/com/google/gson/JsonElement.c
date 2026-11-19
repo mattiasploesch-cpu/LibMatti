@@ -1,4 +1,5 @@
-// Port of com.google.gson.JsonElement / JsonObject / JsonArray / JsonPrimitive / JsonNull.
+
+
 
 #include "libmatti/com/google/gson/JsonElement.h"
 
@@ -130,16 +131,16 @@ char *LIBMATTI_GSON_JsonElement_GetAsString(const LIBMATTI_GSON_JsonElement *ele
 {
     if (element == NULL) return NULL;
 
-    // Java: JsonPrimitive.getAsString()
+// Java: JsonPrimitive.getAsString()
     if (element->type == LIBMATTI_GSON_JSON_PRIMITIVE)
     {
-        // Java: return isNumber() ? getAsNumber().toString() : isBoolean() ? Boolean.toString(value) : (String) value;
+// Java: return isNumber() ? getAsNumber().toString() : isBoolean() ? Boolean.toString(value) : (String) value;
         if (element->isBoolean)
             return strdup(element->booleanValue ? "true" : "false");
         return element->value != NULL ? strdup(element->value) : NULL;
     }
 
-    // Java: the default throws UnsupportedOperationException; the port reports NULL
+// Java: the default throws UnsupportedOperationException; the port reports NULL
     return NULL;
 }
 
@@ -149,7 +150,7 @@ int LIBMATTI_GSON_JsonElement_GetAsBoolean(const LIBMATTI_GSON_JsonElement *elem
     if (element == NULL) return 0;
     if (element->type == LIBMATTI_GSON_JSON_PRIMITIVE)
     {
-        // Java: return isBoolean() ? ((Boolean) value) : Boolean.parseBoolean(getAsString());
+// Java: return isBoolean() ? ((Boolean) value) : Boolean.parseBoolean(getAsString());
         if (element->isBoolean) return element->booleanValue;
         return element->value != NULL && strcasecmp(element->value, "true") == 0;
     }
@@ -256,7 +257,7 @@ void LIBMATTI_GSON_JsonElement_AddMember(LIBMATTI_GSON_JsonElement *object, cons
 {
     if (object == NULL) return;
 
-    // Java: members.put(property, value == null ? JsonNull.INSTANCE : value);
+// Java: members.put(property, value == null ? JsonNull.INSTANCE : value);
     for (size_t i = 0; i < object->memberCount; i++)
     {
         if (strcmp(object->memberNames[i], memberName) == 0)

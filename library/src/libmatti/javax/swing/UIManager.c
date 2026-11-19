@@ -1,7 +1,8 @@
-// Port of javax.swing.UIManager.
-// Java loads and installs a LookAndFeel class; the port keeps the same lifecycle with the
-// cross-platform Metal defaults installed (getSystemLookAndFeelClassName reports the platform
-// class name exactly like Java, the installation itself has no Swing toolkit behind it).
+
+
+
+
+
 
 #include "libmatti/javax/swing/UIManager.h"
 
@@ -31,7 +32,7 @@ int LIBMATTI_JS_UIManager_SetLookAndFeel(const char *className)
 {
     if (className == NULL) return 0;
 
-    // Java: the class is loaded and instantiated; an unknown class name throws
+// Java: the class is loaded and instantiated; an unknown class name throws
     // ClassNotFoundException. The port only knows the Metal and platform class names.
     const char *known[] = {
         "javax.swing.plaf.metal.MetalLookAndFeel",
@@ -49,7 +50,7 @@ int LIBMATTI_JS_UIManager_SetLookAndFeel(const char *className)
         }
     if (!known_name) return 0;
 
-    // Java: the look and feel is installed as the current one
+// Java: the look and feel is installed as the current one
     free(installedLookAndFeel);
     installedLookAndFeel = strdup(className);
     return 1;

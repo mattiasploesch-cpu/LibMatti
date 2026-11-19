@@ -31,12 +31,12 @@ typedef enum LIBMATTI_MC_LevelChunkEntityCreationType
 // Java: public class LevelChunk extends ChunkAccess
 typedef struct LIBMATTI_MC_LevelChunk
 {
-    // Java: the ChunkAccess base (sections, heightmaps, block entity containers,
+// Java: the ChunkAccess base (sections, heightmaps, block entity containers,
     // post-processing, unsaved flag)
     LIBMATTI_MC_ChunkAccess base;
-    // Java: final Level level
+// Java: final Level level
     struct LIBMATTI_MC_Level *level;
-    // Java: private boolean loaded
+// Java: private boolean loaded
     bool loaded;
 } LIBMATTI_MC_LevelChunk;
 
@@ -80,4 +80,4 @@ void LIBMATTI_MC_LevelChunk_Free(LIBMATTI_MC_LevelChunk *chunk);
 }
 #endif
 
-#endif //MATTICRAFT_MC_WORLD_LEVEL_CHUNK_LEVELCHUNK_H
+#endif

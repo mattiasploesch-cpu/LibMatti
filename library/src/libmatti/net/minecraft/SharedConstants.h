@@ -1,6 +1,7 @@
-// Port of net.minecraft.SharedConstants.
-// Only the constants the ported code reads live here; the debug-flag surface is
-// the DEBUG_* system-property family, evaluated like Java's booleanProperty.
+
+
+
+
 
 #ifndef MATTICRAFT_MC_SHAREDCONSTANTS_H
 #define MATTICRAFT_MC_SHAREDCONSTANTS_H
@@ -21,4 +22,4 @@ int LIBMATTI_MC_SharedConstants_GetResourcePackVersionMinor(void);
 int LIBMATTI_MC_SharedConstants_GetDataPackVersionMajor(void);
 int LIBMATTI_MC_SharedConstants_GetDataPackVersionMinor(void);
 
-#endif //MATTICRAFT_MC_SHAREDCONSTANTS_H
+#endif

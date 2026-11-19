@@ -1,4 +1,5 @@
-// Port of net.neoforged.bus.SubscribeEventListener.
+
+
 
 #include "libmatti/net/neoforged/bus/SubscribeEventListener.h"
 
@@ -13,7 +14,7 @@ static void subscribe_invoke(void *self, LIBMATTI_BUS_Event *event)
     LIBMATTI_BUS_SubscribeEventListener *listener = self;
     if (listener->handler == NULL) return;
 
-    // Java: if (subInfo.receiveCanceled() || !((ICancellableEvent) event).isCanceled())
+// Java: if (subInfo.receiveCanceled() || !((ICancellableEvent) event).isCanceled())
     // The cast is safe because the check is removed when the event is not cancellable:
     // ListenerList unwraps this wrapper to the handler in that case.
     if (listener->subInfo.receiveCanceled || !LIBMATTI_BUS_ICancellableEvent_IsCanceled(event))

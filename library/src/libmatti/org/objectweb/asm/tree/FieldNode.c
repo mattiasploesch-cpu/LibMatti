@@ -1,4 +1,5 @@
-// Port of org.objectweb.asm.tree.FieldNode.
+
+
 
 #include "libmatti/org/objectweb/asm/tree/FieldNode.h"
 

@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.classloading.transformation.ClassTransformer.
+
+
 
 #include "libmatti/net/neoforged/fml/classloading/transformation/ClassTransformer.h"
 
@@ -57,7 +58,7 @@ static LIBMATTI_ASM_ClassWriter *create_class_writer(LIBMATTI_NEOFORGESPI_ClassP
     else if (flags == LIBMATTI_NEOFORGESPI_ClassProcessor_ComputeFlags_COMPUTE_FRAMES)
         writerFlag = LIBMATTI_ASM_COMPUTE_FRAMES;
 
-    // Java: only the TransformerClassWriter when COMPUTE_FRAMES is set, as it's slower and only
+// Java: only the TransformerClassWriter when COMPUTE_FRAMES is set, as it's slower and only
     //       COMPUTE_FRAMES calls getCommonSuperClass
     return LIBMATTI_ASM_ClassWriter_New(writerFlag, clazzAccessor);
 }
@@ -97,7 +98,7 @@ static char *dump_temp_dir = NULL;
 // Java: private void dumpClass(byte[] clazz, String className)
 static void dump_class(const unsigned char *clazz, size_t length, const char *className)
 {
-    // Java: if (tempDir == null) { synchronized { if (tempDir == null) tempDir = Files.createTempDirectory("classDump"); } }
+// Java: if (tempDir == null) { synchronized { if (tempDir == null) tempDir = Files.createTempDirectory("classDump"); } }
     if (dump_temp_dir == NULL)
     {
         char *tempDir = LIBMATTI_JNF_Files_CreateTempDirectory("classDump");
@@ -109,14 +110,14 @@ static void dump_class(const unsigned char *clazz, size_t length, const char *cl
         dump_temp_dir = tempDir;
     }
 
-    // Java: Path tempFile = tempDir.resolve(className + ".class"); Files.write(tempFile, clazz);
+// Java: Path tempFile = tempDir.resolve(className + ".class"); Files.write(tempFile, clazz);
     size_t tempFileLength = strlen(dump_temp_dir) + 1 + strlen(className) + 6 + 1;
     char *tempFile = malloc(tempFileLength);
     snprintf(tempFile, tempFileLength, "%s/%s.class", dump_temp_dir, className);
 
     if (LIBMATTI_JNF_Files_Write(tempFile, clazz, length))
     {
-        // Java: LOGGER.info("Wrote {} byte class file {} to {}", clazz.length, className, tempFile)
+// Java: LOGGER.info("Wrote {} byte class file {} to {}", clazz.length, className, tempFile)
         char byteCount[32];
         snprintf(byteCount, sizeof(byteCount), "%zu", length);
         LIBMATTI_ML_Logger_Info(LOGGER(), NULL, "Wrote {} byte class file {} to {}", byteCount, className, tempFile);
@@ -135,21 +136,21 @@ unsigned char *LIBMATTI_FML_ClassTransformer_Transform(LIBMATTI_FML_ClassTransfo
                                                        LIBMATTI_FML_ClassHierarchyRecomputationContext *locator,
                                                        size_t *outLength)
 {
-    // Java: String internalName = className.replace('.', '/'); final Type classDesc = Type.getObjectType(internalName)
+// Java: String internalName = className.replace('.', '/'); final Type classDesc = Type.getObjectType(internalName)
     char *internalName = strdup(className);
     for (char *c = internalName; *c != '\0'; c++) if (*c == '.') *c = '/';
     LIBMATTI_ASM_Type *classDesc = LIBMATTI_ASM_Type_GetObjectType(internalName);
 
     LIBMATTI_FML_ClassTransformStatistics_IncrementLoadedClasses();
 
-    // Java: var transformersToUse = this.processors.transformersFor(classDesc, inputClass.length == 0, upToTransformer)
+// Java: var transformersToUse = this.processors.transformersFor(classDesc, inputClass.length == 0, upToTransformer)
     size_t transformersToUseCount = 0;
     LIBMATTI_NEOFORGESPI_ClassProcessor **transformersToUse = LIBMATTI_FML_ClassProcessorSet_TransformersFor(
         transformer->processors, classDesc, inputLength == 0, upToTransformer, &transformersToUseCount);
 
     if (transformersToUseCount == 0)
     {
-        // Java: return inputClass
+// Java: return inputClass
         unsigned char *result = malloc(inputLength > 0 ? inputLength : 1);
         if (inputLength > 0) memcpy(result, inputClass, inputLength);
         *outLength = inputLength;
@@ -161,7 +162,7 @@ unsigned char *LIBMATTI_FML_ClassTransformer_Transform(LIBMATTI_FML_ClassTransfo
 
     LIBMATTI_FML_ClassTransformStatistics_IncrementTransformedClasses();
 
-    // Java: Supplier<byte[]> digest; ClassNode clazz = new ClassNode(Opcodes.ASM9); boolean isEmpty = inputClass.length == 0;
+// Java: Supplier<byte[]> digest; ClassNode clazz = new ClassNode(Opcodes.ASM9); boolean isEmpty = inputClass.length == 0;
     DigestSource digestSource = {inputClass, inputLength};
     LIBMATTI_ASMT_ClassNode *clazz = LIBMATTI_ASMT_ClassNode_New();
     int isEmpty = inputLength == 0;
@@ -169,7 +170,7 @@ unsigned char *LIBMATTI_FML_ClassTransformer_Transform(LIBMATTI_FML_ClassTransfo
 
     if (inputLength > 0)
     {
-        // Java: new ClassReader(inputClass).accept(clazz, ClassReader.EXPAND_FRAMES)
+// Java: new ClassReader(inputClass).accept(clazz, ClassReader.EXPAND_FRAMES)
         LIBMATTI_ASM_ClassReader *reader = LIBMATTI_ASM_ClassReader_New(inputClass, inputLength,
                                                                        LIBMATTI_ASM_EXPAND_FRAMES);
         LIBMATTI_ASM_ClassReader_Accept(reader, clazz);
@@ -177,7 +178,7 @@ unsigned char *LIBMATTI_FML_ClassTransformer_Transform(LIBMATTI_FML_ClassTransfo
     }
     else
     {
-        // Java: clazz.name = classDesc.getInternalName(); clazz.version = Opcodes.V1_8; clazz.superName = "java/lang/Object"
+// Java: clazz.name = classDesc.getInternalName(); clazz.version = Opcodes.V1_8; clazz.superName = "java/lang/Object"
         clazz->name = strdup(internalName);
         clazz->version = 52;
         clazz->superName = strdup("java/lang/Object");
@@ -192,7 +193,7 @@ unsigned char *LIBMATTI_FML_ClassTransformer_Transform(LIBMATTI_FML_ClassTransfo
         LIBMATTI_NEOFORGESPI_ClassProcessor *processor = transformersToUse[i];
         LIBMATTI_NEOFORGESPI_ProcessorName *name = LIBMATTI_NEOFORGESPI_ClassProcessor_Name(processor);
 
-        // Java: if (ClassProcessorIds.COMPUTING_FRAMES.equals(transformer.name())) { allowsComputeFrames = true; continue; }
+// Java: if (ClassProcessorIds.COMPUTING_FRAMES.equals(transformer.name())) { allowsComputeFrames = true; continue; }
         if (LIBMATTI_NEOFORGESPI_ProcessorName_CompareTo(
                 name, LIBMATTI_NEOFORGESPI_ClassProcessorIds_COMPUTING_FRAMES()) == 0)
         {
@@ -200,13 +201,13 @@ unsigned char *LIBMATTI_FML_ClassTransformer_Transform(LIBMATTI_FML_ClassTransfo
             continue;
         }
 
-        // Java: var trail = auditTrail.forClassProcessor(classDesc.getClassName(), transformer)
+// Java: var trail = auditTrail.forClassProcessor(classDesc.getClassName(), transformer)
         char *classDescName = LIBMATTI_ASM_Type_GetClassName(classDesc);
         LIBMATTI_FML_TransformerActivity *trail =
             LIBMATTI_FML_ClassProcessorAuditLog_ForClassProcessor(transformer->auditTrail, classDescName, processor);
         free(classDescName);
 
-        // Java: var context = new ClassProcessor.TransformationContext(classDesc, clazz, isEmpty, trail, digest)
+// Java: var context = new ClassProcessor.TransformationContext(classDesc, clazz, isEmpty, trail, digest)
         LIBMATTI_NEOFORGESPI_ClassProcessor_TransformationContext *context =
             LIBMATTI_NEOFORGESPI_ClassProcessor_TransformationContext_New(classDesc, clazz, isEmpty, accept_audit,
                                                                          trail, digest, &digestSource);
@@ -217,7 +218,7 @@ unsigned char *LIBMATTI_FML_ClassTransformer_Transform(LIBMATTI_FML_ClassTransfo
 
         if (newFlags != LIBMATTI_NEOFORGESPI_ClassProcessor_ComputeFlags_NO_REWRITE)
         {
-            // Java: trail.rewrites(); isEmpty = false;
+// Java: trail.rewrites(); isEmpty = false;
             LIBMATTI_FML_TransformerActivity_Rewrites(trail);
             isEmpty = 0;
         }
@@ -225,7 +226,7 @@ unsigned char *LIBMATTI_FML_ClassTransformer_Transform(LIBMATTI_FML_ClassTransfo
 
         if (flags >= LIBMATTI_NEOFORGESPI_ClassProcessor_ComputeFlags_COMPUTE_FRAMES)
         {
-            // Java: throw new IllegalStateException when the transformer may not recompute frames
+// Java: throw new IllegalStateException when the transformer may not recompute frames
             char *nameString = LIBMATTI_NEOFORGESPI_ProcessorName_ToString(name);
             char *framesString = LIBMATTI_NEOFORGESPI_ProcessorName_ToString(
                 LIBMATTI_NEOFORGESPI_ClassProcessorIds_COMPUTING_FRAMES());
@@ -250,7 +251,7 @@ unsigned char *LIBMATTI_FML_ClassTransformer_Transform(LIBMATTI_FML_ClassTransfo
 
     if (upToTransformer == NULL)
     {
-        // Java: run post-result callbacks
+// Java: run post-result callbacks
         LIBMATTI_NEOFORGESPI_ClassProcessor_AfterProcessingContext context = {classDesc};
         for (size_t i = 0; i < transformersToUseCount; i++)
             LIBMATTI_NEOFORGESPI_ClassProcessor_AfterProcessing(transformersToUse[i], &context);
@@ -258,7 +259,7 @@ unsigned char *LIBMATTI_FML_ClassTransformer_Transform(LIBMATTI_FML_ClassTransfo
 
     if (flags == LIBMATTI_NEOFORGESPI_ClassProcessor_ComputeFlags_NO_REWRITE)
     {
-        // Java: return inputClass; // No changes were made
+// Java: return inputClass; // No changes were made
         unsigned char *result = malloc(inputLength > 0 ? inputLength : 1);
         if (inputLength > 0) memcpy(result, inputClass, inputLength);
         *outLength = inputLength;
@@ -269,12 +270,12 @@ unsigned char *LIBMATTI_FML_ClassTransformer_Transform(LIBMATTI_FML_ClassTransfo
         return result;
     }
 
-    // Java: ClassWriter cw = createClassWriter(flags, clazz, locator); clazz.accept(cw); return cw.toByteArray()
+// Java: ClassWriter cw = createClassWriter(flags, clazz, locator); clazz.accept(cw); return cw.toByteArray()
     LIBMATTI_ASM_ClassWriter *writer = create_class_writer(flags, clazz);
     LIBMATTI_ASM_ClassWriter_Accept(writer, clazz);
     unsigned char *result = LIBMATTI_ASM_ClassWriter_ToByteArray(writer, outLength);
 
-    // Java: if (LOGGER.isEnabled(Level.TRACE) && upToTransformer == null && LOGGER.isEnabled(Level.TRACE, CLASSDUMP)) dumpClass(cw.toByteArray(), className);
+// Java: if (LOGGER.isEnabled(Level.TRACE) && upToTransformer == null && LOGGER.isEnabled(Level.TRACE, CLASSDUMP)) dumpClass(cw.toByteArray(), className);
     static const LIBMATTI_ML_LogMarker CLASSDUMP_MARKER = {"CLASSDUMP"};
     if (upToTransformer == NULL && LIBMATTI_ML_Logger_IsEnabledTrace(LOGGER(), NULL) &&
         LIBMATTI_ML_Logger_IsEnabledTrace(LOGGER(), &CLASSDUMP_MARKER))

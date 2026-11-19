@@ -1,5 +1,6 @@
-// Port of org.spongepowered.asm.launch.platform.container.ContainerHandleVirtual.
-// "A virtual container, used to marshal other containers around"
+
+
+
 
 #ifndef MATTICRAFT_SP_ASM_LAUNCH_PLATFORM_CONTAINER_CONTAINERHANDLEVIRTUAL_H
 #define MATTICRAFT_SP_ASM_LAUNCH_PLATFORM_CONTAINER_CONTAINERHANDLEVIRTUAL_H
@@ -15,13 +16,13 @@ struct LIBMATTI_SP_ContainerHandleVirtual
 {
     LIBMATTI_SP_ContainerHandle base;
 
-    // Java: private final String name
+// Java: private final String name
     char *name;
-    // Java: private final Map<String, String> attributes
+// Java: private final Map<String, String> attributes
     char **attributeKeys;
     char **attributeValues;
     size_t attributeCount;
-    // Java: private final Set<IContainerHandle> nestedContainers
+// Java: private final Set<IContainerHandle> nestedContainers
     LIBMATTI_SP_ContainerHandle **nestedContainers;
     size_t nestedContainerCount;
 };
@@ -39,4 +40,4 @@ LIBMATTI_SP_ContainerHandleVirtual *LIBMATTI_SP_ContainerHandleVirtual_SetAttrib
 LIBMATTI_SP_ContainerHandleVirtual *LIBMATTI_SP_ContainerHandleVirtual_Add(
     LIBMATTI_SP_ContainerHandleVirtual *handle, LIBMATTI_SP_ContainerHandle *nested);
 
-#endif //MATTICRAFT_SP_ASM_LAUNCH_PLATFORM_CONTAINER_CONTAINERHANDLEVIRTUAL_H
+#endif

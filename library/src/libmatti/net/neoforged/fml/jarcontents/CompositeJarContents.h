@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.jarcontents.CompositeJarContents.
+
+
 
 #ifndef MATTICRAFT_FML_JARCONTENTS_COMPOSITEJARCONTENTS_H
 #define MATTICRAFT_FML_JARCONTENTS_COMPOSITEJARCONTENTS_H
@@ -16,4 +17,4 @@ int LIBMATTI_FML_CompositeJarContents_IsFiltered(const LIBMATTI_FML_JarContents 
 LIBMATTI_FML_JarContents **LIBMATTI_FML_CompositeJarContents_GetDelegates(const LIBMATTI_FML_JarContents *contents,
                                                                          size_t *count);
 
-#endif //MATTICRAFT_FML_JARCONTENTS_COMPOSITEJARCONTENTS_H
+#endif

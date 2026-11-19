@@ -1,4 +1,5 @@
-// Port of com.mojang.brigadier.context.StringRange.
+
+
 
 #ifndef MATTICRAFT_BR_STRINGRANGE_H
 #define MATTICRAFT_BR_STRINGRANGE_H

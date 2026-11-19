@@ -1,4 +1,5 @@
-// Port of cpw.mods.modlauncher.VotingContext.
+
+
 
 #include "libmatti/cpw/modlauncher/VotingContext.h"
 
@@ -39,7 +40,8 @@ void LIBMATTI_ML_VotingContext_SetNode(LIBMATTI_ML_VotingContext *context, void 
     context->node = node;
 }
 
-// the ITransformerVotingContext contract
+
+
 
 const char *LIBMATTI_MLA_ITransformerVotingContext_GetClassName(const LIBMATTI_MLA_ITransformerVotingContext *context)
 {
@@ -54,7 +56,7 @@ int LIBMATTI_MLA_ITransformerVotingContext_DoesClassExist(const LIBMATTI_MLA_ITr
 void LIBMATTI_MLA_ITransformerVotingContext_GetInitialClassSha256(
     const LIBMATTI_MLA_ITransformerVotingContext *context, unsigned char *out, size_t *outLength)
 {
-    // Java: return sha256.get()
+// Java: return sha256.get()
     size_t length = 0;
     unsigned char *digest = context->sha256(context->sha256Userdata, &length);
     if (digest != NULL && out != NULL) memcpy(out, digest, length);
@@ -140,7 +142,7 @@ int LIBMATTI_MLA_ITransformerVotingContext_ApplyInstructionPredicate(
 
     LIBMATTI_ASM_Object args[4];
     size_t argCount = 0;
-    // Java: toObjectArray(insns[0]) - the original passes the first instruction
+// Java: toObjectArray(insns[0]) - the original passes the first instruction
     if (insnCount > 0) insn_args(insns[0], args, &argCount);
 
     int result = 0;

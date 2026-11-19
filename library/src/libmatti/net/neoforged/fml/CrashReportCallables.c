@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.CrashReportCallables.
+
+
 
 #include "libmatti/net/neoforged/fml/CrashReportCallables.h"
 
@@ -44,7 +45,7 @@ static char *header_supplier_get(LIBMATTI_FML_ISystemReportExtender *self)
 
 static int header_supplier_is_active(LIBMATTI_FML_ISystemReportExtender *self)
 {
-    // Java: try { return active.getAsBoolean(); } catch (Throwable t) { LOGGER.warn(...); return false; }
+// Java: try { return active.getAsBoolean(); } catch (Throwable t) { LOGGER.warn(...); return false; }
     HeaderSupplier *supplier = (HeaderSupplier *) self;
     if (supplier->active == NULL) return 1;
     return supplier->active(supplier->activeUserdata);
@@ -97,7 +98,7 @@ void LIBMATTI_FML_CrashReportCallables_RegisterHeader(LIBMATTI_FML_ICrashReportH
 
 LIBMATTI_FML_ISystemReportExtender **LIBMATTI_FML_CrashReportCallables_AllCrashCallables(size_t *count)
 {
-    // Java: List.copyOf(crashCallables)
+// Java: List.copyOf(crashCallables)
     LIBMATTI_FML_ISystemReportExtender **copy = malloc(sizeof(*copy) * (crashCallableCount > 0 ? crashCallableCount : 1));
     memcpy(copy, crashCallables, sizeof(*copy) * crashCallableCount);
     *count = crashCallableCount;
@@ -106,7 +107,7 @@ LIBMATTI_FML_ISystemReportExtender **LIBMATTI_FML_CrashReportCallables_AllCrashC
 
 char **LIBMATTI_FML_CrashReportCallables_GetHeaders(size_t *count)
 {
-    // Java: HEADERS.stream().map(ICrashReportHeader::getHeader).filter(Objects::nonNull)
+// Java: HEADERS.stream().map(ICrashReportHeader::getHeader).filter(Objects::nonNull)
     char **result = malloc(sizeof(*result) * (headerCount > 0 ? headerCount : 1));
     size_t resultCount = 0;
     for (size_t i = 0; i < headerCount; i++)

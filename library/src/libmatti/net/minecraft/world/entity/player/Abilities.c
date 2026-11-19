@@ -1,4 +1,5 @@
-// Port of net.minecraft.world.entity.player.Abilities (implementation).
+
+
 
 #include "libmatti/net/minecraft/world/entity/player/Abilities.h"
 
@@ -14,11 +15,11 @@ void LIBMATTI_MC_Abilities_Init(LIBMATTI_MC_Abilities *abilities)
     abilities->flying = false;
     abilities->mayfly = false;
     abilities->instabuild = false;
-    // Java: public boolean mayBuild = true
+// Java: public boolean mayBuild = true
     abilities->mayBuild = true;
-    // Java: private float flyingSpeed = 0.05F
+// Java: private float flyingSpeed = 0.05F
     abilities->flyingSpeed = 0.05f;
-    // Java: private float walkingSpeed = 0.1F
+// Java: private float walkingSpeed = 0.1F
     abilities->walkingSpeed = 0.1f;
 }
 

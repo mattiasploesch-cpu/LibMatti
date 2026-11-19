@@ -1,5 +1,6 @@
-// Throwaway harness for MixinFacade: builds a LoadingModList from two real .so mod files and
-// runs finishInitialization, so every branch of addMixins is exercised.
+
+
+
 
 #include "libmatti/java/lang/Thread.h"
 #include "libmatti/net/neoforged/fml/ModLoader.h"
@@ -67,8 +68,9 @@ int main(int argc, char **argv)
     LIBMATTI_FML_LoadingModList *loadingModList = LIBMATTI_FML_LoadingModList_Of(
         NULL, 0, NULL, 0, modFiles, 2, NULL, 0, NULL, 0, NULL);
 
-    // The facade checks that the context class loader is the one it was handed; with no JVM the
-    // port's default is NULL, so a stand-in pointer stands in for the transforming class loader.
+
+
+
     LIBMATTI_JL_Thread_SetContextClassLoader(LIBMATTI_JL_Thread_CurrentThread(), (LIBMATTI_JL_ClassLoader *) 0x1);
 
     LIBMATTI_FML_MixinFacade *facade = LIBMATTI_FML_MixinFacade_New();

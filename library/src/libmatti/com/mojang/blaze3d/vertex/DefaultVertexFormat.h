@@ -1,6 +1,7 @@
-// Port of com.mojang.blaze3d.vertex.DefaultVertexFormat - the 15 vanilla
-// vertex formats built at class-init. Java holds static final constants; the
-// C port hands out lazily created singletons.
+
+
+
+
 
 #ifndef MATTICRAFT_BLAZE3D_VERTEX_DEFAULTVERTEXFORMAT_H
 #define MATTICRAFT_BLAZE3D_VERTEX_DEFAULTVERTEXFORMAT_H

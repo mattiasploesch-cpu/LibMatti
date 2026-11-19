@@ -22,7 +22,7 @@ char *LIBMATTI_NEOFORGESPI_IModFileCandidateLocator_ToString(
 LIBMATTI_NEOFORGESPI_IModFileCandidateLocator *LIBMATTI_NEOFORGESPI_IModFileCandidateLocator_ForFolder(const char *folder,
                                                                                                       const char *identifier)
 {
-    // Java: return new ModsFolderLocator(folder.toPath(), identifier);
+// Java: return new ModsFolderLocator(folder.toPath(), identifier);
     LIBMATTI_FML_ModsFolderLocator *modsFolderLocator = LIBMATTI_FML_ModsFolderLocator_NewWithFolder(folder, identifier);
     return &modsFolderLocator->locator;
 }

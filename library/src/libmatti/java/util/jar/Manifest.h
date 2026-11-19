@@ -1,7 +1,8 @@
-//
-// Created by administrator on 09.09.26.
-//
-// Port of java.util.jar.Manifest.
+
+
+
+
+
 
 #ifndef MATTICRAFT_MANIFEST_H
 #define MATTICRAFT_MANIFEST_H
@@ -17,13 +18,14 @@ typedef struct
 
 typedef struct
 {
-    char *name; // section name (entry path)
+    char *name;
+
     LIBMATTI_JU_Attributes attributes;
 } LIBMATTI_JU_ManifestSection;
 
 typedef struct
 {
-    LIBMATTI_JU_Attributes mainAttributes; // Java: getMainAttributes()
+    LIBMATTI_JU_Attributes mainAttributes;// Java: getMainAttributes()
     LIBMATTI_JU_ManifestSection *sections;
     size_t sectionCount;
 } LIBMATTI_JU_Manifest;
@@ -40,4 +42,4 @@ const char *LIBMATTI_JU_Manifest_GetMainValue(const LIBMATTI_JU_Manifest *manife
 const LIBMATTI_JU_Attributes *LIBMATTI_JU_Manifest_GetSection(const LIBMATTI_JU_Manifest *manifest, const char *name);
 const char *LIBMATTI_JU_Attributes_GetValue(const LIBMATTI_JU_Attributes *attributes, const char *key);
 
-#endif //MATTICRAFT_MANIFEST_H
+#endif

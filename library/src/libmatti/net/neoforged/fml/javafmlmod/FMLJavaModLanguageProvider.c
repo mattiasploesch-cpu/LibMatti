@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.javafmlmod.FMLJavaModLanguageProvider.
+
+
 
 #include "libmatti/net/neoforged/fml/javafmlmod/FMLJavaModLanguageProvider.h"
 
@@ -55,7 +56,7 @@ static const char *annotation_value(const LIBMATTI_NEOFORGESPI_AnnotationData *d
 // carried as the same delimited form AutomaticEventSubscriber.getSides reads.
 size_t LIBMATTI_FML_FMLJavaModLanguageProvider_GetDepends(const char *data, const char **depends, size_t capacity)
 {
-    // Java: return depends != null ? (List<String>) depends : Collections.emptyList();
+// Java: return depends != null ? (List<String>) depends : Collections.emptyList();
     if (data == NULL) return 0;
 
     size_t count = 0;
@@ -125,14 +126,14 @@ static void *provider_load_mod(void *self, void *infoData, void *modFileScanResu
     LIBMATTI_FML_ModList *modList = LIBMATTI_FML_FMLLoader_GetLoadingModList(loader);
     const char *modId = LIBMATTI_NEOFORGESPI_IModInfo_GetModId(info);
 
-    // Java: scanData.getAnnotatedBy(Mod.class, ElementType.TYPE).filter(...)
+// Java: scanData.getAnnotatedBy(Mod.class, ElementType.TYPE).filter(...)
     LIBMATTI_NEOFORGESPI_AnnotationData **annotations = NULL;
     size_t annotationCount = 0;
     if (scanData != NULL)
         annotations = LIBMATTI_NEOFORGESPI_ModFileScanData_GetAnnotatedBy(
             scanData, MOD_TYPE, LIBMATTI_NEOFORGESPI_ElementType_TYPE, &annotationCount);
 
-    // Java: the filters keep the annotation count stable, so the port keeps them in place
+// Java: the filters keep the annotation count stable, so the port keeps them in place
     LIBMATTI_NEOFORGESPI_AnnotationData **candidates = calloc(annotationCount > 0 ? annotationCount : 1,
                                                              sizeof(void *));
     size_t candidateCount = 0;
@@ -155,7 +156,7 @@ static void *provider_load_mod(void *self, void *infoData, void *modFileScanResu
         candidates[candidateCount++] = data;
     }
 
-    // Java: .sorted(comparingInt(ad -> getDepends(ad).size()).thenComparingInt(ad -> -getSides(...).size()))
+// Java: .sorted(comparingInt(ad -> getDepends(ad).size()).thenComparingInt(ad -> -getSides(...).size()))
     for (size_t i = 1; i < candidateCount; i++)
     {
         LIBMATTI_NEOFORGESPI_AnnotationData *current = candidates[i];
@@ -187,7 +188,7 @@ static void *provider_load_mod(void *self, void *infoData, void *modFileScanResu
         candidates[j] = current;
     }
 
-    // Java: .map(ad -> ad.clazz().getClassName()).toList()
+// Java: .map(ad -> ad.clazz().getClassName()).toList()
     const char **modClasses = calloc(candidateCount > 0 ? candidateCount : 1, sizeof(char *));
     for (size_t i = 0; i < candidateCount; i++)
     {
@@ -195,7 +196,7 @@ static void *provider_load_mod(void *self, void *infoData, void *modFileScanResu
         modClasses[i] = className;
     }
 
-    // Java: return new FMLModContainer(info, modClasses, modFileScanResults, layer);
+// Java: return new FMLModContainer(info, modClasses, modFileScanResults, layer);
     // gameLayer.findModule(info.getOwningFile().getFile().getId())
     LIBMATTI_NEOFORGESPI_IModFile *file = LIBMATTI_NEOFORGESPI_IModFileInfo_GetFile(
         LIBMATTI_NEOFORGESPI_IModInfo_GetOwningFile(info));
@@ -221,7 +222,7 @@ static void provider_validate(void *self, void *fileData, void **loadedContainer
 
     LIBMATTI_NEOFORGESPI_IModFile *file = fileData;
 
-    // Java: Set<String> modIds = the @Mod ids of the infos whose loader is this loader
+// Java: Set<String> modIds = the @Mod ids of the infos whose loader is this loader
     size_t modInfoCount = 0;
     LIBMATTI_NEOFORGESPI_IModInfo **modInfos = LIBMATTI_NEOFORGESPI_IModFile_GetModInfos(file, &modInfoCount);
 
@@ -247,7 +248,7 @@ static void provider_validate(void *self, void *fileData, void **loadedContainer
             if (strcmp(modIds[j], modId) == 0) known = 1;
         if (known) continue;
 
-        // Java: ModLoadingIssue.error("fml.modloadingissue.javafml.dangling_entrypoint", modId, entrypointClass, file.getFilePath()).withAffectedModFile(file)
+// Java: ModLoadingIssue.error("fml.modloadingissue.javafml.dangling_entrypoint", modId, entrypointClass, file.getFilePath()).withAffectedModFile(file)
         char *entrypointClass = LIBMATTI_ASM_Type_GetClassName(annotations[i]->clazz);
         const char *args[] = {modId, entrypointClass, LIBMATTI_NEOFORGESPI_IModFile_GetFilePath(file)};
         LIBMATTI_FML_ModLoadingIssue *issue = LIBMATTI_FML_ModLoadingIssue_Error(
@@ -265,7 +266,7 @@ static void provider_validate(void *self, void *fileData, void **loadedContainer
 // Java: the instance used as an IModLanguageLoader
 LIBMATTI_NEOFORGESPI_IModLanguageLoader *LIBMATTI_FML_FMLJavaModLanguageProvider_AsLanguageLoader(void)
 {
-    // Java: modInfo.getLoader() == this - the port compares against the language loader itself
+// Java: modInfo.getLoader() == this - the port compares against the language loader itself
     languageLoader.self = &languageLoader;
     languageLoader.name = provider_name;
     languageLoader.version = provider_version;

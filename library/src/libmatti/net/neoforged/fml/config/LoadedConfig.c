@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.config.LoadedConfig.
+
+
 
 #include "libmatti/net/neoforged/fml/config/LoadedConfig.h"
 
@@ -22,10 +23,10 @@ static void loaded_save(void *self)
 {
     LIBMATTI_FML_LoadedConfig *config = self;
 
-    // Java: if (path != null) { ConfigTracker.writeConfig(path, config); }
+// Java: if (path != null) { ConfigTracker.writeConfig(path, config); }
     if (config->path != NULL) LIBMATTI_FML_ConfigTracker_WriteConfig(config->path, config->config);
 
-    // Java: modConfig.lock.lock(); try { modConfig.container.acceptEvent(new ModConfigEvent.Reloading(modConfig)); }
+// Java: modConfig.lock.lock(); try { modConfig.container.acceptEvent(new ModConfigEvent.Reloading(modConfig)); }
     //       finally { modConfig.lock.unlock(); }
     pthread_mutex_lock(&config->modConfig->lock);
     LIBMATTI_FML_Event_Config_ModConfigEvent *event =

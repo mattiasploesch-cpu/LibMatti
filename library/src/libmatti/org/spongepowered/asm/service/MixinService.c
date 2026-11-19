@@ -1,8 +1,9 @@
-// Port of org.spongepowered.asm.service.MixinService.
-// "Provides access to the service layer which connects the mixin transformer to a particular host
-// environment." The ServiceLoader lookups of Java resolve through the mixin.bootstrapService /
-// mixin.service system properties, exactly like the Java code's property bypass - in the C port
-// the property values name the registered service structs (fml).
+
+
+
+
+
+
 
 #include "libmatti/org/spongepowered/asm/service/MixinService.h"
 
@@ -79,13 +80,13 @@ static void run_boot_services(void)
     const char *serviceCls = LIBMATTI_JL_System_GetProperty("mixin.bootstrapService");
     if (serviceCls != NULL)
     {
-        // Java: bootService.bootstrap(); bootedServices.add(bootService.getServiceClassName());
+// Java: bootService.bootstrap(); bootedServices.add(bootService.getServiceClassName());
         LIBMATTI_SP_IMixinServiceBootstrap *bootService = LIBMATTI_FML_FMLMixinServiceBootstrap_Instance();
         bootService->bootstrap(bootService->self);
         return;
     }
 
-    // Java: ServiceLoader.load(IMixinServiceBootstrap.class) - no services without the property
+// Java: ServiceLoader.load(IMixinServiceBootstrap.class) - no services without the property
 }
 
 // Java: private static MixinService getInstance() -> the constructor runs runBootServices()
@@ -108,7 +109,7 @@ static LIBMATTI_SP_IMixinService *init_service(void)
     const char *serviceCls = LIBMATTI_JL_System_GetProperty("mixin.service");
     if (serviceCls != NULL)
     {
-        // Java: the property names the service class; the port's registered service is FML's.
+// Java: the property names the service class; the port's registered service is FML's.
         // Java: if (!service.isValid()) throw new RuntimeException("invalid service ...")
         LIBMATTI_SP_IMixinService *fmlService = LIBMATTI_FML_FMLMixinService_Instance();
         if (!fmlService->isValid(fmlService->self))
@@ -119,7 +120,7 @@ static LIBMATTI_SP_IMixinService *init_service(void)
         return fmlService;
     }
 
-    // Java: ServiceLoader.load(IMixinService.class) -> ServiceNotAvailableError
+// Java: ServiceLoader.load(IMixinService.class) -> ServiceNotAvailableError
     log_buffer_debug(&logBuffer, "No mixin host service is available. Services: ");
     return NULL;
 }
@@ -132,7 +133,7 @@ LIBMATTI_SP_IMixinService *LIBMATTI_SP_MixinService_GetService(void)
     if (service == NULL)
     {
         service = init_service();
-        // Java: ILogger serviceLogger = this.service.getLogger("mixin"); logBuffer.flush(serviceLogger);
+// Java: ILogger serviceLogger = this.service.getLogger("mixin"); logBuffer.flush(serviceLogger);
         if (service != NULL) log_buffer_flush(&logBuffer, service->getLogger(service->self, "mixin"));
         else log_buffer_flush(&logBuffer, LIBMATTI_SP_MixinService_DefaultLogger());
     }
@@ -142,7 +143,7 @@ LIBMATTI_SP_IMixinService *LIBMATTI_SP_MixinService_GetService(void)
 // Java: private IGlobalPropertyService initPropertyService()
 static LIBMATTI_SP_IGlobalPropertyService *init_property_service(void)
 {
-    // Java: ServiceLoader.load(IGlobalPropertyService.class) - the port registers FML's impl
+// Java: ServiceLoader.load(IGlobalPropertyService.class) - the port registers FML's impl
     return LIBMATTI_FML_FMLMixinGlobalProperties_Instance();
 }
 

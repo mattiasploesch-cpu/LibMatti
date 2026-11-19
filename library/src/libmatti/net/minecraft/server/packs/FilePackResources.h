@@ -1,4 +1,5 @@
-// Port of net.minecraft.server.packs.FilePackResources (the ZIP pack).
+
+
 
 #ifndef MATTICRAFT_MC_PACKS_FILEPACKRESOURCES_H
 #define MATTICRAFT_MC_PACKS_FILEPACKRESOURCES_H
@@ -16,11 +17,11 @@ typedef struct LIBMATTI_MC_FilePackResources
 {
     const LIBMATTI_MC_PackResources_VTable *vtable;
     LIBMATTI_MC_PackLocationInfo *location;
-    // Java: private final File source
+// Java: private final File source
     char *source;
-    // Java: private final boolean isBuiltin
+// Java: private final boolean isBuiltin
     int isBuiltin;
-    // Java: private FilePackResources.FileBackup backup (the ZipFile, opened lazily)
+// Java: private FilePackResources.FileBackup backup (the ZipFile, opened lazily)
     LIBMATTI_MC_FilePackResources_FileBackup *backup;
 } LIBMATTI_MC_FilePackResources;
 

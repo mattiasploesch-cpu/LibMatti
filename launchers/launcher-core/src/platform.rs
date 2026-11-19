@@ -51,7 +51,7 @@ impl Platform {
         !matches!(self, Platform::Android | Platform::Unknown)
     }
 
-    /// The local copy of `LIBMATTI_Platform_DefaultRenderer`.
+/// The local copy of `LIBMATTI_Platform_DefaultRenderer`.
     pub fn local_default_selection(self) -> &'static str {
         match self {
             Platform::Android => {
@@ -143,7 +143,8 @@ fn library_candidates() -> Vec<PathBuf> {
                 candidates.push(dir.join("lib").join(name));
                 candidates.push(dir.join("..").join("lib").join(name));
             }
-            // macOS app bundle: Contents/MacOS/<binary> + Contents/Frameworks.
+
+
             if cfg!(target_os = "macos") {
                 for name in library_names() {
                     candidates.push(dir.join("..").join("Frameworks").join(name));
@@ -152,7 +153,8 @@ fn library_candidates() -> Vec<PathBuf> {
         }
     }
     for name in library_names() {
-        // An empty parent makes the platform loader search its normal paths.
+
+
         candidates.push(PathBuf::from(name));
     }
     candidates
@@ -232,8 +234,9 @@ unsafe fn read_default_renderer(path: &std::path::Path) -> Option<String> {
     type DefaultRendererFn = unsafe extern "C" fn() -> *const c_char;
 
     let handle = dynamic::open(path)?;
-    // The handle is intentionally not closed: the function pointer and the
-    // CString it returns stay valid for the rest of the process.
+
+
+
     let symbol = dynamic::symbol(handle, "LIBMATTI_Platform_DefaultRenderer")?;
     let function: DefaultRendererFn = std::mem::transmute(symbol);
     let value = function();

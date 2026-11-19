@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.mclanguageprovider.MinecraftModLanguageProvider.
+
+
 
 #include "libmatti/net/neoforged/fml/mclanguageprovider/MinecraftModLanguageProvider.h"
 
@@ -28,7 +29,7 @@ static void *provider_load_mod(void *self, void *info, void *modFileScanResults,
     (void)modFileScanResults;
     (void)layer;
 
-    // Java: return new MinecraftModContainer(info);
+// Java: return new MinecraftModContainer(info);
     return LIBMATTI_FML_MinecraftModContainer_New(info);
 }
 
@@ -39,7 +40,7 @@ LIBMATTI_NEOFORGESPI_IModLanguageLoader *LIBMATTI_FML_MinecraftModLanguageProvid
     languageLoader.name = provider_name;
     languageLoader.version = provider_version;
     languageLoader.loadMod = provider_load_mod;
-    // Java: the default validate() does nothing
+// Java: the default validate() does nothing
     languageLoader.validate = NULL;
     return &languageLoader;
 }

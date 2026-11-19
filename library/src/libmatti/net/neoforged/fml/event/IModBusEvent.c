@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.event.IModBusEvent.
+
+
 
 #include "libmatti/net/neoforged/fml/event/IModBusEvent.h"
 

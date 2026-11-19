@@ -1,4 +1,5 @@
-// Port of net.neoforged.bus.api.IEventClassChecker.
+
+
 
 #ifndef MATTICRAFT_BUS_API_IEVENTCLASSCHECKER_H
 #define MATTICRAFT_BUS_API_IEVENTCLASSCHECKER_H
@@ -12,7 +13,7 @@ struct LIBMATTI_BUS_IEventClassChecker
 {
     void *self;
 
-    // Java: void check(Class<? extends Event> eventClass) throws IllegalArgumentException
+// Java: void check(Class<? extends Event> eventClass) throws IllegalArgumentException
     void (*check)(void *self, LIBMATTI_JL_Class *eventClass);
 };
 
@@ -20,4 +21,4 @@ struct LIBMATTI_BUS_IEventClassChecker
 void LIBMATTI_BUS_IEventClassChecker_Check(const LIBMATTI_BUS_IEventClassChecker *checker,
                                            LIBMATTI_JL_Class *eventClass);
 
-#endif //MATTICRAFT_BUS_API_IEVENTCLASSCHECKER_H
+#endif

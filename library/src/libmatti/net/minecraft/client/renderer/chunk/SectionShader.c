@@ -1,6 +1,7 @@
-// The terrain draw program (see SectionShader.h). Java's core shaders live in
-// assets/minecraft/shaders/core/position_color; the port embeds the same
-// attribute set the BLOCK format carries (position, color, uv0, uv2, normal).
+
+
+
+
 
 #include "libmatti/net/minecraft/client/renderer/chunk/SectionShader.h"
 
@@ -85,7 +86,7 @@ unsigned int LIBMATTI_MC_SectionShader_Compile(int *mvpLocation, int *originLoca
     LIBMATTI_GL_glAttachShader(program, vertex);
     LIBMATTI_GL_glAttachShader(program, fragment);
 
-    // Java: the BLOCK format's attribute order - the port binds the VAO slots
+// Java: the BLOCK format's attribute order - the port binds the VAO slots
     // 0..4 (position, color, uv0, uv2, normal).
     LIBMATTI_GL_glBindAttribLocation(program, 0, "position");
     LIBMATTI_GL_glBindAttribLocation(program, 1, "color");

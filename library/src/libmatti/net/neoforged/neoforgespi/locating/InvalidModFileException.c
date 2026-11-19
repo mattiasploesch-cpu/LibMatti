@@ -11,7 +11,7 @@
 LIBMATTI_NEOFORGESPI_InvalidModFileException *LIBMATTI_NEOFORGESPI_InvalidModFileException_New(const char *message,
                                                                                              void *modFileInfo)
 {
-    // Java: "%s (%s)" with Optional.ofNullable(modFileInfo).map(mf -> mf.getFile().getFileName()).orElse("MISSING FILE NAME")
+// Java: "%s (%s)" with Optional.ofNullable(modFileInfo).map(mf -> mf.getFile().getFileName()).orElse("MISSING FILE NAME")
     const char *fileName = "MISSING FILE NAME";
     if (modFileInfo != NULL)
     {

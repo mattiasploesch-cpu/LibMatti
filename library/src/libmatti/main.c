@@ -1,6 +1,7 @@
-//
-// Created by administrator on 08.09.26.
-//
+
+
+
+
 #include "main.h"
 
 #include <stdlib.h>
@@ -10,7 +11,7 @@
 
 int start_from_bsl(int argc, char *argv[], char *envp[])
 {
-    // Java: BootstrapLauncher.run(...) ends with
+// Java: BootstrapLauncher.run(...) ends with
     //   ServiceLoader.load(layer.layer(), Consumer.class).stream().findFirst().get().accept(args)
     // which resolves cpw.mods.modlauncher.BootstrapLaunchConsumer -> Launcher.main(args).
     // C has no service files, so the consumer is registered with the bootstrap launcher.
@@ -23,7 +24,7 @@ int start_from_bsl(int argc, char *argv[], char *envp[])
     }
     LIBMATTI_BSL_RUN(1, argc, argv, debug);
 
-    // Java: the launcher runs inside accept(...); an uncaught exception there
+// Java: the launcher runs inside accept(...); an uncaught exception there
     // terminates the JVM, so its status becomes the process exit status.
     return LIBMATTI_ML_BootstrapLaunchConsumer_GetLauncherStatus();
 }

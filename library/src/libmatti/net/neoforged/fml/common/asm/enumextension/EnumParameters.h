@@ -29,15 +29,15 @@ typedef enum
 typedef struct
 {
     LIBMATTI_FML_EnumParameters_ConstantType type;
-    // Java: String
+// Java: String
     char *stringValue;
-    // Java: Character / Byte / Short / Integer / Boolean
+// Java: Character / Byte / Short / Integer / Boolean
     int intValue;
-    // Java: Long
+// Java: Long
     long long longValue;
-    // Java: Float
+// Java: Float
     float floatValue;
-    // Java: Double
+// Java: Double
     double doubleValue;
 } LIBMATTI_FML_EnumParameters_Constant;
 
@@ -54,11 +54,11 @@ typedef struct LIBMATTI_FML_EnumParameters
 {
     LIBMATTI_FML_EnumParameters_Kind kind;
 
-    // Java: record Constant(List<Object> params)
+// Java: record Constant(List<Object> params)
     LIBMATTI_FML_EnumParameters_Constant *params;
     size_t paramCount;
 
-    // Java: record FieldReference(Type owner, String fieldName)
+// Java: record FieldReference(Type owner, String fieldName)
     // Java: record MethodReference(Type owner, String methodName)
     LIBMATTI_ASM_Type *owner;
     char *memberName;
@@ -75,4 +75,4 @@ LIBMATTI_FML_EnumParameters *LIBMATTI_FML_EnumParameters_NewMethodReference(cons
                                                                            const char *methodName);
 void LIBMATTI_FML_EnumParameters_Free(LIBMATTI_FML_EnumParameters *parameters);
 
-#endif //MATTICRAFT_FML_COMMON_ASM_ENUMEXTENSION_ENUMPARAMETERS_H
+#endif

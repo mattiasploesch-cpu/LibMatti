@@ -1,4 +1,5 @@
-// Port of net.minecraft.world.item.equipment.ArmorMaterials.
+
+
 
 #include "libmatti/net/minecraft/world/item/equipment/ArmorMaterials.h"
 
@@ -27,7 +28,8 @@ static LIBMATTI_MC_ArmorMaterial NETHERITE = {37, MAKE_DEFENSE(3, 6, 8, 3, 19), 
 // Java: ARMADILLO_SCUTE = (4, makeDefense(3, 6, 8, 3, 11), 10, ARMOR_EQUIP_WOLF, 0.0F, 0.0F, REPAIRS_WOLF_ARMOR, EquipmentAssets.ARMADILLO_SCUTE)
 static LIBMATTI_MC_ArmorMaterial ARMADILLO_SCUTE = {4, MAKE_DEFENSE(3, 6, 8, 3, 11), 10, "minecraft:item.armor.equip_wolf", 0.0f, 0.0f, NULL, "minecraft:armadillo_scute"};
 
-// The repairIngredient tags are interned lazily (TagKey interning is global).
+
+
 static int tags_ready;
 
 static void ensure_tags(void)

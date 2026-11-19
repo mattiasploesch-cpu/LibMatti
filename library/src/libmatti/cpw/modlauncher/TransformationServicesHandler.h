@@ -1,4 +1,5 @@
-// Port of cpw.mods.modlauncher.TransformationServicesHandler.
+
+
 
 #ifndef MATTICRAFT_MODLAUNCHER_TRANSFORMATIONSERVICESHANDLER_H
 #define MATTICRAFT_MODLAUNCHER_TRANSFORMATIONSERVICESHANDLER_H
@@ -17,7 +18,7 @@
 // Java: class TransformationServicesHandler
 typedef struct LIBMATTI_ML_TransformationServicesHandler
 {
-    // Java: Map<String, TransformationServiceDecorator> serviceLookup
+// Java: Map<String, TransformationServiceDecorator> serviceLookup
     char **names;
     LIBMATTI_ML_TransformationServiceDecorator **services;
     size_t count;
@@ -53,4 +54,4 @@ LIBMATTI_MLA_ITransformationService_Resource *LIBMATTI_ML_TransformationServices
     LIBMATTI_ML_TransformationServicesHandler *handler, LIBMATTI_MLA_IModuleLayerManager *moduleLayerManager,
     size_t *count);
 
-#endif //MATTICRAFT_MODLAUNCHER_TRANSFORMATIONSERVICESHANDLER_H
+#endif

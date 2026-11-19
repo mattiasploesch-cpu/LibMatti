@@ -19,6 +19,7 @@ char *LIBMATTI_CL3_StrSubstitutor_Replace(const char *source, LIBMATTI_CL3_StrLo
 char *LIBMATTI_CL3_ExtendedMessageFormat_Format(const char *pattern, const char *const *values, size_t count);
 
 // Java: org.apache.commons.lang3.StringUtils join/split equivalents used by FML
-char *LIBMATTI_CL3_StringUtils_Join(const char *const *parts, size_t count, char separator); // caller frees
+char *LIBMATTI_CL3_StringUtils_Join(const char *const *parts, size_t count, char separator);
 
-#endif //MATTICRAFT_COMMONS_LANG3_TEXT_H
+
+#endif

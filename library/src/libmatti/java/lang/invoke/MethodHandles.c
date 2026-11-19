@@ -17,7 +17,7 @@ LIBMATTI_JLI_MethodHandle *LIBMATTI_JLI_MethodHandles_Lookup_FindStatic(LIBMATTI
 {
     (void)lookup;
 
-    // Java: the VM resolves the static method on the class
+// Java: the VM resolves the static method on the class
     LIBMATTI_JL_Class_StaticMethod *method = LIBMATTI_JL_Class_FindStaticMethod(refc, name);
     if (method == NULL) return NULL;
 

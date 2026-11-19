@@ -1,4 +1,5 @@
-// Port of cpw.mods.modlauncher.LaunchPluginHandler.
+
+
 
 #ifndef MATTICRAFT_MODLAUNCHER_LAUNCHPLUGINHANDLER_H
 #define MATTICRAFT_MODLAUNCHER_LAUNCHPLUGINHANDLER_H
@@ -23,7 +24,7 @@ typedef struct
 // Java: public class LaunchPluginHandler
 typedef struct LIBMATTI_ML_LaunchPluginHandler
 {
-    // Java: Map<String, ILaunchPluginService> plugins
+// Java: Map<String, ILaunchPluginService> plugins
     char **names;
     LIBMATTI_MLS_ILaunchPluginService **plugins;
     size_t count;
@@ -63,4 +64,4 @@ void LIBMATTI_ML_LaunchPluginHandler_AnnounceLaunch(LIBMATTI_ML_LaunchPluginHand
                                                     LIBMATTI_ML_TransformingClassLoader *transformerLoader,
                                                     LIBMATTI_MLA_NamedPath *specialPaths, size_t specialPathCount);
 
-#endif //MATTICRAFT_MODLAUNCHER_LAUNCHPLUGINHANDLER_H
+#endif

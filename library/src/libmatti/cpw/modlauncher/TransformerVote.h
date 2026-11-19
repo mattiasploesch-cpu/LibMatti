@@ -1,4 +1,5 @@
-// Port of cpw.mods.modlauncher.TransformerVote.
+
+
 
 #ifndef MATTICRAFT_MODLAUNCHER_TRANSFORMERVOTE_H
 #define MATTICRAFT_MODLAUNCHER_TRANSFORMERVOTE_H
@@ -21,4 +22,4 @@ LIBMATTI_MLA_TransformerVoteResult LIBMATTI_ML_TransformerVote_GetResult(const L
 // Java: ITransformer<T> getTransformer()
 LIBMATTI_MLA_ITransformer *LIBMATTI_ML_TransformerVote_GetTransformer(const LIBMATTI_ML_TransformerVote *vote);
 
-#endif //MATTICRAFT_MODLAUNCHER_TRANSFORMERVOTE_H
+#endif

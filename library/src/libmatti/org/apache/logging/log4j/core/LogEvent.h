@@ -27,4 +27,4 @@ LIBMATTI_L4J_ThrowableProxy *LIBMATTI_L4J_LogEvent_GetThrownProxy(LIBMATTI_L4J_L
 void LIBMATTI_L4J_LogEvent_SetThrown(LIBMATTI_L4J_LogEvent *event, LIBMATTI_JL_Throwable *thrown);
 void LIBMATTI_L4J_LogEvent_SetThrownProxy(LIBMATTI_L4J_LogEvent *event, LIBMATTI_L4J_ThrowableProxy *proxy);
 
-#endif //MATTICRAFT_L4J_LOGEVENT_H
+#endif

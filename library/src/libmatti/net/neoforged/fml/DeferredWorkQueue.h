@@ -1,9 +1,10 @@
-// Port of net.neoforged.fml.DeferredWorkQueue.
-// Java's enqueueWork builds a CompletableFuture whose executor only stores the Runnable, so the work
-// runs when runTasks() is called; the port queues the task and runs it there.
-// Java's runTasks() throws the aggregate of the failed tasks; the port reports the failures through
-// LIBMATTI_FML_DeferredWorkQueue_GetFailures and completes the task futures exceptionally.
-// Java's Stopwatch is a monotonic clock here.
+
+
+
+
+
+
+
 
 #ifndef MATTICRAFT_FML_DEFERREDWORKQUEUE_H
 #define MATTICRAFT_FML_DEFERREDWORKQUEUE_H
@@ -41,4 +42,4 @@ void LIBMATTI_FML_DeferredWorkQueue_FailTask(const char *message);
 // Java: the aggregate ("modid: message" entries); caller frees the strings and the array
 char **LIBMATTI_FML_DeferredWorkQueue_GetFailures(LIBMATTI_FML_DeferredWorkQueue *queue, size_t *count);
 
-#endif //MATTICRAFT_FML_DEFERREDWORKQUEUE_H
+#endif

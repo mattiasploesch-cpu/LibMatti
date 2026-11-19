@@ -1,7 +1,8 @@
-// Port of net.minecraft.core.component.DataComponentType.
-// Java is an interface over (codec, streamCodec, ignoreSwapAnimation); the C port
-// keeps the registry-data part: the registered name, the transient flag and the
-// swap-animation flag. The codecs stay with the game port (values are void*).
+
+
+
+
+
 
 #ifndef MATTICRAFT_MC_CORE_COMPONENT_DATACOMPONENTTYPE_H
 #define MATTICRAFT_MC_CORE_COMPONENT_DATACOMPONENTTYPE_H
@@ -15,11 +16,11 @@ extern "C" {
 // Java: public interface DataComponentType<T> - built through DataComponentType.builder()
 typedef struct LIBMATTI_MC_DataComponentType
 {
-    // Java: the registered name (Registry.register(BuiltInRegistries.DATA_COMPONENT_TYPE, ...))
+// Java: the registered name (Registry.register(BuiltInRegistries.DATA_COMPONENT_TYPE, ...))
     char *name;
-    // Java: @Nullable Codec<T> codec() - NULL means transient
+// Java: @Nullable Codec<T> codec() - NULL means transient
     void *codec;
-    // Java: boolean ignoreSwapAnimation()
+// Java: boolean ignoreSwapAnimation()
     bool ignoreSwapAnimation;
 } LIBMATTI_MC_DataComponentType;
 
@@ -36,4 +37,4 @@ void *LIBMATTI_MC_DataComponentType_CodecOrThrow(const LIBMATTI_MC_DataComponent
 }
 #endif
 
-#endif //MATTICRAFT_MC_CORE_COMPONENT_DATACOMPONENTTYPE_H
+#endif

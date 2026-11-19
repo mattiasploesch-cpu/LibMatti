@@ -54,24 +54,24 @@ void LIBMATTI_FML_FMLPaths_LoadAbsolutePaths(const char *rootPath)
 
     for (int i = 0; i < LIBMATTI_FML_FMLPATHS_COUNT; i++)
     {
-        // Java: path.absolutePath = rootPath.resolve(path.relativePath).toAbsolutePath().normalize();
+// Java: path.absolutePath = rootPath.resolve(path.relativePath).toAbsolutePath().normalize();
         char *resolved = LIBMATTI_JNF_Path_Resolve(rootPath, relativePaths[i]);
         free(absolutePaths[i]);
         absolutePaths[i] = LIBMATTI_JNF_Path_ToAbsolutePath(resolved);
         free(resolved);
 
-        // Java: if (path.isDirectory && !Files.isDirectory(path.absolutePath)) { Files.createDirectories(...) }
+// Java: if (path.isDirectory && !Files.isDirectory(path.absolutePath)) { Files.createDirectories(...) }
         if (is_directory(i) && !LIBMATTI_JNF_Files_IsDirectory(absolutePaths[i]))
         {
             if (!LIBMATTI_JNF_Files_CreateDirectories(absolutePaths[i]))
             {
-                // Java: throw new UncheckedIOException(ioe);
+// Java: throw new UncheckedIOException(ioe);
                 LIBMATTI_ML_Logger_Error(LOGGER(), &LIBMATTI_FML_MARKER_CORE, "Failed to create directory {}",
                                          absolutePaths[i]);
             }
         }
 
-        // Java: if (LOGGER.isDebugEnabled(CORE)) { LOGGER.debug(CORE, "Path {} is {}", path, path.absolutePath); }
+// Java: if (LOGGER.isDebugEnabled(CORE)) { LOGGER.debug(CORE, "Path {} is {}", path, path.absolutePath); }
         LIBMATTI_ML_Logger_Debug(LOGGER(), &LIBMATTI_FML_MARKER_CORE, "Path {} is {}", NAMES[i], absolutePaths[i]);
     }
 }
@@ -79,15 +79,15 @@ void LIBMATTI_FML_FMLPaths_LoadAbsolutePaths(const char *rootPath)
 // Java: public static Path getOrCreateGameRelativePath(Path path)
 char *LIBMATTI_FML_FMLPaths_GetOrCreateGameRelativePath(const char *path)
 {
-    // Java: Path gameFolderPath = FMLPaths.GAMEDIR.get().resolve(path);
+// Java: Path gameFolderPath = FMLPaths.GAMEDIR.get().resolve(path);
     char *gameFolderPath = LIBMATTI_JNF_Path_Resolve(LIBMATTI_FML_FMLPaths_Get(LIBMATTI_FML_FMLPaths_GAMEDIR), path);
 
-    // Java: if (!Files.isDirectory(gameFolderPath)) { Files.createDirectories(gameFolderPath); }
+// Java: if (!Files.isDirectory(gameFolderPath)) { Files.createDirectories(gameFolderPath); }
     if (!LIBMATTI_JNF_Files_IsDirectory(gameFolderPath))
     {
         if (!LIBMATTI_JNF_Files_CreateDirectories(gameFolderPath))
         {
-            // Java: throw new RuntimeException(e);
+// Java: throw new RuntimeException(e);
             LIBMATTI_ML_Logger_Error(LOGGER(), &LIBMATTI_FML_MARKER_CORE, "Failed to create directory {}",
                                      gameFolderPath);
         }

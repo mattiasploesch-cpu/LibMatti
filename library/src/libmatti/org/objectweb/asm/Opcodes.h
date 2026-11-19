@@ -1,4 +1,5 @@
-// Port of org.objectweb.asm.Opcodes (the subset used by ModLauncher).
+
+
 
 #ifndef MATTICRAFT_ASM_OPCODES_H
 #define MATTICRAFT_ASM_OPCODES_H
@@ -10,7 +11,8 @@
 #define LIBMATTI_ASM_ASM8 8 << 16
 #define LIBMATTI_ASM_ASM9 9 << 16
 
-// access flags
+
+
 #define LIBMATTI_ASM_ACC_PUBLIC 0x0001
 #define LIBMATTI_ASM_ACC_PRIVATE 0x0002
 #define LIBMATTI_ASM_ACC_PROTECTED 0x0004
@@ -36,17 +38,20 @@
 #define LIBMATTI_ASM_ACC_DEPRECATED 0x20000
 #define LIBMATTI_ASM_ACC_RECORD 0x10000
 
-// ClassWriter flags
+
+
 #define LIBMATTI_ASM_COMPUTE_MAXS 1
 #define LIBMATTI_ASM_COMPUTE_FRAMES 2
 
-// ClassReader flags
+
+
 #define LIBMATTI_ASM_SKIP_CODE 1
 #define LIBMATTI_ASM_SKIP_DEBUG 2
 #define LIBMATTI_ASM_SKIP_FRAMES 4
 #define LIBMATTI_ASM_EXPAND_FRAMES 8
 
-// frame types
+
+
 #define LIBMATTI_ASM_F_NEW 0
 #define LIBMATTI_ASM_F_FULL 1
 #define LIBMATTI_ASM_F_APPEND 2
@@ -56,7 +61,8 @@
 #define LIBMATTI_ASM_F_SAME_LOCALS_1_STACK_ITEM_EXTENDED -1
 #define LIBMATTI_ASM_F_SAME_LOCALS_1_STACK_ITEM 6
 
-// opcodes
+
+
 #define LIBMATTI_ASM_NOP 0
 #define LIBMATTI_ASM_ACONST_NULL 1
 #define LIBMATTI_ASM_ICONST_M1 2
@@ -270,4 +276,4 @@
 #define LIBMATTI_ASM_GOTO_W 200
 #define LIBMATTI_ASM_JSR_W 201
 
-#endif //MATTICRAFT_ASM_OPCODES_H
+#endif

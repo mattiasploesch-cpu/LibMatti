@@ -1,4 +1,5 @@
-// Port of cpw.mods.modlauncher.TransformerAuditTrail.
+
+
 
 #include "libmatti/cpw/modlauncher/TransformerAuditTrail.h"
 
@@ -72,7 +73,7 @@ void LIBMATTI_ML_TransformerAuditTrail_AddPluginAuditTrail(LIBMATTI_ML_Transform
                                                            LIBMATTI_MLS_ILaunchPluginService *plugin,
                                                            LIBMATTI_MLS_Phase phase)
 {
-    // Java: new TransformerActivity(PLUGIN, plugin.name(), phase.name().substring(0, 1))
+// Java: new TransformerActivity(PLUGIN, plugin.name(), phase.name().substring(0, 1))
     char *context[2];
     context[0] = (char *)LIBMATTI_MLS_ILaunchPluginService_Name(plugin);
     context[1] = phase == LIBMATTI_MLS_PHASE_BEFORE ? "B" : "A";
@@ -127,7 +128,7 @@ char *LIBMATTI_MLA_ITransformerAuditTrail_GetAuditString(LIBMATTI_MLA_ITransform
         length += strlen(parts[i]) + 1;
     }
 
-    // Java: Collectors.joining(",")
+// Java: Collectors.joining(",")
     char *result = malloc(length);
     result[0] = '\0';
     for (size_t i = 0; i < count; i++)

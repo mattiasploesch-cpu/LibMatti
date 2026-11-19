@@ -1,6 +1,7 @@
-// Port of net.minecraft.client.renderer.culling.Frustum - the camera-
-// relative frustum wrapper JOML's FrustumIntersection feeds. The offset
-// stepping (OFFSET_STEP) and the cubeInFrustum result contract match Java.
+
+
+
+
 
 #ifndef MATTICRAFT_MC_CLIENT_RENDERER_CULLING_FRUSTUM_H
 #define MATTICRAFT_MC_CLIENT_RENDERER_CULLING_FRUSTUM_H
@@ -19,13 +20,13 @@ extern "C" {
 // Java: public class Frustum
 typedef struct LIBMATTI_MC_Frustum
 {
-    // Java: private final FrustumIntersection intersection
+// Java: private final FrustumIntersection intersection
     LIBMATTI_JOML_FrustumIntersection intersection;
-    // Java: private final Matrix4f matrix - the projection*view matrix
+// Java: private final Matrix4f matrix - the projection*view matrix
     LIBMATTI_JOML_Matrix4f matrix;
-    // Java: private Vector4f viewVector - the camera-forward row transform
+// Java: private Vector4f viewVector - the camera-forward row transform
     LIBMATTI_JOML_Vector4f viewVector;
-    // Java: private double camX / camY / camZ
+// Java: private double camX / camY / camZ
     double camX;
     double camY;
     double camZ;

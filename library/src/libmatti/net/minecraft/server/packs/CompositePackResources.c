@@ -1,4 +1,5 @@
-// Port of net.minecraft.server.packs.CompositePackResources.
+
+
 
 #include "libmatti/net/minecraft/server/packs/CompositePackResources.h"
 
@@ -10,7 +11,7 @@ static unsigned char *composite_get_root_resource(LIBMATTI_MC_PackResources *pac
 {
     LIBMATTI_MC_CompositePackResources *self = (LIBMATTI_MC_CompositePackResources *) pack;
     *outLength = 0;
-    // Java: the first stack that can serve the resource wins
+// Java: the first stack that can serve the resource wins
     for (size_t i = 0; i < self->stackCount; i++)
     {
         unsigned char *data = self->stacks[i]->vtable->getRootResource(self->stacks[i], paths, pathCount, outLength);
@@ -52,7 +53,7 @@ static void composite_list_resources(LIBMATTI_MC_PackResources *pack, int type, 
 static char **composite_get_namespaces(LIBMATTI_MC_PackResources *pack, int type, size_t *outCount)
 {
     LIBMATTI_MC_CompositePackResources *self = (LIBMATTI_MC_CompositePackResources *) pack;
-    // Java: union of the stack namespaces
+// Java: union of the stack namespaces
     char **names = NULL;
     size_t count = 0;
     size_t capacity = 0;

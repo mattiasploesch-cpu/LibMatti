@@ -1,4 +1,5 @@
-// Port of net.neoforged.bus.GeneratedEventListener.
+
+
 
 #include "libmatti/net/neoforged/bus/GeneratedEventListener.h"
 
@@ -13,7 +14,7 @@ static void generated_invoke(void *self, LIBMATTI_BUS_Event *event)
 
 static char *generated_to_string(void *self)
 {
-    // Java: GeneratedEventListener does not override toString()
+// Java: GeneratedEventListener does not override toString()
     (void)self;
     return strdup("net.neoforged.bus.GeneratedEventListener");
 }

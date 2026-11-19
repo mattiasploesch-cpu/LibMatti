@@ -1,4 +1,5 @@
-// Port of net.minecraft.server.packs.PathPackResources.
+
+
 
 #include "libmatti/net/minecraft/server/packs/PathPackResources.h"
 
@@ -12,9 +13,10 @@
 #include <string.h>
 #include <sys/stat.h>
 
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
+
+
+
+
 
 // Java: hidden() -> a name starting with '.' is hidden
 static int is_hidden(const char *name)
@@ -49,7 +51,7 @@ static const char *get_root(LIBMATTI_MC_PathPackResources *self)
 static char *resolve_directory(LIBMATTI_MC_PathPackResources *self, int type, const char *namespace,
                                const char *const *parts, size_t partCount)
 {
-    // Java: root().resolve(type.directory).resolve(...)
+// Java: root().resolve(type.directory).resolve(...)
     const char *directory = LIBMATTI_MC_PackType_GetDirectory(type);
     if (directory == NULL) return NULL;
 
@@ -65,7 +67,8 @@ static char *resolve_directory(LIBMATTI_MC_PathPackResources *self, int type, co
         return result;
     }
 
-    // LISTFILE: the namespaces live in <root>/<type>/listfile
+
+
     char *list = join_path3(get_root(self), directory, "listfile");
     return list;
 }
@@ -82,16 +85,17 @@ static int file_exists(const char *path)
     return LIBMATTI_JNF_Files_Exists(path);
 }
 
-// ---------------------------------------------------------------------------
-// VTable implementation
-// ---------------------------------------------------------------------------
+
+
+
+
 
 static unsigned char *path_get_root_resource(LIBMATTI_MC_PackResources *pack, const char *const *paths,
                                              size_t pathCount, size_t *outLength)
 {
     LIBMATTI_MC_PathPackResources *self = (LIBMATTI_MC_PathPackResources *) pack;
     *outLength = 0;
-    // Java: PathPackResources.getRootResource walks the parts under the root
+// Java: PathPackResources.getRootResource walks the parts under the root
     char *path = strdup(get_root(self));
     for (size_t i = 0; i < pathCount; i++)
     {
@@ -131,12 +135,14 @@ static void path_list_resources(LIBMATTI_MC_PackResources *pack, int type, const
     const char *directory = LIBMATTI_MC_PackType_GetDirectory(type);
     if (directory == NULL) return;
 
-    // Java: resolve the directory <root>/<type>/<namespace>/<prefix...>
+// Java: resolve the directory <root>/<type>/<namespace>/<prefix...>
     char *base = join_path3(get_root(self), directory, namespace);
-    char *walk = strdup(base); // the walk cursor (freed separately from base)
+    char *walk = strdup(base);
+
     if (prefix != NULL && prefix[0] != '\0')
     {
-        // The prefix can be hierarchical ("textures/block")
+
+
         const char *p = prefix;
         while (*p != '\0')
         {
@@ -175,7 +181,7 @@ static void path_list_resources(LIBMATTI_MC_PackResources *pack, int type, const
         }
         if (S_ISDIR(st.st_mode))
         {
-            // Java: directories are reported with a trailing slash, the path
+// Java: directories are reported with a trailing slash, the path
             // relative to the namespace directory (prefix is only the walk root).
             char *relative = full + strlen(base) + 1;
             size_t locationLength = strlen(relative) + 2;
@@ -211,7 +217,7 @@ static char **path_get_namespaces(LIBMATTI_MC_PackResources *pack, int type, siz
 
     if (self->mode == LIBMATTI_MC_PathPackResources_MODE_DIRECTORY)
     {
-        // Java: walk <root>/<type>/ and collect non-hidden directories
+// Java: walk <root>/<type>/ and collect non-hidden directories
         char *base = join_path(get_root(self), directory);
         DIR *dir = opendir(base);
         if (dir != NULL)
@@ -235,7 +241,8 @@ static char **path_get_namespaces(LIBMATTI_MC_PackResources *pack, int type, siz
     }
     else
     {
-        // LISTFILE: each line is "<namespace>/<path>"; the namespaces are the first segments
+
+
         char *list = join_path3(get_root(self), directory, "listfile");
         if (file_exists(list))
         {
@@ -256,7 +263,8 @@ static char **path_get_namespaces(LIBMATTI_MC_PackResources *pack, int type, siz
                         char *namespace = malloc(namespaceLength + 1);
                         memcpy(namespace, cursor, namespaceLength);
                         namespace[namespaceLength] = '\0';
-                        // deduplicate
+
+
                         int duplicate = 0;
                         for (size_t i = 0; i < count; i++)
                         {
@@ -275,7 +283,8 @@ static char **path_get_namespaces(LIBMATTI_MC_PackResources *pack, int type, siz
                         }
                         else if (duplicate)
                         {
-                            // namespace already owned by the array
+
+
                         }
                     }
                     if (lineEnd == NULL) break;
@@ -296,7 +305,7 @@ static char **path_get_namespaces(LIBMATTI_MC_PackResources *pack, int type, siz
 static void *path_get_metadata_section(LIBMATTI_MC_PackResources *pack,
                                        const LIBMATTI_MC_MetadataSectionSerializer *serializer, char **outError)
 {
-    // Java: AbstractPackResources.getMetadataSection -> getRootResource("pack.mcmeta")
+// Java: AbstractPackResources.getMetadataSection -> getRootResource("pack.mcmeta")
     size_t length = 0;
     unsigned char *data = LIBMATTI_MC_PackResources_GetMetadataSectionSupplierFromRoot(pack, "pack.mcmeta", &length);
     if (data == NULL)
@@ -304,8 +313,9 @@ static void *path_get_metadata_section(LIBMATTI_MC_PackResources *pack,
         *outError = NULL;
         return NULL;
     }
-    // The port parses lazily; the pack.mcmeta JSON lives in MetadataSection parsing.
-    // Caller chain: FilePackResources/PathPackResources both go through this helper.
+
+
+
     LIBMATTI_GSON_Gson *gson = LIBMATTI_GSON_Gson_New();
     LIBMATTI_GSON_JsonElement *element = LIBMATTI_GSON_Gson_FromJson(gson, (const char *) data, length);
     LIBMATTI_GSON_Gson_Free(gson);
@@ -346,9 +356,10 @@ static const LIBMATTI_MC_PackResources_VTable PATH_VTABLE = {
     path_close,
 };
 
-// ---------------------------------------------------------------------------
-// Constructors
-// ---------------------------------------------------------------------------
+
+
+
+
 
 LIBMATTI_MC_PathPackResources *LIBMATTI_MC_PathPackResources_NewWithMode(LIBMATTI_MC_PackLocationInfo *location,
                                                                          const char *source, int isBuiltin,

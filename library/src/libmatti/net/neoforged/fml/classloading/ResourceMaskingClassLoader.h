@@ -1,6 +1,7 @@
-// Port of net.neoforged.fml.classloading.ResourceMaskingClassLoader.
-// This class loader filters the resources returned from getResources(String) and getResource(String)
-// by removing any results that come from a given set of classpath items (folders or jars).
+
+
+
+
 
 #ifndef MATTICRAFT_FML_CLASSLOADING_RESOURCEMASKINGCLASSLOADER_H
 #define MATTICRAFT_FML_CLASSLOADING_RESOURCEMASKINGCLASSLOADER_H
@@ -13,10 +14,10 @@
 // Java: public class ResourceMaskingClassLoader extends ClassLoader
 typedef struct LIBMATTI_FML_ResourceMaskingClassLoader
 {
-    // Java: extends ClassLoader
+// Java: extends ClassLoader
     LIBMATTI_JL_ClassLoader base;
 
-    // Java: private final Set<Path> maskedClasspathElements
+// Java: private final Set<Path> maskedClasspathElements
     const char **maskedClasspathElements;
     size_t maskedClasspathElementCount;
 } LIBMATTI_FML_ResourceMaskingClassLoader;
@@ -33,4 +34,4 @@ LIBMATTI_JN_URL *LIBMATTI_FML_ResourceMaskingClassLoader_GetResource(
 LIBMATTI_JN_URL **LIBMATTI_FML_ResourceMaskingClassLoader_GetResources(
     LIBMATTI_FML_ResourceMaskingClassLoader *classLoader, const char *name, size_t *count);
 
-#endif //MATTICRAFT_FML_CLASSLOADING_RESOURCEMASKINGCLASSLOADER_H
+#endif

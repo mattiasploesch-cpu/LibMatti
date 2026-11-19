@@ -23,7 +23,7 @@ pub struct Settings {
     pub update_manifest_url: Option<String>,
     #[serde(default)]
     pub crash_upload_url: Option<String>,
-    /// Explicit opt-in; crash reports stay local unless this is true.
+/// Explicit opt-in; crash reports stay local unless this is true.
     #[serde(default)]
     pub upload_crash_reports: bool,
     #[serde(default)]
@@ -72,7 +72,7 @@ fn default_schema() -> u32 {
 }
 
 impl Store {
-    /// `MATTI_LAUNCHER_HOME`, else the platform data directory.
+/// `MATTI_LAUNCHER_HOME`, else the platform data directory.
     pub fn default_root() -> Result<PathBuf> {
         if let Some(home) = std::env::var_os("MATTI_LAUNCHER_HOME") {
             return Ok(PathBuf::from(home));
@@ -86,7 +86,7 @@ impl Store {
         std::env::current_dir().map_err(Error::Io)
     }
 
-    /// Load the store from `root`, creating a first profile when the file does
+/// Load the store from `root`, creating a first profile when the file does
     /// not exist yet.
     pub fn load_or_create(root: impl AsRef<Path>) -> Result<Self> {
         let root = prepare_root(root.as_ref())?;
@@ -213,7 +213,7 @@ impl Store {
         Ok(())
     }
 
-    /// Add a profile. Duplicate folder slugs get `-2`, `-3`, ... suffixes.
+/// Add a profile. Duplicate folder slugs get `-2`, `-3`, ... suffixes.
     pub fn add_profile(
         &mut self,
         name: &str,

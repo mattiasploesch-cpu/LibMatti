@@ -1,4 +1,5 @@
-// Port of joptsimple.OptionSpec.
+
+
 
 #include "libmatti/joptsimple/OptionSpec.h"
 
@@ -32,7 +33,7 @@ const char *LIBMATTI_JOPT_OptionSpec_Options(const LIBMATTI_JOPT_OptionSpec *spe
 
 const char *LIBMATTI_JOPT_OptionSpec_Value(const LIBMATTI_JOPT_OptionSpec *spec)
 {
-    // Java: AbstractOptionSpec.value(OptionSet) returns the default when absent
+// Java: AbstractOptionSpec.value(OptionSet) returns the default when absent
     if (spec->valueCount > 0) return spec->values[spec->valueCount - 1];
     return spec->defaultValue;
 }

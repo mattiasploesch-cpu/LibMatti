@@ -1,4 +1,5 @@
-// Port of net.minecraft.server.packs.AbstractPackResources.
+
+
 
 #include "libmatti/net/minecraft/server/packs/PackResources.h"
 
@@ -29,7 +30,7 @@ const char *abstract_pack_id(LIBMATTI_MC_PackResources *self)
 
 int LIBMATTI_MC_AbstractPackResources_HasResource(LIBMATTI_MC_PackResources *self, const char *path)
 {
-    // Java: protected abstract boolean hasResource(String) - dispatched over the vtable's owner
+// Java: protected abstract boolean hasResource(String) - dispatched over the vtable's owner
     // The concrete packs implement it via open(); the port keeps the helper for the
     // getMetadataSectionSupplierFromRoot path.
     size_t length = 0;
@@ -42,7 +43,7 @@ int LIBMATTI_MC_AbstractPackResources_HasResource(LIBMATTI_MC_PackResources *sel
 unsigned char *LIBMATTI_MC_PackResources_GetMetadataSectionSupplierFromRoot(LIBMATTI_MC_PackResources *self,
                                                                             const char *name, size_t *outLength)
 {
-    // Java: getRootResource("pack.mcmeta") -> the metadata markers only exist at the root
+// Java: getRootResource("pack.mcmeta") -> the metadata markers only exist at the root
     const char *paths[1] = {name};
     return self->vtable->getRootResource(self, paths, 1, outLength);
 }

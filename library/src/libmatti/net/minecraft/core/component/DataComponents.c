@@ -1,5 +1,6 @@
-// Port of net.minecraft.core.component.DataComponents.
-// Generated from the vendor Java sources (vendor/MCP-Reborn .../core/component/DataComponents.java).
+
+
+
 
 #include "libmatti/net/minecraft/core/component/DataComponents.h"
 

@@ -1,4 +1,5 @@
-// Port of com.mojang.brigadier.Message / LiteralMessage.
+
+
 
 #include "libmatti/com/mojang/brigadier/Message.h"
 

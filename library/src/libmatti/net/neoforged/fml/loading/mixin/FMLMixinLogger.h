@@ -10,4 +10,4 @@
 // Java: public FMLMixinLogger(String name)
 LIBMATTI_SP_ILogger *LIBMATTI_FML_FMLMixinLogger_Instance(const char *name);
 
-#endif //MATTICRAFT_FML_LOADING_MIXIN_FMLMIXINLOGGER_H
+#endif

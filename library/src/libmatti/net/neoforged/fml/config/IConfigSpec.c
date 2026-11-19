@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.config.IConfigSpec.
+
+
 
 #include "libmatti/net/neoforged/fml/config/IConfigSpec.h"
 

@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent.
+
+
 
 #ifndef MATTICRAFT_FML_EVENT_LIFECYCLE_FMLCOMMONSETUPEVENT_H
 #define MATTICRAFT_FML_EVENT_LIFECYCLE_FMLCOMMONSETUPEVENT_H
@@ -10,7 +11,7 @@ typedef struct LIBMATTI_FML_Event_Lifecycle_FMLCommonSetupEvent LIBMATTI_FML_Eve
 // Java: public class FMLCommonSetupEvent extends ParallelDispatchEvent
 struct LIBMATTI_FML_Event_Lifecycle_FMLCommonSetupEvent
 {
-    // Java: extends ParallelDispatchEvent
+// Java: extends ParallelDispatchEvent
     LIBMATTI_FML_Event_Lifecycle_ParallelDispatchEvent base;
 };
 
@@ -22,4 +23,4 @@ LIBMATTI_FML_Event_Lifecycle_FMLCommonSetupEvent *LIBMATTI_FML_Event_Lifecycle_F
     LIBMATTI_FML_ModContainer *container, LIBMATTI_FML_DeferredWorkQueue *deferredWorkQueue);
 void LIBMATTI_FML_Event_Lifecycle_FMLCommonSetupEvent_Free(LIBMATTI_FML_Event_Lifecycle_FMLCommonSetupEvent *event);
 
-#endif //MATTICRAFT_FML_EVENT_LIFECYCLE_FMLCOMMONSETUPEVENT_H
+#endif

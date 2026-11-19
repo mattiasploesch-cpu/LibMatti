@@ -1,6 +1,7 @@
-// Port of org.lwjgl.glfw.GLFW (the constants and functions DisplayWindow uses).
-// LWJGL binds the native libglfw; the port dlopen()s it exactly like the tinyfd
-// binding. Every symbol here has the name and signature of the GLFW C API.
+
+
+
+
 
 #ifndef MATTICRAFT_LWJGL_GLFW_GLFW_H
 #define MATTICRAFT_LWJGL_GLFW_GLFW_H
@@ -152,4 +153,4 @@ const char **LIBMATTI_GLFW_glfwGetRequiredInstanceExtensions(unsigned int *count
 int LIBMATTI_GLFW_glfwCreateWindowSurface(void *instance, long window, const void *allocator,
                                           void **surface);
 
-#endif //MATTICRAFT_LWJGL_GLFW_GLFW_H
+#endif

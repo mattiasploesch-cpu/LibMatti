@@ -1,9 +1,10 @@
-// Port of net.minecraft.world.level.GrassColor / FoliageColor (implementation).
-//
-// Java loads the 256x1 biome color textures (grass.png / foliage.png) through
-// GrassColorReloadListener / FoliageColorReloadListener; the vanilla defaults
-// (no resource pack) are the pixels embedded below - the same values the
-// vanilla textures carry, sampled from the vendored client jar's assets.
+
+
+
+
+
+
+
 
 #include "libmatti/net/minecraft/world/level/GrassColor.h"
 

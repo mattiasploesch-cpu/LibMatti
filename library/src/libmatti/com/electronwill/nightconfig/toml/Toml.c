@@ -1,4 +1,5 @@
-// Port of com.electronwill.nightconfig.toml.Toml.
+
+
 
 #include "libmatti/com/electronwill/nightconfig/toml/Toml.h"
 

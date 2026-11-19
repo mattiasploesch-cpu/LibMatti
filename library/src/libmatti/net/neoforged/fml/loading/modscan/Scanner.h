@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.loading.modscan.Scanner.
+
+
 
 #ifndef MATTICRAFT_FML_LOADING_MODSCAN_SCANNER_H
 #define MATTICRAFT_FML_LOADING_MODSCAN_SCANNER_H
@@ -18,4 +19,4 @@ void LIBMATTI_FML_Scanner_Free(LIBMATTI_FML_Scanner *scanner);
 // Java: public ModFileScanData scan()
 LIBMATTI_NEOFORGESPI_ModFileScanData *LIBMATTI_FML_Scanner_Scan(const LIBMATTI_FML_Scanner *scanner);
 
-#endif //MATTICRAFT_FML_LOADING_MODSCAN_SCANNER_H
+#endif

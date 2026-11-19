@@ -1,4 +1,5 @@
-// Port of com.electronwill.nightconfig.toml.TableParser.
+
+
 
 #include "libmatti/com/electronwill/nightconfig/toml/TableParser.h"
 
@@ -75,7 +76,7 @@ static int checkDuplicateKey(LIBMATTI_NC_TomlParser *parser, int hadPrevious, in
 int LIBMATTI_NC_TableParser_ParseInline(LIBMATTI_NC_ReaderInput *input, LIBMATTI_NC_TomlParser *parser,
                                         LIBMATTI_NC_Config *config)
 {
-    // Java: switch on the TOML version; the port implements the two variants
+// Java: switch on the TOML version; the port implements the two variants
     if (LIBMATTI_NC_TomlParser_GetTomlVersion(parser) == LIBMATTI_NC_TOMLVERSION_V1_1)
         return parseInlineV1_1(input, parser, config);
     return parseInlineV1_0(input, parser, config);
@@ -95,7 +96,8 @@ static int parseInlineV1_0(LIBMATTI_NC_ReaderInput *input, LIBMATTI_NC_TomlParse
             LIBMATTI_NC_TomlParser_Error(parser, "Invalid inline table: missing closing brace }");
             return 0;
         }
-        if (keyFirst == '}') // handles {} and {k1=v1,... ,}
+        if (keyFirst == '}')
+
         {
             if (expectNextElement)
                 LIBMATTI_NC_TomlParser_Error(parser, "Invalid trailing comma in inline table.");
@@ -152,9 +154,11 @@ static int parseInlineV1_1(LIBMATTI_NC_ReaderInput *input, LIBMATTI_NC_TomlParse
             LIBMATTI_NC_TomlParser_Error(parser, "Invalid inline table: missing closing brace }");
             return 0;
         }
-        else if (keyFirst == '}') // handles {} and {k1=v1,... ,}
+        else if (keyFirst == '}')
+
         {
-            // Java accepts trailing commas (the flag is set but not checked here)
+
+
             (void) expectNextElement;
             return 1;
         }
@@ -186,13 +190,15 @@ static int parseInlineV1_1(LIBMATTI_NC_ReaderInput *input, LIBMATTI_NC_TomlParse
 
         int after = LIBMATTI_NC_Toml_ReadNonSpaceChar(input, 0);
         int expectComma = 0;
-        if (after == '}') // end of the inline config table
+        if (after == '}')
+
         {
             return 1;
         }
         else if (after == '#')
         {
-            // Java keeps the comment; the port drops it (FML does not read comments)
+
+
             LIBMATTI_NC_Toml_ReadLine(input);
         }
         else if (after != ',')
@@ -211,7 +217,8 @@ static int parseInlineV1_1(LIBMATTI_NC_ReaderInput *input, LIBMATTI_NC_TomlParse
         if (expectComma)
         {
             after = LIBMATTI_NC_Toml_ReadUsefulChar(input);
-            if (after == '}') // end of the table
+            if (after == '}')
+
             {
                 return 1;
             }
@@ -235,7 +242,8 @@ int LIBMATTI_NC_TableParser_ParseNormal(LIBMATTI_NC_ReaderInput *input, LIBMATTI
         int keyFirst = LIBMATTI_NC_Toml_ReadUseful(input, parser);
         if (keyFirst == -1 || keyFirst == '[')
         {
-            // No more data, or beginning of an other table
+
+
             return 1;
         }
 
@@ -265,13 +273,15 @@ int LIBMATTI_NC_TableParser_ParseNormal(LIBMATTI_NC_ReaderInput *input, LIBMATTI
         LIBMATTI_NC_KeyList_Free(key);
 
         int after = LIBMATTI_NC_Toml_ReadNonSpace(input, 0);
-        if (after == -1) // End of the stream
+        if (after == -1)
+
         {
             return 1;
         }
         if (after == '#')
         {
-            // Java keeps the comment; the port drops it (FML does not read comments)
+
+
             LIBMATTI_NC_Toml_ReadLine(input);
         }
         else if (after != '\n' && after != '\r')
@@ -321,7 +331,8 @@ LIBMATTI_NC_KeyList *LIBMATTI_NC_TableParser_ParseTableName(LIBMATTI_NC_ReaderIn
         LIBMATTI_NC_KeyList_Add(list, key);
 
         int separator = LIBMATTI_NC_Toml_ReadNonSpaceChar(input, 0);
-        if (separator == ']') // End of the declaration
+        if (separator == ']')
+
         {
             if (array)
             {
@@ -336,9 +347,11 @@ LIBMATTI_NC_KeyList *LIBMATTI_NC_TableParser_ParseTableName(LIBMATTI_NC_ReaderIn
             }
 
             int after = LIBMATTI_NC_Toml_ReadNonSpaceChar(input, 0);
-            if (after == '#') // Comment
+            if (after == '#')
+
             {
-                // Java keeps the comment; the port drops it (FML does not read comments)
+
+
                 LIBMATTI_NC_Toml_ReadLine(input);
             }
             else if (after != '\n' && after != '\r')
@@ -401,8 +414,9 @@ LIBMATTI_NC_KeyList *LIBMATTI_NC_TableParser_ParseDottedKey(LIBMATTI_NC_ReaderIn
 char *LIBMATTI_NC_TableParser_ParseNonDottedKey(LIBMATTI_NC_ReaderInput *input, char firstChar,
                                                LIBMATTI_NC_TomlParser *parser)
 {
-    // Note that a key can't be multiline
-    // Empty keys are allowed if and only if they are quoted (with double or single quotes)
+
+
+
     if (firstChar == '"') return LIBMATTI_NC_StringParser_ParseBasic(input, parser);
     if (firstChar == '\'') return LIBMATTI_NC_StringParser_ParseLiteral(input, parser);
 
@@ -415,7 +429,8 @@ char *LIBMATTI_NC_TableParser_ParseNonDottedKey(LIBMATTI_NC_ReaderInput *input, 
     char *bareKey = LIBMATTI_NC_CharsWrapper_Builder_ToString(builder);
     LIBMATTI_NC_CharsWrapper_Builder_Free(builder);
 
-    // Checks that the bare key is conform to the specification
+
+
     if (bareKey[0] == '\0')
     {
         LIBMATTI_NC_TomlParser_Error(parser, "Empty bare keys aren't allowed.");

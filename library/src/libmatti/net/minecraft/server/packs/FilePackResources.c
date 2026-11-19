@@ -1,4 +1,5 @@
-// Port of net.minecraft.server.packs.FilePackResources (the ZIP pack).
+
+
 
 #include "libmatti/net/minecraft/server/packs/FilePackResources.h"
 
@@ -53,9 +54,10 @@ static LIBMATTI_JU_ZipFile *ensure_zip(LIBMATTI_MC_FilePackResources *self)
     return self->backup != NULL ? self->backup->zip : NULL;
 }
 
-// ---------------------------------------------------------------------------
-// VTable implementation
-// ---------------------------------------------------------------------------
+
+
+
+
 
 static unsigned char *file_get_root_resource(LIBMATTI_MC_PackResources *pack, const char *const *paths,
                                              size_t pathCount, size_t *outLength)
@@ -65,7 +67,7 @@ static unsigned char *file_get_root_resource(LIBMATTI_MC_PackResources *pack, co
     LIBMATTI_JU_ZipFile *zip = ensure_zip(self);
     if (zip == NULL) return NULL;
 
-    // Java: getRootResource joins the parts with '/' ("pack.mcmeta" is a single part)
+// Java: getRootResource joins the parts with '/' ("pack.mcmeta" is a single part)
     size_t joinedLength = 1;
     for (size_t i = 0; i < pathCount; i++) joinedLength += strlen(paths[i]) + 1;
     char *joined = malloc(joinedLength);
@@ -111,7 +113,7 @@ static void file_list_resources(LIBMATTI_MC_PackResources *pack, int type, const
     LIBMATTI_JU_ZipFile *zip = ensure_zip(self);
     if (zip == NULL) return;
 
-    // Java: the search prefix is "<directory>/<namespace>/<prefix>/"
+// Java: the search prefix is "<directory>/<namespace>/<prefix>/"
     const char *directory = LIBMATTI_MC_PackType_GetDirectory(type);
     if (directory == NULL) return;
     size_t searchLength = strlen(directory) + strlen(namespace) + strlen(prefix) + 3;
@@ -128,7 +130,7 @@ static void file_list_resources(LIBMATTI_MC_PackResources *pack, int type, const
         if (relative[0] == '\0') continue;
         char *location = malloc(strlen(prefix) + strlen(relative) + 1);
         snprintf(location, strlen(prefix) + strlen(relative) + 1, "%s%s", prefix, relative);
-        // Java: the output receives the entry; a directory entry ends with '/'
+// Java: the output receives the entry; a directory entry ends with '/'
         int isDirectory = entry->isDirectory;
         onFile(userData, namespace, location, isDirectory ? 0 : 1, entry->uncompressedSize);
         free(location);
@@ -155,7 +157,7 @@ static char **file_get_namespaces(LIBMATTI_MC_PackResources *pack, int type, siz
     for (size_t i = 0; i < entryCount; i++)
     {
         const LIBMATTI_JU_ZipEntry *entry = LIBMATTI_JU_ZipFile_EntryAt(zip, i);
-        // Java: entries "<dir>/<namespace>/..." contribute the namespace
+// Java: entries "<dir>/<namespace>/..." contribute the namespace
         if (strncmp(entry->name, directory, directoryLength) != 0) continue;
         const char *rest = entry->name + directoryLength;
         if (rest[0] != '/') continue;

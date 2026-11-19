@@ -38,6 +38,7 @@ set_target_properties(matti_objects PROPERTIES
         POSITION_INDEPENDENT_CODE ON
 )
 
+
 # HAVE_* feature macros from the configure checks, force-included like the
 # config.h of an autoconf build.
 if(COMMAND matti_apply_config)
@@ -47,26 +48,29 @@ endif()
 # Optional renderer backends. The sources are always compiled; the defines
 # switch the real implementation on, otherwise the backend reports itself as
 # unavailable. OpenGL needs no development headers (GLFW/GL are dlopen'ed).
-find_package(PkgConfig QUIET)
-if(PkgConfig_FOUND)
-    pkg_check_modules(MATTI_SDL3 QUIET IMPORTED_TARGET sdl3)
-    pkg_check_modules(MATTI_VULKAN QUIET IMPORTED_TARGET vulkan)
-endif()
-
-# vcpkg/Homebrew/SDL3's own CMake package: used when pkg-config has no sdl3.
-if(NOT MATTI_SDL3_FOUND)
-    find_package(SDL3 CONFIG QUIET)
-    if(SDL3_FOUND)
-        set(MATTI_SDL3_FOUND TRUE)
-        set(MATTI_SDL3_VERSION "${SDL3_VERSION}")
-        if(TARGET SDL3::SDL3)
-            set(MATTI_SDL3_TARGET SDL3::SDL3)
-        elseif(TARGET SDL3::SDL3-shared)
-            set(MATTI_SDL3_TARGET SDL3::SDL3-shared)
-        endif()
+# A cross build must not resolve the host's Linux .so files. Native macOS and
+# Linux find their packages here; Android/Windows use their own runtime paths.
+if(NOT CMAKE_CROSSCOMPILING)
+    find_package(PkgConfig QUIET)
+    if(PkgConfig_FOUND)
+        pkg_check_modules(MATTI_SDL3 QUIET IMPORTED_TARGET sdl3)
+        pkg_check_modules(MATTI_VULKAN QUIET IMPORTED_TARGET vulkan)
     endif()
-else()
-    set(MATTI_SDL3_TARGET PkgConfig::MATTI_SDL3)
+
+    if(NOT MATTI_SDL3_FOUND)
+        find_package(SDL3 CONFIG QUIET)
+        if(SDL3_FOUND)
+            set(MATTI_SDL3_FOUND TRUE)
+            set(MATTI_SDL3_VERSION "${SDL3_VERSION}")
+            if(TARGET SDL3::SDL3)
+                set(MATTI_SDL3_TARGET SDL3::SDL3)
+            elseif(TARGET SDL3::SDL3-shared)
+                set(MATTI_SDL3_TARGET SDL3::SDL3-shared)
+            endif()
+        endif()
+    else()
+        set(MATTI_SDL3_TARGET PkgConfig::MATTI_SDL3)
+    endif()
 endif()
 
 if(MATTI_SDL3_FOUND)
@@ -80,15 +84,17 @@ else()
 endif()
 
 set(MATTI_VULKAN_ENABLED OFF)
-if(MATTI_VULKAN_FOUND)
-    set(MATTI_VULKAN_ENABLED ON)
-    target_link_libraries(matti_objects PUBLIC PkgConfig::MATTI_VULKAN)
-endif()
-if(NOT MATTI_VULKAN_ENABLED)
-    find_package(Vulkan QUIET)
-    if(Vulkan_FOUND)
+if(NOT CMAKE_CROSSCOMPILING)
+    if(MATTI_VULKAN_FOUND)
         set(MATTI_VULKAN_ENABLED ON)
-        target_link_libraries(matti_objects PUBLIC Vulkan::Vulkan)
+        target_link_libraries(matti_objects PUBLIC PkgConfig::MATTI_VULKAN)
+    endif()
+    if(NOT MATTI_VULKAN_ENABLED)
+        find_package(Vulkan QUIET)
+        if(Vulkan_FOUND)
+            set(MATTI_VULKAN_ENABLED ON)
+            target_link_libraries(matti_objects PUBLIC Vulkan::Vulkan)
+        endif()
     endif()
 endif()
 if(MATTI_VULKAN_ENABLED)

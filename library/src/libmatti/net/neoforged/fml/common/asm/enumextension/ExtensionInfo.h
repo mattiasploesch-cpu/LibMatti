@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.common.asm.enumextension.ExtensionInfo.
+
+
 
 #ifndef MATTICRAFT_FML_COMMON_ASM_ENUMEXTENSION_EXTENSIONINFO_H
 #define MATTICRAFT_FML_COMMON_ASM_ENUMEXTENSION_EXTENSIONINFO_H
@@ -24,7 +25,7 @@ typedef struct LIBMATTI_FML_ExtensionInfo
     int extended;
     int vanillaCount;
     int totalCount;
-    // Java: @Nullable NetworkedEnum.NetworkCheck netCheck
+// Java: @Nullable NetworkedEnum.NetworkCheck netCheck
     LIBMATTI_FML_NetworkedEnum_NetworkCheck *netCheck;
 } LIBMATTI_FML_ExtensionInfo;
 
@@ -36,4 +37,4 @@ LIBMATTI_FML_ExtensionInfo *LIBMATTI_FML_ExtensionInfo_NonExtended(
     LIBMATTI_FML_NetworkedEnum_NetworkCheck *netCheck);
 void LIBMATTI_FML_ExtensionInfo_Free(LIBMATTI_FML_ExtensionInfo *info);
 
-#endif //MATTICRAFT_FML_COMMON_ASM_ENUMEXTENSION_EXTENSIONINFO_H
+#endif

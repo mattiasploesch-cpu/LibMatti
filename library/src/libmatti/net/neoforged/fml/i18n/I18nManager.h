@@ -1,6 +1,7 @@
-// Port of net.neoforged.fml.i18n.I18nManager.
-// Loads the FML translation JSONs (/lang/<locale>.json) and keeps the
-// current-locale map.
+
+
+
+
 
 #ifndef MATTICRAFT_FML_I18N_I18NMANAGER_H
 #define MATTICRAFT_FML_I18N_I18NMANAGER_H
@@ -12,8 +13,10 @@
 
 typedef struct
 {
-    char **keys;   // owned
-    char **values; // owned
+    char **keys;
+
+    char **values;
+
     size_t count;
 } LIBMATTI_FML_I18nManager_TranslationMap;
 
@@ -33,7 +36,8 @@ LIBMATTI_FML_I18nManager_TranslationMap *LIBMATTI_FML_I18nManager_LoadTranslatio
 // Java: Map.get(key) - NULL when absent
 const char *LIBMATTI_FML_I18nManager_Get(const LIBMATTI_FML_I18nManager_TranslationMap *map, const char *key);
 
-// frees a translation map
+
+
 void LIBMATTI_FML_I18nManager_FreeMap(LIBMATTI_FML_I18nManager_TranslationMap *map);
 
-#endif //MATTICRAFT_FML_I18N_I18NMANAGER_H
+#endif

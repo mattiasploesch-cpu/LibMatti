@@ -1,9 +1,10 @@
-// Port of net.neoforged.fml.loading.JarVersionLookupHandler.
-//
-// Java reads the version from the class's module descriptor (rawVersion) or, when the class was
-// loaded non-modularly, from its package (the jar manifest's Implementation-Version). The C
-// artifact carries its manifest in the ELF ".matti_manifest" section, so both paths read
-// Implementation-Version from the running executable, as Launcher.c does for modlauncher.
+
+
+
+
+
+
+
 
 #include "libmatti/net/neoforged/fml/loading/JarVersionLookupHandler.h"
 

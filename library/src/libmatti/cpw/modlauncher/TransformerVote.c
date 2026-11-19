@@ -1,4 +1,5 @@
-// Port of cpw.mods.modlauncher.TransformerVote.
+
+
 
 #include "libmatti/cpw/modlauncher/TransformerVote.h"
 

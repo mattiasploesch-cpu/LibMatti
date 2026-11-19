@@ -1,4 +1,5 @@
-// Port of java.lang.AutoCloseable.
+
+
 
 #ifndef MATTICRAFT_AUTOCLOSEABLE_H
 #define MATTICRAFT_AUTOCLOSEABLE_H
@@ -18,4 +19,4 @@ struct LIBMATTI_JL_AutoCloseable
 // Java: void close() throws Exception
 void LIBMATTI_JL_AutoCloseable_Close(LIBMATTI_JL_AutoCloseable *closeable);
 
-#endif //MATTICRAFT_AUTOCLOSEABLE_H
+#endif

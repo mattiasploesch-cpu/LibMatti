@@ -11,8 +11,9 @@
 
 #include "libmatti/defines.h"
 
-// The vendored upstream header lives next to the binding (vendor/stb on the
-// include path; same layout when installed).
+
+
+
 #include <stb_truetype.h>
 
 #ifdef __cplusplus
@@ -61,10 +62,10 @@ typedef struct LIBMATTI_STBTT_PackRange
 {
     float fontSize;
     int firstUnicodeCodepoint;
-    int *arrayOfUnicodeCodepoints; // always NULL (Java: firstUnicodeChar form)
+    int *arrayOfUnicodeCodepoints;// always NULL (Java: firstUnicodeChar form)
     int numChars;
     LIBMATTI_STBTT_Packedchar *packedChars;
-    unsigned char oversampleX; // internal use, like stb (Java: set() takes oversampling)
+    unsigned char oversampleX;// internal use, like stb (Java: set() takes oversampling)
     unsigned char oversampleY;
 } LIBMATTI_STBTT_PackRange;
 
@@ -81,4 +82,4 @@ void LIBMATTI_STBTT_GetPackedQuad(const LIBMATTI_STBTT_Packedchar *packedChars, 
 }
 #endif
 
-#endif //MATTICRAFT_ORG_LWJGL_STB_STBTRUETYPE_H
+#endif

@@ -1,9 +1,10 @@
-// Port of net.minecraft.core.registries.Registries.
-// Java declares one ResourceKey<Registry<T>> constant per registry through
-// createRegistryKey(Identifier.withDefaultNamespace(name)); the C port interns the same
-// keys through ResourceKey_CreateRegistryKey so identity matches Java. Every key of the
-// Java file is carried in declaration order; the typed generics collapse to the shared
-// ResourceKey type (C has no generics).
+
+
+
+
+
+
+
 
 #ifndef MATTICRAFT_NET_MINECRAFT_CORE_REGISTRIES_REGISTRIES_H
 #define MATTICRAFT_NET_MINECRAFT_CORE_REGISTRIES_REGISTRIES_H
@@ -156,4 +157,4 @@ LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_PREDICATE(void);
 LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_ADVANCEMENT(void);
 LIBMATTI_MC_ResourceKey *LIBMATTI_MC_Registries_RECIPE(void);
 
-#endif //MATTICRAFT_NET_MINECRAFT_CORE_REGISTRIES_REGISTRIES_H
+#endif

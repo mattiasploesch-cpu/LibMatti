@@ -1,9 +1,10 @@
-// Port of net.neoforged.fml.earlydisplay.render.EarlyFramebuffer (implementation).
-// Every GL call routes through the GlStateManager / GL binding layer like the
-// rest of the port. The blit is the heart of the class: the source rectangle is
-// vertically flipped (srcY0 = height, srcY1 = 0) because the y-down screen-pixel
-// projection of the element shaders lands bottom-up in the FBO - the flipped
-// read-back mirrors it upright onto the window.
+
+
+
+
+
+
+
 
 #include "libmatti/net/neoforged/fml/earlydisplay/EarlyFramebuffer.h"
 
@@ -23,9 +24,10 @@ struct LIBMATTI_FML_EarlyFramebuffer
 {
     unsigned int framebuffer;
     unsigned int texture;
-    // The depth renderbuffer the 3D passes (the section meshes) need: the
-    // Java earlydisplay renders 2D only, but the framebuffer stays a complete
-    // GL target once the game draws its depth-tested geometry into it.
+
+
+
+
     unsigned int depthRenderbuffer;
     int width;
     int height;
@@ -105,14 +107,14 @@ void LIBMATTI_FML_EarlyFramebuffer_BlitToScreen(LIBMATTI_FML_EarlyFramebuffer *f
     int wright = (int) ((float) windowFBWidth * 0.5f + scale * fb->width);
     int wbottom = (int) ((float) windowFBHeight * 0.5f + scale * fb->height);
 
-    // Java: bindDrawFramebuffer(0); bindReadFramebuffer(this.framebuffer);
+// Java: bindDrawFramebuffer(0); bindReadFramebuffer(this.framebuffer);
     LIBMATTI_B3D_GlStateManager_BindFramebuffer(LIBMATTI_GL_GL_DRAW_FRAMEBUFFER, 0);
     LIBMATTI_B3D_GlStateManager_BindFramebuffer(LIBMATTI_GL_GL_READ_FRAMEBUFFER, fb->framebuffer);
 
     LIBMATTI_B3D_GlStateManager_ClearColor(backgroundR, backgroundG, backgroundB, 1.0f);
     LIBMATTI_B3D_GlStateManager_Clear(LIBMATTI_GL_GL_COLOR_BUFFER_BIT);
 
-    // Java: src Y are flipped, since our FB is flipped
+// Java: src Y are flipped, since our FB is flipped
     LIBMATTI_GL_glBlitFramebuffer(0, fb->height, fb->width, 0,
                                   clamp(wleft, 0, windowFBWidth),
                                   clamp(wtop, 0, windowFBHeight),

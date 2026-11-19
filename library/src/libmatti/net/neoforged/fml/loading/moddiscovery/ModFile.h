@@ -1,7 +1,8 @@
-// Port of net.neoforged.fml.loading.moddiscovery.ModFile.
-// Java's startScan runs the scan through CompletableFuture.supplyAsync(scan, executor); the port
-// keeps the scan on the calling thread but wraps the result in a CompletableFuture. The executor is
-// the port's LIBMATTI_JUC_Executor (direct = immediate scan, queued = stored for a later drain).
+
+
+
+
+
 
 #ifndef MATTICRAFT_FML_LOADING_MODDISCOVERY_MODFILE_H
 #define MATTICRAFT_FML_LOADING_MODDISCOVERY_MODFILE_H
@@ -37,21 +38,22 @@ struct LIBMATTI_FML_ModFile
     char *id;
     char *jarVersion;
     LIBMATTI_NEOFORGESPI_ModFileDiscoveryAttributes discoveryAttributes;
-    LIBMATTI_JU_HashMap *fileProperties; // Java: Map<String, Object> fileProperties
+    LIBMATTI_JU_HashMap *fileProperties;// Java: Map<String, Object> fileProperties
     LIBMATTI_NEOFORGESPI_IModLanguageLoader **loaders;
     size_t loaderCount;
     LIBMATTI_FML_JarContents *contents;
     LIBMATTI_FML_JarModuleInfo *jarModuleInfo;
-    LIBMATTI_JL_ModuleDescriptor *moduleDescriptor; // Java: @Nullable private volatile ModuleDescriptor
+    LIBMATTI_JL_ModuleDescriptor *moduleDescriptor;// Java: @Nullable private volatile ModuleDescriptor
     LIBMATTI_NEOFORGESPI_IModFile_Type modFileType;
     LIBMATTI_NEOFORGESPI_IModFileInfo *modFileInfo;
     LIBMATTI_FML_ModFileParser_MixinConfig *mixinConfigs;
     size_t mixinConfigCount;
     char **accessTransformers;
     size_t accessTransformerCount;
-    // Java: CompletableFuture<ModFileScanData> futureScanResult
+// Java: CompletableFuture<ModFileScanData> futureScanResult
     LIBMATTI_JUC_CompletableFuture *futureScanResult;
-    // the completed value the future carries (owned here, freed with the file)
+
+
     LIBMATTI_NEOFORGESPI_ModFileScanData *scanResult;
 };
 
@@ -115,4 +117,4 @@ const char *LIBMATTI_FML_ModFile_GetSubstitutionValue(const LIBMATTI_FML_ModFile
 // Java: public void close()
 void LIBMATTI_FML_ModFile_Close(LIBMATTI_FML_ModFile *modFile);
 
-#endif //MATTICRAFT_FML_LOADING_MODDISCOVERY_MODFILE_H
+#endif

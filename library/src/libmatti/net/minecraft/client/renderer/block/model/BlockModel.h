@@ -1,8 +1,9 @@
-// Port of net.minecraft.client.renderer.block.model.BlockModel (the unbaked
-// JSON model) plus the TextureSlots.Data slice the bake needs. The port keeps
-// the parent chain as an owned string ("block/block" etc.) and the texture map
-// as insertion-ordered string pairs - references ("#side") resolve against it
-// at bake time like Java's TextureSlots.Resolver chain.
+
+
+
+
+
+
 
 #ifndef MATTICRAFT_MC_CLIENT_RENDERER_BLOCK_MODEL_BLOCKMODEL_H
 #define MATTICRAFT_MC_CLIENT_RENDERER_BLOCK_MODEL_BLOCKMODEL_H
@@ -16,18 +17,18 @@ extern "C" {
 
 typedef struct LIBMATTI_MC_BlockModel
 {
-    // Java: @Nullable Identifier parent - owned.
+// Java: @Nullable Identifier parent - owned.
     char *parent;
-    // Java: TextureSlots.Data - the "textures" member, insertion ordered.
+// Java: TextureSlots.Data - the "textures" member, insertion ordered.
     size_t textureCount;
     char **textureNames;
-    char **textureValues; // "#ref" or "block/stone" - owned.
+    char **textureValues;// "#ref" or "block/stone" - owned.
     // Java: List<BlockElement> elements (NULL elements = the model only
     // inherits, like Java's getElements() returning null when absent).
     int elementsPresent;
     size_t elementCount;
     LIBMATTI_MC_BlockElement *elements;
-    // Java: boolean gui3d / hasAmbientOcclusion - the flags the bake reads.
+// Java: boolean gui3d / hasAmbientOcclusion - the flags the bake reads.
     int ambientOcclusion;
 } LIBMATTI_MC_BlockModel;
 
@@ -50,4 +51,4 @@ void LIBMATTI_MC_BlockModel_Free(LIBMATTI_MC_BlockModel *model);
 }
 #endif
 
-#endif //MATTICRAFT_MC_CLIENT_RENDERER_BLOCK_MODEL_BLOCKMODEL_H
+#endif

@@ -28,4 +28,4 @@ void LIBMATTI_ML_LogTransformerContext_SetMethodName(LIBMATTI_ML_LogTransformerC
 const char *LIBMATTI_ML_LogTransformerContext_GetMethodName(const LIBMATTI_ML_LogTransformerContext *context);
 char *LIBMATTI_ML_LogTransformerContext_ToString(const LIBMATTI_ML_LogTransformerContext *context);
 
-#endif //MATTICRAFT_MODLAUNCHER_EXTRADATATEXTRENDERER_H
+#endif

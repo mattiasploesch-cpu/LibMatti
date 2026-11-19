@@ -1,6 +1,7 @@
-// Port of com.mojang.blaze3d.vertex.VertexSorting - the transparent quad sort.
-// Java is a functional interface; the C port uses a function pointer plus the
-// two built-in singletons DISTANCE_TO_ORIGIN and ORTHOGRAPHIC_Z.
+
+
+
+
 
 #ifndef MATTICRAFT_BLAZE3D_VERTEX_VERTEXSORTING_H
 #define MATTICRAFT_BLAZE3D_VERTEX_VERTEXSORTING_H

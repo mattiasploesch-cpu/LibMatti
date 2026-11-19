@@ -1,6 +1,7 @@
-// Port of java.lang.instrument.Instrumentation.
-// The interface is JVM machinery; the C port keeps the handle the agent was
-// attached with, so the loader can tell attached from not attached.
+
+
+
+
 
 #ifndef MATTICRAFT_JAVA_LANG_INSTRUMENT_INSTRUMENTATION_H
 #define MATTICRAFT_JAVA_LANG_INSTRUMENT_INSTRUMENTATION_H
@@ -13,7 +14,7 @@ struct LIBMATTI_JLI_Instrumentation
 {// Java: the JVM hands this to premain/agentmain
     int attached;
 
-    // Java: private final List<ClassFileTransformer> transformers
+// Java: private final List<ClassFileTransformer> transformers
     void **transformers;
     size_t transformerCount;
     size_t transformerCapacity;};
@@ -62,4 +63,4 @@ void LIBMATTI_JLI_Instrumentation_RegisterLoadedClass(const char *name, void *cl
 // defined (the port's Class_Register calls this) and records the loaded class.
 void LIBMATTI_JLI_Instrumentation_OnClassDefined(const char *name, void *classLoader, const char *packageName);
 
-#endif //MATTICRAFT_JAVA_LANG_INSTRUMENT_INSTRUMENTATION_H
+#endif

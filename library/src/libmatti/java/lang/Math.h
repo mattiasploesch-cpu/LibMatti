@@ -1,6 +1,7 @@
-// Port of java.lang.Math.
-// C has no overloading, so the numeric type becomes a name suffix:
-// AbsD(double), AbsF(float), AbsI(int), AbsL(long) ...
+
+
+
+
 
 #ifndef MATTICRAFT_JAVA_LANG_MATH_H
 #define MATTICRAFT_JAVA_LANG_MATH_H
@@ -96,13 +97,17 @@ double LIBMATTI_JL_Math_ToDegrees(double angrad);
 // Java: public static double random()
 double LIBMATTI_JL_Math_Random(void);
 
-// Java 21: public static int clamp(int value, int min, int max)
+
+
 int LIBMATTI_JL_Math_ClampI(int value, int min, int max);
-// Java 21: public static long clamp(long value, long min, long max)
+
+
 long LIBMATTI_JL_Math_ClampL(long value, long min, long max);
-// Java 21: public static float clamp(float value, float min, float max)
+
+
 float LIBMATTI_JL_Math_ClampF(float value, float min, float max);
-// Java 21: public static double clamp(double value, double min, double max)
+
+
 double LIBMATTI_JL_Math_ClampD(double value, double min, double max);
 
 // Java: public static int compare(int x, int y) / long / float / double
@@ -111,4 +116,4 @@ int LIBMATTI_JL_Math_CompareL(long x, long y);
 int LIBMATTI_JL_Math_CompareF(float x, float y);
 int LIBMATTI_JL_Math_CompareD(double x, double y);
 
-#endif //MATTICRAFT_JAVA_LANG_MATH_H
+#endif

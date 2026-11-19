@@ -11,12 +11,12 @@ LIBMATTI_FML_JarContentsModuleFinder *LIBMATTI_FML_JarContentsModuleFinder_New(
     finder->names = calloc(jarCount > 0 ? jarCount : 1, sizeof(char *));
     finder->references = calloc(jarCount > 0 ? jarCount : 1, sizeof(LIBMATTI_FML_JarContentsModuleReference *));
 
-    // Java: Collectors.toMap(JarContentsModule::moduleName, sj -> new JarContentsModuleReference(sj.moduleDescriptor(), sj.contents()))
+// Java: Collectors.toMap(JarContentsModule::moduleName, sj -> new JarContentsModuleReference(sj.moduleDescriptor(), sj.contents()))
     for (size_t i = 0; i < jarCount; i++)
     {
         const char *name = LIBMATTI_FML_JarContentsModule_ModuleName(jars[i]);
 
-        // Java: Collectors.toMap without a merge function - a duplicate key throws
+// Java: Collectors.toMap without a merge function - a duplicate key throws
         int duplicate = 0;
         for (size_t existing = 0; existing < finder->count; existing++)
         {

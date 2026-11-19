@@ -1,6 +1,7 @@
-//
-// Created by administrator on 09.09.26.
-//
+
+
+
+
 
 #include "SimpleJarMetadata.h"
 
@@ -15,7 +16,7 @@ static LIBMATTI_JL_ModuleDescriptor *simple_compute_descriptor(LIBMATTI_JH_LazyJ
 {
     LIBMATTI_JH_SimpleJarMetadata *meta = (LIBMATTI_JH_SimpleJarMetadata *)self;
 
-    // Java: ModuleDescriptor.newAutomaticModule(name())
+// Java: ModuleDescriptor.newAutomaticModule(name())
     LIBMATTI_JL_ModuleDescriptor *descriptor = LIBMATTI_JL_ModuleDescriptor_Create(meta->name, NULL, 0);
     LIBMATTI_JL_ModuleDescriptor_AddModifier(descriptor, LIBMATTI_JL_MODIFIER_AUTOMATIC);
 
@@ -45,7 +46,7 @@ LIBMATTI_JH_SimpleJarMetadata *LIBMATTI_JH_SimpleJarMetadata_Create(const char *
     if (version != NULL) metadata->version = strdup(version);
     metadata->contents = contents;
 
-    // Java: providers.stream().filter(p -> !p.providers().isEmpty()).toList()
+// Java: providers.stream().filter(p -> !p.providers().isEmpty()).toList()
     metadata->providers = calloc(providerCount, sizeof(LIBMATTI_JH_Provider));
     for (size_t i = 0; i < providerCount; i++)
     {
@@ -59,9 +60,10 @@ LIBMATTI_JH_SimpleJarMetadata *LIBMATTI_JH_SimpleJarMetadata_Create(const char *
     return metadata;
 }
 
-// ---------------------------------------------------------------------------
-// JarMetadata interface implementation
-// ---------------------------------------------------------------------------
+
+
+
+
 
 const char *LIBMATTI_JH_JarMetadata_Name(const LIBMATTI_JH_JarMetadata *metadata)
 {
@@ -93,7 +95,8 @@ void LIBMATTI_JH_JarMetadata_Free(LIBMATTI_JH_JarMetadata *metadata)
     LIBMATTI_JH_SimpleJarMetadata *meta = (LIBMATTI_JH_SimpleJarMetadata *)metadata;
     if (meta == NULL) return;
 
-    // The providers are shallow copies referencing the contents' data
+
+
     free(meta->providers);
     free(meta->name);
     free(meta->version);

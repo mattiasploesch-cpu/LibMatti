@@ -1,4 +1,5 @@
-// Port of net.neoforged.bus.LockHelper.
+
+
 
 #include "libmatti/net/neoforged/bus/LockHelper.h"
 
@@ -6,18 +7,18 @@
 
 struct LIBMATTI_BUS_LockHelper
 {
-    // Java: private final IntFunction<Map<K, V>> mapConstructor - IdentityHashMap::new vs size -> new HashMap<>(size)
+// Java: private final IntFunction<Map<K, V>> mapConstructor - IdentityHashMap::new vs size -> new HashMap<>(size)
     int identity;
-    // Java: private final Map<K, V> backingMap
+// Java: private final Map<K, V> backingMap
     const void **keys;
     void **values;
     size_t count;
-    // Java: @Nullable private volatile Map<K, V> readOnlyView = null;
+// Java: @Nullable private volatile Map<K, V> readOnlyView = null;
     const void **readKeys;
     void **readValues;
     size_t readCount;
     int hasReadOnlyView;
-    // Java: private Object lock = new Object();
+// Java: private Object lock = new Object();
     pthread_mutex_t lock;
 };
 
@@ -64,7 +65,7 @@ size_t LIBMATTI_BUS_LockHelper_GetReadMap(LIBMATTI_BUS_LockHelper *helper,
 {
     if (!helper->hasReadOnlyView)
     {
-        // Java: need to update the read map
+// Java: need to update the read map
         pthread_mutex_lock(&helper->lock);
         free(helper->readKeys);
         free(helper->readValues);
@@ -108,18 +109,18 @@ int LIBMATTI_BUS_LockHelper_ContainsKey(LIBMATTI_BUS_LockHelper *helper, const v
 void *LIBMATTI_BUS_LockHelper_ComputeIfAbsent(LIBMATTI_BUS_LockHelper *helper, const void *key,
                                               void *(*factory)(void *userdata, const void *key), void *userdata)
 {
-    // Java: try lock-free get first
+// Java: try lock-free get first
     void *ret = LIBMATTI_BUS_LockHelper_Get(helper, key);
     if (ret != NULL) return ret;
 
-    // Java: pre-compute the new value without holding the lock (factory may recurse into this helper)
+// Java: pre-compute the new value without holding the lock (factory may recurse into this helper)
     void *intermediate = factory(userdata, key);
 
     pthread_mutex_lock(&helper->lock);
     size_t index = find(helper->keys, helper->count, key);
     if (index == helper->count)
     {
-        // Java: ret = finalizer.apply(intermediate) - the identity finalizer keeps the value
+// Java: ret = finalizer.apply(intermediate) - the identity finalizer keeps the value
         helper->keys = realloc(helper->keys, sizeof(*helper->keys) * (helper->count + 1));
         helper->values = realloc(helper->values, sizeof(*helper->values) * (helper->count + 1));
         helper->keys[helper->count] = key;

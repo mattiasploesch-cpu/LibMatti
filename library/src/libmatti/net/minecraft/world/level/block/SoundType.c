@@ -1,4 +1,5 @@
-// Port of net.minecraft.world.level.block.SoundType.
+
+
 
 #include "libmatti/net/minecraft/world/level/block/SoundType.h"
 

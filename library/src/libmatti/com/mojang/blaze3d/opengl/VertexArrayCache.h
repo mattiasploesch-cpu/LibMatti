@@ -1,7 +1,8 @@
-// Port of com.mojang.blaze3d.opengl.VertexArrayCache.
-// Java picks the Separate (ARB_vertex_attrib_binding) or Emulated strategy at
-// creation; the port keeps both and defaults to Emulated (the driver probe
-// happens through LIBMATTI_B3D_VertexArrayCache_Create like Java's factory).
+
+
+
+
+
 
 #ifndef MATTICRAFT_BLAZE3D_OPENGL_VERTEXARRAYCACHE_H
 #define MATTICRAFT_BLAZE3D_OPENGL_VERTEXARRAYCACHE_H

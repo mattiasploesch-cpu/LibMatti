@@ -20,7 +20,7 @@ LIBMATTI_B3D_NativeImage *LIBMATTI_B3D_NativeImage_New(int width, int height, in
 LIBMATTI_B3D_NativeImage *LIBMATTI_B3D_NativeImage_NewWithFormat(LIBMATTI_B3D_NativeImage_Format format,
                                                                  int width, int height, int clear)
 {
-    // Java: if (width > 0 && height > 0) {...} else throw IllegalArgumentException
+// Java: if (width > 0 && height > 0) {...} else throw IllegalArgumentException
     if (width <= 0 || height <= 0)
         return NULL;
 
@@ -28,7 +28,7 @@ LIBMATTI_B3D_NativeImage *LIBMATTI_B3D_NativeImage_NewWithFormat(LIBMATTI_B3D_Na
     image->format = format;
     image->width = width;
     image->height = height;
-    // Java: nmemCalloc when clear, nmemAlloc otherwise
+// Java: nmemCalloc when clear, nmemAlloc otherwise
     image->pixels = malloc((size_t) width * (size_t) height * 4);
     if (image->pixels == NULL)
     {
@@ -59,7 +59,7 @@ LIBMATTI_B3D_NativeImage *LIBMATTI_B3D_NativeImage_Wrap(LIBMATTI_B3D_NativeImage
 // reads the stream, PngInfo.validateHeader checks the signature, STB decodes.
 LIBMATTI_B3D_NativeImage *LIBMATTI_B3D_NativeImage_Read(const unsigned char *data, size_t length)
 {
-    // Java: PngInfo.validateHeader - the 8-byte signature
+// Java: PngInfo.validateHeader - the 8-byte signature
     if (data == NULL || length < 8
         || data[0] != (unsigned char) 0x89 || data[1] != 'P' || data[2] != 'N' || data[3] != 'G'
         || data[4] != '\r' || data[5] != '\n' || data[6] != (unsigned char) 0x1A || data[7] != '\n')
@@ -67,7 +67,8 @@ LIBMATTI_B3D_NativeImage *LIBMATTI_B3D_NativeImage_Read(const unsigned char *dat
         return NULL;
     }
 
-    // The PngReader port decodes into an 8-bit RGBA byte raster.
+
+
     int width = 0;
     int height = 0;
     unsigned char *decoded = LIBMATTI_JXI_PngReader_Decode(data, length, &width, &height);
@@ -114,7 +115,7 @@ void LIBMATTI_B3D_NativeImage_SetPixelABGR(LIBMATTI_B3D_NativeImage *image, int 
 int LIBMATTI_B3D_NativeImage_GetPixel(const LIBMATTI_B3D_NativeImage *image, int x, int y)
 {
     int abgr = LIBMATTI_B3D_NativeImage_GetPixelABGR(image, x, y);
-    // Java: ARGB.fromABGR - ABGR int to ARGB int
+// Java: ARGB.fromABGR - ABGR int to ARGB int
     int a = (abgr >> 24) & 0xFF;
     int r = (abgr >> 16) & 0xFF;
     int g = (abgr >> 8) & 0xFF;

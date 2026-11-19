@@ -1,4 +1,5 @@
-// Port of java.util.Base64 (basic, MIME and URL schemes).
+
+
 
 #ifndef MATTICRAFT_JAVA_UTIL_BASE64_H
 #define MATTICRAFT_JAVA_UTIL_BASE64_H
@@ -23,4 +24,4 @@ char *LIBMATTI_JU_Base64_EncodeToString(const unsigned char *src, size_t length)
 // Java: Base64.getDecoder().decode(String)
 unsigned char *LIBMATTI_JU_Base64_DecodeString(const char *src, size_t *outLength);
 
-#endif //MATTICRAFT_JAVA_UTIL_BASE64_H
+#endif

@@ -1,7 +1,8 @@
-// Port of net.neoforged.fml.loading.modscan.ModAnnotation.
-// Java keeps the annotation values as Object (String, Integer, ..., Type, EnumHolder,
-// Map and List); the port tags them like the class file element_value
-// (see org.objectweb.asm.tree.AnnotationNode).
+
+
+
+
+
 
 #ifndef MATTICRAFT_FML_LOADING_MODSCAN_MODANNOTATION_H
 #define MATTICRAFT_FML_LOADING_MODSCAN_MODANNOTATION_H
@@ -30,9 +31,9 @@ typedef enum
     LIBMATTI_FML_ModAnnotationValue_BOOLEAN,
     LIBMATTI_FML_ModAnnotationValue_TYPE,
     LIBMATTI_FML_ModAnnotationValue_ENUM,
-    // Java: Map<String, Object> - the values of a child annotation
+// Java: Map<String, Object> - the values of a child annotation
     LIBMATTI_FML_ModAnnotationValue_ANNOTATION,
-    // Java: List<Object> - the arrayList after endArray()
+// Java: List<Object> - the arrayList after endArray()
     LIBMATTI_FML_ModAnnotationValue_LIST
 } LIBMATTI_FML_ModAnnotationValueKind;
 
@@ -53,15 +54,15 @@ struct LIBMATTI_FML_ModAnnotationValues
 struct LIBMATTI_FML_ModAnnotationValue
 {
     LIBMATTI_FML_ModAnnotationValueKind kind;
-    // Java: String
+// Java: String
     char *stringValue;
-    // Java: Integer/Boolean / Long
+// Java: Integer/Boolean / Long
     long longValue;
-    // Java: Double / Float
+// Java: Double / Float
     double doubleValue;
-    // Java: EnumHolder
+// Java: EnumHolder
     LIBMATTI_FML_ModAnnotation_EnumHolder *enumHolder;
-    // Java: the Map of a child annotation / the List of an array
+// Java: the Map of a child annotation / the List of an array
     LIBMATTI_FML_ModAnnotationValues *container;
 };
 
@@ -71,9 +72,9 @@ struct LIBMATTI_FML_ModAnnotation
     LIBMATTI_NEOFORGESPI_ElementType type;
     LIBMATTI_ASM_Type *asmType;
     char *member;
-    // Java: private final Map<String, Object> values
+// Java: private final Map<String, Object> values
     LIBMATTI_FML_ModAnnotationValues *values;
-    // Java: private ArrayList<Object> arrayList / private String arrayName
+// Java: private ArrayList<Object> arrayList / private String arrayName
     LIBMATTI_FML_ModAnnotationValues *arrayList;
     char *arrayName;
 };
@@ -147,4 +148,4 @@ char *LIBMATTI_FML_ModAnnotationValue_ToString(const LIBMATTI_FML_ModAnnotationV
 void LIBMATTI_FML_ModAnnotationValue_Free(LIBMATTI_FML_ModAnnotationValue *value);
 void LIBMATTI_FML_ModAnnotationValues_Free(LIBMATTI_FML_ModAnnotationValues *values);
 
-#endif //MATTICRAFT_FML_LOADING_MODSCAN_MODANNOTATION_H
+#endif

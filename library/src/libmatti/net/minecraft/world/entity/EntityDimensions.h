@@ -1,5 +1,6 @@
-// Port of net.minecraft.world.entity.EntityDimensions (the record carrying the
-// width/height/eye-height plus the EntityAttachments the bounding box derives).
+
+
+
 
 #ifndef MATTICRAFT_MC_WORLD_ENTITY_ENTITYDIMENSIONS_H
 #define MATTICRAFT_MC_WORLD_ENTITY_ENTITYDIMENSIONS_H
@@ -22,7 +23,8 @@ typedef struct LIBMATTI_MC_EntityDimensions
     float width;
     float height;
     float eyeHeight;
-    LIBMATTI_MC_EntityAttachments *attachments; // owned
+    LIBMATTI_MC_EntityAttachments *attachments;
+
     bool fixed;
 } LIBMATTI_MC_EntityDimensions;
 
@@ -30,7 +32,8 @@ typedef struct LIBMATTI_MC_EntityDimensions
 // is height * 0.85, the attachments default to createDefault(width, height)
 LIBMATTI_MC_EntityDimensions *LIBMATTI_MC_EntityDimensions_Scalable(float width, float height);
 LIBMATTI_MC_EntityDimensions *LIBMATTI_MC_EntityDimensions_Fixed(float width, float height);
-// The full constructor (takes the attachments over; the dimensions own it)
+
+
 LIBMATTI_MC_EntityDimensions *LIBMATTI_MC_EntityDimensions_New(float width, float height, float eyeHeight,
                                                                LIBMATTI_MC_EntityAttachments *attachments, bool fixed);
 // Java: public EntityDimensions withEyeHeight(float)
@@ -54,4 +57,4 @@ void LIBMATTI_MC_EntityDimensions_Free(LIBMATTI_MC_EntityDimensions *dimensions)
 }
 #endif
 
-#endif //MATTICRAFT_MC_WORLD_ENTITY_ENTITYDIMENSIONS_H
+#endif

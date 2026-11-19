@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.event.lifecycle.FMLConstructModEvent.
+
+
 
 #ifndef MATTICRAFT_FML_EVENT_LIFECYCLE_FMLCONSTRUCTMODEVENT_H
 #define MATTICRAFT_FML_EVENT_LIFECYCLE_FMLCONSTRUCTMODEVENT_H
@@ -10,7 +11,7 @@ typedef struct LIBMATTI_FML_Event_Lifecycle_FMLConstructModEvent LIBMATTI_FML_Ev
 // Java: public class FMLConstructModEvent extends ParallelDispatchEvent
 struct LIBMATTI_FML_Event_Lifecycle_FMLConstructModEvent
 {
-    // Java: extends ParallelDispatchEvent
+// Java: extends ParallelDispatchEvent
     LIBMATTI_FML_Event_Lifecycle_ParallelDispatchEvent base;
 };
 
@@ -23,4 +24,4 @@ LIBMATTI_FML_Event_Lifecycle_FMLConstructModEvent *LIBMATTI_FML_Event_Lifecycle_
 void LIBMATTI_FML_Event_Lifecycle_FMLConstructModEvent_Free(
     LIBMATTI_FML_Event_Lifecycle_FMLConstructModEvent *event);
 
-#endif //MATTICRAFT_FML_EVENT_LIFECYCLE_FMLCONSTRUCTMODEVENT_H
+#endif

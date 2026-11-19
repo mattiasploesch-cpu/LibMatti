@@ -1,6 +1,7 @@
-// Port of net.neoforged.fml.jarcontents.JarContents.
-// The artifact reader behind the interface is the .so/ELF reader in
-// bsl/sjh/niofs/union (entry mapping is documented in UnionFileSystem.h).
+
+
+
+
 
 #ifndef MATTICRAFT_FML_JARCONTENTS_JARCONTENTS_H
 #define MATTICRAFT_FML_JARCONTENTS_JARCONTENTS_H
@@ -19,7 +20,7 @@ typedef int (*LIBMATTI_FML_JarContents_PathFilter)(const char *relativePath, voi
 typedef struct
 {
     const char *path;
-    // Java: @Nullable PathFilter filter
+// Java: @Nullable PathFilter filter
     LIBMATTI_FML_JarContents_PathFilter filter;
     void *filterUserdata;
 } LIBMATTI_FML_FilteredPath;
@@ -41,31 +42,31 @@ struct LIBMATTI_FML_JarContents
 {
     void *self;
 
-    // Java: the implementing class (CompositeJarContents / EmptyJarContents / FolderJarContents / JarFileContents)
+// Java: the implementing class (CompositeJarContents / EmptyJarContents / FolderJarContents / JarFileContents)
     LIBMATTI_FML_JarContents_Kind kind;
 
-    // Java: Optional<String> getChecksum() - 1 if present, *out is a new string
+// Java: Optional<String> getChecksum() - 1 if present, *out is a new string
     int (*getChecksum)(void *self, char **out);
-    // Java: Path getPrimaryPath()
+// Java: Path getPrimaryPath()
     const char *(*getPrimaryPath)(void *self);
-    // Java: Collection<Path> getContentRoots()
+// Java: Collection<Path> getContentRoots()
     const char **(*getContentRoots)(void *self, size_t *count);
-    // Java: JarResource get(String relativePath)
+// Java: JarResource get(String relativePath)
     LIBMATTI_FML_JarResource *(*get)(void *self, const char *relativePath);
-    // Java: Optional<URI> findFile(String relativePath) - 1 if present; the caller frees *out
+// Java: Optional<URI> findFile(String relativePath) - 1 if present; the caller frees *out
     int (*findFile)(void *self, const char *relativePath, LIBMATTI_JN_URI **out);
-    // Java: InputStream openFile(String relativePath) - NULL if not found
+// Java: InputStream openFile(String relativePath) - NULL if not found
     unsigned char *(*openFile)(void *self, const char *relativePath, size_t *outLength);
-    // Java: boolean containsFile(String relativePath)
+// Java: boolean containsFile(String relativePath)
     int (*containsFile)(void *self, const char *relativePath);
-    // Java: Manifest getManifest()
+// Java: Manifest getManifest()
     LIBMATTI_JU_Manifest *(*getManifest)(void *self);
-    // Java: void visitContent(String startingFolder, JarResourceVisitor visitor)
+// Java: void visitContent(String startingFolder, JarResourceVisitor visitor)
     void (*visitContent)(void *self, const char *startingFolder, LIBMATTI_FML_JarResourceVisitor visitor,
                          void *userdata);
-    // Java: void close()
+// Java: void close()
     void (*close)(void *self);
-    // Java: String toString()
+// Java: String toString()
     char *(*toStringImpl)(void *self);
 };
 
@@ -112,4 +113,4 @@ void LIBMATTI_FML_JarContents_Close(LIBMATTI_FML_JarContents *contents);
 // Java: String toString()
 char *LIBMATTI_FML_JarContents_ToString(const LIBMATTI_FML_JarContents *contents);
 
-#endif //MATTICRAFT_FML_JARCONTENTS_JARCONTENTS_H
+#endif

@@ -1,4 +1,5 @@
-// Port of net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent.
+
+
 
 #include "libmatti/net/neoforged/neoforge/capabilities/RegisterCapabilitiesEvent.h"
 

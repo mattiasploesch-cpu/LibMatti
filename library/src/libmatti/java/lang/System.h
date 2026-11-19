@@ -21,4 +21,4 @@ void LIBMATTI_JL_System_Exit(int status);
 // Java: public static long currentTimeMillis()
 long long LIBMATTI_JL_System_CurrentTimeMillis(void);
 
-#endif //MATTICRAFT_JAVA_LANG_SYSTEM_H
+#endif

@@ -1,4 +1,5 @@
-// Port of net.neoforged.neoforgespi.transformation.ClassProcessor.
+
+
 
 #include "libmatti/net/neoforged/neoforgespi/transformation/ClassProcessor.h"
 
@@ -11,7 +12,7 @@ LIBMATTI_NEOFORGESPI_ClassProcessor_ComputeFlags LIBMATTI_NEOFORGESPI_ClassProce
     LIBMATTI_NEOFORGESPI_ClassProcessor_ComputeFlags flags,
     LIBMATTI_NEOFORGESPI_ClassProcessor_ComputeFlags other)
 {
-    // Java: return this.ordinal() > other.ordinal() ? this : other
+// Java: return this.ordinal() > other.ordinal() ? this : other
     return flags > other ? flags : other;
 }
 
@@ -158,7 +159,7 @@ const char **LIBMATTI_NEOFORGESPI_ClassProcessor_GeneratesPackages(
 LIBMATTI_NEOFORGESPI_ClassProcessor_OrderingHint LIBMATTI_NEOFORGESPI_ClassProcessor_GetOrderingHint(
     LIBMATTI_NEOFORGESPI_ClassProcessor *processor)
 {
-    // Java: default OrderingHint orderingHint() { return OrderingHint.DEFAULT; }
+// Java: default OrderingHint orderingHint() { return OrderingHint.DEFAULT; }
     if (processor->orderingHint == NULL) return LIBMATTI_NEOFORGESPI_ClassProcessor_OrderingHint_DEFAULT;
     return processor->orderingHint(processor);
 }
@@ -181,7 +182,7 @@ void LIBMATTI_NEOFORGESPI_ClassProcessor_AfterProcessing(
     LIBMATTI_NEOFORGESPI_ClassProcessor *processor,
     const LIBMATTI_NEOFORGESPI_ClassProcessor_AfterProcessingContext *context)
 {
-    // Java: default void afterProcessing(AfterProcessingContext context) {}
+// Java: default void afterProcessing(AfterProcessingContext context) {}
     if (processor->afterProcessing == NULL) return;
     processor->afterProcessing(processor, context);
 }
@@ -189,7 +190,7 @@ void LIBMATTI_NEOFORGESPI_ClassProcessor_AfterProcessing(
 void LIBMATTI_NEOFORGESPI_ClassProcessor_Link(LIBMATTI_NEOFORGESPI_ClassProcessor *processor,
                                              const LIBMATTI_NEOFORGESPI_ClassProcessor_LinkContext *context)
 {
-    // Java: default void link(LinkContext context) {}
+// Java: default void link(LinkContext context) {}
     if (processor->link == NULL) return;
     processor->link(processor, context);
 }

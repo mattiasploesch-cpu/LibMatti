@@ -1,4 +1,5 @@
-// Port of net.neoforged.neoforgespi.locating.IDependencyLocator.
+
+
 
 #ifndef MATTICRAFT_NEOFORGESPI_LOCATING_IDEPENDENCYLOCATOR_H
 #define MATTICRAFT_NEOFORGESPI_LOCATING_IDEPENDENCYLOCATOR_H
@@ -12,10 +13,10 @@
 // Java: public interface IDependencyLocator extends IOrderedProvider
 typedef struct LIBMATTI_NEOFORGESPI_IDependencyLocator
 {
-    // Java: extends IOrderedProvider
+// Java: extends IOrderedProvider
     LIBMATTI_NEOFORGESPI_IOrderedProvider ordered;
 
-    // Java: void scanMods(List<IModFile> loadedMods, IDiscoveryPipeline pipeline)
+// Java: void scanMods(List<IModFile> loadedMods, IDiscoveryPipeline pipeline)
     void (*scanMods)(void *self, LIBMATTI_NEOFORGESPI_IModFile **loadedMods, size_t loadedModCount,
                      LIBMATTI_NEOFORGESPI_IDiscoveryPipeline *pipeline);
 } LIBMATTI_NEOFORGESPI_IDependencyLocator;
@@ -26,4 +27,4 @@ void LIBMATTI_NEOFORGESPI_IDependencyLocator_ScanMods(const LIBMATTI_NEOFORGESPI
                                                       size_t loadedModCount,
                                                       LIBMATTI_NEOFORGESPI_IDiscoveryPipeline *pipeline);
 
-#endif //MATTICRAFT_NEOFORGESPI_LOCATING_IDEPENDENCYLOCATOR_H
+#endif

@@ -1,4 +1,5 @@
-// Port of net.minecraft.server.packs.repository.PackRepository.
+
+
 
 #include "libmatti/net/minecraft/server/packs/repository/PackRepository.h"
 
@@ -7,7 +8,7 @@
 
 static void add_available(LIBMATTI_MC_PackRepository *repository, Pack *pack)
 {
-    // Java: Pack previous = available.putIfAbsent(pack.getId(), pack);
+// Java: Pack previous = available.putIfAbsent(pack.getId(), pack);
     //       if (previous != null) LOGGER.warn("Pack {} was already there, skipping", ...)
     for (size_t i = 0; i < repository->availableCount; i++)
     {
@@ -68,7 +69,7 @@ void LIBMATTI_MC_PackRepository_AddSource(LIBMATTI_MC_PackRepository *repository
 
 void LIBMATTI_MC_PackRepository_Reload(LIBMATTI_MC_PackRepository *repository)
 {
-    // Java: public void reload() {
+// Java: public void reload() {
     //   this.clearSelected();
     //   this.available.clear();
     //   for (RepositorySource source : this.sources) source.loadPacks(this::addPack);
@@ -89,7 +90,7 @@ void LIBMATTI_MC_PackRepository_Reload(LIBMATTI_MC_PackRepository *repository)
         repository->sources[i]->loadPacks(repository->sources[i], repository, load_packs_consumer);
     }
 
-    // Java: this.available.values().stream().sorted(...).forEach(p -> this.available.put(p.getId(), p));
+// Java: this.available.values().stream().sorted(...).forEach(p -> this.available.put(p.getId(), p));
     if (repository->availableCount > 1)
     {
         qsort(repository->availablePacks, repository->availableCount, sizeof(Pack *), availability_comparator);
@@ -114,7 +115,7 @@ static void set_selected_internal(LIBMATTI_MC_PackRepository *repository, const 
     repository->selectedPacks = NULL;
     repository->selectedCount = 0;
 
-    // Java: resolve the ids in order, then append the required packs that are missing
+// Java: resolve the ids in order, then append the required packs that are missing
     for (size_t i = 0; i < count; i++)
     {
         Pack *pack = LIBMATTI_MC_PackRepository_GetPack(repository, ids[i]);

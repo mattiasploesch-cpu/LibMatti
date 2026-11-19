@@ -1,5 +1,6 @@
-// Port of com.mojang.brigadier.suggestion.Suggestion, IntegerSuggestion,
-// Suggestions and SuggestionsBuilder.
+
+
+
 
 #include "libmatti/com/mojang/brigadier/suggestion/Suggestions.h"
 
@@ -72,7 +73,7 @@ LIBMATTI_BR_Suggestions *LIBMATTI_BR_Suggestions_Create(const char *input, LIBMA
         result->suggestions = malloc(count * sizeof(LIBMATTI_BR_Suggestion *));
         memcpy(result->suggestions, suggestions, count * sizeof(LIBMATTI_BR_Suggestion *));
         result->count = count;
-        // Java: sorted(RESPONSE_ORDER)
+// Java: sorted(RESPONSE_ORDER)
         if (count > 1)
         {
             qsort(result->suggestions, result->count, sizeof(LIBMATTI_BR_Suggestion *), suggestion_compare);
@@ -89,7 +90,7 @@ LIBMATTI_BR_Suggestions *LIBMATTI_BR_Suggestions_Empty(void)
 LIBMATTI_BR_Suggestions *LIBMATTI_BR_Suggestions_Merge(const char *input, LIBMATTI_BR_Suggestions **suggestions,
                                                        size_t count)
 {
-    // Java: merge flattens all lists into one; the port concatenates and re-sorts
+// Java: merge flattens all lists into one; the port concatenates and re-sorts
     LIBMATTI_BR_Suggestion **merged = NULL;
     size_t mergedCount = 0;
     for (size_t i = 0; i < count; i++)
@@ -120,9 +121,10 @@ void LIBMATTI_BR_Suggestions_Free(LIBMATTI_BR_Suggestions *suggestions)
     free(suggestions);
 }
 
-// ---------------------------------------------------------------------------
-// SuggestionsBuilder
-// ---------------------------------------------------------------------------
+
+
+
+
 
 LIBMATTI_BR_SuggestionsBuilder *LIBMATTI_BR_SuggestionsBuilder_New(const char *input, int start)
 {
@@ -154,7 +156,7 @@ LIBMATTI_BR_SuggestionsBuilder *LIBMATTI_BR_SuggestionsBuilder_SuggestTooltip(LI
                                                                               const char *text,
                                                                               LIBMATTI_BR_Message *tooltip)
 {
-    // Java: if (text.equals(remaining)) return this;
+// Java: if (text.equals(remaining)) return this;
     if (strcmp(text, self->remaining) == 0) return self;
     self->result = realloc(self->result, (self->resultCount + 1) * sizeof(LIBMATTI_BR_Suggestion *));
     self->result[self->resultCount] = LIBMATTI_BR_Suggestion_NewWithTooltip(
@@ -206,7 +208,7 @@ LIBMATTI_BR_SuggestionsBuilder *LIBMATTI_BR_SuggestionsBuilder_Restart(const LIB
 
 LIBMATTI_BR_Suggestions *LIBMATTI_BR_SuggestionsBuilder_Build(LIBMATTI_BR_SuggestionsBuilder *self)
 {
-    // Java: return Suggestions.create(input, result); the result moves
+// Java: return Suggestions.create(input, result); the result moves
     LIBMATTI_BR_Suggestions *suggestions = LIBMATTI_BR_Suggestions_Create(self->input, self->result, self->resultCount);
     free(self->result);
     self->result = NULL;

@@ -1,4 +1,5 @@
-// Port of org.joml.Matrix3f.
+
+
 
 #ifndef MATTICRAFT_JOML_MATRIX3F_H
 #define MATTICRAFT_JOML_MATRIX3F_H
@@ -29,4 +30,4 @@ LIBMATTI_JOML_Matrix3f *LIBMATTI_JOML_Matrix3f_RotateTowards(LIBMATTI_JOML_Matri
 // Java: public Matrix3f rotateZ(float ang)
 LIBMATTI_JOML_Matrix3f *LIBMATTI_JOML_Matrix3f_RotateZ(LIBMATTI_JOML_Matrix3f *m, float ang);
 
-#endif //MATTICRAFT_JOML_MATRIX3F_H
+#endif

@@ -10,4 +10,4 @@
 // Java: public String version()
 const char *LIBMATTI_FML_BuiltInLanguageLoader_Version(void);
 
-#endif //MATTICRAFT_FML_LOADING_BUILTINLANGUAGELOADER_H
+#endif

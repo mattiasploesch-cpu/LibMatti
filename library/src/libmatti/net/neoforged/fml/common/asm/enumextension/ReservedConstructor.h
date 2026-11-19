@@ -8,4 +8,4 @@
 #define LIBMATTI_FML_RESERVEDCONSTRUCTOR_DESCRIPTOR \
     "Lnet/neoforged/fml/common/asm/enumextension/ReservedConstructor;"
 
-#endif //MATTICRAFT_FML_COMMON_ASM_ENUMEXTENSION_RESERVEDCONSTRUCTOR_H
+#endif

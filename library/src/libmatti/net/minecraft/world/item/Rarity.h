@@ -1,4 +1,5 @@
-// Port of net.minecraft.world.item.Rarity.
+
+
 
 #ifndef MATTICRAFT_MC_WORLD_ITEM_RARITY_H
 #define MATTICRAFT_MC_WORLD_ITEM_RARITY_H
@@ -27,4 +28,4 @@ LIBMATTI_MC_Rarity LIBMATTI_MC_Rarity_ById(int id);
 }
 #endif
 
-#endif //MATTICRAFT_MC_WORLD_ITEM_RARITY_H
+#endif

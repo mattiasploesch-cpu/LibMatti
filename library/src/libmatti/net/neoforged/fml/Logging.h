@@ -1,6 +1,7 @@
-// Port of net.neoforged.fml.Logging.
-// Java markers come from org.apache.logging.log4j.MarkerManager; the C port keeps the marker
-// names and reuses the logger's marker type (parents are therefore not modelled).
+
+
+
+
 
 #ifndef MATTICRAFT_FML_LOGGING_H
 #define MATTICRAFT_FML_LOGGING_H
@@ -22,4 +23,4 @@ extern const LIBMATTI_ML_LogMarker LIBMATTI_FML_Logging_MODELLOADING;
 // Java: public static final Marker FORGEMOD = MarkerManager.getMarker("FORGEMOD").addParents(LOADING);
 extern const LIBMATTI_ML_LogMarker LIBMATTI_FML_Logging_FORGEMOD;
 
-#endif //MATTICRAFT_FML_LOGGING_H
+#endif

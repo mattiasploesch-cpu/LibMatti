@@ -1,7 +1,8 @@
-// Port of net.minecraft.core.Registry (the static register helpers and the interface surface
-// the C port needs). The interface methods live on MappedRegistry; this header carries the
-// Registry.register statics Java's Mods call and the Registry interface helpers that do not
-// need the codec/holder stacks.
+
+
+
+
+
 
 #ifndef MATTICRAFT_NET_MINECRAFT_CORE_REGISTRY_H
 #define MATTICRAFT_NET_MINECRAFT_CORE_REGISTRY_H
@@ -30,4 +31,4 @@ void *LIBMATTI_MC_Registry_GetOptional(const LIBMATTI_MC_MappedRegistry *registr
 void *LIBMATTI_MC_Registry_GetValueOrThrow(const LIBMATTI_MC_MappedRegistry *registry,
                                            const LIBMATTI_MC_ResourceKey *resourceKey);
 
-#endif //MATTICRAFT_NET_MINECRAFT_CORE_REGISTRY_H
+#endif

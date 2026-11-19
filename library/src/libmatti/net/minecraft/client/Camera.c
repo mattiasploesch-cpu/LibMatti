@@ -1,10 +1,11 @@
-// Port of net.minecraft.client.Camera (implementation).
-// setRotation builds JOML's rotationYXZ(PI - yRot, -xRot, 0) through the
-// port's identity + rotateAxis pair. RotateAxis PRE-multiplies (q = axisQ*q),
-// so the X pitch term must be applied FIRST and the Y yaw term LAST to yield
-// the rotationYXZ product qY·qX (the zero Z term drops out), and
-// the basis vectors rotate through the standard q*v*q*-1 sandwich - the
-// same math Vector3f.rotate(Quaternionfc, Vector3f) performs.
+
+
+
+
+
+
+
+
 
 #include "libmatti/net/minecraft/client/Camera.h"
 
@@ -26,16 +27,19 @@ static void set_vec3(LIBMATTI_JOML_Vector3f *v, float x, float y, float z)
     v->z = z;
 }
 
-// Vector3f.rotate(Quaternionfc, Vector3f): v' = q * (0, v) * q^-1.
+
+
 static void rotate_by_quaternion(const LIBMATTI_JOML_Quaternionf *q,
                                  const LIBMATTI_JOML_Vector3f *v,
                                  LIBMATTI_JOML_Vector3f *out)
 {
-    // t = 2 * cross(q.xyz, v)
+
+
     float tx = 2.0f * (q->y * v->z - q->z * v->y);
     float ty = 2.0f * (q->z * v->x - q->x * v->z);
     float tz = 2.0f * (q->x * v->y - q->y * v->x);
-    // out = v + q.w * t + cross(q.xyz, t)
+
+
     out->x = v->x + q->w * tx + (q->y * tz - q->z * ty);
     out->y = v->y + q->w * ty + (q->z * tx - q->x * tz);
     out->z = v->z + q->w * tz + (q->x * ty - q->y * tx);
@@ -73,7 +77,7 @@ void LIBMATTI_MC_Camera_SetRotation(LIBMATTI_MC_Camera *camera, float yRot, floa
 {
     camera->yRot = yRot;
     camera->xRot = xRot;
-    // Java: this.rotation.rotationYXZ((float) Math.PI - yRot * rad, -xRot * rad, 0)
+// Java: this.rotation.rotationYXZ((float) Math.PI - yRot * rad, -xRot * rad, 0)
     // = RY(PI - yRot) * RX(-xRot). RotateAxis PRE-multiplies (q = axisQ * q),
     // so the pitch about X goes in FIRST and the yaw about Y LAST - the yaw
     // must sit on the LEFT of the product (the outermost world-space turn).
@@ -85,7 +89,7 @@ void LIBMATTI_MC_Camera_SetRotation(LIBMATTI_MC_Camera *camera, float yRot, floa
                                          -xRot * ((float) M_PI / 180.0f), 1.0f, 0.0f, 0.0f);
     LIBMATTI_JOML_Quaternionf_RotateAxis(&camera->rotation,
                                          (float) M_PI - yRot * ((float) M_PI / 180.0f), 0.0f, 1.0f, 0.0f);
-    // Java: FORWARDS.rotate(this.rotation, this.forwards) - the CONSTANTS
+// Java: FORWARDS.rotate(this.rotation, this.forwards) - the CONSTANTS
     // rotate INTO the fields, so every call starts from the unit axes again
     // (rotating the fields in place would compose with the previous frame).
     set_vec3(&camera->forwards, 0.0f, 0.0f, -1.0f);
@@ -103,7 +107,7 @@ void LIBMATTI_MC_Camera_SetPosition(LIBMATTI_MC_Camera *camera, double x, double
     camera->x = x;
     camera->y = y;
     camera->z = z;
-    // Java: this.blockPosition.set(x, y, z) - BlockPos.containing (floor).
+// Java: this.blockPosition.set(x, y, z) - BlockPos.containing (floor).
     camera->blockX = (int) floor(x);
     camera->blockY = (int) floor(y);
     camera->blockZ = (int) floor(z);
@@ -126,7 +130,7 @@ void LIBMATTI_MC_Camera_Move(LIBMATTI_MC_Camera *camera, float forward, float up
 void LIBMATTI_MC_Camera_Tick(LIBMATTI_MC_Camera *camera)
 {
     camera->eyeHeightOld = camera->eyeHeight;
-    // Java: eyeHeight + (entity.getEyeHeight() - eyeHeight) * 0.5F - the
+// Java: eyeHeight + (entity.getEyeHeight() - eyeHeight) * 0.5F - the
     // entity eye height arrives with P5, so the easing is a no-op there.
     camera->eyeHeight += (0.0f - camera->eyeHeight) * 0.5f;
 }

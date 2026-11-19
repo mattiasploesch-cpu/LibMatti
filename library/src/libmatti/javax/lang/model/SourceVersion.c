@@ -1,4 +1,5 @@
-// Port of javax.lang.model.SourceVersion.
+
+
 
 #include "libmatti/javax/lang/model/SourceVersion.h"
 
@@ -21,7 +22,7 @@ int LIBMATTI_SV_SourceVersion_IsKeyword(const char *name)
 {
     if (name == NULL) return 0;
 
-    // Java: "true", "false", "null" and "_" are keywords too
+// Java: "true", "false", "null" and "_" are keywords too
     if (strcmp(name, "true") == 0 || strcmp(name, "false") == 0 || strcmp(name, "null") == 0 ||
         strcmp(name, "_") == 0)
         return 1;
@@ -36,7 +37,7 @@ int LIBMATTI_SV_SourceVersion_IsKeyword(const char *name)
 // Java: Character.isJavaIdentifierStart(int codePoint)
 static int isJavaIdentifierStart(int codePoint)
 {
-    // Java: Character.isLetter(codePoint) || codePoint == '$' || codePoint == '_'
+// Java: Character.isLetter(codePoint) || codePoint == '$' || codePoint == '_'
     return (codePoint >= 'a' && codePoint <= 'z') || (codePoint >= 'A' && codePoint <= 'Z') ||
            codePoint == '$' || codePoint == '_';
 }

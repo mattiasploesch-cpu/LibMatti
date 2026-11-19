@@ -1,11 +1,12 @@
-// SDL3 renderer backend: SDL window + SDL_Renderer + streaming ARGB texture.
-// SDL owns the platform window and the graphics API (Vulkan/OpenGL/Metal/...),
-// while the client keeps drawing into the common CPU framebuffer.
-//
-// Unlike the first version, this is a complete integration: SDL events update
-// the input state (mouse position/buttons and GLFW-numbered keys), window
-// resizes and high-DPI changes are reflected by the logical presentation, and
-// the streaming texture is recreated when the framebuffer size changes.
+
+
+
+
+
+
+
+
+
 
 #include "libmatti/matti/render/render_internal.h"
 
@@ -45,9 +46,10 @@ static void sdl3_backend_free(LIBMATTI_SDL3Backend *backend)
 {
     if (backend == NULL)
         return;
-    // Destroy whatever a failed or successful init created. Partial inits are
-    // common here (window ok, renderer fails, ...), so every field is checked
-    // independently of the "fully initialized" flag.
+
+
+
+
     if (backend->texture != NULL)
         SDL_DestroyTexture(backend->texture);
     if (backend->renderer != NULL)
@@ -84,9 +86,10 @@ static int sdl3_init(LIBMATTI_Renderer *renderer)
     if (renderer->config.fullscreen)
     {
         flags |= SDL_WINDOW_FULLSCREEN;
-        // SDL3's default fullscreen mode is borderless desktop fullscreen. Set
-        // it explicitly so no exclusive mode (and no host resolution change)
-        // is selected. The UI is rendered at that native size below.
+
+
+
+
         const SDL_DisplayMode *desktop = SDL_GetDesktopDisplayMode(SDL_GetPrimaryDisplay());
         if (desktop != NULL && desktop->w > 0 && desktop->h > 0)
         {
@@ -116,9 +119,10 @@ static int sdl3_init(LIBMATTI_Renderer *renderer)
         }
     }
 
-    // The player picked an API below the SDL layer (Vulkan/OpenGL/DirectX).
-    // SDL render drivers are named after the API; the first matching driver
-    // wins (Direct3D 12 -> 11 -> 9 on Windows).
+
+
+
+
     const char *driver = NULL;
     switch (renderer->config.api)
     {
@@ -141,7 +145,8 @@ static int sdl3_init(LIBMATTI_Renderer *renderer)
                 const char *name = SDL_GetRenderDriver(i);
                 if (name == NULL || strncmp(name, "direct3d", 8) != 0)
                     continue;
-                // Prefer 12 over 11 over 9 as SDL lists them.
+
+
                 if (driver == NULL || strcmp(name, "direct3d12") == 0)
                     driver = name;
             }
@@ -209,9 +214,10 @@ static int mouse_button_index(Uint8 button)
     }
 }
 
-// The UI uses GLFW key codes (the same values as org.lwjgl.glfw.GLFW). SDL
-// reports scancodes, so translate instead of leaking a second key numbering
-// into the bridge.
+
+
+
+
 static SDL_Scancode glfw_to_scancode(int key)
 {
     if (key >= 'A' && key <= 'Z')
@@ -486,7 +492,8 @@ const LIBMATTI_RenderBackendOps *LIBMATTI_Render_SDL3Ops(void)
     return &ops;
 }
 
-#else // MATTI_HAVE_SDL3
+#else
+
 
 static int sdl3_is_available(void)
 {
@@ -594,4 +601,4 @@ const LIBMATTI_RenderBackendOps *LIBMATTI_Render_SDL3Ops(void)
     return &ops;
 }
 
-#endif // MATTI_HAVE_SDL3
+#endif

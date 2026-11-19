@@ -1,8 +1,9 @@
-// Port of net.minecraft.core.MappedRegistry (also serving as WritableRegistry, the Holder
-// machinery folds into the registry: a Reference holder is the registry's own entry record).
-// Java keys values by identity (IdentityHashMap/Reference2IntMap); the C port does the same
-// with pointer keys. Tags (frozenTags/allTags) are the tag-loading part and stay out until
-// the game port needs them.
+
+
+
+
+
+
 
 #ifndef MATTICRAFT_NET_MINECRAFT_CORE_MAPPEDREGISTRY_H
 #define MATTICRAFT_NET_MINECRAFT_CORE_MAPPEDREGISTRY_H
@@ -17,15 +18,15 @@
 // Java: Holder.Reference<T> - the registry's entry record; the holder binds key and value
 typedef struct LIBMATTI_MC_HolderReference
 {
-    // Java: the owning registry (Holder.Reference.createStandAlone(this, key))
+// Java: the owning registry (Holder.Reference.createStandAlone(this, key))
     struct LIBMATTI_MC_MappedRegistry *registry;
-    // Java: bindKey(ResourceKey) - NULL until the value is registered
+// Java: bindKey(ResourceKey) - NULL until the value is registered
     LIBMATTI_MC_ResourceKey *key;
-    // Java: bindValue(T) on freeze - NULL until bound
+// Java: bindValue(T) on freeze - NULL until bound
     void *value;
-    // Java: isBound() - key != null && value != null
+// Java: isBound() - key != null && value != null
     int bound;
-    // Java: bindTags(List<TagKey>) - the tag keys bound to this holder
+// Java: bindTags(List<TagKey>) - the tag keys bound to this holder
     LIBMATTI_MC_ResourceKey **tags;
     size_t tagCount;
 } LIBMATTI_MC_HolderReference;
@@ -35,18 +36,18 @@ typedef struct LIBMATTI_MC_MappedRegistry LIBMATTI_MC_MappedRegistry;
 
 struct LIBMATTI_MC_MappedRegistry
 {
-    // Java: private final ResourceKey<? extends Registry<T>> key;
+// Java: private final ResourceKey<? extends Registry<T>> key;
     LIBMATTI_MC_ResourceKey *key;
-    // Java: private final ObjectList<Holder.Reference<T>> byId;
+// Java: private final ObjectList<Holder.Reference<T>> byId;
     LIBMATTI_MC_HolderReference **byId;
     size_t byIdCount;
     size_t byIdCapacity;
-    // Java: private final Reference2IntMap<T> toId (default -1)
+// Java: private final Reference2IntMap<T> toId (default -1)
     void **toIdKeys;
     int *toIdValues;
     size_t toIdCount;
     size_t toIdCapacity;
-    // Java: private final Map<Identifier, Holder.Reference<T>> byLocation;
+// Java: private final Map<Identifier, Holder.Reference<T>> byLocation;
     struct
     {
         LIBMATTI_MC_Identifier **keys;
@@ -54,7 +55,7 @@ struct LIBMATTI_MC_MappedRegistry
         size_t count;
         size_t capacity;
     } byLocation;
-    // Java: private final Map<ResourceKey<T>, Holder.Reference<T>> byKey;
+// Java: private final Map<ResourceKey<T>, Holder.Reference<T>> byKey;
     struct
     {
         LIBMATTI_MC_ResourceKey **keys;
@@ -62,7 +63,7 @@ struct LIBMATTI_MC_MappedRegistry
         size_t count;
         size_t capacity;
     } byKey;
-    // Java: private final Map<T, Holder.Reference<T>> byValue (identity);
+// Java: private final Map<T, Holder.Reference<T>> byValue (identity);
     struct
     {
         void **keys;
@@ -70,7 +71,7 @@ struct LIBMATTI_MC_MappedRegistry
         size_t count;
         size_t capacity;
     } byValue;
-    // Java: private final Map<ResourceKey<T>, RegistrationInfo> registrationInfos;
+// Java: private final Map<ResourceKey<T>, RegistrationInfo> registrationInfos;
     struct
     {
         LIBMATTI_MC_ResourceKey **keys;
@@ -78,13 +79,13 @@ struct LIBMATTI_MC_MappedRegistry
         size_t count;
         size_t capacity;
     } registrationInfos;
-    // Java: private Lifecycle registryLifecycle;
+// Java: private Lifecycle registryLifecycle;
     LIBMATTI_MJS_Lifecycle registryLifecycle;
-    // Java: private boolean frozen;
+// Java: private boolean frozen;
     int frozen;
-    // Java: intrusive holders (unregisteredIntrusiveHolders != null when intrusive)
+// Java: intrusive holders (unregisteredIntrusiveHolders != null when intrusive)
     int intrusiveHolders;
-    // Java: the default key of DefaultedMappedRegistry - NULL for plain registries
+// Java: the default key of DefaultedMappedRegistry - NULL for plain registries
     char *defaultKey;
 };
 
@@ -175,10 +176,11 @@ void *LIBMATTI_MC_MappedRegistry_GetValueOrDefault(const LIBMATTI_MC_MappedRegis
 // Java: @NonNull public T byId(int) - falls back to the default value
 void *LIBMATTI_MC_MappedRegistry_ByIdOrDefault(const LIBMATTI_MC_MappedRegistry *registry, int id);
 
-// The port's DefaultedMappedRegistry constructor: DefaultedRegistry<T> with getDefaultKey()
+
+
 LIBMATTI_MC_MappedRegistry *LIBMATTI_MC_DefaultedMappedRegistry_New(const char *defaultKey,
                                                                     LIBMATTI_MC_ResourceKey *key,
                                                                     LIBMATTI_MJS_Lifecycle lifecycle,
                                                                     int intrusiveHolders);
 
-#endif //MATTICRAFT_NET_MINECRAFT_CORE_MAPPEDREGISTRY_H
+#endif

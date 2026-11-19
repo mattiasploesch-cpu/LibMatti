@@ -1,10 +1,11 @@
-// The vanilla block textures (implementation). The stitch normally runs over
-// the resource pack; the port generates the demo textures procedurally into
-// NativeImages, wraps them into sprite sources the SpriteLoader accepts and
-// uploads the stitched page into the atlas.
-//
-// Java equivalent: Minecraft's MODEL_ATLAS loading step
-// (SpriteSourceList over assets/minecraft/atlases/blocks.json).
+
+
+
+
+
+
+
+
 
 #include "libmatti/net/minecraft/server/bootstrap/VanillaBlockTextures.h"
 
@@ -19,7 +20,8 @@
 // Java: the stone texture - grayscale noise around #7d7d7d.
 static void fill_stone(LIBMATTI_B3D_NativeImage *image)
 {
-    unsigned int seed = 0x517cc1b7; // a fixed seed keeps the texture stable
+    unsigned int seed = 0x517cc1b7;
+
     for (int y = 0; y < 16; y++)
     {
         for (int x = 0; x < 16; x++)
@@ -75,7 +77,8 @@ LIBMATTI_MC_TextureAtlas *LIBMATTI_MC_VanillaBlockTextures_Bootstrap(int maxText
     if (atlas == NULL)
         return NULL;
 
-    // The two procedural sprites on a 32x16 page.
+
+
     LIBMATTI_B3D_NativeImage *stone = LIBMATTI_B3D_NativeImage_New(16, 16, 1);
     LIBMATTI_B3D_NativeImage *dirt = LIBMATTI_B3D_NativeImage_New(16, 16, 1);
     fill_stone(stone);
@@ -89,7 +92,7 @@ LIBMATTI_MC_TextureAtlas *LIBMATTI_MC_VanillaBlockTextures_Bootstrap(int maxText
         return NULL;
     }
 
-    // Java: the atlas takes the sprites over (texturesByName).
+// Java: the atlas takes the sprites over (texturesByName).
     atlas->sprites = calloc(2, sizeof(LIBMATTI_MC_TextureAtlasSprite *));
     atlas->sprites[0] = stoneSprite;
     atlas->sprites[1] = dirtSprite;
@@ -97,7 +100,7 @@ LIBMATTI_MC_TextureAtlas *LIBMATTI_MC_VanillaBlockTextures_Bootstrap(int maxText
     atlas->width = 32;
     atlas->height = 16;
 
-    // Java: the GL upload of the stitched page (the port composes the 32x16
+// Java: the GL upload of the stitched page (the port composes the 32x16
     // RGBA page from the two images and pushes it through the binding).
     LIBMATTI_B3D_NativeImage *page = LIBMATTI_B3D_NativeImage_New(32, 16, 1);
     for (int y = 0; y < 16; y++)
@@ -110,7 +113,8 @@ LIBMATTI_MC_TextureAtlas *LIBMATTI_MC_VanillaBlockTextures_Bootstrap(int maxText
             page->pixels[y * 32 + x + 16] = d;
         }
     }
-    atlas->base.pixels = page; // the DynamicTexture upload path owns it
+    atlas->base.pixels = page;
+
     atlas->base.kind = LIBMATTI_MC_TextureKind_ATLAS;
 
     return atlas;

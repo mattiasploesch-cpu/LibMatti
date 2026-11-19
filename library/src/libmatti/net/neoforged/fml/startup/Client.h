@@ -24,4 +24,4 @@ typedef struct
 LIBMATTI_FML_Client *LIBMATTI_FML_Client_New(void);
 void LIBMATTI_FML_Client_Free(LIBMATTI_FML_Client *client);
 
-#endif //MATTICRAFT_FML_CLIENT_H
+#endif

@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.jarcontents.PathNormalization.
+
+
 
 #ifndef MATTICRAFT_FML_JARCONTENTS_PATHNORMALIZATION_H
 #define MATTICRAFT_FML_JARCONTENTS_PATHNORMALIZATION_H
@@ -12,4 +13,4 @@ char *LIBMATTI_FML_PathNormalization_Normalize(const char *path);
 // Java: public static String normalizeFolderPrefix(CharSequence path) - returns a new string
 char *LIBMATTI_FML_PathNormalization_NormalizeFolderPrefix(const char *path);
 
-#endif //MATTICRAFT_FML_JARCONTENTS_PATHNORMALIZATION_H
+#endif

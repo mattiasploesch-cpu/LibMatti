@@ -1,7 +1,8 @@
-// Port of net.minecraft.world.item.ItemStack.
-// Java's ItemStack is (count, item, PatchedDataComponentMap). The C port keeps
-// exactly that; the behaviour methods (use, interact, ...) stay with the game
-// port since they pull in Level/Player/Entity.
+
+
+
+
+
 
 #ifndef MATTICRAFT_MC_WORLD_ITEM_ITEMSTACK_H
 #define MATTICRAFT_MC_WORLD_ITEM_ITEMSTACK_H
@@ -20,13 +21,13 @@ extern "C" {
 // Java: public class ItemStack implements DataComponentHolder
 typedef struct LIBMATTI_MC_ItemStack
 {
-    // Java: private int count
+// Java: private int count
     int count;
-    // Java: private int popTime
+// Java: private int popTime
     int popTime;
-    // Java: private final @Nullable Item item - NULL for EMPTY
+// Java: private final @Nullable Item item - NULL for EMPTY
     LIBMATTI_MC_Item *item;
-    // Java: final PatchedDataComponentMap components
+// Java: final PatchedDataComponentMap components
     LIBMATTI_MC_PatchedDataComponentMap *components;
 } LIBMATTI_MC_ItemStack;
 
@@ -111,4 +112,4 @@ void LIBMATTI_MC_ItemStack_Free(LIBMATTI_MC_ItemStack *stack);
 }
 #endif
 
-#endif //MATTICRAFT_MC_WORLD_ITEM_ITEMSTACK_H
+#endif

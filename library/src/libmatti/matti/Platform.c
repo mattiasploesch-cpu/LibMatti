@@ -64,8 +64,9 @@ const char *LIBMATTI_Platform_Arch(void)
 
 int LIBMATTI_Platform_Bits(void)
 {
-    // The pointer width is the one value that is always right, even for a
-    // 32-bit build of an otherwise 64-bit OS (Windows WOW64, x86 Android).
+
+
+
     return (int) (sizeof(void *) * 8);
 }
 
@@ -110,7 +111,8 @@ const char *LIBMATTI_Platform_DefaultRenderer(void)
         return "sdl:directx";
     if (LIBMATTI_Platform_IsMacOS())
         return "sdl:opengl";
-    // 64-bit Linux desktops get Vulkan; 32-bit installs keep the GL path,
-    // where 32-bit Vulkan drivers are much less common.
+
+
+
     return LIBMATTI_Platform_Bits() >= 64 ? "native:vulkan" : "native:opengl";
 }

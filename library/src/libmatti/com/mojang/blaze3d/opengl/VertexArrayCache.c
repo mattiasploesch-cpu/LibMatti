@@ -51,14 +51,14 @@ LIBMATTI_B3D_VertexArrayCache *LIBMATTI_B3D_VertexArrayCache_Create(int useSepar
 {
     LIBMATTI_B3D_VertexArrayCache *cache = calloc(1, sizeof(LIBMATTI_B3D_VertexArrayCache));
     cache->separate = useSeparate;
-    // Java: Separate ctor - needsMesaWorkaround when the vendor is Mesa and the
+// Java: Separate ctor - needsMesaWorkaround when the vendor is Mesa and the
     // version is one of 25.0.0/25.0.1/25.0.2.
     if (useSeparate)
     {
-        const char *vendor = LIBMATTI_B3D_GlStateManager_GetString(7936 /* GL_VENDOR */);
+        const char *vendor = LIBMATTI_B3D_GlStateManager_GetString(7936  );
         if (vendor != NULL && strcmp(vendor, "Mesa") == 0)
         {
-            const char *version = LIBMATTI_B3D_GlStateManager_GetString(7938 /* GL_VERSION */);
+            const char *version = LIBMATTI_B3D_GlStateManager_GetString(7938  );
             cache->needsMesaWorkaround = version != NULL &&
                                          (strstr(version, "25.0.0") != NULL ||
                                           strstr(version, "25.0.1") != NULL ||
@@ -173,7 +173,7 @@ void LIBMATTI_B3D_VertexArrayCache_BindVertexArray(LIBMATTI_B3D_VertexArrayCache
             LIBMATTI_B3D_GlStateManager_BindVertexArray(entry->id);
             if (vertexBuffer != NULL && entry->lastVertexBuffer != vertexBuffer)
             {
-                // Java: the Mesa workaround rebinds slot 0 to nothing first.
+// Java: the Mesa workaround rebinds slot 0 to nothing first.
                 if (cache->needsMesaWorkaround && entry->lastVertexBuffer != NULL &&
                     entry->lastVertexBuffer->handle == vertexBuffer->handle)
                 {
@@ -199,7 +199,7 @@ void LIBMATTI_B3D_VertexArrayCache_BindVertexArray(LIBMATTI_B3D_VertexArrayCache
         return;
     }
 
-    // Java: Emulated.bindVertexArray.
+// Java: Emulated.bindVertexArray.
     if (entry != NULL)
     {
         LIBMATTI_B3D_GlStateManager_BindVertexArray(entry->id);

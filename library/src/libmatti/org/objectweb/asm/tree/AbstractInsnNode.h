@@ -1,4 +1,5 @@
-// Port of org.objectweb.asm.tree.AbstractInsnNode.
+
+
 
 #ifndef MATTICRAFT_ASM_ABSTRACTINSNNODE_H
 #define MATTICRAFT_ASM_ABSTRACTINSNNODE_H
@@ -38,4 +39,4 @@ int LIBMATTI_ASM_AbstractInsnNode_GetOpcode(const LIBMATTI_ASMT_AbstractInsnNode
 // Java: public int getType()
 int LIBMATTI_ASM_AbstractInsnNode_GetType(const LIBMATTI_ASMT_AbstractInsnNode *node);
 
-#endif //MATTICRAFT_ASM_ABSTRACTINSNNODE_H
+#endif

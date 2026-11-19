@@ -1,9 +1,10 @@
-// Port of the javax.imageio PNG reader plugin (com.sun.imageio.plugins.png.PNGImageReader).
-// The container is validated like Java's plugin: signature, IHDR as the first chunk, palette
-// metadata before the IDAT, consecutive IDAT chunks, IEND. The zlib stream inflates into the
-// filtered scanlines; the five PNG filters are undone line by line and every supported bit
-// depth (1/2/4/8/16) and colour type (0/2/3/4/6) is expanded into 8-bit RGBA, like the
-// BufferedImage types the Java plugin emits.
+
+
+
+
+
+
+
 
 #include "libmatti/javax/imageio/PngReader.h"
 
@@ -60,11 +61,16 @@ static int channels_of(unsigned int colorType)
 {
     switch (colorType)
     {
-    case 0: return 1; // gray
-    case 2: return 3; // truecolor
-    case 3: return 1; // palette
-    case 4: return 2; // gray + alpha
-    case 6: return 4; // truecolor + alpha
+    case 0: return 1;
+
+    case 2: return 3;
+
+    case 3: return 1;
+
+    case 4: return 2;
+
+    case 6: return 4;
+
     default: return -1;
     }
 }
@@ -73,7 +79,7 @@ static int channels_of(unsigned int colorType)
 static int palette_channels(int bitDepth, int trnsCount)
 {
     int samples = 1;
-    // Java: getImageTypes - the tRNS adds a second (alpha) band
+// Java: getImageTypes - the tRNS adds a second (alpha) band
     if (trnsCount > 0) samples = 2;
     (void) bitDepth;
     return samples;
@@ -104,7 +110,8 @@ static int read_sample(const unsigned char *line, int x, int channel, int channe
     {
         int bytes = sample_bytes(bitDepth);
         size_t index = ((size_t) x * (size_t) channels + (size_t) channel) * (size_t) bytes;
-        if (bytes == 2) return line[index]; // the high byte of the unsigned short
+        if (bytes == 2) return line[index];
+
         return line[index];
     }
 
@@ -134,13 +141,15 @@ static void emit_row(const unsigned char *line, int rowWidth, int channels, int 
 
         switch (colorType)
         {
-        case 0: // gray
-        case 4: // gray + alpha
+        case 0:
+
+        case 4:
+
         {
             int gray = read_sample(line, x, 0, channels, bitDepth);
             if (bitDepth < 8)
             {
-                // Java: the smaller depths are scaled to the full 8-bit range
+// Java: the smaller depths are scaled to the full 8-bit range
                 int max = (1 << bitDepth) - 1;
                 gray = gray * 255 / max;
             }
@@ -148,8 +157,10 @@ static void emit_row(const unsigned char *line, int rowWidth, int channels, int 
             if (channels == 2) a = (unsigned char) read_sample(line, x, 1, channels, bitDepth);
             break;
         }
-        case 2: // truecolor
-        case 6: // truecolor + alpha
+        case 2:
+
+        case 6:
+
         {
             r = (unsigned char) read_sample(line, x, 0, channels, bitDepth);
             g = (unsigned char) read_sample(line, x, 1, channels, bitDepth);
@@ -157,7 +168,8 @@ static void emit_row(const unsigned char *line, int rowWidth, int channels, int 
             if (channels == 4) a = (unsigned char) read_sample(line, x, 3, channels, bitDepth);
             break;
         }
-        case 3: // palette
+        case 3:
+
         {
             int index = read_sample(line, x, 0, channels, bitDepth);
             if (index < paletteCount)
@@ -219,11 +231,16 @@ static int unfilter_pass(const unsigned char *raw, size_t rawLength, size_t *raw
             int prediction;
             switch (filterType)
             {
-            case 0: prediction = 0; break;        // None
-            case 1: prediction = left; break;     // Sub
-            case 2: prediction = up; break;       // Up
-            case 3: prediction = (left + up) / 2; break; // Average
-            case 4: // Paeth
+            case 0: prediction = 0; break;
+
+            case 1: prediction = left; break;
+
+            case 2: prediction = up; break;
+
+            case 3: prediction = (left + up) / 2; break;
+
+            case 4:
+
             {
                 int p = left + up - upperLeft;
                 int pa = p - left;
@@ -270,8 +287,9 @@ unsigned char *LIBMATTI_JXI_PngReader_Decode(const unsigned char *data, size_t l
     if (!read_u32(&reader, &chunkLength) || !read_u32(&reader, &chunkType))
         return NULL;
 
-    // Java: the IHDR must be the first chunk, 13 bytes long
-    if (chunkType != 0x49484452 || chunkLength != 13) return NULL; // 'IHDR'
+// Java: the IHDR must be the first chunk, 13 bytes long
+    if (chunkType != 0x49484452 || chunkLength != 13) return NULL;
+
 
     unsigned int chunkWidth;
     unsigned int chunkHeight;
@@ -287,7 +305,7 @@ unsigned char *LIBMATTI_JXI_PngReader_Decode(const unsigned char *data, size_t l
         return NULL;
     skip_crc(&reader);
 
-    // Java: the plugin rejects the invalid combinations before decoding
+// Java: the plugin rejects the invalid combinations before decoding
     if (chunkWidth == 0 || chunkHeight == 0 || chunkWidth > 0x7fffffffu || chunkHeight > 0x7fffffffu)
         return NULL;
     if (compression != 0 || filterMethod != 0) return NULL;
@@ -315,7 +333,7 @@ unsigned char *LIBMATTI_JXI_PngReader_Decode(const unsigned char *data, size_t l
     unsigned char *trns = NULL;
     int trnsCount = 0;
 
-    // Java: the zlib stream is fed the concatenated IDAT chunks
+// Java: the zlib stream is fed the concatenated IDAT chunks
     unsigned char *compressed = NULL;
     size_t compressedLength = 0;
     int sawHeader = 0;
@@ -328,7 +346,8 @@ unsigned char *LIBMATTI_JXI_PngReader_Decode(const unsigned char *data, size_t l
         if (!read_u32(&reader, &chunkLength) || !read_u32(&reader, &chunkType))
             goto error;
 
-        if (chunkType == 0x504c5445) // 'PLTE' - must appear before the IDAT
+        if (chunkType == 0x504c5445)
+
         {
             if (sawIDAT || (chunkLength % 3) != 0 || chunkLength / 3 > 256) goto error;
             paletteCount = (int) (chunkLength / 3);
@@ -339,7 +358,8 @@ unsigned char *LIBMATTI_JXI_PngReader_Decode(const unsigned char *data, size_t l
             sawHeader = 1;
             continue;
         }
-        if (chunkType == 0x74524e53) // 'tRNS' - before the IDAT
+        if (chunkType == 0x74524e53)
+
         {
             if (sawIDAT) goto error;
             free(trns);
@@ -350,9 +370,11 @@ unsigned char *LIBMATTI_JXI_PngReader_Decode(const unsigned char *data, size_t l
             if (!skip_crc(&reader)) goto error;
             continue;
         }
-        if (chunkType == 0x49444154) // 'IDAT' - consecutive
+        if (chunkType == 0x49444154)
+
         {
-            if (!sawHeader && colorTypeValue != 3) sawHeader = 1; // a truecolor image needs no PLTE
+            if (!sawHeader && colorTypeValue != 3) sawHeader = 1;
+
             if (!sawHeader) goto error;
             if (idatEnded) goto error;
             sawIDAT = 1;
@@ -365,21 +387,22 @@ unsigned char *LIBMATTI_JXI_PngReader_Decode(const unsigned char *data, size_t l
             if (!skip_crc(&reader)) goto error;
             continue;
         }
-        if (chunkType == 0x49454e44) // 'IEND'
+        if (chunkType == 0x49454e44)
+
         {
             sawEnd = 1;
             skip_crc(&reader);
             break;
         }
 
-        // Java: every other chunk is skipped (metadata the port does not need)
+// Java: every other chunk is skipped (metadata the port does not need)
         if (reader.position + chunkLength + 4 > reader.length) goto error;
         reader.position += chunkLength + 4;
     }
 
     if (!sawIDAT || compressedLength == 0) goto error;
 
-    // Java: inflate the whole stream, then walk the scanlines
+// Java: inflate the whole stream, then walk the scanlines
     unsigned char *raw = NULL;
     size_t rawCapacity = 65536;
     size_t rawLength = 0;
@@ -419,7 +442,7 @@ unsigned char *LIBMATTI_JXI_PngReader_Decode(const unsigned char *data, size_t l
     }
     inflateEnd(&stream);
 
-    // Java: the pass loop - a non-interlaced image is one pass with a single geometry
+// Java: the pass loop - a non-interlaced image is one pass with a single geometry
     int imageChannels = colorTypeValue == 3 ? palette_channels(bitDepth, trnsCount) : channels;
     size_t lineBytes = scanline_bytes(widthValue, imageChannels, bitDepth);
     size_t rawPosition = 0;
@@ -433,7 +456,7 @@ unsigned char *LIBMATTI_JXI_PngReader_Decode(const unsigned char *data, size_t l
     }
     else
     {
-        // Java: seven Adam7 passes, each with its own scanline width
+// Java: seven Adam7 passes, each with its own scanline width
         for (int pass = 0; pass < 7; pass++)
         {
             int passWidth = (widthValue - ADAM7_X_OFFSET[pass] + ADAM7_X_STEP[pass] - 1) / ADAM7_X_STEP[pass];

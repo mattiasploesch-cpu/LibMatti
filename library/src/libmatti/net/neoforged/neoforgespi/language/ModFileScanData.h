@@ -1,7 +1,8 @@
-// Port of net.neoforged.neoforgespi.language.ModFileScanData.
-// The records carry real org.objectweb.asm.Type objects (see asm/Type.h); the annotation
-// model (java.lang.annotation.Annotation/ElementType) is keyed by the annotation's class
-// name like the Class-based lookups of Java.
+
+
+
+
+
 
 #ifndef MATTICRAFT_NEOFORGESPI_LANGUAGE_MODFILESCANDATA_H
 #define MATTICRAFT_NEOFORGESPI_LANGUAGE_MODFILESCANDATA_H
@@ -32,34 +33,42 @@ typedef enum
 // Java: record ClassData(Type clazz, Type parent, Set<Type> interfaces)
 typedef struct
 {
-    LIBMATTI_ASM_Type *clazz;        // owned
-    LIBMATTI_ASM_Type *parent;       // owned, NULL for Object's superclass-less case
-    LIBMATTI_ASM_Type **interfaces;  // owned, each element owned
+    LIBMATTI_ASM_Type *clazz;
+
+    LIBMATTI_ASM_Type *parent;
+
+    LIBMATTI_ASM_Type **interfaces;
+
     size_t interfaceCount;
 } LIBMATTI_NEOFORGESPI_ClassData;
 
 // Java: record AnnotationData(Type annotationType, ElementType targetType, Type clazz, String memberName, Map<String, Object> annotationData)
 typedef struct
 {
-    LIBMATTI_ASM_Type *annotationType; // owned
+    LIBMATTI_ASM_Type *annotationType;
+
     LIBMATTI_NEOFORGESPI_ElementType targetType;
-    LIBMATTI_ASM_Type *clazz;          // owned
-    char *memberName;                  // owned
-    char **annotationDataKeys;         // owned
-    char **annotationDataValues;       // owned
+    LIBMATTI_ASM_Type *clazz;
+
+    char *memberName;
+
+    char **annotationDataKeys;
+
+    char **annotationDataValues;
+
     size_t annotationDataCount;
 } LIBMATTI_NEOFORGESPI_AnnotationData;
 
 // Java: public class ModFileScanData
 typedef struct LIBMATTI_NEOFORGESPI_ModFileScanData
 {
-    // Java: Set<AnnotationData> annotations (LinkedHashSet)
+// Java: Set<AnnotationData> annotations (LinkedHashSet)
     LIBMATTI_NEOFORGESPI_AnnotationData *annotations;
     size_t annotationCount;
-    // Java: Set<ClassData> classes (LinkedHashSet)
+// Java: Set<ClassData> classes (LinkedHashSet)
     LIBMATTI_NEOFORGESPI_ClassData *classes;
     size_t classCount;
-    // Java: List<IModFileInfo> modFiles
+// Java: List<IModFileInfo> modFiles
     LIBMATTI_NEOFORGESPI_IModFileInfo **modFiles;
     size_t modFileCount;
 } LIBMATTI_NEOFORGESPI_ModFileScanData;
@@ -90,4 +99,4 @@ void LIBMATTI_NEOFORGESPI_ModFileScanData_AddModFileInfo(LIBMATTI_NEOFORGESPI_Mo
 LIBMATTI_NEOFORGESPI_IModFileInfo **LIBMATTI_NEOFORGESPI_ModFileScanData_GetIModInfoData(
     const LIBMATTI_NEOFORGESPI_ModFileScanData *scanData, size_t *count);
 
-#endif //MATTICRAFT_NEOFORGESPI_LANGUAGE_MODFILESCANDATA_H
+#endif

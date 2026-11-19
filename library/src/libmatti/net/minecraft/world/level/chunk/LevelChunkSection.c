@@ -1,6 +1,7 @@
-// Port of net.minecraft.world.level.chunk.LevelChunkSection.
-// The states ride the PalettedContainer port (palette + BitStorage, the
-// SINGLE_VALUE/LINEAR/GLOBAL strategies); the block-count bookkeeping is 1:1.
+
+
+
+
 
 #include "libmatti/net/minecraft/world/level/chunk/LevelChunkSection.h"
 
@@ -18,14 +19,14 @@ static bool is_air_state(const LIBMATTI_MC_BlockState *state)
 
 int LIBMATTI_MC_LevelChunkSection_Index(int x, int y, int z)
 {
-    // Java: PalettedContainer index - y * 256 + z * 16 + x
+// Java: PalettedContainer index - y * 256 + z * 16 + x
     return y * 256 + z * 16 + x;
 }
 
 LIBMATTI_MC_LevelChunkSection *LIBMATTI_MC_LevelChunkSection_New(void)
 {
     LIBMATTI_MC_LevelChunkSection *section = calloc(1, sizeof(LIBMATTI_MC_LevelChunkSection));
-    // Java: PalettedContainerFactory.createForBlockStates() starts as the
+// Java: PalettedContainerFactory.createForBlockStates() starts as the
     // SINGLE_VALUE container over air
     LIBMATTI_MC_BlockState *air = LIBMATTI_MC_Block_DefaultBlockState(LIBMATTI_MC_VanillaBlocks_AIR());
     section->states = LIBMATTI_MC_PalettedContainer_New(air);
@@ -44,16 +45,16 @@ LIBMATTI_MC_BlockState *LIBMATTI_MC_LevelChunkSection_GetBlockState(const LIBMAT
 
 LIBMATTI_MC_BlockState *LIBMATTI_MC_LevelChunkSection_SetBlockState(LIBMATTI_MC_LevelChunkSection *section, int x, int y, int z, LIBMATTI_MC_BlockState *state)
 {
-    // Java: states.getAndSet(x, y, z, state) + the count bookkeeping
+// Java: states.getAndSet(x, y, z, state) + the count bookkeeping
     LIBMATTI_MC_BlockState *oldState = LIBMATTI_MC_PalettedContainer_GetAndSet(section->states, x, y, z, state);
 
-    // Java: if (!blockstate.isAir()) nonEmptyBlockCount-- (+ tickingBlockCount--)
+// Java: if (!blockstate.isAir()) nonEmptyBlockCount-- (+ tickingBlockCount--)
     if (!is_air_state(oldState))
     {
         section->nonEmptyBlockCount--;
         section->tickingBlockCount--;
     }
-    // Java: if (!p_62995_.isAir()) nonEmptyBlockCount++ (+ tickingBlockCount++)
+// Java: if (!p_62995_.isAir()) nonEmptyBlockCount++ (+ tickingBlockCount++)
     if (!is_air_state(state))
     {
         section->nonEmptyBlockCount++;
@@ -80,13 +81,13 @@ bool LIBMATTI_MC_LevelChunkSection_IsRandomlyTickingBlocks(const LIBMATTI_MC_Lev
 
 bool LIBMATTI_MC_LevelChunkSection_IsRandomlyTickingFluids(const LIBMATTI_MC_LevelChunkSection *section)
 {
-    // Java: tickingFluidCount - the fluid model is game-port content, no fluids yet
+// Java: tickingFluidCount - the fluid model is game-port content, no fluids yet
     return section->tickingFluidCount > 0;
 }
 
 void LIBMATTI_MC_LevelChunkSection_RecalcBlockCounts(LIBMATTI_MC_LevelChunkSection *section)
 {
-    // Java: recalcBlockCounts - walk the palette and count (the port walks the
+// Java: recalcBlockCounts - walk the palette and count (the port walks the
     // storage because the palette ids can repeat with different air predicates)
     section->nonEmptyBlockCount = 0;
     section->tickingBlockCount = 0;

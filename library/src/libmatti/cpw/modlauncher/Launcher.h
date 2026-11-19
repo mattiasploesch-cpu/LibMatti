@@ -1,6 +1,7 @@
-//
-// Port of cpw.mods.modlauncher.Launcher.
-//
+
+
+
+
 
 #ifndef MATTICRAFT_MODLAUNCHER_LAUNCHER_H
 #define MATTICRAFT_MODLAUNCHER_LAUNCHER_H
@@ -61,4 +62,4 @@ LIBMATTI_MLA_ILaunchHandlerService *LIBMATTI_ML_Launcher_FindLaunchHandler(LIBMA
 // Java: public Optional<IModuleLayerManager> findLayerManager() - NULL means empty
 LIBMATTI_MLA_IModuleLayerManager *LIBMATTI_ML_Launcher_FindLayerManager(LIBMATTI_ML_Launcher *launcher);
 
-#endif //MATTICRAFT_MODLAUNCHER_LAUNCHER_H
+#endif

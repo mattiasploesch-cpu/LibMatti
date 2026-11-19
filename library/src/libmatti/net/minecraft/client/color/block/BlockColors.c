@@ -219,19 +219,19 @@ LIBMATTI_MC_BlockColors *LIBMATTI_MC_BlockColors_CreateDefault(void)
 {
     LIBMATTI_MC_BlockColors *colors = LIBMATTI_MC_BlockColors_New();
 
-    // Java: the LARGE_FERN/TALL_GRASS provider (upper half looks below)
+// Java: the LARGE_FERN/TALL_GRASS provider (upper half looks below)
     static const char *const tall_grass[] = {"LARGE_FERN", "TALL_GRASS"};
     register_blocks(colors, grass_color, tall_grass, 2);
 
-    // Java: the GRASS_BLOCK/FERN/SHORT_GRASS/POTTED_FERN/BUSH provider
+// Java: the GRASS_BLOCK/FERN/SHORT_GRASS/POTTED_FERN/BUSH provider
     static const char *const grass[] = {"GRASS_BLOCK", "FERN", "SHORT_GRASS", "POTTED_FERN", "BUSH"};
     register_blocks(colors, grass_color, grass, 5);
 
-    // Java: the PINK_PETALS/WILDFLOWERS provider
+// Java: the PINK_PETALS/WILDFLOWERS provider
     static const char *const petals[] = {"PINK_PETALS", "WILDFLOWERS"};
     register_blocks(colors, pink_petals_color, petals, 2);
 
-    // Java: the leaves providers
+// Java: the leaves providers
     static const char *const spruce[] = {"SPRUCE_LEAVES"};
     register_blocks(colors, spruce_leaves_color, spruce, 1);
     static const char *const birch[] = {"BIRCH_LEAVES"};
@@ -241,23 +241,23 @@ LIBMATTI_MC_BlockColors *LIBMATTI_MC_BlockColors_CreateDefault(void)
     static const char *const leaf_litter[] = {"LEAF_LITTER"};
     register_blocks(colors, dry_foliage_color, leaf_litter, 1);
 
-    // Java: the WATER/BUBBLE_COLUMN/WATER_CAULDRON provider
+// Java: the WATER/BUBBLE_COLUMN/WATER_CAULDRON provider
     static const char *const water[] = {"WATER", "BUBBLE_COLUMN", "WATER_CAULDRON"};
     register_blocks(colors, water_color, water, 3);
 
-    // Java: the REDSTONE_WIRE provider
+// Java: the REDSTONE_WIRE provider
     static const char *const redstone[] = {"REDSTONE_WIRE"};
     register_blocks(colors, redstone_wire_color, redstone, 1);
 
-    // Java: the SUGAR_CANE provider
+// Java: the SUGAR_CANE provider
     static const char *const cane[] = {"SUGAR_CANE"};
     register_blocks(colors, sugar_cane_color, cane, 1);
 
-    // Java: the stems - ARGB over the AGE property value
+// Java: the stems - ARGB over the AGE property value
     static const char *const melon_stem[] = {"MELON_STEM", "PUMPKIN_STEM"};
     register_blocks(colors, stem_age_color, melon_stem, 2);
 
-    // Java: the LILY_PAD provider
+// Java: the LILY_PAD provider
     static const char *const lily[] = {"LILY_PAD"};
     register_blocks(colors, lily_pad_color, lily, 1);
 
@@ -275,7 +275,7 @@ int LIBMATTI_MC_BlockColors_GetColor(LIBMATTI_MC_BlockColors *colors,
                                          LIBMATTI_MC_BlockState_GetBlock(state)));
     if (color != NULL)
         return color(state, NULL, NULL, 0);
-    // Java: the MapColor fallback
+// Java: the MapColor fallback
     const LIBMATTI_MC_Block *block = LIBMATTI_MC_BlockState_GetBlock(state);
     if (block != NULL && block->properties != NULL && block->properties->mapColor != NULL)
         return block->properties->mapColor->col;

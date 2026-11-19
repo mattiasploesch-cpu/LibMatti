@@ -1,4 +1,5 @@
-// Port of cpw.mods.cl.JarModuleFinder.
+
+
 
 #ifndef MATTICRAFT_JARMODULEFINDER_H
 #define MATTICRAFT_JARMODULEFINDER_H
@@ -17,15 +18,17 @@ typedef struct LIBMATTI_CL_JarModuleReader LIBMATTI_CL_JarModuleReader;
 // Java: static class JarModuleReference extends ModuleReference
 typedef struct
 {
-    LIBMATTI_JL_ModuleReference base; // Java: super(jar.descriptor(), jar.uri())
+    LIBMATTI_JL_ModuleReference base;// Java: super(jar.descriptor(), jar.uri())
     LIBMATTI_CL_ModuleDataProvider *jar;
 } LIBMATTI_CL_JarModuleReference;
 
 // Java: class JarModuleFinder implements ModuleFinder
 typedef struct
 {
-    char **names;                              // moduleReferenceMap keys
-    LIBMATTI_CL_JarModuleReference **references; // moduleReferenceMap values
+    char **names;
+
+    LIBMATTI_CL_JarModuleReference **references;
+
     size_t count;
 } LIBMATTI_CL_JarModuleFinder;
 
@@ -58,4 +61,4 @@ void LIBMATTI_CL_JarModuleReader_Close(const LIBMATTI_CL_JarModuleReader *reader
 // Java: String toString() -> getClass().getName() + "[jar=" + jar + "]"; caller frees
 char *LIBMATTI_CL_JarModuleReader_ToString(const LIBMATTI_CL_JarModuleReader *reader);
 
-#endif //MATTICRAFT_JARMODULEFINDER_H
+#endif

@@ -1,4 +1,5 @@
-// Port of net.minecraft.core.component.DataComponentMap.
+
+
 
 #include "libmatti/net/minecraft/core/component/DataComponentMap.h"
 

@@ -1,6 +1,7 @@
-// Port of org.spongepowered.asm.launch.platform.MixinContainer and
-// org.spongepowered.asm.launch.platform.MixinPlatformManager.
-// "Handler for platform-specific behaviour required in different mixin environments."
+
+
+
+
 
 #include "libmatti/org/spongepowered/asm/launch/platform/MixinPlatformManager.h"
 
@@ -26,9 +27,10 @@ static LIBMATTI_SP_ILogger *LOGGER(void)
     return service != NULL ? service->getLogger(service->self, "mixin") : NULL;
 }
 
-// ---------------------------------------------------------------------------
-// MixinContainer
-// ---------------------------------------------------------------------------
+
+
+
+
 
 // Java: private static final List<String> agentClasses = new ArrayList<String>();
 //       static { GlobalProperties.put(Keys.AGENTS, agentClasses);
@@ -56,7 +58,7 @@ static void agent_classes_init(void)
             ? service->getPlatformAgents(service->self, &serviceAgentCount)
             : NULL;
 
-    // Java: the service's agents + MixinPlatformAgentDefault (the only agent the port ships)
+// Java: the service's agents + MixinPlatformAgentDefault (the only agent the port ships)
     agentClasses = malloc(sizeof(AgentClass));
     agentClasses[0].name = "org.spongepowered.asm.launch.platform.MixinPlatformAgentDefault";
     agentClasses[0].create = (LIBMATTI_SP_IMixinPlatformAgent * (*)(void)) LIBMATTI_SP_MixinPlatformAgentDefault_New;
@@ -76,23 +78,23 @@ LIBMATTI_SP_MixinContainer *LIBMATTI_SP_MixinContainer_New(LIBMATTI_SP_MixinPlat
 
     for (size_t i = 0; i < agentClassCount; i++)
     {
-        // Java: Class<IMixinPlatformAgent> clazz = (Class<IMixinPlatformAgent>)Class.forName(agentClass);
+// Java: Class<IMixinPlatformAgent> clazz = (Class<IMixinPlatformAgent>)Class.forName(agentClass);
         //       String simpleName = clazz.getSimpleName();
         //       logger.debug("Instancing new {} for {}", simpleName, this.handle);
         //       IMixinPlatformAgent agent = clazz.getDeclaredConstructor().newInstance();
         LIBMATTI_SP_IMixinPlatformAgent *agent = agentClasses[i].create();
 
-        // Java: AcceptResult acceptAction = agent.accept(manager, this.handle);
+// Java: AcceptResult acceptAction = agent.accept(manager, this.handle);
         LIBMATTI_SP_AcceptResult acceptAction = agent->accept(agent->self, manager, handle);
         if (acceptAction == LIBMATTI_SP_AcceptResult_ACCEPTED)
         {
-            // Java: this.agents.add(agent);
+// Java: this.agents.add(agent);
             container->agents = realloc(container->agents, sizeof(LIBMATTI_SP_IMixinPlatformAgent *) * (container->agentCount + 1));
             container->agents[container->agentCount++] = agent;
         }
         else if (acceptAction == LIBMATTI_SP_AcceptResult_INVALID)
         {
-            // Java: iter.remove(); continue; - the agent class is struck from the list
+// Java: iter.remove(); continue; - the agent class is struck from the list
             memmove(&agentClasses[i], &agentClasses[i + 1], sizeof(AgentClass) * (agentClassCount - i - 1));
             agentClassCount--;
             free(agent);
@@ -141,7 +143,7 @@ void LIBMATTI_SP_MixinContainer_Prepare(LIBMATTI_SP_MixinContainer *container)
     for (size_t i = 0; i < container->agentCount; i++)
     {
         LIBMATTI_SP_IMixinPlatformAgent *agent = container->agents[i];
-        // Java: logger.debug("Processing prepare() for {}", agent);
+// Java: logger.debug("Processing prepare() for {}", agent);
         agent->prepare(agent->self);
     }
 }
@@ -152,7 +154,7 @@ void LIBMATTI_SP_MixinContainer_InitPrimaryContainer(LIBMATTI_SP_MixinContainer 
     for (size_t i = 0; i < container->agentCount; i++)
     {
         LIBMATTI_SP_IMixinPlatformAgent *agent = container->agents[i];
-        // Java: logger.debug("Processing launch tasks for {}", agent);
+// Java: logger.debug("Processing launch tasks for {}", agent);
         agent->initPrimaryContainer(agent->self);
     }
 }
@@ -163,14 +165,15 @@ void LIBMATTI_SP_MixinContainer_Inject(LIBMATTI_SP_MixinContainer *container)
     for (size_t i = 0; i < container->agentCount; i++)
     {
         LIBMATTI_SP_IMixinPlatformAgent *agent = container->agents[i];
-        // Java: logger.debug("Processing inject() for {}", agent);
+// Java: logger.debug("Processing inject() for {}", agent);
         agent->inject(agent->self);
     }
 }
 
-// ---------------------------------------------------------------------------
-// MixinPlatformManager
-// ---------------------------------------------------------------------------
+
+
+
+
 
 static LIBMATTI_SP_MixinContainer *find_container(LIBMATTI_SP_MixinPlatformManager *manager,
                                                   LIBMATTI_SP_ContainerHandle *handle)
@@ -185,11 +188,11 @@ static LIBMATTI_SP_MixinContainer *find_container(LIBMATTI_SP_MixinPlatformManag
 static LIBMATTI_SP_MixinContainer *create_container_for(LIBMATTI_SP_MixinPlatformManager *manager,
                                                         LIBMATTI_SP_ContainerHandle *handle)
 {
-    // Java: logger.debug("Adding mixin platform agents for container {}", handle);
+// Java: logger.debug("Adding mixin platform agents for container {}", handle);
     LIBMATTI_SP_MixinContainer *container = LIBMATTI_SP_MixinContainer_New(manager, handle);
     if (manager->prepared)
     {
-        // Java: container.prepare();
+// Java: container.prepare();
         LIBMATTI_SP_MixinContainer_Prepare(container);
     }
     return container;
@@ -231,17 +234,17 @@ void LIBMATTI_SP_MixinPlatformManager_Free(LIBMATTI_SP_MixinPlatformManager *man
 // Java: public void init()
 void LIBMATTI_SP_MixinPlatformManager_Init(LIBMATTI_SP_MixinPlatformManager *manager)
 {
-    // Java: logger.debug("Initialising Mixin Platform Manager");
+// Java: logger.debug("Initialising Mixin Platform Manager");
     LIBMATTI_SP_ILogger_Debug(LOGGER(), "Initialising Mixin Platform Manager");
 
     LIBMATTI_SP_IMixinService *service = LIBMATTI_SP_MixinService_GetService();
     LIBMATTI_SP_ContainerHandle *primaryContainerHandle =
         service != NULL && service->getPrimaryContainer != NULL ? service->getPrimaryContainer(service->self) : NULL;
 
-    // Java: this.primaryContainer = this.addContainer(primaryContainerHandle);
+// Java: this.primaryContainer = this.addContainer(primaryContainerHandle);
     manager->primaryContainer = LIBMATTI_SP_MixinPlatformManager_AddContainer(manager, primaryContainerHandle);
 
-    // Java: this.scanForContainers(); - "Do an early scan to ensure preinit mixins are discovered"
+// Java: this.scanForContainers(); - "Do an early scan to ensure preinit mixins are discovered"
     LIBMATTI_SP_MixinPlatformManager_ScanForContainers(manager);
 }
 
@@ -259,7 +262,7 @@ void LIBMATTI_SP_MixinPlatformManager_ScanForContainers(LIBMATTI_SP_MixinPlatfor
 
     for (size_t i = 0; i < mixinContainerCount; i++)
     {
-        // Java: logger.debug("Adding agents for Mixin Container {}", handle); addContainer(handle);
+// Java: logger.debug("Adding agents for Mixin Container {}", handle); addContainer(handle);
         LIBMATTI_SP_MixinPlatformManager_AddContainer(manager, mixinContainers[i]);
     }
 }
@@ -281,14 +284,14 @@ LIBMATTI_SP_MixinContainer *LIBMATTI_SP_MixinPlatformManager_AddContainer(LIBMAT
 {
     if (handle == NULL) return NULL;
 
-    // Java: MixinContainer existingContainer = this.containers.get(handle);
+// Java: MixinContainer existingContainer = this.containers.get(handle);
     LIBMATTI_SP_MixinContainer *existingContainer = find_container(manager, handle);
     if (existingContainer != NULL) return existingContainer;
 
-    // Java: MixinContainer container = this.createContainerFor(handle);
+// Java: MixinContainer container = this.createContainerFor(handle);
     LIBMATTI_SP_MixinContainer *container = create_container_for(manager, handle);
 
-    // Java: this.containers.put(handle, container);
+// Java: this.containers.put(handle, container);
     manager->containerHandles = realloc(manager->containerHandles,
                                         sizeof(LIBMATTI_SP_ContainerHandle *) * (manager->containerCount + 1));
     manager->containers = realloc(manager->containers,
@@ -297,7 +300,7 @@ LIBMATTI_SP_MixinContainer *LIBMATTI_SP_MixinPlatformManager_AddContainer(LIBMAT
     manager->containers[manager->containerCount] = container;
     manager->containerCount++;
 
-    // Java: this.addNestedContainers(handle);
+// Java: this.addNestedContainers(handle);
     add_nested_containers(manager, handle);
     return container;
 }
@@ -306,7 +309,7 @@ LIBMATTI_SP_MixinContainer *LIBMATTI_SP_MixinPlatformManager_AddContainer(LIBMAT
 void LIBMATTI_SP_MixinPlatformManager_Prepare(LIBMATTI_SP_MixinPlatformManager *manager,
                                               LIBMATTI_SP_CommandLineOptions *args)
 {
-    // Java: this.prepared = true;
+// Java: this.prepared = true;
     manager->prepared = 1;
 
     for (size_t i = 0; i < manager->containerCount; i++)
@@ -317,7 +320,7 @@ void LIBMATTI_SP_MixinPlatformManager_Prepare(LIBMATTI_SP_MixinPlatformManager *
         args != NULL ? LIBMATTI_SP_CommandLineOptions_GetConfigs(args, &configCount) : NULL;
     for (size_t i = 0; i < configCount; i++)
     {
-        // Java: this.addConfig(config, null);
+// Java: this.addConfig(config, null);
         LIBMATTI_SP_MixinPlatformManager_AddConfig(manager, configs[i], NULL);
     }
 }
@@ -330,19 +333,19 @@ void LIBMATTI_SP_MixinPlatformManager_Inject(LIBMATTI_SP_MixinPlatformManager *m
 
     if (manager->primaryContainer != NULL)
     {
-        // Java: this.primaryContainer.initPrimaryContainer();
+// Java: this.primaryContainer.initPrimaryContainer();
         LIBMATTI_SP_MixinContainer_InitPrimaryContainer(manager->primaryContainer);
     }
 
-    // Java: this.scanForContainers();
+// Java: this.scanForContainers();
     LIBMATTI_SP_MixinPlatformManager_ScanForContainers(manager);
 
-    // Java: logger.debug("inject() running with {} agents", this.containers.size());
+// Java: logger.debug("inject() running with {} agents", this.containers.size());
     //       for (MixinContainer container : this.containers.values()) { try { container.inject(); } ... }
     for (size_t i = 0; i < manager->containerCount; i++)
         LIBMATTI_SP_MixinContainer_Inject(manager->containers[i]);
 
-    // Java: this.connectors.inject();
+// Java: this.connectors.inject();
     LIBMATTI_SP_MixinConnectorManager_Inject(manager->connectors);
 }
 
@@ -360,7 +363,7 @@ void LIBMATTI_SP_MixinPlatformManager_SetCompatibilityLevel(LIBMATTI_SP_MixinPla
     (void) manager;
     if (level == NULL) return;
 
-    // Java: CompatibilityLevel value = CompatibilityLevel.valueOf(level.toUpperCase(Locale.ROOT));
+// Java: CompatibilityLevel value = CompatibilityLevel.valueOf(level.toUpperCase(Locale.ROOT));
     //       MixinEnvironment.setCompatibilityLevel(value);
     char upper[64];
     size_t len = strlen(level);
@@ -375,7 +378,7 @@ void LIBMATTI_SP_MixinPlatformManager_SetCompatibilityLevel(LIBMATTI_SP_MixinPla
         LIBMATTI_SP_MixinEnvironment_CompatibilityLevel_ForName(upper);
     if (value == LIBMATTI_SP_MixinEnvironment_COMPAT_NONE)
     {
-        // Java: catch (IllegalArgumentException ex) { logger.warn("Invalid compatibility level specified: {}", level); }
+// Java: catch (IllegalArgumentException ex) { logger.warn("Invalid compatibility level specified: {}", level); }
         char *msg = malloc(strlen("Invalid compatibility level specified: ") + strlen(level) + 1);
         sprintf(msg, "Invalid compatibility level specified: %s", level);
         LIBMATTI_SP_ILogger_Warn(LOGGER(), msg);
@@ -383,7 +386,7 @@ void LIBMATTI_SP_MixinPlatformManager_SetCompatibilityLevel(LIBMATTI_SP_MixinPla
         return;
     }
 
-    // Java: logger.debug("Setting mixin compatibility level: {}", value);
+// Java: logger.debug("Setting mixin compatibility level: {}", value);
     LIBMATTI_SP_MixinEnvironment_SetCompatibilityLevel(value);
 }
 
@@ -397,13 +400,13 @@ void LIBMATTI_SP_MixinPlatformManager_AddConfig(LIBMATTI_SP_MixinPlatformManager
     size_t len = strlen(config);
     if (len >= 5 && strcmp(config + len - 5, ".json") == 0)
     {
-        // Java: logger.debug("Registering mixin config: {} source={}", config, source);
+// Java: logger.debug("Registering mixin config: {} source={}", config, source);
         //       Mixins.addConfiguration(config, source);
         LIBMATTI_SP_Mixins_AddConfiguration(config);
     }
     else if (strstr(config, ".json@") != NULL)
     {
-        // Java: throw new MixinError("Setting config phase via manifest is no longer supported: "
+// Java: throw new MixinError("Setting config phase via manifest is no longer supported: "
         //       + config + ". Specify target in config instead");
         char *msg = malloc(strlen("Setting config phase via manifest is no longer supported: . Specify target in config instead")
                            + len + 1);
@@ -420,11 +423,11 @@ void LIBMATTI_SP_MixinPlatformManager_AddTokenProvider(LIBMATTI_SP_MixinPlatform
     (void) manager;
     if (provider == NULL) return;
 
-    // Java: token providers resolve through the environment's class provider; the port's native
+// Java: token providers resolve through the environment's class provider; the port's native
     // backend has no token providers, so the registration keeps the name for diagnostics only.
     if (strstr(provider, "@") != NULL)
     {
-        // Java: String[] parts = provider.split("@", 2);
+// Java: String[] parts = provider.split("@", 2);
         //       Phase phase = Phase.forName(parts[1]);
         //       if (phase != null) MixinEnvironment.getEnvironment(phase).registerTokenProviderClass(parts[0]);
         const char *at = strchr(provider, '@');
@@ -434,7 +437,7 @@ void LIBMATTI_SP_MixinPlatformManager_AddTokenProvider(LIBMATTI_SP_MixinPlatform
     }
     else
     {
-        // Java: MixinEnvironment.getDefaultEnvironment().registerTokenProviderClass(provider);
+// Java: MixinEnvironment.getDefaultEnvironment().registerTokenProviderClass(provider);
     }
 }
 

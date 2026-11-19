@@ -1,4 +1,5 @@
-// Port of net.neoforged.neoforgespi.transformation.ProcessorName.
+
+
 
 #ifndef MATTICRAFT_NEOFORGESPI_TRANSFORMATION_PROCESSORNAME_H
 #define MATTICRAFT_NEOFORGESPI_TRANSFORMATION_PROCESSORNAME_H
@@ -23,4 +24,4 @@ char *LIBMATTI_NEOFORGESPI_ProcessorName_ToString(const LIBMATTI_NEOFORGESPI_Pro
 int LIBMATTI_NEOFORGESPI_ProcessorName_CompareTo(const LIBMATTI_NEOFORGESPI_ProcessorName *name,
                                                  const LIBMATTI_NEOFORGESPI_ProcessorName *other);
 
-#endif //MATTICRAFT_NEOFORGESPI_TRANSFORMATION_PROCESSORNAME_H
+#endif

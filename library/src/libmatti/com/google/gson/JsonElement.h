@@ -23,21 +23,21 @@ typedef struct LIBMATTI_GSON_JsonElement LIBMATTI_GSON_JsonElement;
 
 struct LIBMATTI_GSON_JsonElement
 {
-    // Java: the runtime class of the element
+// Java: the runtime class of the element
     LIBMATTI_GSON_JsonElementType type;
 
-    // Java: JsonPrimitive - a boolean, a number (LazilyParsedNumber) or a string
+// Java: JsonPrimitive - a boolean, a number (LazilyParsedNumber) or a string
     int booleanValue;
-    int isString; // Java: JsonPrimitive.isString()
-    int isNumber; // Java: JsonPrimitive.isNumber()
-    int isBoolean; // Java: JsonPrimitive.isBoolean()
-    char *value; // Java: the string value / the number literal
+    int isString;// Java: JsonPrimitive.isString()
+    int isNumber;// Java: JsonPrimitive.isNumber()
+    int isBoolean;// Java: JsonPrimitive.isBoolean()
+    char *value;// Java: the string value / the number literal
 
-    // Java: JsonArray.elements
+// Java: JsonArray.elements
     LIBMATTI_GSON_JsonElement **elements;
     size_t elementCount;
 
-    // Java: JsonObject.members (a LinkedTreeMap, kept insertion-ordered)
+// Java: JsonObject.members (a LinkedTreeMap, kept insertion-ordered)
     char **memberNames;
     LIBMATTI_GSON_JsonElement **members;
     size_t memberCount;
@@ -115,4 +115,4 @@ LIBMATTI_GSON_JsonElement *LIBMATTI_GSON_JsonElement_ElementAt(const LIBMATTI_GS
 // Java: @Override public String toString(); caller frees
 char *LIBMATTI_GSON_JsonElement_ToString(const LIBMATTI_GSON_JsonElement *element);
 
-#endif //MATTICRAFT_GSON_JSONELEMENT_H
+#endif

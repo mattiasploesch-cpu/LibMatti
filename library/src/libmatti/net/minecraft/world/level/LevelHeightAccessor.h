@@ -1,9 +1,10 @@
-// Port of net.minecraft.world.level.LevelHeightAccessor (interface) and
-// net.minecraft.core.SectionPos.blockToSectionCoord (the one helper it needs).
-//
-// Java's interface with defaults becomes a plain struct + free functions the
-// Level/LevelChunk share; the two abstract accessors are function pointers so a
-// Level or any custom source can override them.
+
+
+
+
+
+
+
 
 #ifndef MATTICRAFT_MC_WORLD_LEVEL_LEVELHEIGHTACCESSOR_H
 #define MATTICRAFT_MC_WORLD_LEVEL_LEVELHEIGHTACCESSOR_H
@@ -24,7 +25,7 @@ extern "C" {
 // accessors in the struct and implements every default as a free function
 typedef struct LIBMATTI_MC_LevelHeightAccessor
 {
-    // Java: int getHeight() / int getMinY() - the abstract pair
+// Java: int getHeight() / int getMinY() - the abstract pair
     int height;
     int minY;
 } LIBMATTI_MC_LevelHeightAccessor;
@@ -54,4 +55,4 @@ LIBMATTI_MC_LevelHeightAccessor LIBMATTI_MC_LevelHeightAccessor_Create(int minY,
 }
 #endif
 
-#endif //MATTICRAFT_MC_WORLD_LEVEL_LEVELHEIGHTACCESSOR_H
+#endif

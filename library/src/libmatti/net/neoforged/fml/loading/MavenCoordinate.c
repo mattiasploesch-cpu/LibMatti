@@ -37,7 +37,7 @@ LIBMATTI_FML_MavenCoordinate *LIBMATTI_FML_MavenCoordinate_Parse(const char *coo
     char *text = strdup(coordinate);
     char *extension = "";
 
-    // Java: var coordinateAndExt = coordinate.split("@");
+// Java: var coordinateAndExt = coordinate.split("@");
     char *at = strchr(text, '@');
     if (at != NULL)
     {
@@ -46,7 +46,7 @@ LIBMATTI_FML_MavenCoordinate *LIBMATTI_FML_MavenCoordinate_Parse(const char *coo
         if (strchr(extension, '@') != NULL)
         {
             free(text);
-            return NULL; // Java: throw new IllegalArgumentException("Malformed Maven coordinate: " + coordinate)
+            return NULL;// Java: throw new IllegalArgumentException("Malformed Maven coordinate: " + coordinate)
         }
     }
 
@@ -70,7 +70,7 @@ LIBMATTI_FML_MavenCoordinate *LIBMATTI_FML_MavenCoordinate_Parse(const char *coo
 // Java: public Path toRelativeRepositoryPath()
 char *LIBMATTI_FML_MavenCoordinate_ToRelativeRepositoryPath(const LIBMATTI_FML_MavenCoordinate *coordinate)
 {
-    // Java: String fileName = artifactId + "-" + version + (!classifier.isEmpty() ? "-" + classifier : "") + (!extension.isEmpty() ? "." + extension : ".jar");
+// Java: String fileName = artifactId + "-" + version + (!classifier.isEmpty() ? "-" + classifier : "") + (!extension.isEmpty() ? "." + extension : ".jar");
     size_t fileNameLength = strlen(coordinate->artifactId) + strlen(coordinate->version) + 2 +
                             (coordinate->classifier[0] != '\0' ? strlen(coordinate->classifier) + 1 : 0) +
                             (coordinate->extension[0] != '\0' ? strlen(coordinate->extension) + 1 : 4);
@@ -85,7 +85,7 @@ char *LIBMATTI_FML_MavenCoordinate_ToRelativeRepositoryPath(const LIBMATTI_FML_M
     else
         snprintf(fileName + written, fileNameLength - written, ".jar");
 
-    // Java: String[] groups = groupId.split("\\."); Path result = Paths.get(groups[0]); for (i=1..) result = result.resolve(groups[i]);
+// Java: String[] groups = groupId.split("\\."); Path result = Paths.get(groups[0]); for (i=1..) result = result.resolve(groups[i]);
     //       return result.resolve(artifactId).resolve(version).resolve(fileName);
     char *groupPath = strdup(coordinate->groupId);
     for (char *p = groupPath; *p != '\0'; p++)

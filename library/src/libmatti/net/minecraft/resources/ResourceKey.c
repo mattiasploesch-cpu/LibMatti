@@ -1,4 +1,5 @@
-// Port of net.minecraft.resources.ResourceKey.
+
+
 
 #include "libmatti/net/minecraft/resources/ResourceKey.h"
 
@@ -39,7 +40,7 @@ static LIBMATTI_MC_ResourceKey *intern(const LIBMATTI_MC_Identifier *registry,
     }
 
     LIBMATTI_MC_ResourceKey *key = calloc(1, sizeof(LIBMATTI_MC_ResourceKey));
-    // Java: the identifiers are shared references from the caller; the intern table owns its
+// Java: the identifiers are shared references from the caller; the intern table owns its
     // own copies so the caller's lifecycle does not matter
     key->registryName = LIBMATTI_MC_Identifier_New(LIBMATTI_MC_Identifier_GetNamespace(registry),
                                                    LIBMATTI_MC_Identifier_GetPath(registry));

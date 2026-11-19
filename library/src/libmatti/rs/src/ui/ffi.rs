@@ -39,7 +39,8 @@ extern "C" {
         fullscreen: *mut c_int,
     ) -> c_int;
 
-    // Exposed for future Rust screens; the C menus call these themselves.
+
+
     fn LIBMATTI_UI_WindowWidth() -> c_int;
     fn LIBMATTI_UI_WindowHeight() -> c_int;
     fn LIBMATTI_UI_BackendName() -> *const c_char;
@@ -101,7 +102,8 @@ pub fn time() -> f64 {
 
 pub fn save_screenshot(path: &str) -> bool {
     let path = CString::new(path).unwrap_or_default();
-    // The C side follows the SavePPM convention: 0 means the file was written.
+
+
     unsafe { LIBMATTI_UI_SaveScreenshot(path.as_ptr()) == 0 }
 }
 

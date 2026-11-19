@@ -1,5 +1,6 @@
-// Port of the it.unimi.dsi.fastutil.ints surface the game uses:
-// Int2ObjectMap, IntOpenHashSet, IntArrayList, IntObjectImmutablePair.
+
+
+
 
 #ifndef MATTICRAFT_FASTUTIL_INTS_H
 #define MATTICRAFT_FASTUTIL_INTS_H
@@ -14,14 +15,16 @@
 typedef struct
 {
     int32_t key;
-    void *value; // owned by the caller (like the Java map not owning values)
+    void *value;
+
     int used;
 } LIBMATTI_FU_Int2ObjectEntry;
 
 typedef struct
 {
     LIBMATTI_FU_Int2ObjectEntry *entries;
-    size_t capacity; // power of two
+    size_t capacity;
+
     size_t size;
 } LIBMATTI_FU_Int2ObjectMap;
 
@@ -50,7 +53,8 @@ typedef struct
 {
     int32_t *keys;
     unsigned char *used;
-    size_t capacity; // power of two
+    size_t capacity;
+
     size_t size;
 } LIBMATTI_FU_IntOpenHashSet;
 
@@ -83,4 +87,4 @@ size_t LIBMATTI_FU_IntArrayList_Size(const LIBMATTI_FU_IntArrayList *list);
 // Java: public int[] toIntArray()
 int32_t *LIBMATTI_FU_IntArrayList_ToArray(const LIBMATTI_FU_IntArrayList *list, size_t *count);
 
-#endif //MATTICRAFT_FASTUTIL_INTS_H
+#endif

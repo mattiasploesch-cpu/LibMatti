@@ -1,15 +1,16 @@
-//
-// The selftest phase: see selftest.h. The harnesses are built into the same
-// build tree as matticraft; this file runs them with their fixture arguments
-// (the same commands the ctest entries use) and reports each result.
-//
-// The fixture .so files come straight from the test targets, so the paths are
-// fixed by the build: <build>/tests/<fixture>.so. The absolute build and source
-// folder reach this file as compile definitions from client/CMakeLists.txt.
-//
-// The runClient target skips this phase entirely (--no-tests in its run
-// configuration): it has no test harnesses as build dependencies.
-//
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 #include "selftest.h"
 
@@ -29,9 +30,12 @@
 
 typedef struct
 {
-    const char *name;    // reported in the summary line
-    const char *binary;  // the harness binary, relative to the build folder
-    const char *args[4]; // fixture arguments, NULL terminated
+    const char *name;
+
+    const char *binary;
+
+    const char *args[4];
+
 } SelftestEntry;
 
 static const SelftestEntry SELFTESTS[] = {
@@ -49,12 +53,14 @@ static const SelftestEntry SELFTESTS[] = {
 
 #define SELFTEST_COUNT (sizeof(SELFTESTS) / sizeof(SELFTESTS[0]))
 
-// The executable's own directory: the harnesses sit next to it in the build tree.
+
+
 static int selftest_run_one(const SelftestEntry *entry)
 {
-    // A missing harness binary (exit 127 from execv) is a skip, not a
-    // failure: the release packages ship the game binary only. The gate is
-    // the same one ctest uses - a full build tree has every harness.
+
+
+
+
     if (access(entry->binary, X_OK) != 0)
         return 0;
     char *argv[7] = {(char *) entry->binary};
@@ -68,7 +74,8 @@ static int selftest_run_one(const SelftestEntry *entry)
     if (pid == 0)
     {
         execv(entry->binary, argv);
-        // execv only returns on failure
+
+
         _exit(127);
     }
 
@@ -77,7 +84,8 @@ static int selftest_run_one(const SelftestEntry *entry)
     if (WIFEXITED(status))
     {
         int code = WEXITSTATUS(status);
-        // Same skip semantics for a raced-away binary (127 = execv failed).
+
+
         if (code == 127)
             return 0;
         return code;
@@ -87,8 +95,9 @@ static int selftest_run_one(const SelftestEntry *entry)
 
 int selftest_run_all(void)
 {
-    // The harness binaries are the test targets of the full matticraft build; runClient
-    // (no test dependencies) starts directly instead of probing for missing binaries.
+
+
+
     printf("[SELFTEST] running %d libmatti test harness(es)\n", (int) SELFTEST_COUNT);
 
     int failed = 0;

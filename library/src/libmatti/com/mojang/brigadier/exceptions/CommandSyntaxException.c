@@ -1,5 +1,6 @@
-// Port of com.mojang.brigadier.exceptions.*: CommandSyntaxException,
-// SimpleCommandExceptionType, DynamicCommandExceptionType, BuiltInExceptions.
+
+
+
 
 #include "libmatti/com/mojang/brigadier/exceptions/CommandSyntaxException.h"
 
@@ -8,9 +9,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-// ---------------------------------------------------------------------------
-// CommandSyntaxException
-// ---------------------------------------------------------------------------
+
+
+
+
 
 LIBMATTI_BR_CommandSyntaxException *LIBMATTI_BR_CommandSyntaxException_New(LIBMATTI_BR_CommandExceptionType *type,
                                                                            LIBMATTI_BR_Message *message)
@@ -36,11 +38,11 @@ char *LIBMATTI_BR_CommandSyntaxException_GetContext(const LIBMATTI_BR_CommandSyn
 {
     if (exception->input == NULL || exception->cursor < 0) return NULL;
 
-    // Java: cursor = Math.min(input.length(), this.cursor)
+// Java: cursor = Math.min(input.length(), this.cursor)
     int length = (int) strlen(exception->input);
     int cursor = exception->cursor < length ? exception->cursor : length;
 
-    // Java: builder over [max(0, cursor - CONTEXT_AMOUNT), cursor) + "<--[HERE]"
+// Java: builder over [max(0, cursor - CONTEXT_AMOUNT), cursor) + "<--[HERE]"
     int start = cursor - LIBMATTI_BR_CommandSyntaxException_CONTEXT_AMOUNT;
     if (start < 0) start = 0;
     size_t contextLength = (size_t) (cursor - start);
@@ -78,20 +80,22 @@ void LIBMATTI_BR_CommandSyntaxException_Free(LIBMATTI_BR_CommandSyntaxException 
 {
     if (exception->type != NULL && exception->type->name == NULL) free(exception->type);
     free(exception->input);
-    // Java: the message is owned by the exception type's template; simple types keep
+// Java: the message is owned by the exception type's template; simple types keep
     // their own. The port frees the per-exception copy only when detached.
     LIBMATTI_BR_Message_Free(exception->message);
     free(exception);
 }
 
-// ---------------------------------------------------------------------------
-// SimpleCommandExceptionType
-// ---------------------------------------------------------------------------
+
+
+
+
 
 LIBMATTI_BR_SimpleCommandExceptionType *LIBMATTI_BR_SimpleCommandExceptionType_New(const char *message)
 {
     LIBMATTI_BR_SimpleCommandExceptionType *type = calloc(1, sizeof(LIBMATTI_BR_SimpleCommandExceptionType));
-    type->type.name = NULL; // unnamed; freed with the exception
+    type->type.name = NULL;
+
     type->message = LIBMATTI_BR_LiteralMessage_New(message);
     return type;
 }
@@ -99,7 +103,7 @@ LIBMATTI_BR_SimpleCommandExceptionType *LIBMATTI_BR_SimpleCommandExceptionType_N
 LIBMATTI_BR_CommandSyntaxException *LIBMATTI_BR_SimpleCommandExceptionType_Create(
     const LIBMATTI_BR_SimpleCommandExceptionType *type)
 {
-    // Java: new CommandSyntaxException(this, message)
+// Java: new CommandSyntaxException(this, message)
     LIBMATTI_BR_CommandExceptionType *exceptionType = malloc(sizeof(LIBMATTI_BR_CommandExceptionType));
     exceptionType->name = NULL;
     LIBMATTI_BR_Message *message = LIBMATTI_BR_LiteralMessage_New(type->message->string);
@@ -115,9 +119,10 @@ LIBMATTI_BR_CommandSyntaxException *LIBMATTI_BR_SimpleCommandExceptionType_Creat
     return LIBMATTI_BR_CommandSyntaxException_NewWithContext(exceptionType, message, input, cursor);
 }
 
-// ---------------------------------------------------------------------------
-// DynamicCommandExceptionType
-// ---------------------------------------------------------------------------
+
+
+
+
 
 LIBMATTI_BR_DynamicCommandExceptionType *LIBMATTI_BR_DynamicCommandExceptionType_New(const char *format)
 {
@@ -128,7 +133,7 @@ LIBMATTI_BR_DynamicCommandExceptionType *LIBMATTI_BR_DynamicCommandExceptionType
 
 static LIBMATTI_BR_Message *apply_format(const LIBMATTI_BR_DynamicCommandExceptionType *type, const char *arg)
 {
-    // Java: function.apply(arg); the port formats the single %s
+// Java: function.apply(arg); the port formats the single %s
     size_t length = strlen(type->format) - 2 + strlen(arg) + 1;
     char *text = malloc(length);
     snprintf(text, length, type->format, arg);
@@ -158,7 +163,8 @@ LIBMATTI_BR_CommandSyntaxException *LIBMATTI_BR_DynamicCommandExceptionType_Crea
 static LIBMATTI_BR_Message *apply_format2(const LIBMATTI_BR_DynamicCommandExceptionType *type, const char *a,
                                           const char *b)
 {
-    // the format carries two %s; render in two passes
+
+
     size_t length = strlen(type->format) - 4 + strlen(a) + strlen(b) + 1;
     char *text = malloc(length);
     int written = snprintf(text, length, type->format, a, b);
@@ -184,9 +190,10 @@ LIBMATTI_BR_CommandSyntaxException *LIBMATTI_BR_DynamicCommandExceptionType_Crea
     return LIBMATTI_BR_CommandSyntaxException_NewWithContext(exceptionType, apply_format2(type, a, b), input, cursor);
 }
 
-// ---------------------------------------------------------------------------
-// BuiltInExceptions (lazily built singletons with the exact Java messages)
-// ---------------------------------------------------------------------------
+
+
+
+
 
 #define SIMPLE_BUILTIN(accessor, text)                                                                                 \
     static LIBMATTI_BR_SimpleCommandExceptionType *accessor##_instance = NULL;                                         \

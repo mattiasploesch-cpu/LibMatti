@@ -15,6 +15,8 @@ android {
                 // The main CMake project is added as a subdirectory by the bridge
                 // CMakeLists; LIBMATTI_ROOT points at the repository root.
                 arguments += "-DLIBMATTI_ROOT=${rootProject.projectDir}/../.."
+                arguments += "-DMATTI_MOBILE_ONLY=ON"
+                arguments += "-DMATTI_BUILD_LAUNCHER=OFF"
                 cppFlags += ""
             }
         }

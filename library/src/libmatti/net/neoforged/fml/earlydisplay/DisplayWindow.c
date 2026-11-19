@@ -1,10 +1,11 @@
-// Port of net.neoforged.fml.earlydisplay.DisplayWindow.
-//
-// Java spins a scheduled renderer thread that draws the theme'd loading screen
-// into the window. The C port owns the identical window lifecycle - init with
-// the vanilla window hints, centered positioning, resize callback, hand-off to
-// the game - and mirrors the renderer's progress through the
-// StartupNotificationManager progress meters until the game takes over.
+
+
+
+
+
+
+
+
 
 #include "libmatti/net/neoforged/fml/earlydisplay/DisplayWindow.h"
 
@@ -35,13 +36,13 @@ static const char *ERROR_URL = "https://links.neoforged.net/early-display-errors
 
 struct LIBMATTI_FML_DisplayWindow
 {
-    // Java: private final ProgressMeter mainProgress
+// Java: private final ProgressMeter mainProgress
     LIBMATTI_FML_ProgressMeter *mainProgress;
 
     int darkMode;
     int borderless;
 
-    // Java: private long window - the GL ID of the window
+// Java: private long window - the GL ID of the window
     long window;
     int winWidth;
     int winHeight;
@@ -50,8 +51,9 @@ struct LIBMATTI_FML_DisplayWindow
 
     int maximized;
     int closed;
-    // The port keeps booting when the graphics system is unavailable; Java
-    // aborts in crashElegantly instead.
+
+
+
     int unavailable;
     char *neoForgeVersion;
     char *minecraftVersion;
@@ -87,12 +89,12 @@ static void crash_elegantly(LIBMATTI_FML_DisplayWindow *window, const char *erro
              "yes, we will try and open %s in your default browser",
              errorDetails, ERROR_URL);
     LIBMATTI_ML_Logger_Error(LOGGER(), NULL, "ERROR DISPLAY\n{}", msgBuilder);
-    // Java: we show the display on a new dedicated thread; the port shows it inline
+// Java: we show the display on a new dedicated thread; the port shows it inline
     int res = LIBMATTI_LWJGL_TINYFD_TinyFileDialogs_TinyfdMessageBox("Minecraft: NeoForge", msgBuilder, "yesno",
                                                                      "error", 1);
     if (res == 1)
     {
-        // Java: Desktop.getDesktop().browse(URI.create(ERROR_URL)); - no desktop toolkit
+// Java: Desktop.getDesktop().browse(URI.create(ERROR_URL)); - no desktop toolkit
         LIBMATTI_LWJGL_TINYFD_TinyFileDialogs_TinyfdMessageBox(
             "Minecraft: NeoForge", "Sadly, we couldn't open your browser.\nVisit https://links.neoforged.net/early-display-errors",
             "ok", "error", 1);
@@ -102,9 +104,10 @@ static void crash_elegantly(LIBMATTI_FML_DisplayWindow *window, const char *erro
     exit(1);
 }
 
-// A machine without a display (SSH, CI, a broken driver) still boots the game,
-// it just has no splash screen. Java calls crashElegantly here and exits; the
-// port logs and continues headless so the launcher chain reaches the game main.
+
+
+
+
 static void disable_early_window(LIBMATTI_FML_DisplayWindow *window, const char *reason)
 {
     LIBMATTI_ML_Logger_Warn(LOGGER(), NULL, "Early window unavailable ({}), continuing without it",
@@ -139,7 +142,7 @@ static void set_window_icon(LIBMATTI_FML_DisplayWindow *window)
 // Java: private void winResize(long window, int width, int height)
 static void win_resize(long callbackWindow, int width, int height)
 {
-    // Java: if (window == this.window && width != 0 && height != 0)
+// Java: if (window == this.window && width != 0 && height != 0)
     if (width != 0 && height != 0)
     {
         LIBMATTI_FML_DisplayWindow *window = LIBMATTI_FML_DisplayWindow_Current();
@@ -154,20 +157,21 @@ static void win_resize(long callbackWindow, int width, int height)
 // Java: public void initWindow()
 void LIBMATTI_FML_DisplayWindow_InitWindow(LIBMATTI_FML_DisplayWindow *window)
 {
-    // Java: boolean preferWayland = getBoolProperty("MC_DEBUG_ENABLED") && getBoolProperty("MC_DEBUG_PREFER_WAYLAND");
+// Java: boolean preferWayland = getBoolProperty("MC_DEBUG_ENABLED") && getBoolProperty("MC_DEBUG_PREFER_WAYLAND");
     int preferWayland = get_bool_property("MC_DEBUG_ENABLED") && get_bool_property("MC_DEBUG_PREFER_WAYLAND");
     if (LIBMATTI_GLFW_glfwPlatformSupported(LIBMATTI_GLFW_PLATFORM_WAYLAND) &&
         LIBMATTI_GLFW_glfwPlatformSupported(LIBMATTI_GLFW_PLATFORM_X11) && !preferWayland)
     {
-        // Pin X11 only when the session offers it: a Wayland-only session has no
-        // DISPLAY, and pinning X11 there makes glfwInit fail even though GLFW
-        // could have used Wayland.
+
+
+
+
         int haveX11 = getenv("DISPLAY") != NULL;
         LIBMATTI_GLFW_glfwInitHint(LIBMATTI_GLFW_PLATFORM,
                                    haveX11 ? LIBMATTI_GLFW_PLATFORM_X11 : LIBMATTI_GLFW_PLATFORM_WAYLAND);
     }
 
-    // Java: Initialize GLFW with a time guard, in case something goes wrong
+// Java: Initialize GLFW with a time guard, in case something goes wrong
     long glfwInitBegin = (long) time(NULL) * 1000000000L;
     if (!LIBMATTI_GLFW_glfwInit())
     {
@@ -182,14 +186,14 @@ void LIBMATTI_FML_DisplayWindow_InitWindow(LIBMATTI_FML_DisplayWindow *window)
                                  (double) (glfwInitEnd - glfwInitBegin) / 1.0e9);
     }
 
-    // Java: Clear the Last Exception (#7285)
+// Java: Clear the Last Exception (#7285)
     char glfwError[128];
     if (get_last_glfw_error(glfwError, sizeof(glfwError)))
     {
         LIBMATTI_ML_Logger_Error(LOGGER(), NULL, "Suppressing Last GLFW error: {}", glfwError);
     }
 
-    // Java: Set window hints for the new window we're gonna create.
+// Java: Set window hints for the new window we're gonna create.
     LIBMATTI_GLFW_glfwDefaultWindowHints();
     LIBMATTI_GLFW_glfwWindowHint(LIBMATTI_GLFW_CLIENT_API, LIBMATTI_GLFW_OPENGL_API);
     LIBMATTI_GLFW_glfwWindowHint(LIBMATTI_GLFW_CONTEXT_CREATION_API, LIBMATTI_GLFW_NATIVE_CONTEXT_API);
@@ -200,7 +204,7 @@ void LIBMATTI_FML_DisplayWindow_InitWindow(LIBMATTI_FML_DisplayWindow *window)
     LIBMATTI_GLFW_glfwWindowHint(LIBMATTI_GLFW_SOFT_FULLSCREEN, window->borderless ? LIBMATTI_GLFW_TRUE : LIBMATTI_GLFW_FALSE);
     LIBMATTI_GLFW_glfwWindowHint(LIBMATTI_GLFW_VISIBLE, LIBMATTI_GLFW_FALSE);
     LIBMATTI_GLFW_glfwWindowHint(LIBMATTI_GLFW_RESIZABLE, LIBMATTI_GLFW_TRUE);
-    // Java: this emulates what we would get without early progress window
+// Java: this emulates what we would get without early progress window
     const char *vanillaWindowTitle = "Minecraft*";
     LIBMATTI_GLFW_glfwWindowHintString(LIBMATTI_GLFW_X11_CLASS_NAME, vanillaWindowTitle);
     LIBMATTI_GLFW_glfwWindowHintString(LIBMATTI_GLFW_X11_INSTANCE_NAME, vanillaWindowTitle);
@@ -249,7 +253,7 @@ void LIBMATTI_FML_DisplayWindow_InitWindow(LIBMATTI_FML_DisplayWindow *window)
 
     LIBMATTI_GLFW_glfwSetWindowSizeCallback(window->window, win_resize);
 
-    // Java: Show the window
+// Java: Show the window
     LIBMATTI_GLFW_glfwShowWindow(window->window);
     if (get_last_glfw_error(glfwError, sizeof(glfwError)))
     {
@@ -262,7 +266,7 @@ void LIBMATTI_FML_DisplayWindow_InitWindow(LIBMATTI_FML_DisplayWindow *window)
 LIBMATTI_FML_DisplayWindow *LIBMATTI_FML_DisplayWindow_New(void)
 {
     LIBMATTI_FML_DisplayWindow *window = calloc(1, sizeof(LIBMATTI_FML_DisplayWindow));
-    // Java: mainProgress = StartupNotificationManager.addProgressBar("", 0);
+// Java: mainProgress = StartupNotificationManager.addProgressBar("", 0);
     window->mainProgress = LIBMATTI_FML_StartupNotificationManager_AddProgressBar("", 0);
     window->borderless = 1;
     return window;
@@ -291,7 +295,7 @@ static void display_window_initialize(void *self, LIBMATTI_FML_ProgramArgs *argu
 {
     LIBMATTI_FML_DisplayWindow *window = self;
 
-    // Java: the OptionParser reads width/height/earlywindow.maximized/assetsDir/assetIndex
+// Java: the OptionParser reads width/height/earlywindow.maximized/assetsDir/assetIndex
     size_t count = 0;
     char **args = LIBMATTI_FML_ProgramArgs_GetArguments(arguments, &count);
     window->winWidth = LIBMATTI_FML_FMLConfig_GetIntConfigValue(LIBMATTI_FML_FMLConfig_EARLY_WINDOW_WIDTH);
@@ -319,7 +323,7 @@ static void display_window_initialize(void *self, LIBMATTI_FML_ProgramArgs *argu
     LIBMATTI_FML_FMLConfig_UpdateConfigInt(LIBMATTI_FML_FMLConfig_EARLY_WINDOW_WIDTH, window->winWidth);
     LIBMATTI_FML_FMLConfig_UpdateConfigInt(LIBMATTI_FML_FMLConfig_EARLY_WINDOW_HEIGHT, window->winHeight);
 
-    // Java: read darkMode/borderless from options.txt in the game dir
+// Java: read darkMode/borderless from options.txt in the game dir
     int darkMode = 0;
     int borderless = 1;
     char *optionsPath = LIBMATTI_JNF_Path_Resolve(LIBMATTI_FML_FMLPaths_Get(LIBMATTI_FML_FMLPaths_GAMEDIR), "options.txt");
@@ -357,14 +361,14 @@ static void display_window_initialize(void *self, LIBMATTI_FML_ProgramArgs *argu
     window->darkMode = get_bool_property("fml.earlyWindowDarkMode") || darkMode;
     window->borderless = borderless;
 
-    // Java: this.maximized = parsed.has(maximizedopt) || FMLConfig.getBoolConfigValue(...);
+// Java: this.maximized = parsed.has(maximizedopt) || FMLConfig.getBoolConfigValue(...);
 
     LIBMATTI_FML_DisplayWindow_InitWindow(window);
 
-    // Java: rendererFuture = renderScheduler.schedule(() -> new LoadingScreenRenderer(...), 1, MILLISECONDS);
+// Java: rendererFuture = renderScheduler.schedule(() -> new LoadingScreenRenderer(...), 1, MILLISECONDS);
     // The renderer port does not exist yet; the progress meters carry the same state.
 
-    // Java: updateProgress("Initializing Game Graphics");
+// Java: updateProgress("Initializing Game Graphics");
     LIBMATTI_FML_ProgressMeter_SetLabel(window->mainProgress, "Initializing Game Graphics");
 }
 
@@ -373,7 +377,7 @@ static void display_window_set_minecraft_version(void *self, const char *version
 {
     LIBMATTI_FML_DisplayWindow *window = self;
     free(window->minecraftVersion);
-    // Java: version may be null when the game version is unknown; the port mirrors that
+// Java: version may be null when the game version is unknown; the port mirrors that
     window->minecraftVersion = version != NULL ? strdup(version) : NULL;
 }
 
@@ -403,18 +407,19 @@ static void display_window_set_neoforge_version(void *self, const char *version)
 // Java: public long takeOverGlfwWindow()
 long LIBMATTI_FML_DisplayWindow_TakeOverGlfwWindow(LIBMATTI_FML_DisplayWindow *window)
 {
-    // Java: wait for the renderer, stop automatic rendering, complete the progress bar
+// Java: wait for the renderer, stop automatic rendering, complete the progress bar
     LIBMATTI_FML_ProgressMeter_Complete(window->mainProgress);
 
-    // No usable early window: the game creates its own window (or runs
-    // headless) instead of taking over a handle that does not exist.
+
+
+
     if (window->unavailable || window->window == 0)
         return 0;
 
     LIBMATTI_GLFW_glfwMakeContextCurrent(window->window);
-    // Java: Set the title to what the game wants
+// Java: Set the title to what the game wants
     LIBMATTI_GLFW_glfwSwapInterval(0);
-    // Java: Clean up our hooks
+// Java: Clean up our hooks
     LIBMATTI_GLFW_glfwSetWindowSizeCallback(window->window, NULL);
     return window->window;
 }
@@ -422,14 +427,14 @@ long LIBMATTI_FML_DisplayWindow_TakeOverGlfwWindow(LIBMATTI_FML_DisplayWindow *w
 // Java: public void renderToFramebuffer()
 void LIBMATTI_FML_DisplayWindow_RenderToFramebuffer(LIBMATTI_FML_DisplayWindow *window)
 {
-    // Java: rendererFuture.resultNow().renderToFramebuffer(); - renderer port pending
+// Java: rendererFuture.resultNow().renderToFramebuffer(); - renderer port pending
     (void) window;
 }
 
 // Java: public int getFramebufferTextureId()
 int LIBMATTI_FML_DisplayWindow_GetFramebufferTextureId(LIBMATTI_FML_DisplayWindow *window)
 {
-    // Java: rendererFuture.resultNow().getFramebufferTextureId(); - renderer port pending
+// Java: rendererFuture.resultNow().getFramebufferTextureId(); - renderer port pending
     (void) window;
     return 0;
 }
@@ -439,7 +444,7 @@ static void display_window_periodic_tick(void *self)
 {
     LIBMATTI_FML_DisplayWindow *window = self;
     LIBMATTI_GLFW_glfwPollEvents();
-    // Java: if (!closed) { repaintTick.run(); } - the renderer port carries the repaint
+// Java: if (!closed) { repaintTick.run(); } - the renderer port carries the repaint
 }
 
 // Java: @Override public void updateProgress(String label)
@@ -470,7 +475,7 @@ static void display_window_display_fatal_error_and_exit(void *self, LIBMATTI_FML
     LIBMATTI_FML_DisplayWindow *window = self;
     long windowId = LIBMATTI_FML_DisplayWindow_TakeOverGlfwWindow(window);
     LIBMATTI_FML_DisplayWindow_Close(window);
-    // Java: ErrorDisplay.fatal(windowId, assetsDir, assetIndex, issues, modsFolder, logFile, crashReportFile);
+// Java: ErrorDisplay.fatal(windowId, assetsDir, assetIndex, issues, modsFolder, logFile, crashReportFile);
     // The ErrorDisplay port does not exist; the fatal details go to the crash dialog instead.
     (void) windowId;
     (void) issues;
@@ -478,7 +483,7 @@ static void display_window_display_fatal_error_and_exit(void *self, LIBMATTI_FML
     (void) modsFolder;
     (void) logFile;
     (void) crashReportFile;
-    // Java: ErrorDisplay terminates the game
+// Java: ErrorDisplay terminates the game
     LIBMATTI_FML_DisplayWindow_Free(window);
     exit(1);
 }
@@ -489,7 +494,7 @@ void LIBMATTI_FML_DisplayWindow_Close(LIBMATTI_FML_DisplayWindow *window)
     if (!window->closed)
     {
         window->closed = 1;
-        // Java: renderScheduler.shutdown(); rendererFuture.get().close();
+// Java: renderScheduler.shutdown(); rendererFuture.get().close();
         if (window->window != 0)
         {
             LIBMATTI_GLFW_glfwDestroyWindow(window->window);

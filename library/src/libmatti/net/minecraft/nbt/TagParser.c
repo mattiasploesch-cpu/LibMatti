@@ -1,6 +1,7 @@
-// Port of net.minecraft.nbt.TagParser + SnbtGrammar as a recursive-descent parser
-// over the same grammar, plus the SnbtOperations builtins ("true"/"false" collapse
-// to ByteTag like NbtOps.createBoolean).
+
+
+
+
 
 #include "libmatti/net/minecraft/nbt/TagParser.h"
 
@@ -38,7 +39,7 @@ typedef struct
     int depth;
     char error[256];
     int hasError;
-    // Java: Term.cut() - a cut error is final (the float fallback may not retry)
+// Java: Term.cut() - a cut error is final (the float fallback may not retry)
     int cut;
 } Parser;
 
@@ -150,7 +151,7 @@ static char *read_digits(Parser *parser, const char *accepted)
                 return NULL;
             }
         }
-        // Java: cleanAndAppend strips the underscores
+// Java: cleanAndAppend strips the underscores
         size_t out = 0;
         for (size_t i = 0; i < digitLength; i++)
             if (digits[i] != '_')
@@ -169,7 +170,8 @@ typedef struct
     int unsignedPrefix;
     int base;
     char *digits;
-    // 0 = no suffix, else the TAG_* constant
+
+
     int suffixType;
 } IntegerLiteral;
 
@@ -212,7 +214,7 @@ static int scan_integer(Parser *parser, IntegerLiteral *literal)
             digits = read_digits(parser, "0123456789_");
             if (digits == NULL)
                 return 0;
-            // Java: a decimal run after '0' hits the cut and fails with the
+// Java: a decimal run after '0' hits the cut and fails with the
             // leading-zero error; a bare "0" is the "0" marker
             if (digits[0] != '\0')
             {
@@ -238,7 +240,7 @@ static int scan_integer(Parser *parser, IntegerLiteral *literal)
         return 0;
     }
 
-    // Java: the integer_suffix rule - a bare suffix or the signed/unsigned pairs
+// Java: the integer_suffix rule - a bare suffix or the signed/unsigned pairs
     int type = 0;
     if (!at_end(parser))
     {
@@ -271,7 +273,8 @@ static int scan_integer(Parser *parser, IntegerLiteral *literal)
         }
         else if (c == 's' || c == 'S')
         {
-            // 's' starts the signed pair (sb/ss/si/sl) or is the short suffix alone
+
+
             char next = peek_at(parser, 1);
             if (next == 'b' || next == 'B' || next == 's' || next == 'S' || next == 'i' || next == 'I' ||
                 next == 'l' || next == 'L')
@@ -349,7 +352,7 @@ static LIBMATTI_MC_Nbt_Tag *literal_create(Parser *parser, const IntegerLiteral 
         }
     }
 
-    // Java: the range checks of parseByte/parseShort/parseInt/parseUnsigned*
+// Java: the range checks of parseByte/parseShort/parseInt/parseUnsigned*
     switch (type)
     {
     case LIBMATTI_MC_Nbt_TAG_BYTE:
@@ -493,7 +496,7 @@ static LIBMATTI_MC_Nbt_Tag *parse_float_tag(Parser *parser)
         parser->position++;
     }
 
-    // Java: createFloat assembles sign/whole/'.'/fraction/exp into one string
+// Java: createFloat assembles sign/whole/'.'/fraction/exp into one string
     char number[160];
     size_t offset = 0;
     if (negative)
@@ -525,7 +528,7 @@ static LIBMATTI_MC_Nbt_Tag *parse_float_tag(Parser *parser)
         return NULL;
     }
 
-    // Java: convertFloat/convertDouble - the finite checks
+// Java: convertFloat/convertDouble - the finite checks
     if (isFloat)
     {
         float f = (float) value;
@@ -544,9 +547,10 @@ static LIBMATTI_MC_Nbt_Tag *parse_float_tag(Parser *parser)
     return LIBMATTI_MC_Nbt_DoubleTag_Of(value);
 }
 
-// ---------------------------------------------------------------------------
-// strings
-// ---------------------------------------------------------------------------
+
+
+
+
 
 // Java: the quoted_string_literal rule with the string_escape_sequence table
 // (b/s/t/n/f/r/\\/'/"/xHH/uuuu/UUUUUUUU; \N{..} needs the Unicode name table and
@@ -647,7 +651,8 @@ static LIBMATTI_MC_Nbt_Tag *parse_quoted_string(Parser *parser)
                     return NULL;
                 }
                 parser->position += width;
-                // UTF-8 encode the code point
+
+
                 unsigned int code = (unsigned int) value;
                 if (code < 0x80)
                 {
@@ -681,7 +686,7 @@ static LIBMATTI_MC_Nbt_Tag *parse_quoted_string(Parser *parser)
         }
         else
         {
-            // Java: the plain chunk accepts everything but the quotes and the backslash
+// Java: the plain chunk accepts everything but the quotes and the backslash
             PUSH(&c, 1);
             parser->position++;
         }
@@ -716,9 +721,10 @@ static LIBMATTI_MC_Nbt_Tag *parse_unquoted_string(Parser *parser)
     return tag;
 }
 
-// ---------------------------------------------------------------------------
-// the compound/list/literal rules
-// ---------------------------------------------------------------------------
+
+
+
+
 
 static LIBMATTI_MC_Nbt_Tag *parse_tag(Parser *parser);
 
@@ -766,7 +772,8 @@ static int parse_map_entry(Parser *parser, char **key, LIBMATTI_MC_Nbt_Tag **val
 
 static LIBMATTI_MC_Nbt_Tag *parse_compound(Parser *parser)
 {
-    parser->position++; // '{'
+    parser->position++;
+
     LIBMATTI_MC_Nbt_CompoundTag *compound = LIBMATTI_MC_Nbt_CompoundTag_New();
     skip_whitespace(parser);
     if (read_char(parser, '}'))
@@ -799,7 +806,7 @@ static LIBMATTI_MC_Nbt_Tag *parse_compound(Parser *parser)
         if (read_char(parser, ','))
         {
             skip_whitespace(parser);
-            // Java: repeatedWithTrailingSeparator allows a trailing comma
+// Java: repeatedWithTrailingSeparator allows a trailing comma
             if (peek(parser) == '}')
                 break;
             continue;
@@ -819,10 +826,11 @@ static LIBMATTI_MC_Nbt_Tag *parse_compound(Parser *parser)
 
 static LIBMATTI_MC_Nbt_Tag *parse_list_or_array(Parser *parser)
 {
-    parser->position++; // '['
+    parser->position++;
+
     skip_whitespace(parser);
 
-    // Java: the array_prefix rule - [B;..] / [I;..] / [L;..]
+// Java: the array_prefix rule - [B;..] / [I;..] / [L;..]
     char prefix = 0;
     if (!at_end(parser) && (peek(parser) == 'B' || peek(parser) == 'I' || peek(parser) == 'L'))
     {
@@ -838,7 +846,7 @@ static LIBMATTI_MC_Nbt_Tag *parse_list_or_array(Parser *parser)
     {
         if (read_char(parser, ']'))
         {
-            // the empty array (Java: ArrayPrefix.create(ops))
+// the empty array (Java: ArrayPrefix.create(ops))
             if (prefix == 'B')
                 return LIBMATTI_MC_Nbt_ByteArrayTag_Of(NULL, 0);
             if (prefix == 'I')
@@ -852,7 +860,7 @@ static LIBMATTI_MC_Nbt_Tag *parse_list_or_array(Parser *parser)
 
         while (!at_end(parser) && peek(parser) != ']')
         {
-            // Java: the element is scanned as an IntegerLiteral and evaluated against the
+// Java: the element is scanned as an IntegerLiteral and evaluated against the
             // target type - the prefix type when the literal carries no suffix
             IntegerLiteral literal;
             if (!scan_integer(parser, &literal))
@@ -860,7 +868,7 @@ static LIBMATTI_MC_Nbt_Tag *parse_list_or_array(Parser *parser)
                 free(longs);
                 return NULL;
             }
-            // Java: ArrayPrefix.computeType - an explicit suffix must be allowed for the
+// Java: ArrayPrefix.computeType - an explicit suffix must be allowed for the
             // array kind (B: byte; I: int/byte/short; L: long/byte/short/int)
             int targetType;
             if (literal.suffixType == 0)
@@ -947,7 +955,8 @@ static LIBMATTI_MC_Nbt_Tag *parse_list_or_array(Parser *parser)
         return tag;
     }
 
-    // the plain list
+
+
     LIBMATTI_MC_Nbt_ListTag *list = LIBMATTI_MC_Nbt_ListTag_New();
     if (read_char(parser, ']'))
         return (LIBMATTI_MC_Nbt_Tag *) list;
@@ -1024,7 +1033,7 @@ static LIBMATTI_MC_Nbt_Tag *parse_tag(Parser *parser)
     }
     else if (can_start_number(peek(parser)))
     {
-        // Java: the float literal wins on '.', otherwise the integer literal - the port
+// Java: the float literal wins on '.', otherwise the integer literal - the port
         // parses the integer first and hands over to the float rule when '.'/'e' follows
         if (peek(parser) == '.')
         {
@@ -1041,16 +1050,18 @@ static LIBMATTI_MC_Nbt_Tag *parse_tag(Parser *parser)
             if (tag != NULL && !at_end(parser) &&
                 (peek(parser) == '.' || peek(parser) == 'e' || peek(parser) == 'E'))
             {
-                // "1.5"/"1e3" - the float rule takes the whole span
+
+
                 parser->position = save;
                 LIBMATTI_MC_Nbt_Tag_Free(tag);
                 tag = parse_float_tag(parser);
             }
             else if (tag == NULL && !parser->cut)
             {
-                // Java tries the float literal before the integer one - the port retries
-                // as float unless the integer hit a cut (leading zeros, underscores);
-                // this covers "+.5" where the integer scan finds no digits
+
+
+
+
                 parser->position = save;
                 parser->hasError = savedError;
                 memcpy(parser->error, savedErrorText, sizeof(parser->error));
@@ -1112,7 +1123,7 @@ LIBMATTI_MC_Nbt_CompoundTag *LIBMATTI_MC_Nbt_TagParser_ParseCompoundFully(const 
         return NULL;
     if (tag->id != LIBMATTI_MC_Nbt_TAG_COMPOUND)
     {
-        // Java: ERROR_EXPECTED_COMPOUND - "Expected compound tag, got <tag>"
+// Java: ERROR_EXPECTED_COMPOUND - "Expected compound tag, got <tag>"
         char *printed = LIBMATTI_MC_Nbt_StringTagVisitor_Print(tag);
         char message[300];
         snprintf(message, sizeof(message), "Expected compound tag, got %s", printed != NULL ? printed : "?");

@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.ModLoadingIssue.
+
+
 
 #ifndef MATTICRAFT_FML_MODLOADINGISSUE_H
 #define MATTICRAFT_FML_MODLOADINGISSUE_H
@@ -21,14 +22,14 @@ typedef struct LIBMATTI_FML_ModLoadingIssue
 {
     LIBMATTI_FML_ModLoadingIssue_Severity severity;
     char *translationKey;
-    // Java: List<Object> translationArgs - the C port keeps the arguments as strings
+// Java: List<Object> translationArgs - the C port keeps the arguments as strings
     char **translationArgs;
     size_t translationArgCount;
     LIBMATTI_JL_Throwable *cause;
-    char *affectedPath; // Java: Path affectedPath
+    char *affectedPath;// Java: Path affectedPath
     // TODO: net.neoforged.neoforgespi.locating.IModFile
     void *affectedModFile;
-    // TODO: net.neoforged.neoforgespi.language.IModInfo
+// TODO: net.neoforged.neoforgespi.language.IModInfo
     void *affectedMod;
 } LIBMATTI_FML_ModLoadingIssue;
 
@@ -72,4 +73,4 @@ LIBMATTI_FML_ModLoadingIssue *LIBMATTI_FML_ModLoadingIssue_WithSeverity(const LI
 // Java: @Override public String toString()
 char *LIBMATTI_FML_ModLoadingIssue_ToString(const LIBMATTI_FML_ModLoadingIssue *issue);
 
-#endif //MATTICRAFT_FML_MODLOADINGISSUE_H
+#endif

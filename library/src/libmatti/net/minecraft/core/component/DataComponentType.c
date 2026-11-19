@@ -1,4 +1,5 @@
-// Port of net.minecraft.core.component.DataComponentType.
+
+
 
 #include "libmatti/net/minecraft/core/component/DataComponentType.h"
 

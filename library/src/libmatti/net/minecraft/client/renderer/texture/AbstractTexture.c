@@ -1,6 +1,7 @@
-// Implementation of the AbstractTexture family. The upload runs through
-// GlStateManager exactly like Java's GlCommandEncoder.writeToTexture -> the
-// GlStateManager texture path.
+
+
+
+
 
 #include "libmatti/net/minecraft/client/renderer/texture/AbstractTexture.h"
 
@@ -26,7 +27,7 @@ void LIBMATTI_MC_AbstractTexture_Close(LIBMATTI_MC_AbstractTexture *texture)
 {
     if (texture == NULL)
         return;
-    // Java: if (this.texture != null) { this.texture.close(); this.texture = null; }
+// Java: if (this.texture != null) { this.texture.close(); this.texture = null; }
     if (texture->texture != 0)
     {
         LIBMATTI_B3D_GlStateManager_DeleteTexture(texture->texture);
@@ -41,9 +42,10 @@ unsigned int LIBMATTI_MC_AbstractTexture_GetTexture(const LIBMATTI_MC_AbstractTe
     return texture->texture;
 }
 
-// ---------------------------------------------------------------------------
-// TextureContents
-// ---------------------------------------------------------------------------
+
+
+
+
 
 // Java: resource.metadata().getSection(TextureMetadataSection.TYPE) - the
 // port parses the .mcmeta bytes as JSON and picks the "texture" object.
@@ -72,13 +74,13 @@ static LIBMATTI_MC_TextureMetadataSection *parse_texture_metadata(const LIBMATTI
 LIBMATTI_MC_TextureContents *LIBMATTI_MC_TextureContents_Load(
     const LIBMATTI_MC_MultiPackResourceManager *resourceManager, const LIBMATTI_MC_Identifier *resourceId)
 {
-    // Java: Resource resource = resourceManager.getResourceOrThrow(location)
+// Java: Resource resource = resourceManager.getResourceOrThrow(location)
     LIBMATTI_MC_Resource *resource =
         LIBMATTI_MC_MultiPackResourceManager_GetResource(resourceManager, resourceId->namespace, resourceId->path);
     if (resource == NULL)
         return NULL;
 
-    // Java: NativeImage.read(resource.open()) - Resource_Open hands out the
+// Java: NativeImage.read(resource.open()) - Resource_Open hands out the
     // owning pointer (no copy), so the bytes stay with the resource here.
     size_t length = 0;
     unsigned char *bytes = LIBMATTI_MC_Resource_Open(resource, &length);
@@ -133,9 +135,10 @@ void LIBMATTI_MC_TextureContents_Free(LIBMATTI_MC_TextureContents *contents)
     free(contents);
 }
 
-// ---------------------------------------------------------------------------
-// Constructors
-// ---------------------------------------------------------------------------
+
+
+
+
 
 // Java: public SimpleTexture(Identifier resourceId)
 LIBMATTI_MC_AbstractTexture *LIBMATTI_MC_SimpleTexture_New(const LIBMATTI_MC_Identifier *resourceId)
@@ -159,14 +162,15 @@ LIBMATTI_MC_AbstractTexture *LIBMATTI_MC_DynamicTexture_New(LIBMATTI_B3D_NativeI
     return texture;
 }
 
-// ---------------------------------------------------------------------------
-// ReloadableTexture
-// ---------------------------------------------------------------------------
+
+
+
+
 
 // Java: protected void doLoad(NativeImage)
 void LIBMATTI_MC_ReloadableTexture_DoLoad(LIBMATTI_MC_AbstractTexture *texture, LIBMATTI_B3D_NativeImage *image)
 {
-    // Java: GpuDevice.createTexture(resourceId::toString, 5, RGBA8, w, h, 1, 1)
+// Java: GpuDevice.createTexture(resourceId::toString, 5, RGBA8, w, h, 1, 1)
     LIBMATTI_MC_AbstractTexture_Close(texture);
     texture->texture = LIBMATTI_B3D_GlStateManager_GenTexture();
     texture->textureView = texture->texture;
@@ -178,11 +182,11 @@ void LIBMATTI_MC_ReloadableTexture_DoLoad(LIBMATTI_MC_AbstractTexture *texture, 
 void LIBMATTI_MC_ReloadableTexture_Apply(LIBMATTI_MC_AbstractTexture *texture,
                                          LIBMATTI_MC_TextureContents *contents)
 {
-    // Java: AddressMode mode = clamp ? CLAMP_TO_EDGE : REPEAT
+// Java: AddressMode mode = clamp ? CLAMP_TO_EDGE : REPEAT
     texture->addressModeClamp = LIBMATTI_MC_TextureContents_Clamp(contents);
     texture->filterLinear = LIBMATTI_MC_TextureContents_Blur(contents);
 
-    // Java: try (NativeImage image = contents.image()) { this.doLoad(image); }
+// Java: try (NativeImage image = contents.image()) { this.doLoad(image); }
     LIBMATTI_MC_ReloadableTexture_DoLoad(texture, contents->image);
     LIBMATTI_B3D_NativeImage_Free(contents->image);
     contents->image = NULL;
@@ -203,9 +207,10 @@ void LIBMATTI_MC_DynamicTexture_Upload(LIBMATTI_MC_AbstractTexture *texture)
     LIBMATTI_MC_Texture_WriteToTexture(texture->texture, texture->pixels);
 }
 
-// ---------------------------------------------------------------------------
-// MissingTextureAtlasSprite
-// ---------------------------------------------------------------------------
+
+
+
+
 
 // Java: public static NativeImage generateMissingImage(int width, int height)
 static LIBMATTI_B3D_NativeImage *generate_missing_image(int width, int height)
@@ -213,14 +218,14 @@ static LIBMATTI_B3D_NativeImage *generate_missing_image(int width, int height)
     LIBMATTI_B3D_NativeImage *image = LIBMATTI_B3D_NativeImage_New(width, height, 0);
     if (image == NULL)
         return NULL;
-    // Java: int i = -524040 - the magenta
+// Java: int i = -524040 - the magenta
     const int magenta = -524040;
     const int black = -16777216;
     for (int y = 0; y < height; y++)
     {
         for (int x = 0; x < width; x++)
         {
-            // Java: if (j < height / 2 ^ k < width / 2) - the XOR checkerboard
+// Java: if (j < height / 2 ^ k < width / 2) - the XOR checkerboard
             if ((y < height / 2) ^ (x < width / 2))
                 LIBMATTI_B3D_NativeImage_SetPixel(image, x, y, magenta);
             else
@@ -237,13 +242,14 @@ LIBMATTI_B3D_NativeImage *LIBMATTI_MC_MissingTextureAtlasSprite_GenerateMissingI
 
 LIBMATTI_MC_Identifier *LIBMATTI_MC_MissingTextureAtlasSprite_GetLocation(void)
 {
-    // Java: Identifier.withDefaultNamespace("missingno")
+// Java: Identifier.withDefaultNamespace("missingno")
     return LIBMATTI_MC_Identifier_WithDefaultNamespace("missingno");
 }
 
-// ---------------------------------------------------------------------------
-// writeToTexture
-// ---------------------------------------------------------------------------
+
+
+
+
 
 // Java: GlCommandEncoder.writeToTexture(GpuTexture, NativeImage) - the GL path
 // (GlTextureManager/GlCommandEncoder): pixel store, bind, TexImage2D.

@@ -1,6 +1,7 @@
-//
-// Created by administrator on 09.09.26.
-//
+
+
+
+
 
 #include "JarContentsImpl.h"
 
@@ -33,25 +34,26 @@ LIBMATTI_JH_Provider *LIBMATTI_JH_Provider_FromContent(const char *serviceName, 
 
     while (line != NULL)
     {
-        // strip \r
+
+
         size_t len = strlen(line);
         if (len > 0 && line[len - 1] == '\r') line[len - 1] = '\0';
 
-        // Java: String::trim
+// Java: String::trim
         char *start = line;
         while (*start != '\0' && *start <= ' ') start++;
         char *end = start + strlen(start);
         while (end > start && *(end - 1) <= ' ') end--;
         *end = '\0';
 
-        // Java: skip empty lines and '#' comments
+// Java: skip empty lines and '#' comments
         if (start[0] == '\0' || start[0] == '#')
         {
             line = strtok_r(NULL, "\n", &saveptr);
             continue;
         }
 
-        // Java: pkgFilter.test(p.replace('.','/'), path.getRoot())
+// Java: pkgFilter.test(p.replace('.','/'), path.getRoot())
         if (pkgFilter != NULL)
         {
             size_t pathLength = strlen(start);
@@ -90,9 +92,10 @@ void LIBMATTI_JH_Provider_Free(LIBMATTI_JH_Provider *provider)
     free(provider);
 }
 
-// ---------------------------------------------------------------------------
-// JarContentsImpl
-// ---------------------------------------------------------------------------
+
+
+
+
 
 static const char *MANIFEST_NAME = "META-INF/MANIFEST.MF";
 static const char *NAUGHTY_SERVICE_FILE = "org.codehaus.groovy.runtime.ExtensionModule";
@@ -118,7 +121,7 @@ static LIBMATTI_JU_Manifest *read_manifest(LIBMATTI_UNION_UnionFileSystem *files
 
     if (manifest == NULL)
     {
-        // Java: defaultManifest.get()
+// Java: defaultManifest.get()
         if (defaultManifest != NULL) return defaultManifest;
         return LIBMATTI_JU_Manifest_CreateEmpty();
     }
@@ -153,14 +156,16 @@ static int packages_scan_callback(const char *relativePath, int isDirectory, voi
     size_t length = strlen(relativePath);
     if (length < 6 || strcmp(relativePath + length - 6, ".class") != 0) return 1;
 
-    // package = parent path with '/' -> '.'
+
+
     const char *lastSlash = strrchr(relativePath, '/');
-    if (lastSlash == NULL) return 1; // root file, no package
+    if (lastSlash == NULL) return 1;
+
 
     size_t packageLength = (size_t)(lastSlash - relativePath);
     if (packageLength == 0) return 1;
 
-    // Java: skip subtrees of ignored root packages (META-INF and excluded roots)
+// Java: skip subtrees of ignored root packages (META-INF and excluded roots)
     const char *firstSlash = strchr(relativePath, '/');
     if (firstSlash != NULL)
     {
@@ -180,7 +185,7 @@ static int packages_scan_callback(const char *relativePath, int isDirectory, voi
         package[i] = relativePath[i] == '/' ? '.' : relativePath[i];
     package[packageLength] = '\0';
 
-    // set semantics (Java: Set.copyOf)
+// set semantics (Java: Set.copyOf)
     if (!string_in_list(ctx->packages, ctx->packageCount, package))
     {
         ctx->packages = realloc(ctx->packages, sizeof(char *) * (ctx->packageCount + 1));
@@ -210,7 +215,7 @@ static int services_scan_callback(const char *relativePath, int isDirectory, voi
     const char *filename = strrchr(relativePath, '/');
     filename = filename != NULL ? filename + 1 : relativePath;
 
-    // Java: NAUGHTY_SERVICE_FILES filter
+// Java: NAUGHTY_SERVICE_FILES filter
     if (strcmp(filename, NAUGHTY_SERVICE_FILE) == 0) return 1;
 
     ServicesScanContext *ctx = userdata;
@@ -224,7 +229,7 @@ static int services_scan_callback(const char *relativePath, int isDirectory, voi
 
     if (LIBMATTI_UNION_UnionFileSystem_ReadAllBytes(filesystem, filePath, &bytes, &length))
     {
-        // Java: SecureJar.Provider.fromPath(path, filesystem.getFilesystemFilter())
+// Java: SecureJar.Provider.fromPath(path, filesystem.getFilesystemFilter())
         LIBMATTI_JH_Provider *provider = LIBMATTI_JH_Provider_FromContent(
             filename, (const char *)bytes, length,
             LIBMATTI_UNION_UnionFileSystem_GetFilesystemFilter(filesystem),
@@ -245,7 +250,7 @@ LIBMATTI_JH_JarContentsImpl *LIBMATTI_JH_JarContentsImpl_New(const char **paths,
                                                              LIBMATTI_JU_Manifest *defaultManifest,
                                                              LIBMATTI_UNION_UnionPathFilter *pathFilter)
 {
-    // Java: Arrays.stream(paths).filter(Files::exists).toArray()
+// Java: Arrays.stream(paths).filter(Files::exists).toArray()
     char **validPaths = calloc(pathCount, sizeof(char *));
     size_t validCount = 0;
 
@@ -255,7 +260,7 @@ LIBMATTI_JH_JarContentsImpl *LIBMATTI_JH_JarContentsImpl_New(const char **paths,
             validPaths[validCount++] = strdup(paths[i]);
     }
 
-    // Java: throws UncheckedIOException "Invalid paths argument"
+// Java: throws UncheckedIOException "Invalid paths argument"
     if (validCount == 0)
     {
         free(validPaths);
@@ -263,7 +268,7 @@ LIBMATTI_JH_JarContentsImpl *LIBMATTI_JH_JarContentsImpl_New(const char **paths,
         return NULL;
     }
 
-    // Java: this.filesystem = UFSP.newFileSystem(pathFilter, validPaths)
+// Java: this.filesystem = UFSP.newFileSystem(pathFilter, validPaths)
     LIBMATTI_UNION_UnionFileSystem *filesystem = LIBMATTI_UNION_UnionFileSystemProvider_NewFileSystem(
         LIBMATTI_UNION_UnionFileSystemProvider_Get(), pathFilter, (const char **)validPaths, validCount);
 
@@ -330,7 +335,7 @@ int LIBMATTI_JH_JarContents_FindFile(const LIBMATTI_JH_JarContents *contents, co
 {
     const LIBMATTI_JH_JarContentsImpl *impl = (const LIBMATTI_JH_JarContentsImpl *)contents;
 
-    // Java: rel = filesystem.getPath(name); root.resolve(rel) exists -> toUri
+// Java: rel = filesystem.getPath(name); root.resolve(rel) exists -> toUri
     const char *parts[1] = {name};
     LIBMATTI_UNION_UnionPath *relative = LIBMATTI_UNION_UnionFileSystem_GetPath(impl->filesystem, parts, 1);
 
@@ -388,7 +393,7 @@ char **LIBMATTI_JH_JarContents_GetPackagesExcluding(const LIBMATTI_JH_JarContent
 
     PackagesScanContext ctx = {excludedRootPackages, excludedCount, NULL, 0};
 
-    // Java: Files.walkFileTree(filesystem.getRoot(), ...)
+// Java: Files.walkFileTree(filesystem.getRoot(), ...)
     LIBMATTI_UNION_UnionFileSystem_Walk(impl->filesystem, "", 1, packages_scan_callback, &ctx);
 
     *count = ctx.packageCount;
@@ -399,7 +404,7 @@ char **LIBMATTI_JH_JarContents_GetPackages(const LIBMATTI_JH_JarContents *conten
 {
     LIBMATTI_JH_JarContentsImpl *impl = (LIBMATTI_JH_JarContentsImpl *)contents;
 
-    // Java: lazy cache
+// Java: lazy cache
     if (impl->packages == NULL)
     {
         impl->packages = LIBMATTI_JH_JarContents_GetPackagesExcluding(contents, NULL, 0, &impl->packageCount);
@@ -413,12 +418,12 @@ LIBMATTI_JH_Provider *LIBMATTI_JH_JarContents_GetMetaInfServices(const LIBMATTI_
 {
     LIBMATTI_JH_JarContentsImpl *impl = (LIBMATTI_JH_JarContentsImpl *)contents;
 
-    // Java: lazy cache
+// Java: lazy cache
     if (impl->providers == NULL)
     {
         ServicesScanContext ctx = {impl, NULL, 0};
 
-        // Java: Files.walk(services, 1) over META-INF/services/
+// Java: Files.walk(services, 1) over META-INF/services/
         LIBMATTI_UNION_UnionFileSystem_Walk(impl->filesystem, "META-INF/services", 0, services_scan_callback, &ctx);
 
         impl->providers = ctx.providers;

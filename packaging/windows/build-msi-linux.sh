@@ -26,6 +26,14 @@ if [ ! -d "$BIN_DIR" ]; then
     BIN_DIR="$(find "$STAGE" -name vulkancraft.exe -printf '%h' -quit)"
 fi
 
+# The MSI stages only bin/, so keep the launcher-visible resources next to it.
+if [ -d "$STAGE/Matticraft/share/matticraft/assets" ]; then
+    cp -R "$STAGE/Matticraft/share/matticraft/assets" "$BIN_DIR/assets"
+fi
+if [ -f "$STAGE/Matticraft/share/matticraft/Monocraft.ttf" ]; then
+    cp "$STAGE/Matticraft/share/matticraft/Monocraft.ttf" "$BIN_DIR/Monocraft.ttf"
+fi
+
 # The MSI installs the launcher as the entry point. Native Windows builds get
 # it from CMake; cross builds can pass LAUNCHER_BIN (cargo --target
 # x86_64-pc-windows-gnu) or place it in launchers/target/<target>/release.

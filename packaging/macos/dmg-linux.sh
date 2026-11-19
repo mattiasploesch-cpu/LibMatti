@@ -27,6 +27,9 @@ else
     cp "$STAGE/usr/bin/vulkancraft" "$APP/Contents/MacOS/Matticraft"
 fi
 cp "$STAGE"/usr/lib/libmatti*.dylib "$APP/Contents/Frameworks/" 2>/dev/null || true
+mkdir -p "$APP/Contents/Resources"
+cp -R "$STAGE/usr/share/matticraft/assets" "$APP/Contents/Resources/assets"
+cp "$STAGE/usr/share/matticraft/Monocraft.ttf" "$APP/Contents/Resources/Monocraft.ttf"
 sed "s/__VERSION__/$VERSION/g" "$ROOT/packaging/macos/Info.plist" > "$APP/Contents/Info.plist"
 mkdir -p "$DIST"
 

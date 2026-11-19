@@ -1,6 +1,7 @@
-//
-// Created by administrator on 09.09.26.
-//
+
+
+
+
 
 #include "JarSigningData.h"
 
@@ -20,5 +21,5 @@ LIBMATTI_JH_JarSigningData *LIBMATTI_JH_JarSigningData_Read(void)
         LIBMATTI_ML_Logger *logger = LIBMATTI_ML_LogManager_GetLogger();
         LIBMATTI_ML_Logger_Debug(logger, NULL, "Jar signing verification skipped (jar signing data not read)");
     }
-    return NULL; // Java: JarSigningData.EMPTY equivalent
+    return NULL;// Java: JarSigningData.EMPTY equivalent
 }

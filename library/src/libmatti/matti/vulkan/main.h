@@ -3,4 +3,4 @@
 
 int LIBMATTI_VK_MAIN(int argc, char *argv[]);
 
-#endif // !MATTICRAFT_MATTI_VULKAN_MAIN
+#endif

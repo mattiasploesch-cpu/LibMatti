@@ -1,8 +1,9 @@
-// Port of cpw.mods.modlauncher.TransformerClassWriter.
-// Java's writer only computes frames when COMPUTE_FRAMES is set and then asks
-// getCommonSuperClass for the hierarchy. The C ClassWriter does not recompute
-// frames (see ClassWriter.h), so the hierarchy helpers below are provided for
-// callers that need them, but the writer itself never calls them.
+
+
+
+
+
+
 
 #include "libmatti/cpw/modlauncher/TransformerClassWriter.h"
 
@@ -68,10 +69,10 @@ LIBMATTI_ASM_ClassWriter *LIBMATTI_ML_TransformerClassWriter_CreateClassWriter(
     (void)classTransformer;
     (void)clazzAccessor;
 
-    // Java: final int writerFlag = mlFlags & ~ILaunchPluginService.ComputeFlags.SIMPLE_REWRITE
+// Java: final int writerFlag = mlFlags & ~ILaunchPluginService.ComputeFlags.SIMPLE_REWRITE
     int writerFlag = mlFlags & ~LIBMATTI_MLS_COMPUTE_SIMPLE_REWRITE;
 
-    // Java: only the TransformerClassWriter is used when COMPUTE_FRAMES is set
+// Java: only the TransformerClassWriter is used when COMPUTE_FRAMES is set
     return LIBMATTI_ASM_ClassWriter_New(writerFlag, clazzAccessor);
 }
 
@@ -127,7 +128,7 @@ void LIBMATTI_ML_TransformerClassWriter_ComputeHierarchy(LIBMATTI_ML_ClassTransf
 {
     if (hierarchy_for(className) != NULL) return;
 
-    // Java: Class<?> clz = classTransformer.getTransformingClassLoader().getLoadedClass(className.replace('/','.'))
+// Java: Class<?> clz = classTransformer.getTransformingClassLoader().getLoadedClass(className.replace('/','.'))
     //       if (clz != null) computeHierarchyFromClass(...) else computeHierarchyFromFile(className)
     // findLoadedClass is JVM-backed (external), so the C port always reads the class file.
     if (classTransformer == NULL) return;
@@ -144,14 +145,14 @@ void LIBMATTI_ML_TransformerClassWriter_ComputeHierarchy(LIBMATTI_ML_ClassTransf
 
     if (classData == NULL)
     {
-        // Java: catch (ClassNotFoundException e) -> LOGGER.fatal("Failed to find class {}", className)
+// Java: catch (ClassNotFoundException e) -> LOGGER.fatal("Failed to find class {}", className)
         LIBMATTI_ML_Logger_Fatal(LIBMATTI_ML_LogManager_GetLogger(), &LIBMATTI_ML_MARKER_MODLAUNCHER,
                                  "Failed to find class {} ", className);
         free(dotted);
         return;
     }
 
-    // Java: classReader.accept(new SuperCollectingVisitor(), SKIP_CODE | SKIP_DEBUG | SKIP_FRAMES)
+// Java: classReader.accept(new SuperCollectingVisitor(), SKIP_CODE | SKIP_DEBUG | SKIP_FRAMES)
     LIBMATTI_ASM_ClassReader *reader = LIBMATTI_ASM_ClassReader_New(
         classData, length, LIBMATTI_ASM_SKIP_CODE | LIBMATTI_ASM_SKIP_DEBUG | LIBMATTI_ASM_SKIP_FRAMES);
     LIBMATTI_ASMT_ClassNode *node = LIBMATTI_ASMT_ClassNode_New();

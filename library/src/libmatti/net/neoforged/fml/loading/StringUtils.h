@@ -1,5 +1,6 @@
-// Port of net.neoforged.fml.loading.StringUtils.
-// parseStringFormat resolves through the ported org.apache.commons.lang3.text.StrSubstitutor.
+
+
+
 
 #ifndef MATTICRAFT_FML_LOADING_STRINGUTILS_H
 #define MATTICRAFT_FML_LOADING_STRINGUTILS_H
@@ -24,4 +25,4 @@ char *LIBMATTI_FML_StringUtils_ParseStringFormat(const char *input, void *proper
 // Java: public static String binToHex(byte[] bytes) - returns a new string
 char *LIBMATTI_FML_StringUtils_BinToHex(const unsigned char *bytes, size_t length);
 
-#endif //MATTICRAFT_FML_LOADING_STRINGUTILS_H
+#endif

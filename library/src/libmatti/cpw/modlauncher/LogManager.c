@@ -1,6 +1,7 @@
-//
-// Replacement for org.apache.logging.log4j.LogManager / Logger.
-//
+
+
+
+
 
 #include "LogManager.h"
 
@@ -13,7 +14,8 @@
 
 struct LIBMATTI_ML_Logger
 {
-    int level; // 0 = trace .. 5 = fatal
+    int level;
+
 };
 
 static LIBMATTI_ML_Logger INSTANCE = {0};
@@ -23,7 +25,8 @@ LIBMATTI_ML_Logger *LIBMATTI_ML_LogManager_GetLogger(void)
     return &INSTANCE;
 }
 
-// log4j: "{}" is replaced by the next parameter
+
+
 static void log_message(int level, const char *levelName, const LIBMATTI_ML_LogMarker *marker,
                         const char *message, va_list args)
 {

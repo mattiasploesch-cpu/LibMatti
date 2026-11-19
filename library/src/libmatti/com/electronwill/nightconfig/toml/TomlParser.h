@@ -1,6 +1,7 @@
-// Port of com.electronwill.nightconfig.toml.TomlParser.
-// Java throws a ParsingException on invalid data; the port records the first failure in the parser
-// (LIBMATTI_NC_TomlParser_Failed) and returns NULL, because C has no exception channel.
+
+
+
+
 
 #ifndef MATTICRAFT_NC_TOML_TOMLPARSER_H
 #define MATTICRAFT_NC_TOML_TOMLPARSER_H
@@ -23,7 +24,7 @@ typedef struct
 // Java: public final class TomlParser implements ConfigParser<CommentedConfig>
 typedef struct LIBMATTI_NC_TomlParser
 {
-    // Java: the parser's settings
+// Java: the parser's settings
     int initialStringBuilderCapacity;
     int initialListCapacity;
     int lenientBareKeys;
@@ -32,19 +33,20 @@ typedef struct LIBMATTI_NC_TomlParser
     LIBMATTI_NC_ParsingMode parsingMode;
     LIBMATTI_NC_TomlVersion tomlVersion;
 
-    // Java: private final Set<Config> inlineTables - an identity set
+// Java: private final Set<Config> inlineTables - an identity set
     LIBMATTI_NC_Config **inlineTables;
     size_t inlineTableCount;
 
-    // Java: private String currentComment
+// Java: private String currentComment
     char *currentComment;
 
-    // Java: the ParsingException the parser would have thrown
+// Java: the ParsingException the parser would have thrown
     int failed;
     char *error;
 } LIBMATTI_NC_TomlParser;
 
-// the Ok(value) / failed result of the parsers
+
+
 LIBMATTI_NC_ValueResult LIBMATTI_NC_ValueResult_Ok(LIBMATTI_NC_Value value);
 LIBMATTI_NC_ValueResult LIBMATTI_NC_ValueResult_Fail(void);
 
@@ -83,4 +85,4 @@ void LIBMATTI_NC_TomlParser_SetComments(LIBMATTI_NC_TomlParser *parser, const LI
 // Java: public CommentedConfig parse(Reader reader) - NULL when the data is invalid
 LIBMATTI_NC_Config *LIBMATTI_NC_TomlParser_Parse(LIBMATTI_NC_TomlParser *parser, const char *data, size_t length);
 
-#endif //MATTICRAFT_NC_TOML_TOMLPARSER_H
+#endif

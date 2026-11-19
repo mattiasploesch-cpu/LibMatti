@@ -24,13 +24,13 @@ void LIBMATTI_FML_InDevJarLocator_FindCandidates(void *self, LIBMATTI_NEOFORGESP
     (void) self;
     (void) context;
 
-    // Java: for (var path : ClasspathResourceUtils.findFileSystemRootsOfFileOnClasspath(JarModsDotTomlModFileReader.MODS_TOML))
+// Java: for (var path : ClasspathResourceUtils.findFileSystemRootsOfFileOnClasspath(JarModsDotTomlModFileReader.MODS_TOML))
     size_t modsTomlRootCount = 0;
     char **modsTomlRoots = LIBMATTI_FML_ClasspathResourceUtils_FindFileSystemRootsOfFileOnClasspath(
         LIBMATTI_FML_MODS_TOML, &modsTomlRootCount);
     for (size_t i = 0; i < modsTomlRootCount; i++)
     {
-        // Java: if (Files.isRegularFile(path)) pipeline.addPath(path, DEFAULT, WARN_ON_KNOWN_INCOMPATIBILITY);
+// Java: if (Files.isRegularFile(path)) pipeline.addPath(path, DEFAULT, WARN_ON_KNOWN_INCOMPATIBILITY);
         if (!LIBMATTI_JNF_Files_IsRegularFile(modsTomlRoots[i])) continue;
 
         LIBMATTI_NEOFORGESPI_ModFileDiscoveryAttributes attributes =
@@ -41,7 +41,7 @@ void LIBMATTI_FML_InDevJarLocator_FindCandidates(void *self, LIBMATTI_NEOFORGESP
             LIBMATTI_NEOFORGESPI_IncompatibleFileReporting_WARN_ON_KNOWN_INCOMPATIBILITY, &added);
     }
 
-    // Java: for (var path : ClasspathResourceUtils.findFileSystemRootsOfFileOnClasspath(JarFile.MANIFEST_NAME))
+// Java: for (var path : ClasspathResourceUtils.findFileSystemRootsOfFileOnClasspath(JarFile.MANIFEST_NAME))
     size_t manifestRootCount = 0;
     char **manifestRoots = LIBMATTI_FML_ClasspathResourceUtils_FindFileSystemRootsOfFileOnClasspath(
         LIBMATTI_FML_MODS_TOML_MANIFEST, &manifestRootCount);
@@ -49,7 +49,7 @@ void LIBMATTI_FML_InDevJarLocator_FindCandidates(void *self, LIBMATTI_NEOFORGESP
     {
         if (!LIBMATTI_JNF_Files_IsRegularFile(manifestRoots[i])) continue;
 
-        // Java: try (var jarFile = new JarFile(path.toFile(), false)) { manifest = jarFile.getManifest(); }
+// Java: try (var jarFile = new JarFile(path.toFile(), false)) { manifest = jarFile.getManifest(); }
         //       catch (IOException e) { pipeline.addIssue(...invalidzip...); continue; }
         LIBMATTI_FML_JarContents *contents = LIBMATTI_FML_JarContents_OfPath(manifestRoots[i]);
         if (contents == NULL)
@@ -62,7 +62,7 @@ void LIBMATTI_FML_InDevJarLocator_FindCandidates(void *self, LIBMATTI_NEOFORGESP
             continue;
         }
 
-        // Java: var modType = manifest.getMainAttributes().getValue(ModFile.TYPE); if (modType != null) pipeline.addPath(...);
+// Java: var modType = manifest.getMainAttributes().getValue(ModFile.TYPE); if (modType != null) pipeline.addPath(...);
         LIBMATTI_JU_Manifest *manifest = LIBMATTI_FML_JarContents_GetManifest(contents);
         const char *modType = manifest != NULL ? LIBMATTI_JU_Manifest_GetMainValue(manifest, LIBMATTI_FML_MODFILE_TYPE)
                                                : NULL;

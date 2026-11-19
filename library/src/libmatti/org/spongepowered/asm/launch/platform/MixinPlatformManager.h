@@ -1,6 +1,7 @@
-// Port of org.spongepowered.asm.launch.platform.MixinContainer and
-// org.spongepowered.asm.launch.platform.MixinPlatformManager
-// (sponge-mixin 0.17.3+mixin.0.8.7).
+
+
+
+
 
 #ifndef MATTICRAFT_SP_ASM_LAUNCH_PLATFORM_MIXINPLATFORMMANAGER_H
 #define MATTICRAFT_SP_ASM_LAUNCH_PLATFORM_MIXINPLATFORMMANAGER_H
@@ -18,9 +19,9 @@ typedef struct LIBMATTI_SP_MixinContainer LIBMATTI_SP_MixinContainer;
 
 struct LIBMATTI_SP_MixinContainer
 {
-    // Java: private final IContainerHandle handle
+// Java: private final IContainerHandle handle
     LIBMATTI_SP_ContainerHandle *handle;
-    // Java: private final List<IMixinPlatformAgent> agents
+// Java: private final List<IMixinPlatformAgent> agents
     LIBMATTI_SP_IMixinPlatformAgent **agents;
     size_t agentCount;
 };
@@ -46,17 +47,17 @@ typedef struct LIBMATTI_SP_MixinPlatformManager LIBMATTI_SP_MixinPlatformManager
 
 struct LIBMATTI_SP_MixinPlatformManager
 {
-    // Java: private final Map<IContainerHandle, MixinContainer> containers
+// Java: private final Map<IContainerHandle, MixinContainer> containers
     LIBMATTI_SP_ContainerHandle **containerHandles;
     LIBMATTI_SP_MixinContainer **containers;
     size_t containerCount;
-    // Java: private final MixinConnectorManager connectors
+// Java: private final MixinConnectorManager connectors
     LIBMATTI_SP_MixinConnectorManager *connectors;
-    // Java: private MixinContainer primaryContainer
+// Java: private MixinContainer primaryContainer
     LIBMATTI_SP_MixinContainer *primaryContainer;
-    // Java: private boolean prepared
+// Java: private boolean prepared
     int prepared;
-    // Java: private boolean injected
+// Java: private boolean injected
     int injected;
 };
 
@@ -95,4 +96,4 @@ void LIBMATTI_SP_MixinPlatformManager_AddTokenProvider(LIBMATTI_SP_MixinPlatform
 void LIBMATTI_SP_MixinPlatformManager_AddConnector(LIBMATTI_SP_MixinPlatformManager *manager,
                                                    const char *connectorClass);
 
-#endif //MATTICRAFT_SP_ASM_LAUNCH_PLATFORM_MIXINPLATFORMMANAGER_H
+#endif

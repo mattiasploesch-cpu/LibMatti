@@ -1,6 +1,7 @@
-// Port of net.neoforged.fml.loading.TracingPrintStream.
-// Java extends java.io.PrintStream (which the port does not model) and prefixes every logged line
-// with the caller's origin, taken from Thread.currentThread().getStackTrace().
+
+
+
+
 
 #ifndef MATTICRAFT_FML_LOADING_TRACINGPRINTSTREAM_H
 #define MATTICRAFT_FML_LOADING_TRACINGPRINTSTREAM_H
@@ -32,4 +33,4 @@ void LIBMATTI_FML_TracingPrintStream_PrintlnDouble(LIBMATTI_FML_TracingPrintStre
 // Java: @Override public void println(char[] x)
 void LIBMATTI_FML_TracingPrintStream_PrintlnChars(LIBMATTI_FML_TracingPrintStream *stream, const char *value);
 
-#endif //MATTICRAFT_FML_LOADING_TRACINGPRINTSTREAM_H
+#endif

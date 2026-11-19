@@ -9,4 +9,4 @@
 // Java: public IdentifierException(String message)
 LIBMATTI_JL_Throwable *LIBMATTI_MC_IdentifierException_New(const char *message);
 
-#endif //MATTICRAFT_NET_MINECRAFT_IDENTIFIEREXCEPTION_H
+#endif

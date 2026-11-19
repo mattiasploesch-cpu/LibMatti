@@ -1,4 +1,5 @@
-// Implementation of net.minecraft.client.renderer.texture.TextureAtlas.
+
+
 
 #include "libmatti/net/minecraft/client/renderer/texture/TextureAtlas.h"
 
@@ -33,7 +34,7 @@ static void create_texture(LIBMATTI_MC_TextureAtlas *atlas, int width, int heigh
     snprintf(message, sizeof(message), "Created: %dx%dx%d atlas", width, height, mipLevel);
     LIBMATTI_ML_Logger_Info(LOGGER(), NULL, message);
 
-    // Java: this.close(); texture = createTexture(..., mipLevel + 1)
+// Java: this.close(); texture = createTexture(..., mipLevel + 1)
     LIBMATTI_MC_AbstractTexture_Close(&atlas->base);
     atlas->base.texture = LIBMATTI_B3D_GlStateManager_GenTexture();
     atlas->base.textureView = atlas->base.texture;
@@ -41,7 +42,7 @@ static void create_texture(LIBMATTI_MC_TextureAtlas *atlas, int width, int heigh
     atlas->height = height;
     atlas->maxMipLevel = mipLevel;
 
-    // Java: the sampler is getClampToEdge(NEAREST)
+// Java: the sampler is getClampToEdge(NEAREST)
     atlas->base.addressModeClamp = 1;
     atlas->base.filterLinear = 0;
 }
@@ -63,7 +64,7 @@ int LIBMATTI_MC_TextureAtlas_Upload(LIBMATTI_MC_TextureAtlas *atlas, LIBMATTI_MC
     create_texture(atlas, preparations->width, preparations->height, preparations->mipLevel);
     LIBMATTI_MC_TextureAtlas_ClearTextureData(atlas);
 
-    // Java: this.texturesByName = Map.copyOf(regions); missingSprite = get(missingno)
+// Java: this.texturesByName = Map.copyOf(regions); missingSprite = get(missingno)
     atlas->spriteCount = preparations->spriteCount;
     atlas->sprites = calloc(atlas->spriteCount > 0 ? atlas->spriteCount : 1, sizeof(LIBMATTI_MC_TextureAtlasSprite *));
     for (size_t i = 0; i < atlas->spriteCount; i++)
@@ -75,14 +76,14 @@ int LIBMATTI_MC_TextureAtlas_Upload(LIBMATTI_MC_TextureAtlas *atlas, LIBMATTI_MC
 
     if (atlas->missingSprite == NULL)
     {
-        // Java: throw new IllegalStateException("Atlas ... has no missing texture sprite")
+// Java: throw new IllegalStateException("Atlas ... has no missing texture sprite")
         atlas->spriteCount = 0;
         free(atlas->sprites);
         atlas->sprites = NULL;
         return 0;
     }
 
-    // Java: uploadInitialContents - the port uploads every sprite's first mip
+// Java: uploadInitialContents - the port uploads every sprite's first mip
     // frame into the atlas region directly (the Java blit runs through the
     // ANIMATE_SPRITE_BLIT render pass, a game-port pipeline).
     LIBMATTI_GL_glPixelStorei(LIBMATTI_GL_GL_UNPACK_ALIGNMENT, 1);
@@ -94,7 +95,7 @@ int LIBMATTI_MC_TextureAtlas_Upload(LIBMATTI_MC_TextureAtlas *atlas, LIBMATTI_MC
         if (image == NULL)
             continue;
 
-        // Java: the first frame blits the sprite into its atlas region -
+// Java: the first frame blits the sprite into its atlas region -
         // TexSubImage2D at (x, y) with the sprite size.
         LIBMATTI_GL_glTexSubImage2D(LIBMATTI_GL_GL_TEXTURE_2D, 0, sprite->x, sprite->y,
                                     image->width, image->height, LIBMATTI_GL_GL_RGBA,
@@ -113,7 +114,7 @@ LIBMATTI_MC_TextureAtlasSprite *LIBMATTI_MC_TextureAtlas_GetSprite(const LIBMATT
         if (strcmp(name->namespace, spriteId->namespace) == 0 && strcmp(name->path, spriteId->path) == 0)
             return atlas->sprites[i];
     }
-    // Java: getOrDefault(sprite, missingSprite)
+// Java: getOrDefault(sprite, missingSprite)
     return atlas->missingSprite;
 }
 

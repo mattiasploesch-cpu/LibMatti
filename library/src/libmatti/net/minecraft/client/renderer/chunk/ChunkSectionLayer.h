@@ -1,6 +1,7 @@
-// Port of net.minecraft.client.renderer.chunk.ChunkSectionLayer - the four
-// terrain layers a section compiles into (Java's enum with the pipeline, the
-// buffer size and the sortOnUpload flag).
+
+
+
+
 
 #ifndef MATTICRAFT_MC_CLIENT_RENDERER_CHUNK_CHUNKSECTIONLAYER_H
 #define MATTICRAFT_MC_CLIENT_RENDERER_CHUNK_CHUNKSECTIONLAYER_H
@@ -32,4 +33,4 @@ const char *LIBMATTI_MC_ChunkSectionLayer_Label(LIBMATTI_MC_ChunkSectionLayer la
 }
 #endif
 
-#endif //MATTICRAFT_MC_CLIENT_RENDERER_CHUNK_CHUNKSECTIONLAYER_H
+#endif

@@ -1,5 +1,6 @@
-// Port of net.neoforged.fml.loading.moddiscovery.locators.ModsFolderLocator.
-// The loader reads native mods, so the scanned suffix is ".so" (see EarlyServiceDiscovery).
+
+
+
 
 #ifndef MATTICRAFT_FML_LOADING_MODDISCOVERY_LOCATORS_MODSFOLDERLOCATOR_H
 #define MATTICRAFT_FML_LOADING_MODDISCOVERY_LOCATORS_MODSFOLDERLOCATOR_H
@@ -32,4 +33,4 @@ void LIBMATTI_FML_ModsFolderLocator_FindCandidates(void *self, LIBMATTI_NEOFORGE
 // Java: @Override public String toString() { return "{" + customName + " locator at " + this.modFolder + "}"; }
 char *LIBMATTI_FML_ModsFolderLocator_ToString(void *self);
 
-#endif //MATTICRAFT_FML_LOADING_MODDISCOVERY_LOCATORS_MODSFOLDERLOCATOR_H
+#endif

@@ -1,4 +1,5 @@
-// Port of java.util.function.Supplier.
+
+
 
 #include "libmatti/java/util/function/Supplier.h"
 

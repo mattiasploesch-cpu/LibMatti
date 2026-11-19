@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.loading.UniqueModListBuilder.
+
+
 
 #ifndef MATTICRAFT_FML_LOADING_UNIQUEMODLISTBUILDER_H
 #define MATTICRAFT_FML_LOADING_UNIQUEMODLISTBUILDER_H
@@ -16,7 +17,7 @@ typedef struct
     size_t modFileCount;
     LIBMATTI_FML_ModFile **discardedFiles;
     size_t discardedFileCount;
-    // Java: Map<String, List<ModFile>> modFilesByFirstId
+// Java: Map<String, List<ModFile>> modFilesByFirstId
     char **modFilesByFirstIdKeys;
     LIBMATTI_FML_ModFile ***modFilesByFirstIdValues;
     size_t *modFilesByFirstIdValueCounts;
@@ -37,4 +38,4 @@ LIBMATTI_FML_UniqueModListData *LIBMATTI_FML_UniqueModListBuilder_BuildUniqueLis
 
 void LIBMATTI_FML_UniqueModListData_Free(LIBMATTI_FML_UniqueModListData *data);
 
-#endif //MATTICRAFT_FML_LOADING_UNIQUEMODLISTBUILDER_H
+#endif

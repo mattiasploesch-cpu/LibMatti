@@ -1,7 +1,8 @@
-// Port of net.neoforged.neoforge.logging.CrashReportExtender.
-// Java builds a CrashReport with one category per issue and saves it to
-// crash-reports/crash-<timestamp>-fml.txt; the port writes the same categories into the file
-// (the CrashReport object model is the game port's part, the report text is the same layout).
+
+
+
+
+
 
 #include "libmatti/net/neoforged/neoforge/logging/CrashReportExtender.h"
 
@@ -17,7 +18,7 @@
 // Java: category.setDetail(name, value)
 static void write_detail(FILE *file, const char *name, const char *value)
 {
-    // Java: the report indents the details with two tabs
+// Java: the report indents the details with two tabs
     fprintf(file, "\t\t%s: %s\n", name, value != NULL ? value : "<null>");
 }
 
@@ -26,12 +27,12 @@ char *LIBMATTI_NEOFORGE_CrashReportExtender_DumpModLoadingCrashReport(const LIBM
                                                                      LIBMATTI_FML_ModLoadingIssue **issues,
                                                                      size_t issueCount, const char *topLevelDir)
 {
-    // Java: new File(topLevelDir, "crash-reports") + crashReport.saveToFile creates the parents
+// Java: new File(topLevelDir, "crash-reports") + crashReport.saveToFile creates the parents
     char reportsDir[512];
     snprintf(reportsDir, sizeof(reportsDir), "%s/crash-reports", topLevelDir);
     LIBMATTI_JNF_Files_CreateDirectories(reportsDir);
 
-    // Java: the file name carries the timestamp
+// Java: the file name carries the timestamp
     char timestamp[32];
     time_t now = time(NULL);
     struct tm *local = localtime(&now);
@@ -47,7 +48,7 @@ char *LIBMATTI_NEOFORGE_CrashReportExtender_DumpModLoadingCrashReport(const LIBM
         return NULL;
     }
 
-    // Java: CrashReport.forThrowable(new ModLoadingCrashException("Mod loading has failed"), "Mod loading failures have occurred; ...")
+// Java: CrashReport.forThrowable(new ModLoadingCrashException("Mod loading has failed"), "Mod loading failures have occurred; ...")
     fprintf(file, "---- Minecraft Crash Report ----\n");
     fprintf(file, "// Mod loading failures have occurred; consult the issue messages for more details\n\n");
     fprintf(file, "Time: %s\n", timestamp);
@@ -57,17 +58,17 @@ char *LIBMATTI_NEOFORGE_CrashReportExtender_DumpModLoadingCrashReport(const LIBM
     {
         const LIBMATTI_FML_ModLoadingIssue *issue = issues[i];
 
-        // Java: "Mod loading issue for: <modid>" or "Mod loading issue"
+// Java: "Mod loading issue for: <modid>" or "Mod loading issue"
         fprintf(file, "\n-- Mod loading issue --\n");
 
-        // Java: the failure message is the translated issue, control codes stripped
+// Java: the failure message is the translated issue, control codes stripped
         char *translated = LIBMATTI_FML_FMLTranslations_TranslateIssueEnglish(issue);
         char *stripped = LIBMATTI_FML_FMLTranslations_StripControlCodes(translated != NULL ? translated : issue->translationKey);
         write_detail(file, "Failure message", stripped);
         free(translated);
         free(stripped);
 
-        // Java: Failure message arg N on the translation fallback
+// Java: Failure message arg N on the translation fallback
         for (size_t a = 0; a < issue->translationArgCount; a++)
         {
             char name[32];
@@ -75,7 +76,7 @@ char *LIBMATTI_NEOFORGE_CrashReportExtender_DumpModLoadingCrashReport(const LIBM
             write_detail(file, name, issue->translationArgs[a]);
         }
 
-        // Java: Mod file / Mod version / Mod issues URL / Exception message
+// Java: Mod file / Mod version / Mod issues URL / Exception message
         if (issue->affectedPath != NULL)
             write_detail(file, "Mod file", issue->affectedPath);
         else
@@ -89,7 +90,7 @@ char *LIBMATTI_NEOFORGE_CrashReportExtender_DumpModLoadingCrashReport(const LIBM
 
     LIBMATTI_ML_Logger_Fatal(logger, NULL, "Crash report saved to {}", filePath);
 
-    // Java: Bootstrap.realStdoutPrintln(crashReport.getFriendlyReport(ReportType.CRASH))
+// Java: Bootstrap.realStdoutPrintln(crashReport.getFriendlyReport(ReportType.CRASH))
     char *contents = LIBMATTI_JNF_Files_ReadString(filePath);
     if (contents != NULL)
     {
@@ -98,6 +99,6 @@ char *LIBMATTI_NEOFORGE_CrashReportExtender_DumpModLoadingCrashReport(const LIBM
         free(contents);
     }
 
-    // Java: return file2
+// Java: return file2
     return strdup(filePath);
 }

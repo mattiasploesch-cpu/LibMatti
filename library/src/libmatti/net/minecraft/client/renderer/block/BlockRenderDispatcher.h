@@ -1,7 +1,8 @@
-// Port of net.minecraft.client.renderer.block.BlockRenderDispatcher - the
-// facade the section compiler and the item/entity renderers call: the model
-// shaper (the port's QuadCollection resolver), the ModelBlockRenderer with
-// BlockColors and the batched/single render entries.
+
+
+
+
+
 
 #ifndef MATTICRAFT_MC_CLIENT_RENDERER_BLOCK_BLOCKRENDERDISPATCHER_H
 #define MATTICRAFT_MC_CLIENT_RENDERER_BLOCK_BLOCKRENDERDISPATCHER_H
@@ -21,14 +22,14 @@ struct LIBMATTI_MC_QuadCollection;
 // Java: public class BlockRenderDispatcher
 typedef struct LIBMATTI_MC_BlockRenderDispatcher
 {
-    // Java: private final BlockColors blockColors (the renderer owns them)
+// Java: private final BlockColors blockColors (the renderer owns them)
     struct LIBMATTI_MC_BlockColors *blockColors;
-    // Java: private final ModelBlockRenderer modelRenderer
+// Java: private final ModelBlockRenderer modelRenderer
     LIBMATTI_MC_ModelBlockRenderer *modelRenderer;
-    // Java: useAmbientOcclusion() - the Minecraft options flag; the dispatcher
+// Java: useAmbientOcclusion() - the Minecraft options flag; the dispatcher
     // carries it because the C port has no global options object yet.
     int ambientOcclusion;
-    // The game layer's model resolver (Java: BlockModelShaper.getBlockModel);
+// The game layer's model resolver (Java: BlockModelShaper.getBlockModel);
     // NULL keeps the hardcoded cube path.
     const struct LIBMATTI_MC_QuadCollection *(*modelForBlock)(void *userdata, const struct LIBMATTI_MC_Block *block);
     void *modelUserdata;
@@ -68,4 +69,4 @@ void LIBMATTI_MC_BlockRenderDispatcher_RenderBatched(
 }
 #endif
 
-#endif //MATTICRAFT_MC_CLIENT_RENDERER_BLOCK_BLOCKRENDERDISPATCHER_H
+#endif

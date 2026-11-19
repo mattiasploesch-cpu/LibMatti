@@ -1,14 +1,15 @@
-// Vulkan renderer backend: GLFW window without a GL context (GLFW_NO_API) and
-// a complete Vulkan presentation path.
-//
-// The common renderer owns a CPU framebuffer; this backend uploads it into a
-// device-local texture and blits that texture onto every swapchain image. All
-// swapchain images are usable: the backend tracks their layouts, uses one
-// "render finished" semaphore per image and several frames in flight (each with
-// its own staging buffer, texture, command buffer, semaphore and fence). The
-// swapchain is recreated on resize, on VK_ERROR_OUT_OF_DATE_KHR and on
-// VK_SUBOPTIMAL_KHR; minimized windows simply skip presentation until they are
-// visible again.
+
+
+
+
+
+
+
+
+
+
+
+
 
 #include "libmatti/matti/render/render_internal.h"
 
@@ -35,8 +36,9 @@ typedef struct LIBMATTI_VulkanFrame
     void *staging_mapped;
     VkDeviceSize staging_capacity;
 
-    // Every frame owns its texture: frame N+1 may overwrite its staging and
-    // texture while frame N still samples the previous one.
+
+
+
     VkImage texture;
     VkDeviceMemory texture_memory;
     VkImageLayout texture_layout;
@@ -164,9 +166,10 @@ static int find_queue_family(VkPhysicalDevice device, VkSurfaceKHR surface, uint
     return found;
 }
 
-// Picks a 32-bit format that can be blitted in both directions (texture source,
-// swapchain destination) and prefers non-sRGB so the 0xAARRGGBB bytes keep
-// their exact values on screen.
+
+
+
+
 static int choose_surface_format(VkPhysicalDevice device, VkSurfaceKHR surface,
                                  VkFormat *out_format, VkColorSpaceKHR *out_color_space,
                                  int *out_is_bgr)
@@ -197,8 +200,9 @@ static int choose_surface_format(VkPhysicalDevice device, VkSurfaceKHR surface,
                                && !found;
          preference++)
     {
-        // Prefer the non-linear sRGB color space first, then any color space
-        // the surface offers for this format.
+
+
+
         for (int pass = 0; pass < 2 && !found; pass++)
         {
             for (uint32_t i = 0; i < count && !found; i++)
@@ -258,7 +262,8 @@ static VkPresentModeKHR choose_present_mode(VkPhysicalDevice device, VkSurfaceKH
             }
         }
     }
-    // FIFO is the only mode every implementation is required to support.
+
+
     return VK_PRESENT_MODE_FIFO_KHR;
 }
 
@@ -324,8 +329,9 @@ static int ensure_frame_texture(LIBMATTI_VulkanBackend *backend, LIBMATTI_Vulkan
         && frame->texture_width == width && frame->texture_height == height)
         return 1;
 
-    // The caller has already waited for this frame's fence, so the old texture
-    // is no longer in use by this frame. Other frames own their own textures.
+
+
+
     if (frame->texture != VK_NULL_HANDLE)
         vkDestroyImage(backend->device, frame->texture, NULL);
     if (frame->texture_memory != VK_NULL_HANDLE)
@@ -617,13 +623,15 @@ static int recreate_swapchain(LIBMATTI_VulkanBackend *backend, int width, int he
     if (backend->device == VK_NULL_HANDLE)
         return 0;
 
-    // All images, semaphores and in-flight submissions belong to the old
-    // swapchain. Waiting for the device keeps the recreation path simple and
-    // destroys nothing that a queue still uses.
+
+
+
+
     vkDeviceWaitIdle(backend->device);
     destroy_swapchain_resources(backend);
     if (width <= 0 || height <= 0)
-        return 1; // minimized; the next present retries
+        return 1;
+
     return create_swapchain(backend, width, height);
 }
 
@@ -848,9 +856,10 @@ static int create_window(LIBMATTI_Renderer *renderer, LIBMATTI_VulkanBackend *ba
                                 renderer->config.fullscreen ? LIBMATTI_GLFW_FALSE
                                                             : LIBMATTI_GLFW_TRUE);
 
-    // Fullscreen is a borderless window at the current desktop mode, not a
-    // monitor mode change: a real fullscreen window would switch the monitor
-    // (and Sunshine captures that tiny mode as the host resolution).
+
+
+
+
     int window_width = renderer->width;
     int window_height = renderer->height;
     int monitor_x = 0, monitor_y = 0;
@@ -1066,8 +1075,9 @@ static void copy_pixels_to_staging(const LIBMATTI_VulkanBackend *backend,
         uint32_t *destination_row = destination + (size_t) y * (size_t) width;
         if (backend->format_is_bgr)
         {
-            // 0xAARRGGBB in little-endian memory is B,G,R,A, which is exactly
-            // VK_FORMAT_B8G8R8A8.
+
+
+
             memcpy(destination_row, source_row, (size_t) width * sizeof(uint32_t));
             continue;
         }
@@ -1099,7 +1109,8 @@ static int record_frame(LIBMATTI_VulkanBackend *backend, LIBMATTI_VulkanFrame *f
     range.baseArrayLayer = 0;
     range.layerCount = 1;
 
-    // Texture -> TRANSFER_DST.
+
+
     VkImageMemoryBarrier barrier = {0};
     barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
     barrier.oldLayout = frame->texture_layout;
@@ -1135,7 +1146,8 @@ static int record_frame(LIBMATTI_VulkanBackend *backend, LIBMATTI_VulkanFrame *f
     vkCmdCopyBufferToImage(frame->command, frame->staging, frame->texture,
                            VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &copy);
 
-    // Texture -> TRANSFER_SRC for the blit.
+
+
     barrier.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
     barrier.newLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
     barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
@@ -1143,7 +1155,8 @@ static int record_frame(LIBMATTI_VulkanBackend *backend, LIBMATTI_VulkanFrame *f
     vkCmdPipelineBarrier(frame->command, VK_PIPELINE_STAGE_TRANSFER_BIT,
                          VK_PIPELINE_STAGE_TRANSFER_BIT, 0, 0, NULL, 0, NULL, 1, &barrier);
 
-    // Swapchain image -> TRANSFER_DST.
+
+
     barrier.oldLayout = backend->layouts[image_index];
     barrier.newLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
     barrier.image = backend->images[image_index];
@@ -1177,7 +1190,8 @@ static int record_frame(LIBMATTI_VulkanBackend *backend, LIBMATTI_VulkanFrame *f
                    backend->images[image_index], VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &blit,
                    VK_FILTER_NEAREST);
 
-    // Swapchain image -> PRESENT_SRC.
+
+
     barrier.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
     barrier.newLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
     barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
@@ -1198,7 +1212,8 @@ static void vulkan_present(LIBMATTI_Renderer *renderer)
     int window_width = 0, window_height = 0;
     LIBMATTI_GLFW_glfwGetFramebufferSize(backend->window, &window_width, &window_height);
     if (window_width <= 0 || window_height <= 0)
-        return; // minimized
+        return;
+
 
     if (backend->swapchain == VK_NULL_HANDLE || backend->need_recreate
         || (uint32_t) window_width != backend->extent.width
@@ -1243,9 +1258,10 @@ static void vulkan_present(LIBMATTI_Renderer *renderer)
     if (acquire == VK_SUBOPTIMAL_KHR)
         backend->need_recreate = 1;
 
-    // The image can still be referenced by an older frame even though the
-    // presentation engine handed it back. Wait for that submission before
-    // recording new commands into the image.
+
+
+
+
     if (backend->image_in_flight[image_index] != VK_NULL_HANDLE)
     {
         if (vkWaitForFences(backend->device, 1, &backend->image_in_flight[image_index], VK_TRUE,
@@ -1364,7 +1380,8 @@ const LIBMATTI_RenderBackendOps *LIBMATTI_Render_VulkanOps(void)
     return &ops;
 }
 
-#else // MATTI_HAVE_VULKAN
+#else
+
 
 static int vulkan_is_available(void)
 {
@@ -1473,4 +1490,4 @@ const LIBMATTI_RenderBackendOps *LIBMATTI_Render_VulkanOps(void)
     return &ops;
 }
 
-#endif // MATTI_HAVE_VULKAN
+#endif

@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.loading.moddiscovery.IncompatibleModReason.
+
+
 
 #ifndef MATTICRAFT_FML_LOADING_MODDISCOVERY_INCOMPATIBLEMODREASON_H
 #define MATTICRAFT_FML_LOADING_MODDISCOVERY_INCOMPATIBLEMODREASON_H
@@ -24,4 +25,4 @@ char *LIBMATTI_FML_IncompatibleModReason_GetReason(LIBMATTI_FML_IncompatibleModR
 int LIBMATTI_FML_IncompatibleModReason_Detect(const LIBMATTI_FML_JarContents *jar,
                                               LIBMATTI_FML_IncompatibleModReason *out);
 
-#endif //MATTICRAFT_FML_LOADING_MODDISCOVERY_INCOMPATIBLEMODREASON_H
+#endif

@@ -4,7 +4,8 @@
 
 #include <stdlib.h>
 
-// The set is a HashMap<E,Object> with a shared dummy value, exactly like Java's impl.
+
+
 static int PRESENT_DUMMY;
 
 struct LIBMATTI_JU_HashSet
@@ -52,7 +53,7 @@ int LIBMATTI_JU_HashSet_IsEmpty(const LIBMATTI_JU_HashSet *set)
 
 int LIBMATTI_JU_HashSet_Add(LIBMATTI_JU_HashSet *set, const char *item)
 {
-    // Java: map.put(e, PRESENT) == null
+// Java: map.put(e, PRESENT) == null
     return LIBMATTI_JU_HashMap_Put(set->map, item, &PRESENT_DUMMY) == NULL;
 }
 

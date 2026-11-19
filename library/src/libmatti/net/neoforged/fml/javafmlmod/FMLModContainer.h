@@ -19,7 +19,8 @@
 
 typedef struct LIBMATTI_FML_FMLModContainer LIBMATTI_FML_FMLModContainer;
 
-// Port-only: the mod's code as a loaded shared object (net/neoforged/fml/loading/ModLibrary.h).
+
+
 typedef struct LIBMATTI_FML_ModLibrary LIBMATTI_FML_ModLibrary;
 
 // Java: Map<Class<?>, Object> allowedConstructorArgs = Map.of(IEventBus.class, eventBus,
@@ -45,10 +46,10 @@ typedef struct
 typedef struct
 {
     char *className;
-    // Java: constructor.getParameterTypes()
+// Java: constructor.getParameterTypes()
     LIBMATTI_FML_FMLModContainer_Arg *args;
     size_t argCount;
-    // Java: constructor.newInstance(constructorArgs)
+// Java: constructor.newInstance(constructorArgs)
     void (*construct)(void *self, LIBMATTI_FML_FMLModContainer *container,
                       const LIBMATTI_FML_FMLModContainer_ConstructorArgs *args);
     void *self;
@@ -57,21 +58,21 @@ typedef struct
 // Java: public class FMLModContainer extends ModContainer
 struct LIBMATTI_FML_FMLModContainer
 {
-    // Java: extends ModContainer
+// Java: extends ModContainer
     LIBMATTI_FML_ModContainer base;
 
-    // Java: private final ModFileScanData scanResults
+// Java: private final ModFileScanData scanResults
     LIBMATTI_NEOFORGESPI_ModFileScanData *scanResults;
-    // Java: private final IEventBus eventBus
+// Java: private final IEventBus eventBus
     LIBMATTI_BUS_IEventBus *eventBus;
-    // Java: private final List<Class<?>> modClasses
+// Java: private final List<Class<?>> modClasses
     char **entrypoints;
     size_t entrypointCount;
     LIBMATTI_FML_FMLModContainer_ModClass *modClasses;
     size_t modClassCount;
-    // Java: private final Module layer - the port keeps the module's name
+// Java: private final Module layer - the port keeps the module's name
     char *layer;
-    // Java: Class.forName(layer, entrypoint) defines the mod's classes; the port loads the mod file's
+// Java: Class.forName(layer, entrypoint) defines the mod's classes; the port loads the mod file's
     // shared object instead. NULL when the mod file carries no code.
     LIBMATTI_FML_ModLibrary *library;
 };
@@ -94,4 +95,4 @@ void LIBMATTI_FML_FMLModContainer_RegisterModClass(
 // Java: public IEventBus getEventBus()
 LIBMATTI_BUS_IEventBus *LIBMATTI_FML_FMLModContainer_GetEventBus(LIBMATTI_FML_FMLModContainer *container);
 
-#endif //MATTICRAFT_FML_JAVAFMLMOD_FMLMODCONTAINER_H
+#endif

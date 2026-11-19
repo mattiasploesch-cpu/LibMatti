@@ -39,7 +39,7 @@ char *LIBMATTI_FML_FMLTranslations_StripControlCodes(const char *text)
 
     for (size_t i = 0; i < length; i++)
     {
-        // Java: \u00A7 is the section sign, UTF-8 encoded as C2 A7
+// Java: \u00A7 is the section sign, UTF-8 encoded as C2 A7
         if (i + 2 < length && (unsigned char) text[i] == 0xC2 && (unsigned char) text[i + 1] == 0xA7
             && is_control_code_char(text[i + 2]))
         {
@@ -57,7 +57,7 @@ char *LIBMATTI_FML_FMLTranslations_StripControlCodes(const char *text)
 // Java: public static String getPattern(String patternName, Supplier<String> fallback)
 char *LIBMATTI_FML_FMLTranslations_GetPattern(const char *patternName, const char *fallback)
 {
-    // Java: var translated = I18nManager.currentLocale.get(patternName); return translated == null ? fallback.get() : translated;
+// Java: var translated = I18nManager.currentLocale.get(patternName); return translated == null ? fallback.get() : translated;
     const char *translated = LIBMATTI_FML_I18nManager_Get(LIBMATTI_FML_I18nManager_CurrentLocale(), patternName);
     return strdup(translated != NULL ? translated : fallback);
 }
@@ -65,7 +65,7 @@ char *LIBMATTI_FML_FMLTranslations_GetPattern(const char *patternName, const cha
 // Java: public static String parseFormat(String format, Object... args)
 char *LIBMATTI_FML_FMLTranslations_ParseFormat(const char *format, const char **args, size_t argCount)
 {
-    // Java: format = FORMAT_PATTERN.matcher(format).replaceAll(...) (Mojang %s -> Apache {0});
+// Java: format = FORMAT_PATTERN.matcher(format).replaceAll(...) (Mojang %s -> Apache {0});
     //       return new ExtendedMessageFormat(format, CUSTOM_FACTORIES).format(args);
     // the port converts %s/%d runs into {n} and formats through MessageFormat
     char *converted = malloc(strlen(format) * 2 + 16);
@@ -94,7 +94,7 @@ char *LIBMATTI_FML_FMLTranslations_ParseFormat(const char *format, const char **
 char *LIBMATTI_FML_FMLTranslations_ParseMessageWithFallback(const char *i18nMessage, const char *fallback,
                                                             const char **args, size_t argCount)
 {
-    // Java: String pattern = getPattern(i18nMessage, fallback);
+// Java: String pattern = getPattern(i18nMessage, fallback);
     char *pattern = LIBMATTI_FML_FMLTranslations_GetPattern(i18nMessage, fallback);
     char *result = LIBMATTI_FML_FMLTranslations_ParseFormat(pattern, args, argCount);
     free(pattern);
@@ -104,14 +104,14 @@ char *LIBMATTI_FML_FMLTranslations_ParseMessageWithFallback(const char *i18nMess
 // Java: public static String parseMessage(String i18nMessage, Object... args)
 char *LIBMATTI_FML_FMLTranslations_ParseMessage(const char *i18nMessage, const char **args, size_t argCount)
 {
-    // Java: return parseMessageWithFallback(i18nMessage, () -> i18nMessage, args);
+// Java: return parseMessageWithFallback(i18nMessage, () -> i18nMessage, args);
     return LIBMATTI_FML_FMLTranslations_ParseMessageWithFallback(i18nMessage, i18nMessage, args, argCount);
 }
 
 // Java: public static String parseEnglishMessage(String i18n, Object... args)
 char *LIBMATTI_FML_FMLTranslations_ParseEnglishMessage(const char *i18n, const char **args, size_t argCount)
 {
-    // Java: var translated = I18nManager.DEFAULT_TRANSLATIONS.getOrDefault(i18n, i18n);
+// Java: var translated = I18nManager.DEFAULT_TRANSLATIONS.getOrDefault(i18n, i18n);
     const char *translated = LIBMATTI_FML_I18nManager_Get(LIBMATTI_FML_I18nManager_DefaultTranslations(), i18n);
     char *pattern = strdup(translated != NULL ? translated : i18n);
     char *result = LIBMATTI_FML_FMLTranslations_ParseFormat(pattern, args, argCount);
@@ -122,22 +122,22 @@ char *LIBMATTI_FML_FMLTranslations_ParseEnglishMessage(const char *i18n, const c
 // Java: private static Object[] getTranslationArgs(ModLoadingIssue issue)
 char **LIBMATTI_FML_FMLTranslations_GetTranslationArgs(const LIBMATTI_FML_ModLoadingIssue *issue, size_t *count)
 {
-    // Java: var args = new ArrayList<>(103); args.addAll(issue.translationArgs());
+// Java: var args = new ArrayList<>(103); args.addAll(issue.translationArgs());
     *count = 103;
     char **args = calloc(103, sizeof(*args));
 
     for (size_t i = 0; i < issue->translationArgCount && i < 100; i++)
         args[i] = issue->translationArgs[i] != NULL ? strdup(issue->translationArgs[i]) : NULL;
 
-    // Java: args.add(getModInfo(issue));            // {100} = affected mod
+// Java: args.add(getModInfo(issue));            // {100} = affected mod
     if (issue->affectedMod != NULL)
         args[100] = strdup(LIBMATTI_NEOFORGESPI_IModInfo_GetModId(issue->affectedMod));
 
-    // Java: args.add(getAffectedPath(issue));       // {101} = affected file-path
+// Java: args.add(getAffectedPath(issue));       // {101} = affected file-path
     if (issue->affectedPath != NULL)
         args[101] = strdup(issue->affectedPath);
 
-    // Java: args.add(issue.cause());                // {102} = exception
+// Java: args.add(issue.cause());                // {102} = exception
     if (issue->cause != NULL)
         args[102] = strdup(LIBMATTI_JL_Throwable_GetMessage(issue->cause));
 
@@ -147,7 +147,7 @@ char **LIBMATTI_FML_FMLTranslations_GetTranslationArgs(const LIBMATTI_FML_ModLoa
 // Java: private static Object formatArg(Object arg)
 char *LIBMATTI_FML_FMLTranslations_FormatArg(const char *arg)
 {
-    // Java: if (arg instanceof IModFile modFile) return PathPrettyPrinting.prettyPrint(modFile.getFilePath());
+// Java: if (arg instanceof IModFile modFile) return PathPrettyPrinting.prettyPrint(modFile.getFilePath());
     //       else if (arg instanceof Path path) return PathPrettyPrinting.prettyPrint(path);
     //       else return arg;
     // The port carries no type tags on the arg strings; pretty printing applies to
@@ -164,7 +164,7 @@ char *LIBMATTI_FML_FMLTranslations_FormatArg(const char *arg)
 // Java: public static String translateIssueEnglish(ModLoadingIssue issue)
 char *LIBMATTI_FML_FMLTranslations_TranslateIssueEnglish(const LIBMATTI_FML_ModLoadingIssue *issue)
 {
-    // Java: var args = getTranslationArgs(issue); return parseEnglishMessage(issue.translationKey(), args);
+// Java: var args = getTranslationArgs(issue); return parseEnglishMessage(issue.translationKey(), args);
     size_t argCount = 0;
     char **args = LIBMATTI_FML_FMLTranslations_GetTranslationArgs(issue, &argCount);
 
@@ -180,7 +180,7 @@ char *LIBMATTI_FML_FMLTranslations_TranslateIssueEnglish(const LIBMATTI_FML_ModL
 // Java: public static String translateIssue(ModLoadingIssue issue)
 char *LIBMATTI_FML_FMLTranslations_TranslateIssue(const LIBMATTI_FML_ModLoadingIssue *issue)
 {
-    // Java: var args = getTranslationArgs(issue); return parseMessage(issue.translationKey(), args);
+// Java: var args = getTranslationArgs(issue); return parseMessage(issue.translationKey(), args);
     size_t argCount = 0;
     char **args = LIBMATTI_FML_FMLTranslations_GetTranslationArgs(issue, &argCount);
 
@@ -197,7 +197,7 @@ char *LIBMATTI_FML_FMLTranslations_TranslateIssue(const LIBMATTI_FML_ModLoadingI
 void LIBMATTI_FML_FMLTranslations_FormatException(LIBMATTI_JL_StringBuilder *stringBuffer, LIBMATTI_JL_Throwable *t,
                                                   const char *args)
 {
-    // Java: if (Objects.equals(args, "msg")) stringBuffer.append(t.getClass().getName()).append(": ").append(t.getMessage());
+// Java: if (Objects.equals(args, "msg")) stringBuffer.append(t.getClass().getName()).append(": ").append(t.getMessage());
     if (args != NULL && strcmp(args, "msg") == 0)
     {
         LIBMATTI_JL_StringBuilder_Append(stringBuffer, LIBMATTI_JL_Throwable_GetName(t));
@@ -206,7 +206,7 @@ void LIBMATTI_FML_FMLTranslations_FormatException(LIBMATTI_JL_StringBuilder *str
         return;
     }
 
-    // Java: else if (Objects.equals(args, "cls")) stringBuffer.append(t.getClass().getName());
+// Java: else if (Objects.equals(args, "cls")) stringBuffer.append(t.getClass().getName());
     if (args != NULL && strcmp(args, "cls") == 0)
     {
         LIBMATTI_JL_StringBuilder_Append(stringBuffer, LIBMATTI_JL_Throwable_GetName(t));
@@ -217,7 +217,7 @@ void LIBMATTI_FML_FMLTranslations_FormatException(LIBMATTI_JL_StringBuilder *str
 void LIBMATTI_FML_FMLTranslations_FormatOrNull(LIBMATTI_JL_StringBuilder *stringBuffer, const char *value,
                                                const char *args)
 {
-    // Java: stringBuffer.append(Objects.equals(String.valueOf(o), "null") ? parseMessage(args) : String.valueOf(o));
+// Java: stringBuffer.append(Objects.equals(String.valueOf(o), "null") ? parseMessage(args) : String.valueOf(o));
     if (value == NULL || strcmp(value, "null") == 0)
     {
         char *replacement = LIBMATTI_FML_FMLTranslations_ParseMessage(args, NULL, 0);
@@ -233,7 +233,7 @@ void LIBMATTI_FML_FMLTranslations_FormatOrNull(LIBMATTI_JL_StringBuilder *string
 void LIBMATTI_FML_FMLTranslations_FormatOptional(LIBMATTI_JL_StringBuilder *stringBuffer, const char *value,
                                                  const char *args)
 {
-    // Java: args = Objects.requireNonNullElse(args, ""); if (value.isPresent()) stringBuffer.append(args).append(value.get());
+// Java: args = Objects.requireNonNullElse(args, ""); if (value.isPresent()) stringBuffer.append(args).append(value.get());
     const char *prefix = args != NULL ? args : "";
     if (value == NULL) return;
 

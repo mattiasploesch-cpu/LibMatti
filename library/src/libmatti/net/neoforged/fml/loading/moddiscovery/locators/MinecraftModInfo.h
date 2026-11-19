@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.loading.moddiscovery.locators.MinecraftModInfo.
+
+
 
 #ifndef MATTICRAFT_FML_LOADING_MODDISCOVERY_LOCATORS_MINECRAFTMODINFO_H
 #define MATTICRAFT_FML_LOADING_MODDISCOVERY_LOCATORS_MINECRAFTMODINFO_H
@@ -11,7 +12,7 @@ typedef struct LIBMATTI_FML_MinecraftModInfo LIBMATTI_FML_MinecraftModInfo;
 
 struct LIBMATTI_FML_MinecraftModInfo
 {
-    // Java: var conf = Config.inMemory()
+// Java: var conf = Config.inMemory()
     LIBMATTI_NC_Config *config;
     char *minecraftVersion;
 };
@@ -23,4 +24,4 @@ LIBMATTI_FML_MinecraftModInfo *LIBMATTI_FML_MinecraftModInfo_New(const char *min
 LIBMATTI_NEOFORGESPI_IModFileInfo *LIBMATTI_FML_MinecraftModInfo_BuildMinecraftModInfo(void *iModFile,
                                                                                       void *userdata);
 
-#endif //MATTICRAFT_FML_LOADING_MODDISCOVERY_LOCATORS_MINECRAFTMODINFO_H
+#endif

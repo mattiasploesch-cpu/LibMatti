@@ -1,9 +1,10 @@
-// Port of net.minecraft.client.renderer.chunk.SectionCompiler (implementation).
-//
-// Java walks the section's blocks, renders every non-air one into the
-// per-layer buffers (faces culled against the region neighbours, which include
-// the one-block border from the adjacent sections) and feeds the occluding
-// blocks into the VisGraph for the face-visibility set.
+
+
+
+
+
+
+
 
 #include "libmatti/net/minecraft/client/renderer/chunk/SectionCompiler.h"
 
@@ -34,7 +35,7 @@ typedef struct CompileState
     const LIBMATTI_MC_RenderSectionRegion *region;
     LIBMATTI_MC_SectionBufferBuilderPack *pack;
     LIBMATTI_MC_VisGraph *visGraph;
-    // Java: getOrBeginLayer - one builder per layer over the pack's shared
+// Java: getOrBeginLayer - one builder per layer over the pack's shared
     // ByteBufferBuilder, begun once and built once per layer.
     LIBMATTI_B3D_BufferBuilder *builders[LIBMATTI_MC_ChunkSectionLayer_COUNT];
     LIBMATTI_B3D_MeshData *meshes[LIBMATTI_MC_ChunkSectionLayer_COUNT];
@@ -87,16 +88,16 @@ static void emit_baked_quad(CompileState *state, LIBMATTI_B3D_BufferBuilder *bui
         float x = quad->pos[corner][0] + (float) blockX;
         float y = quad->pos[corner][1] + (float) blockY;
         float z = quad->pos[corner][2] + (float) blockZ;
-        // Java: the model UVs sit in the sprite's 0..1 space; the atlas rect
+// Java: the model UVs sit in the sprite's 0..1 space; the atlas rect
         // maps them in (the vanilla quads bake sprite-relative UVs).
         float u = spriteUv[0] + quad->uv[corner][0] * (spriteUv[2] - spriteUv[0]);
         float v = spriteUv[1] + quad->uv[corner][1] * (spriteUv[3] - spriteUv[1]);
         LIBMATTI_B3D_BufferBuilder_AddVertexFull(
             builder,
             x, y, z,
-            -1, // Java: the untinted white color
+            -1,// Java: the untinted white color
             u, v,
-            0, quad->shade ? 0 : 0, // Java: the lightmap pass rides on the game port
+            0, quad->shade ? 0 : 0,// Java: the lightmap pass rides on the game port
             (float) LIBMATTI_MC_Direction_GetStepX(quad->direction),
             (float) LIBMATTI_MC_Direction_GetStepY(quad->direction),
             (float) LIBMATTI_MC_Direction_GetStepZ(quad->direction));
@@ -120,7 +121,7 @@ static void batch_sink(void *userdata, int corner, const float vertexPos[3],
     BatchSinkState *sinkState = userdata;
     float u = sinkState->spriteUv[0] + quad->uv[corner][0] * (sinkState->spriteUv[2] - sinkState->spriteUv[0]);
     float v = sinkState->spriteUv[1] + quad->uv[corner][1] * (sinkState->spriteUv[3] - sinkState->spriteUv[1]);
-    // Java: the ARGB vertex color - alpha 255, the channels as bytes
+// Java: the ARGB vertex color - alpha 255, the channels as bytes
     int color = 0xFF000000 | ((int) (b * 255.0f) & 0xFF) << 16 | ((int) (g * 255.0f) & 0xFF) << 8 | ((int) (r * 255.0f) & 0xFF);
     LIBMATTI_B3D_BufferBuilder_AddVertexFull(
         sinkState->builder,
@@ -160,7 +161,7 @@ static void render_model_quads(CompileState *state, const LIBMATTI_MC_QuadCollec
     if (builder == NULL)
         return;
 
-    // Java: this.blockRenderer.renderBatched(blockstate, blockpos2, region,
+// Java: this.blockRenderer.renderBatched(blockstate, blockpos2, region,
     // posestack, bufferbuilder1, true, list) - the AO path folds the
     // brightness into the vertex color; the sink packs the corners.
     if (state->compiler->blockRenderer != NULL)
@@ -175,7 +176,7 @@ static void render_model_quads(CompileState *state, const LIBMATTI_MC_QuadCollec
         return;
     }
 
-    // The flat fallback (no dispatcher wired): the untinted emit.
+// The flat fallback (no dispatcher wired): the untinted emit.
     // Java: getUnculledFaces() first, then every cull bucket whose face passes
     // the region visibility gate.
     size_t count = 0;
@@ -203,14 +204,14 @@ static void render_block_faces(CompileState *state, const LIBMATTI_MC_BlockState
 {
     const LIBMATTI_MC_Block *block = LIBMATTI_MC_BlockState_GetBlock(blockState);
 
-    // Java: the layer the block renders into - the port maps occluding blocks
+// Java: the layer the block renders into - the port maps occluding blocks
     // to SOLID and everything else to CUTOUT until the JSON models carry the
     // render-type rules (the P4.2 part).
     LIBMATTI_MC_ChunkSectionLayer layer = LIBMATTI_MC_ChunkSectionLayer_SOLID;
     if (!state_can_occlude(blockState))
         layer = LIBMATTI_MC_ChunkSectionLayer_CUTOUT;
 
-    // Java: getOrBeginLayer - lazily begin the builder over the pack buffer.
+// Java: getOrBeginLayer - lazily begin the builder over the pack buffer.
     LIBMATTI_B3D_BufferBuilder *builder = state->builders[layer];
     if (builder == NULL)
     {
@@ -226,7 +227,7 @@ static void render_block_faces(CompileState *state, const LIBMATTI_MC_BlockState
     if (state->compiler->spriteRectForBlock != NULL)
         state->compiler->spriteRectForBlock(state->compiler->userdata, block, spriteUv);
 
-    // Java: the baked block-model quads (ModelManager) replace the hardcoded
+// Java: the baked block-model quads (ModelManager) replace the hardcoded
     // cube when the block carries a model. The unculled quads + the per-
     // direction culled buckets map onto the same face-visibility gate.
     const LIBMATTI_MC_QuadCollection *model = NULL;
@@ -253,7 +254,7 @@ static void render_block_faces(CompileState *state, const LIBMATTI_MC_BlockState
             LIBMATTI_B3D_BufferBuilder_AddVertexFull(
                 builder,
                 quad.pos[corner][0], quad.pos[corner][1], quad.pos[corner][2],
-                -1, // Java: the untinted white color (-1 = 0xFFFFFFFF)
+                -1,// Java: the untinted white color (-1 = 0xFFFFFFFF)
                 quad.uv[corner][0], quad.uv[corner][1],
                 0, quad.light,
                 (float) LIBMATTI_MC_Direction_GetStepX(direction),
@@ -268,7 +269,7 @@ static void render_block_faces(CompileState *state, const LIBMATTI_MC_BlockState
 static void extract_geometry(CompileState *state)
 {
     const LIBMATTI_MC_RenderSectionRegion *region = state->region;
-    // Java: region.sections[SECTION_SIZE/2] - the center section of the 18^3
+// Java: region.sections[SECTION_SIZE/2] - the center section of the 18^3
     // window (region-relative 1, 1, 1).
     const int centerIndex =
         LIBMATTI_MC_RenderSectionRegion_CENTER_OFFSET * LIBMATTI_MC_RenderSectionRegion_SIZE * LIBMATTI_MC_RenderSectionRegion_SIZE
@@ -278,7 +279,7 @@ static void extract_geometry(CompileState *state)
     if (section == NULL)
         return;
 
-    // Java: SectionPos.origin() - the section's first block corner.
+// Java: SectionPos.origin() - the section's first block corner.
     int originX = region->centerX << 4;
     int originY = region->centerY << 4;
     int originZ = region->centerZ << 4;
@@ -296,7 +297,7 @@ static void extract_geometry(CompileState *state)
 
                 if (state_can_occlude(blockState))
                 {
-                    // Java: VisGraph positions are section-relative.
+// Java: VisGraph positions are section-relative.
                     LIBMATTI_MC_BlockPos visPos = {{bx, by, bz}};
                     LIBMATTI_MC_VisGraph_SetOpaque(state->visGraph, &visPos);
                 }
@@ -338,7 +339,7 @@ LIBMATTI_MC_CompiledSectionMesh *LIBMATTI_MC_SectionCompiler_Compile(
 
     extract_geometry(&state);
 
-    // Java: the end of the walk builds every begun layer's mesh.
+// Java: the end of the walk builds every begun layer's mesh.
     for (int layer = 0; layer < LIBMATTI_MC_ChunkSectionLayer_COUNT; layer++)
     {
         if (state.builders[layer] == NULL)
@@ -348,18 +349,18 @@ LIBMATTI_MC_CompiledSectionMesh *LIBMATTI_MC_SectionCompiler_Compile(
         state.builders[layer] = NULL;
     }
 
-    // Java: visgraph.resolve() - an empty graph answers the all-visible set.
+// Java: visgraph.resolve() - an empty graph answers the all-visible set.
     LIBMATTI_MC_VisibilitySet *visibility = LIBMATTI_MC_VisGraph_Resolve(state.visGraph);
     LIBMATTI_MC_VisGraph_Free(state.visGraph);
 
-    // Java: the finished per-layer vertex data becomes the mesh's
+// Java: the finished per-layer vertex data becomes the mesh's
     // SectionBuffers; nothing rendered means the NULL mesh.
     int any = 0;
     for (int layer = 0; layer < LIBMATTI_MC_ChunkSectionLayer_COUNT; layer++)
         any |= state.meshes[layer] != NULL;
     if (!any)
     {
-        // Java: the resolved visibility dies with the empty mesh.
+// Java: the resolved visibility dies with the empty mesh.
         free(visibility);
         return NULL;
     }
@@ -386,11 +387,11 @@ LIBMATTI_MC_CompiledSectionMesh *LIBMATTI_MC_SectionCompiler_Compile(
                     fv[0], fv[1], fv[2], fv[8], fv[9], fv[10],
                     LIBMATTI_B3D_VertexFormat_GetVertexSize(LIBMATTI_B3D_DefaultVertexFormat_BLOCK()));
         }
-        // Java: the buffers carry the draw count - mode.indexCount(vertices)
+// Java: the buffers carry the draw count - mode.indexCount(vertices)
         // turns the quad vertices into the 6-per-quad element count.
         int indexCount = vertexCount / 4 * 6;
 
-        // Java: GlDevice.createBuffers with the store's byte size - the GL
+// Java: GlDevice.createBuffers with the store's byte size - the GL
         // store is sized for the whole upload up front, the later BufferData
         // only refills it.
         LIBMATTI_B3D_GpuBuffer *vertexBuffer = LIBMATTI_B3D_GlBuffer_New(

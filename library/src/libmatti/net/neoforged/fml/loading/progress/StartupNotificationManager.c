@@ -16,7 +16,7 @@ static void add_message(LIBMATTI_FML_Message_MessageType type, const char *messa
 {
     LIBMATTI_FML_Message *entry = LIBMATTI_FML_Message_New(message, type);
 
-    // Java: var newList = new ArrayList<Message>(); ... newList.add(new Message(message, type));
+// Java: var newList = new ArrayList<Message>(); ... newList.add(new Message(message, type));
     if (maxSize < 0 || (size_t) maxSize >= messageCounts[type])
     {
         messages[type] = realloc(messages[type], sizeof(*messages[type]) * (messageCounts[type] + 1));
@@ -24,7 +24,7 @@ static void add_message(LIBMATTI_FML_Message_MessageType type, const char *messa
         return;
     }
 
-    // Java: newList.addAll(existingList.subList(0, Math.min(existingList.size(), maxSize)));
+// Java: newList.addAll(existingList.subList(0, Math.min(existingList.size(), maxSize)));
     size_t kept = (size_t) maxSize;
     LIBMATTI_FML_Message **newList = malloc(sizeof(*newList) * (kept + 1));
     for (size_t i = 0; i < kept; i++)
@@ -73,7 +73,7 @@ static char *ascii_truncate(const char *value, size_t maxLength, const char *tru
 // Java: public static List<ProgressMeter> getCurrentProgress()
 LIBMATTI_FML_ProgressMeter **LIBMATTI_FML_StartupNotificationManager_GetCurrentProgress(size_t *count)
 {
-    // Java: synchronized (progressMeters) { return progressMeters.stream().toList(); }
+// Java: synchronized (progressMeters) { return progressMeters.stream().toList(); }
     *count = progressMeterCount;
     return progressMeters;
 }
@@ -84,7 +84,7 @@ LIBMATTI_FML_ProgressMeter *LIBMATTI_FML_StartupNotificationManager_PrependProgr
     LIBMATTI_FML_ProgressMeter *progressMeter =
         LIBMATTI_FML_ProgressMeter_New(barName, count, 0, LIBMATTI_FML_Message_New(barName, LIBMATTI_FML_Message_MessageType_ML));
 
-    // Java: progressMeters.addFirst(pm);
+// Java: progressMeters.addFirst(pm);
     progressMeters = realloc(progressMeters, sizeof(*progressMeters) * (progressMeterCount + 1));
     memmove(&progressMeters[1], &progressMeters[0], sizeof(*progressMeters) * progressMeterCount);
     progressMeters[0] = progressMeter;
@@ -99,7 +99,7 @@ LIBMATTI_FML_ProgressMeter *LIBMATTI_FML_StartupNotificationManager_AddProgressB
     LIBMATTI_FML_ProgressMeter *progressMeter =
         LIBMATTI_FML_ProgressMeter_New(barName, count, 0, LIBMATTI_FML_Message_New(barName, LIBMATTI_FML_Message_MessageType_ML));
 
-    // Java: progressMeters.addLast(pm);
+// Java: progressMeters.addLast(pm);
     progressMeters = realloc(progressMeters, sizeof(*progressMeters) * (progressMeterCount + 1));
     progressMeters[progressMeterCount++] = progressMeter;
 
@@ -109,7 +109,7 @@ LIBMATTI_FML_ProgressMeter *LIBMATTI_FML_StartupNotificationManager_AddProgressB
 // Java: public static void popBar(ProgressMeter progressMeter)
 void LIBMATTI_FML_StartupNotificationManager_PopBar(LIBMATTI_FML_ProgressMeter *progressMeter)
 {
-    // Java: progressMeters.removeLastOccurrence(progressMeter);
+// Java: progressMeters.removeLastOccurrence(progressMeter);
     for (size_t i = progressMeterCount; i > 0; i--)
     {
         if (progressMeters[i - 1] != progressMeter) continue;
@@ -133,7 +133,7 @@ static int compare_messages(const void *left, const void *right)
 // Java: public static List<AgeMessage> getMessages()
 LIBMATTI_FML_StartupNotificationManager_AgeMessage *LIBMATTI_FML_StartupNotificationManager_GetMessages(size_t *count)
 {
-    // Java: long ts = System.nanoTime();
+// Java: long ts = System.nanoTime();
     long timestamp = LIBMATTI_FML_Message_NanoTime();
 
     size_t total = 0;
@@ -148,7 +148,7 @@ LIBMATTI_FML_StartupNotificationManager_AgeMessage *LIBMATTI_FML_StartupNotifica
             sorted[index++] = messages[type][i];
     }
 
-    // Java: .sorted(...).reversed().limit(2)
+// Java: .sorted(...).reversed().limit(2)
     if (total > 1) qsort(sorted, total, sizeof(*sorted), compare_messages);
     if (total > 2) total = 2;
 
@@ -168,7 +168,7 @@ LIBMATTI_FML_StartupNotificationManager_AgeMessage *LIBMATTI_FML_StartupNotifica
 // Java: public static void addModMessage(String message)
 void LIBMATTI_FML_StartupNotificationManager_AddModMessage(const char *message)
 {
-    // Java: String safeMessage = Ascii.truncate(CharMatcher.ascii().retainFrom(message), 80, "~"); addMessage(MOD, safeMessage, 20);
+// Java: String safeMessage = Ascii.truncate(CharMatcher.ascii().retainFrom(message), 80, "~"); addMessage(MOD, safeMessage, 20);
     char *ascii = retain_ascii(message);
     char *safeMessage = ascii_truncate(ascii, 80, "~");
     free(ascii);
@@ -180,7 +180,7 @@ void LIBMATTI_FML_StartupNotificationManager_AddModMessage(const char *message)
 // Java: public static void modLoaderMessage(String message)
 void LIBMATTI_FML_StartupNotificationManager_ModLoaderMessage(const char *message)
 {
-    // Java: addMessage(Message.MessageType.ML, message, -1);
+// Java: addMessage(Message.MessageType.ML, message, -1);
     add_message(LIBMATTI_FML_Message_MessageType_ML, message, -1);
 }
 

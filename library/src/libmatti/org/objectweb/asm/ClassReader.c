@@ -1,4 +1,5 @@
-// Port of org.objectweb.asm.ClassReader.
+
+
 
 #include "libmatti/org/objectweb/asm/ClassReader.h"
 
@@ -75,7 +76,8 @@ static int u2(Cursor *cursor)
 
 static long long u4(Cursor *cursor)
 {
-    // unsigned 32 bit value
+
+
     unsigned int value = ((unsigned int)cursor->data[cursor->position] << 24) |
                          ((unsigned int)cursor->data[cursor->position + 1] << 16) |
                          ((unsigned int)cursor->data[cursor->position + 2] << 8) |
@@ -89,15 +91,16 @@ static const char *utf8(Cursor *cursor, int index)
     return LIBMATTI_ASM_ConstantPool_Utf8(cursor->pool, index);
 }
 
-// ---------------------------------------------------------------------------
-// constant pool
-// ---------------------------------------------------------------------------
+
+
+
+
 
 static void read_constant_pool(Cursor *cursor)
 {
     int count = u2(cursor);
 
-    // Java: the constant pool is 1-based and may contain unused slots (Long/Double take two)
+// Java: the constant pool is 1-based and may contain unused slots (Long/Double take two)
     free(cursor->pool->entries);
     cursor->pool->entries = calloc((size_t)count + 1, sizeof(LIBMATTI_ASM_ConstantPoolEntry));
     cursor->pool->count = (size_t)count;
@@ -165,7 +168,7 @@ static void read_constant_pool(Cursor *cursor)
 
         cursor->pool->entries[i] = entry;
 
-        // Java: Long/Double occupy two constant pool slots
+// Java: Long/Double occupy two constant pool slots
         if (tag == CP_LONG || tag == CP_DOUBLE)
         {
             i++;
@@ -174,9 +177,10 @@ static void read_constant_pool(Cursor *cursor)
     }
 }
 
-// ---------------------------------------------------------------------------
-// label bookkeeping
-// ---------------------------------------------------------------------------
+
+
+
+
 
 static LIBMATTI_ASM_Label *label_for(LabelMap *map, int offset)
 {
@@ -205,9 +209,10 @@ static LIBMATTI_ASMT_LabelNode *label_node_for(LabelMap *map, LIBMATTI_ASM_Label
     return NULL;
 }
 
-// ---------------------------------------------------------------------------
-// instructions
-// ---------------------------------------------------------------------------
+
+
+
+
 
 static size_t instruction_size(const unsigned char *code, size_t offset, size_t length)
 {
@@ -385,7 +390,7 @@ static LIBMATTI_ASMT_AnnotationValue *read_element_value(Cursor *cursor);
 // Java: ClassReader.readAnnotationValue / readElementValues
 static LIBMATTI_ASMT_AnnotationNode *read_annotation(Cursor *cursor)
 {
-    // Java: readAnnotationValues(annotationOffset + 2, ...)
+// Java: readAnnotationValues(annotationOffset + 2, ...)
     LIBMATTI_ASMT_AnnotationNode *node = LIBMATTI_ASMT_AnnotationNode_New(utf8(cursor, u2(cursor)));
 
     int pairCount = u2(cursor);
@@ -724,7 +729,8 @@ static void read_code(Cursor *cursor, LIBMATTI_ASMT_MethodNode *method, size_t a
         offset += size;
     }
 
-    // exception table
+
+
     cursor->position = codeOffset + (size_t)codeLength;
     int tryCatchCount = u2(cursor);
     for (int i = 0; i < tryCatchCount; i++)
@@ -743,7 +749,8 @@ static void read_code(Cursor *cursor, LIBMATTI_ASMT_MethodNode *method, size_t a
         block->type = type == 0 ? NULL : strdup(LIBMATTI_ASM_ConstantPool_ClassName(cursor->pool, type));
     }
 
-    // code attributes: line numbers and stack map frames
+
+
     int codeAttributeCount = u2(cursor);
     LIBMATTI_ASM_Object *frameLocals = NULL;
     size_t frameLocalCount = 0;
@@ -808,34 +815,40 @@ static void read_code(Cursor *cursor, LIBMATTI_ASMT_MethodNode *method, size_t a
                 int frameOffset = offsetDelta + previousOffset + 1;
                 previousOffset = frameOffset;
 
-                // Java: EXPAND_FRAMES produces full frames; apply the delta to the
+// Java: EXPAND_FRAMES produces full frames; apply the delta to the
                 // running locals array.
                 if (frameType >= 0 && frameType < 64)
                 {
-                    // same frame
+
+
                 }
                 else if (frameType >= 64 && frameType < 128)
                 {
-                    // same locals, one stack item: locals unchanged
+
+
                 }
                 else if (frameType == 247)
                 {
-                    // same locals, one stack item (extended)
+
+
                 }
                 else if (frameType >= 248 && frameType <= 250)
                 {
-                    // chop
+
+
                     int chop = 251 - frameType;
                     while (chop-- > 0 && frameLocalCount > 0)
                         LIBMATTI_ASM_Object_Free(&frameLocals[--frameLocalCount]);
                 }
                 else if (frameType == 251)
                 {
-                    // same frame (extended)
+
+
                 }
                 else if (frameType >= 252 && frameType <= 254)
                 {
-                    // append
+
+
                     int append = frameType - 251;
                     for (int a = 0; a < append; a++)
                     {
@@ -860,7 +873,8 @@ static void read_code(Cursor *cursor, LIBMATTI_ASMT_MethodNode *method, size_t a
                 }
                 else if (frameType == 255)
                 {
-                    // full frame
+
+
                     for (size_t l = 0; l < frameLocalCount; l++) LIBMATTI_ASM_Object_Free(&frameLocals[l]);
                     frameLocalCount = 0;
 
@@ -878,7 +892,8 @@ static void read_code(Cursor *cursor, LIBMATTI_ASMT_MethodNode *method, size_t a
                     }
                 }
 
-                // stack items
+
+
                 int stackCount = 0;
                 LIBMATTI_ASM_Object *stack = NULL;
                 if (frameType >= 64 && frameType < 128)
@@ -932,7 +947,7 @@ static void read_code(Cursor *cursor, LIBMATTI_ASMT_MethodNode *method, size_t a
         cursor->position = attributeStart + (size_t)length;
     }
 
-    // Java: ClassReader emits, per bytecode offset, the label first, then line
+// Java: ClassReader emits, per bytecode offset, the label first, then line
     // numbers, then stack map frames, then the instruction.
     size_t entryCount = insnCount + labels.count;
     InsnAt *entries = calloc(entryCount > 0 ? entryCount : 1, sizeof(InsnAt));
@@ -960,7 +975,8 @@ static void read_code(Cursor *cursor, LIBMATTI_ASMT_MethodNode *method, size_t a
         entryIndex++;
     }
 
-    // stable insertion sort (equal offsets keep label < line < frame < insn)
+
+
     for (size_t i = 1; i < entryIndex; i++)
     {
         for (size_t j = i; j > 0; j--)
@@ -979,7 +995,7 @@ static void read_code(Cursor *cursor, LIBMATTI_ASMT_MethodNode *method, size_t a
 
     for (size_t i = 0; i < entryIndex; i++) LIBMATTI_ASM_InsnList_Add(&method->instructions, entries[i].node);
 
-    // Java: a freshly read instruction list is not "modified"
+// Java: a freshly read instruction list is not "modified"
     method->instructions.modified = 0;
 
     free(entryRank);
@@ -987,7 +1003,8 @@ static void read_code(Cursor *cursor, LIBMATTI_ASMT_MethodNode *method, size_t a
     free(insns);
     for (size_t l = 0; l < frameLocalCount; l++) LIBMATTI_ASM_Object_Free(&frameLocals[l]);
     free(frameLocals);
-    // the Label objects are owned by the LabelNodes created for them
+
+
     free(labels.entries);
 
     cursor->position = attributeStart + attributeLength;
@@ -1013,7 +1030,7 @@ void LIBMATTI_ASM_ClassReader_Accept(LIBMATTI_ASM_ClassReader *reader, LIBMATTI_
 
     if ((unsigned)u4(&cursor) != 0xCAFEBABEu)
     {
-        // Java: throws IllegalArgumentException("Illegal class file")
+// Java: throws IllegalArgumentException("Illegal class file")
         return;
     }
 
@@ -1074,7 +1091,7 @@ void LIBMATTI_ASM_ClassReader_Accept(LIBMATTI_ASM_ClassReader *reader, LIBMATTI_
             }
             else if (attributeName != NULL && strcmp(attributeName, "RuntimeVisibleAnnotations") == 0)
             {
-                // Java: ClassReader.readElementValues into annotationVisitor.visitAnnotation(...)
+// Java: ClassReader.readElementValues into annotationVisitor.visitAnnotation(...)
                 read_annotations(&cursor, &field->visibleAnnotations, &field->visibleAnnotationCount);
             }
             else if (attributeName != NULL && strcmp(attributeName, "RuntimeInvisibleAnnotations") == 0)

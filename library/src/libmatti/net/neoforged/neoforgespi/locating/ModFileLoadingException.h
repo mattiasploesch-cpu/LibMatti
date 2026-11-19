@@ -12,4 +12,4 @@ LIBMATTI_JL_Throwable *LIBMATTI_NEOFORGESPI_ModFileLoadingException_New(const ch
 LIBMATTI_JL_Throwable *LIBMATTI_NEOFORGESPI_ModFileLoadingException_NewWithCause(const char *message,
                                                                                 LIBMATTI_JL_Throwable *cause);
 
-#endif //MATTICRAFT_NEOFORGESPI_LOCATING_MODFILELOADINGEXCEPTION_H
+#endif

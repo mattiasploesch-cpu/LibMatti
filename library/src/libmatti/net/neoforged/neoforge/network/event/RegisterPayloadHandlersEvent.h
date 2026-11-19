@@ -1,4 +1,5 @@
-// Port of net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent.
+
+
 
 #ifndef MATTICRAFT_NEOFORGE_NETWORK_EVENT_REGISTERPAYLOADHANDLENSEVENT_H
 #define MATTICRAFT_NEOFORGE_NETWORK_EVENT_REGISTERPAYLOADHANDLENSEVENT_H
@@ -12,7 +13,7 @@ typedef struct LIBMATTI_NEOFORGE_Network_RegisterPayloadHandlersEvent
 struct LIBMATTI_NEOFORGE_Network_RegisterPayloadHandlersEvent
 {
     LIBMATTI_BUS_Event base;
-    // Java: registrar(String version) hands out PayloadRegistrations; the port records the
+// Java: registrar(String version) hands out PayloadRegistrations; the port records the
     // (payload id, version, optional) tuples the registrar collected
     char **payloadIds;
     char **versions;
@@ -35,4 +36,4 @@ void LIBMATTI_NEOFORGE_Network_RegisterPayloadHandlersEvent_Register(
     LIBMATTI_NEOFORGE_Network_RegisterPayloadHandlersEvent *event, const char *payloadId,
     const char *version, int optional);
 
-#endif //MATTICRAFT_NEOFORGE_NETWORK_EVENT_REGISTERPAYLOADHANDLENSEVENT_H
+#endif

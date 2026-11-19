@@ -1,6 +1,7 @@
-//
-// Port of cpw.mods.modlauncher.api.NamedPath.
-//
+
+
+
+
 
 #ifndef MATTICRAFT_MODLAUNCHER_NAMEDPATH_H
 #define MATTICRAFT_MODLAUNCHER_NAMEDPATH_H
@@ -15,4 +16,4 @@ typedef struct
     size_t pathCount;
 } LIBMATTI_MLA_NamedPath;
 
-#endif //MATTICRAFT_MODLAUNCHER_NAMEDPATH_H
+#endif

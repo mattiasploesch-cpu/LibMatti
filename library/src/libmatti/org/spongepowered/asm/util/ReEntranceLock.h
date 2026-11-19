@@ -1,6 +1,7 @@
-// Port of org.spongepowered.asm.util.ReEntranceLock (sponge-mixin 0.17.3+mixin.0.8.7).
-// The mixin transformer guards re-entrant transforms with it; the port keeps the
-// push/pop/check state machine 1:1 (no synchronisation - the loader is single threaded).
+
+
+
+
 
 #ifndef MATTICRAFT_SP_ASM_UTIL_REENTRANCELOCK_H
 #define MATTICRAFT_SP_ASM_UTIL_REENTRANCELOCK_H
@@ -10,11 +11,11 @@ typedef struct LIBMATTI_SP_ReEntranceLock LIBMATTI_SP_ReEntranceLock;
 
 struct LIBMATTI_SP_ReEntranceLock
 {
-    // Java: private final int maxDepth
+// Java: private final int maxDepth
     int maxDepth;
-    // Java: private final ThreadLocal<Integer> depth
+// Java: private final ThreadLocal<Integer> depth
     int depth;
-    // Java: private final ThreadLocal<Boolean> set
+// Java: private final ThreadLocal<Boolean> set
     int set;
 };
 
@@ -41,4 +42,4 @@ int LIBMATTI_SP_ReEntranceLock_IsSet(const LIBMATTI_SP_ReEntranceLock *lock);
 // Java: public ReEntranceLock clear()
 LIBMATTI_SP_ReEntranceLock *LIBMATTI_SP_ReEntranceLock_Clear(LIBMATTI_SP_ReEntranceLock *lock);
 
-#endif //MATTICRAFT_SP_ASM_UTIL_REENTRANCELOCK_H
+#endif

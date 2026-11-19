@@ -1,4 +1,5 @@
-// Port of net.minecraft.tags.TagKey.
+
+
 
 #include "libmatti/net/minecraft/tags/TagKey.h"
 
@@ -53,6 +54,7 @@ int LIBMATTI_MC_TagKey_Equals(const LIBMATTI_MC_TagKey *a, const LIBMATTI_MC_Tag
 
 void LIBMATTI_MC_TagKey_Free(LIBMATTI_MC_TagKey *tag)
 {
-    // Interned keys stay alive (Java's intern table does too); only NULL frees are no-ops.
+
+
     (void) tag;
 }

@@ -1,11 +1,12 @@
-// Port of the org.spongepowered.asm.service interfaces the FML layer implements
-// (sponge-mixin 0.17.3+mixin.0.8.7): IPropertyKey, IGlobalPropertyService, IMixinInternal,
-// IMixinService, IMixinServiceBootstrap, IClassTracker, IMixinAuditTrail, IFeatureValidator,
-// IAdviceProvider and IClassProvider.
-// The IMixinService interface is the port's virtual-dispatch struct; the FML implementation
-// (FMLMixinService) fills it. The transformer-facing interfaces (ITransformerProvider,
-// IClassBytecodeProvider) stay out until the transformer is ported - the native backend
-// needs none of them.
+
+
+
+
+
+
+
+
+
 
 #ifndef MATTICRAFT_SP_ASM_SERVICE_IMIXINSERVICE_H
 #define MATTICRAFT_SP_ASM_SERVICE_IMIXINSERVICE_H
@@ -35,13 +36,13 @@ struct LIBMATTI_SP_IGlobalPropertyService
 {
     void *self;
 
-    // Java: IPropertyKey resolveKey(String name)
+// Java: IPropertyKey resolveKey(String name)
     LIBMATTI_SP_IPropertyKey (*resolveKey)(void *self, const char *name);
-    // Java: <T> T getProperty(IPropertyKey key) - NULL when unset
+// Java: <T> T getProperty(IPropertyKey key) - NULL when unset
     void *(*getProperty)(void *self, LIBMATTI_SP_IPropertyKey key);
-    // Java: void setProperty(IPropertyKey key, Object value)
+// Java: void setProperty(IPropertyKey key, Object value)
     void (*setProperty)(void *self, LIBMATTI_SP_IPropertyKey key, void *value);
-    // Java: String getPropertyString(IPropertyKey key, String defaultValue)
+// Java: String getPropertyString(IPropertyKey key, String defaultValue)
     const char *(*getPropertyString)(void *self, LIBMATTI_SP_IPropertyKey key, const char *defaultValue);
 };
 
@@ -51,7 +52,7 @@ typedef struct LIBMATTI_SP_IMixinInternal LIBMATTI_SP_IMixinInternal;
 struct LIBMATTI_SP_IMixinInternal
 {
     void *self;
-    // Java: the transformer factory offer; the port's native backend offers nothing, so the
+// Java: the transformer factory offer; the port's native backend offers nothing, so the
     // callback is what a future transformer port would hook
     void (*offer)(void *self);
 };
@@ -63,53 +64,53 @@ struct LIBMATTI_SP_IMixinService
 {
     void *self;
 
-    // Java: void prepare()
+// Java: void prepare()
     void (*prepare)(void *self);
-    // Java: Phase getInitialPhase()
+// Java: Phase getInitialPhase()
     LIBMATTI_SP_MixinEnvironment_Phase (*getInitialPhase)(void *self);
-    // Java: void offer(IMixinInternal internal)
+// Java: void offer(IMixinInternal internal)
     void (*offer)(void *self, LIBMATTI_SP_IMixinInternal *internal);
-    // Java: void init()
+// Java: void init()
     void (*init)(void *self);
-    // Java: void beginPhase()
+// Java: void beginPhase()
     void (*beginPhase)(void *self);
-    // Java: void checkEnv(Object bootSource)
+// Java: void checkEnv(Object bootSource)
     void (*checkEnv)(void *self, void *bootSource);
-    // Java: ReEntranceLock getReEntranceLock()
+// Java: ReEntranceLock getReEntranceLock()
     LIBMATTI_SP_ReEntranceLock *(*getReEntranceLock)(void *self);
-    // Java: String getSideName()
+// Java: String getSideName()
     const char *(*getSideName)(void *self);
-    // Java: String getName()
+// Java: String getName()
     const char *(*getName)(void *self);
-    // Java: boolean isValid()
+// Java: boolean isValid()
     int (*isValid)(void *self);
-    // Java: CompatibilityLevel getMinCompatibilityLevel()
+// Java: CompatibilityLevel getMinCompatibilityLevel()
     LIBMATTI_SP_MixinEnvironment_CompatibilityLevel (*getMinCompatibilityLevel)(void *self);
-    // Java: CompatibilityLevel getMaxCompatibilityLevel() - NULL-equivalent = NONE
+// Java: CompatibilityLevel getMaxCompatibilityLevel() - NULL-equivalent = NONE
     LIBMATTI_SP_MixinEnvironment_CompatibilityLevel (*getMaxCompatibilityLevel)(void *self);
-    // Java: ILogger getLogger(String name)
+// Java: ILogger getLogger(String name)
     LIBMATTI_SP_ILogger *(*getLogger)(void *self, const char *name);
-    // Java: Collection<String> getPlatformAgents()
+// Java: Collection<String> getPlatformAgents()
     const char *const *(*getPlatformAgents)(void *self, size_t *count);
-    // Java: IContainerHandle getPrimaryContainer()
+// Java: IContainerHandle getPrimaryContainer()
     LIBMATTI_SP_ContainerHandle *(*getPrimaryContainer)(void *self);
-    // Java: Collection<IContainerHandle> getMixinContainers()
+// Java: Collection<IContainerHandle> getMixinContainers()
     LIBMATTI_SP_ContainerHandle **(*getMixinContainers)(void *self, size_t *count);
-    // Java: InputStream getResourceAsStream(String name) - the port hands back the bytes read
+// Java: InputStream getResourceAsStream(String name) - the port hands back the bytes read
     unsigned char *(*getResourceAsStream)(void *self, const char *name, size_t *outLength);
-    // Java: IClassTracker getClassTracker()
+// Java: IClassTracker getClassTracker()
     void *(*getClassTracker)(void *self);
-    // Java: IMixinAuditTrail getAuditTrail()
+// Java: IMixinAuditTrail getAuditTrail()
     void *(*getAuditTrail)(void *self);
-    // Java: IFeatureValidator getFeatureValidator()
+// Java: IFeatureValidator getFeatureValidator()
     void *(*getFeatureValidator)(void *self);
-    // Java: IAdviceProvider getAdviceProvider()
+// Java: IAdviceProvider getAdviceProvider()
     void *(*getAdviceProvider)(void *self);
-    // Java: ITransformerProvider getTransformerProvider() - NULL in FML
+// Java: ITransformerProvider getTransformerProvider() - NULL in FML
     void *(*getTransformerProvider)(void *self);
-    // Java: IClassProvider getClassProvider()
+// Java: IClassProvider getClassProvider()
     void *(*getClassProvider)(void *self);
-    // Java: IClassBytecodeProvider getBytecodeProvider() - throws when unset; NULL = unset
+// Java: IClassBytecodeProvider getBytecodeProvider() - throws when unset; NULL = unset
     void *(*getBytecodeProvider)(void *self);
 };
 
@@ -119,11 +120,11 @@ typedef struct LIBMATTI_SP_IMixinServiceBootstrap LIBMATTI_SP_IMixinServiceBoots
 struct LIBMATTI_SP_IMixinServiceBootstrap
 {
     void *self;
-    // Java: String getName()
+// Java: String getName()
     const char *(*getName)(void *self);
-    // Java: String getServiceClassName()
+// Java: String getServiceClassName()
     const char *(*getServiceClassName)(void *self);
-    // Java: void bootstrap()
+// Java: void bootstrap()
     void (*bootstrap)(void *self);
 };
 
@@ -133,11 +134,11 @@ typedef struct LIBMATTI_SP_IClassTracker LIBMATTI_SP_IClassTracker;
 struct LIBMATTI_SP_IClassTracker
 {
     void *self;
-    // Java: void registerInvalidClass(String className)
+// Java: void registerInvalidClass(String className)
     void (*registerInvalidClass)(void *self, const char *className);
-    // Java: boolean isClassLoaded(String className)
+// Java: boolean isClassLoaded(String className)
     int (*isClassLoaded)(void *self, const char *className);
-    // Java: String getClassRestrictions(String className)
+// Java: String getClassRestrictions(String className)
     const char *(*getClassRestrictions)(void *self, const char *className);
 };
 
@@ -147,13 +148,13 @@ typedef struct LIBMATTI_SP_IMixinAuditTrail LIBMATTI_SP_IMixinAuditTrail;
 struct LIBMATTI_SP_IMixinAuditTrail
 {
     void *self;
-    // Java: void onApply(String className, String mixinName)
+// Java: void onApply(String className, String mixinName)
     void (*onApply)(void *self, const char *className, const char *mixinName);
-    // Java: void onPostProcess(String className)
+// Java: void onPostProcess(String className)
     void (*onPostProcess)(void *self, const char *className);
-    // Java: void onGenerate(String className, String generatorName)
+// Java: void onGenerate(String className, String generatorName)
     void (*onGenerate)(void *self, const char *className, const char *generatorName);
-    // Java: void setConsumer(String className, BiConsumer<String, String[]> consumer)
+// Java: void setConsumer(String className, BiConsumer<String, String[]> consumer)
     void (*setConsumer)(void *self, const char *className,
                         void (*consumer)(const char *activity, const char **context, size_t contextCount,
                                          void *userdata), void *userdata);
@@ -165,7 +166,7 @@ typedef struct LIBMATTI_SP_IFeatureValidator LIBMATTI_SP_IFeatureValidator;
 struct LIBMATTI_SP_IFeatureValidator
 {
     void *self;
-    // Java: void validateEnumExtension(IMixinInfo mixin, ClassInfo targetClass) - the port has no
+// Java: void validateEnumExtension(IMixinInfo mixin, ClassInfo targetClass) - the port has no
     // mixin/target ClassInfo; the native backend never extends Java enums, so the check stays out
     void (*validateEnumExtension)(void *self, void *mixin, void *targetClass);
 };
@@ -176,7 +177,7 @@ typedef struct LIBMATTI_SP_IAdviceProvider LIBMATTI_SP_IAdviceProvider;
 struct LIBMATTI_SP_IAdviceProvider
 {
     void *self;
-    // Java: String higherCompatibilityNeeded(int requiredCompatibility, String requiredCompatibilityString)
+// Java: String higherCompatibilityNeeded(int requiredCompatibility, String requiredCompatibilityString)
     char *(*higherCompatibilityNeeded)(void *self, int requiredCompatibility,
                                        const char *requiredCompatibilityString);
 };
@@ -187,11 +188,11 @@ typedef struct LIBMATTI_SP_IClassProvider LIBMATTI_SP_IClassProvider;
 struct LIBMATTI_SP_IClassProvider
 {
     void *self;
-    // Java: URL[] getClassPath() (deprecated) - an empty array in FML
+// Java: URL[] getClassPath() (deprecated) - an empty array in FML
     void (*getClassPath)(void *self, size_t *count);
-    // Java: Class<?> findClass(String name, boolean initialize) - NULL when absent
+// Java: Class<?> findClass(String name, boolean initialize) - NULL when absent
     LIBMATTI_JL_Class *(*findClass)(void *self, const char *name, int initialize);
-    // Java: Class<?> findAgentClass(String name, boolean initialize)
+// Java: Class<?> findAgentClass(String name, boolean initialize)
     LIBMATTI_JL_Class *(*findAgentClass)(void *self, const char *name, int initialize);
 };
 
@@ -202,4 +203,4 @@ LIBMATTI_SP_IMixinService *LIBMATTI_SP_MixinService_GetService(void);
 // Java: public static IGlobalPropertyService getGlobalPropertyService()
 LIBMATTI_SP_IGlobalPropertyService *LIBMATTI_SP_MixinService_GetGlobalPropertyService(void);
 
-#endif //MATTICRAFT_SP_ASM_SERVICE_IMIXINSERVICE_H
+#endif

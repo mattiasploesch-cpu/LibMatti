@@ -19,7 +19,7 @@ typedef struct
     size_t delegateCount;
     const char **contentRoots;
     size_t contentRootCount;
-    // Java: private volatile Optional<String> checksum
+// Java: private volatile Optional<String> checksum
     char *checksum;
     int checksumComputed;
 } CompositeJarContents;
@@ -56,13 +56,13 @@ static const char **getContentRoots(void *self, size_t *count)
 // Java: private Optional<String> computeChecksum()
 static char *computeChecksum(CompositeJarContents *contents)
 {
-    // Java: if (isFiltered()) return Optional.empty();
+// Java: if (isFiltered()) return Optional.empty();
     if (LIBMATTI_FML_CompositeJarContents_IsFiltered(&contents->base))
         return NULL;
 
     LIBMATTI_JS_MessageDigest *digest = LIBMATTI_JS_MessageDigest_GetInstance("SHA-256");
 
-    // Java: for (var delegate : delegates) { var delegateChecksum = delegate.getChecksum(); if empty return empty;
+// Java: for (var delegate : delegates) { var delegateChecksum = delegate.getChecksum(); if empty return empty;
     //             digest.update(delegateChecksum.get().getBytes()); }
     char *concatenated = NULL;
     size_t concatenatedLength = 0;
@@ -146,7 +146,7 @@ static LIBMATTI_JU_Manifest *getManifest(void *self)
             continue;
 
         LIBMATTI_JU_Manifest *manifest = LIBMATTI_FML_JarContents_GetManifest(contents->delegates[i]);
-        // Java: empty manifests are considered "missing"
+// Java: empty manifests are considered "missing"
         if (manifest != NULL && (manifest->mainAttributes.count > 0 || manifest->sectionCount > 0))
             return manifest;
     }
@@ -207,7 +207,7 @@ typedef struct
     void *userdata;
     CompositeJarContents *contents;
     size_t delegateIdx;
-    // Java: final Set<String> pathsVisited
+// Java: final Set<String> pathsVisited
     char **pathsVisited;
     size_t visitedCount;
 } DistinctVisitor;
@@ -273,7 +273,7 @@ static char *toStringImpl(void *self)
     char *result = strdup("composite(");
     size_t length = strlen(result);
 
-    // Java: in reverse order as that is how the user passed it
+// Java: in reverse order as that is how the user passed it
     for (size_t i = contents->delegateCount; i-- > 0;)
     {
         char *delegate = LIBMATTI_FML_JarContents_ToString(contents->delegates[i]);
@@ -310,13 +310,13 @@ LIBMATTI_FML_JarContents *LIBMATTI_FML_CompositeJarContents_New(LIBMATTI_FML_Jar
                                                                LIBMATTI_FML_JarContents_PathFilter *filters,
                                                                void **filterUserdata, size_t delegateCount)
 {
-    // Java: throw new IllegalArgumentException(...) guards
+// Java: throw new IllegalArgumentException(...) guards
     if (delegateCount == 0)
         return NULL;
 
     CompositeJarContents *contents = calloc(1, sizeof(CompositeJarContents));
 
-    // Java: internally the first match gets returned, so the list is reversed
+// Java: internally the first match gets returned, so the list is reversed
     contents->delegates = calloc(delegateCount, sizeof(LIBMATTI_FML_JarContents *));
     contents->delegateCount = delegateCount;
     for (size_t i = 0; i < delegateCount; i++)
@@ -333,7 +333,7 @@ LIBMATTI_FML_JarContents *LIBMATTI_FML_CompositeJarContents_New(LIBMATTI_FML_Jar
         }
     }
 
-    // Java: collect all unique content roots of our delegates, then reverse
+// Java: collect all unique content roots of our delegates, then reverse
     const char **roots = NULL;
     size_t rootCount = 0;
     for (size_t i = 0; i < delegateCount; i++)

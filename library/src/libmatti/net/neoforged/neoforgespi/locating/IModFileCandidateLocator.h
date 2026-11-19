@@ -11,14 +11,14 @@
 // Java: public interface IModFileCandidateLocator extends IOrderedProvider
 typedef struct LIBMATTI_NEOFORGESPI_IModFileCandidateLocator
 {
-    // Java: extends IOrderedProvider
+// Java: extends IOrderedProvider
     LIBMATTI_NEOFORGESPI_IOrderedProvider ordered;
 
-    // Java: void findCandidates(ILaunchContext context, IDiscoveryPipeline pipeline)
+// Java: void findCandidates(ILaunchContext context, IDiscoveryPipeline pipeline)
     void (*findCandidates)(void *self, LIBMATTI_NEOFORGESPI_ILaunchContext *context,
                            LIBMATTI_NEOFORGESPI_IDiscoveryPipeline *pipeline);
 
-    // Java: String toString() - caller frees the result
+// Java: String toString() - caller frees the result
     char *(*toString)(void *self);
 } LIBMATTI_NEOFORGESPI_IModFileCandidateLocator;
 
@@ -36,4 +36,4 @@ void LIBMATTI_NEOFORGESPI_IModFileCandidateLocator_FindCandidates(
 LIBMATTI_NEOFORGESPI_IModFileCandidateLocator *LIBMATTI_NEOFORGESPI_IModFileCandidateLocator_ForFolder(const char *folder,
                                                                                                       const char *identifier);
 
-#endif //MATTICRAFT_NEOFORGESPI_LOCATING_IMODFILECANDIDATELOCATOR_H
+#endif

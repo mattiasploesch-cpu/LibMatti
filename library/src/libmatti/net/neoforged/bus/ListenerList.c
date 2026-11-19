@@ -1,4 +1,5 @@
-// Port of net.neoforged.bus.ListenerList.
+
+
 
 #include "libmatti/net/neoforged/bus/ListenerList.h"
 
@@ -94,12 +95,12 @@ static void build_cache(LIBMATTI_BUS_ListenerList *list)
         }
     }
 
-    // Java: this.listeners.set(ret.toArray(new EventListener[0]));
+// Java: this.listeners.set(ret.toArray(new EventListener[0]));
     free(list->listeners);
     list->listeners = all;
     list->listenerCount = total;
 
-    // Java: this.perPhaseListeners.set(perPhaseListeners);
+// Java: this.perPhaseListeners.set(perPhaseListeners);
     free_per_phase(list);
     list->perPhaseListeners = perPhase;
 
@@ -127,7 +128,7 @@ static LIBMATTI_BUS_ListenerList *new_list(LIBMATTI_JL_Class *eventClass, LIBMAT
 {
     LIBMATTI_BUS_ListenerList *list = calloc(1, sizeof(LIBMATTI_BUS_ListenerList));
     list->rebuild = 1;
-    // Java: canUnwrapListeners = !ICancellableEvent.class.isAssignableFrom(eventClass);
+// Java: canUnwrapListeners = !ICancellableEvent.class.isAssignableFrom(eventClass);
     list->canUnwrapListeners =
         !LIBMATTI_JL_Class_IsAssignableFrom(LIBMATTI_BUS_ICancellableEvent_Class(), eventClass);
     list->buildPerPhaseList = buildPerPhaseList;
@@ -179,7 +180,7 @@ LIBMATTI_BUS_EventListener **LIBMATTI_BUS_ListenerList_GetPhaseListeners(LIBMATT
 {
     if (!list->buildPerPhaseList)
     {
-        // Java: throw new IllegalStateException("buildPerPhaseList is false!")
+// Java: throw new IllegalStateException("buildPerPhaseList is false!")
         LIBMATTI_ML_Logger_Error(LOGGER(), NULL, "buildPerPhaseList is false!");
         if (count != NULL) *count = 0;
         return NULL;

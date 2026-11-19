@@ -1,15 +1,17 @@
-// Port of java.lang.module.ModuleDescriptor.read (JDK: ModuleInfo.read).
-// Parses a module-info.class directly: the constant pool, the access flags,
-// and the Module/ModulePackages/ModuleMainClass/ModuleVersion attributes.
+
+
+
+
 
 #include "libmatti/java/lang/module/ModuleDescriptorRead.h"
 
 #include <stdlib.h>
 #include <string.h>
 
-// ---------------------------------------------------------------------------
-// little binary reader
-// ---------------------------------------------------------------------------
+
+
+
+
 
 typedef struct
 {
@@ -66,13 +68,15 @@ static const unsigned char *bytes(ByteCursor *c, size_t length)
     return data;
 }
 
-// ---------------------------------------------------------------------------
-// constant pool: only the Utf8 entries matter for the descriptor
-// ---------------------------------------------------------------------------
+
+
+
+
 
 typedef struct
 {
-    char **utf8;    // 1-based, index 0 unused; NULL for non-Utf8 entries
+    char **utf8;
+
     size_t count;
 } ConstantPool;
 
@@ -91,7 +95,8 @@ static int constant_pool_read(ByteCursor *c, ConstantPool *pool)
         return 0;
 
     pool->count = count;
-    pool->utf8 = calloc(count, sizeof(char *)); // slot 0 unused
+    pool->utf8 = calloc(count, sizeof(char *));
+
 
     for (uint16_t index = 1; index < count; index++)
     {
@@ -101,7 +106,8 @@ static int constant_pool_read(ByteCursor *c, ConstantPool *pool)
 
         switch (tag)
         {
-            case 1: // CONSTANT_Utf8
+            case 1:
+
             {
                 uint16_t length = u2(c);
                 const unsigned char *text = bytes(c, length);
@@ -113,35 +119,51 @@ static int constant_pool_read(ByteCursor *c, ConstantPool *pool)
                 pool->utf8[index] = value;
                 break;
             }
-            case 3: // CONSTANT_Integer
-            case 4: // CONSTANT_Float
+            case 3:
+
+            case 4:
+
                 c->position += 4;
                 break;
-            case 5: // CONSTANT_Long
-            case 6: // CONSTANT_Double
+            case 5:
+
+            case 6:
+
                 c->position += 8;
-                index++; // Java: longs/doubles take two slots
+                index++;// Java: longs/doubles take two slots
                 break;
-            case 7: // CONSTANT_Class
-            case 8: // CONSTANT_String
-            case 16: // CONSTANT_MethodType
-            case 19: // CONSTANT_Module
-            case 20: // CONSTANT_Package
+            case 7:
+
+            case 8:
+
+            case 16:
+
+            case 19:
+
+            case 20:
+
                 c->position += 2;
                 break;
-            case 9: // CONSTANT_Fieldref
-            case 10: // CONSTANT_Methodref
-            case 11: // CONSTANT_InterfaceMethodref
-            case 12: // CONSTANT_NameAndType
-            case 17: // CONSTANT_Dynamic
-            case 18: // CONSTANT_InvokeDynamic
+            case 9:
+
+            case 10:
+
+            case 11:
+
+            case 12:
+
+            case 17:
+
+            case 18:
+
                 c->position += 4;
                 break;
-            case 15: // CONSTANT_MethodHandle
+            case 15:
+
                 c->position += 3;
                 break;
             default:
-                return 0; // Java: InvalidModuleDescriptorException
+                return 0;// Java: InvalidModuleDescriptorException
         }
     }
     return 1;
@@ -152,9 +174,10 @@ static const char *utf8(const ConstantPool *pool, uint16_t index)
     return index < pool->count ? pool->utf8[index] : NULL;
 }
 
-// ---------------------------------------------------------------------------
-// attribute flags (JVM: ACC_ constants of the module attribute)
-// ---------------------------------------------------------------------------
+
+
+
+
 
 #define MODULE_ACC_OPEN 0x0020
 #define REQUIRES_ACC_TRANSITIVE 0x0020
@@ -172,11 +195,13 @@ LIBMATTI_JL_ModuleDescriptor *LIBMATTI_JL_ModuleDescriptor_ReadWithFlags(const u
     (void) strict;
     ByteCursor c = {bytes_, length, 0, 0};
 
-    // Java: magic 0xCAFEBABE, minor, major
+// Java: magic 0xCAFEBABE, minor, major
     if (u4(&c) != 0xCAFEBABEU)
         return NULL;
-    u2(&c); // minor
-    u2(&c); // major
+    u2(&c);
+
+    u2(&c);
+
     if (c.failed)
         return NULL;
 
@@ -189,11 +214,13 @@ LIBMATTI_JL_ModuleDescriptor *LIBMATTI_JL_ModuleDescriptor_ReadWithFlags(const u
 
     uint16_t accessFlags = u2(&c);
     uint16_t thisClass = u2(&c);
-    u2(&c); // superCount
+    u2(&c);
+
     uint16_t interfaceCount = u2(&c);
     c.position += (size_t) interfaceCount * 2;
     uint16_t fieldCount = u2(&c);
-    c.position += (size_t) fieldCount * 6; // each field: 6 bytes of header (attrs not present in module-info)
+    c.position += (size_t) fieldCount * 6;
+
     uint16_t methodCount = u2(&c);
     c.position += (size_t) methodCount * 6;
     if (c.failed)
@@ -205,7 +232,7 @@ LIBMATTI_JL_ModuleDescriptor *LIBMATTI_JL_ModuleDescriptor_ReadWithFlags(const u
     LIBMATTI_JL_ModuleDescriptor *descriptor = NULL;
     const char *moduleName = NULL;
 
-    // Java: the attribute table walk; Module must be present
+// Java: the attribute table walk; Module must be present
     uint16_t attributeCount = u2(&c);
     for (uint16_t i = 0; i < attributeCount && !c.failed; i++)
     {
@@ -219,10 +246,11 @@ LIBMATTI_JL_ModuleDescriptor *LIBMATTI_JL_ModuleDescriptor_ReadWithFlags(const u
 
         if (strcmp(attributeName, "Module") == 0)
         {
-            // Java: module_name_index, module_flags, module_version_index
+// Java: module_name_index, module_flags, module_version_index
             uint16_t nameIdx = u2(&c);
             uint16_t moduleFlags = u2(&c);
-            u2(&c); // module_version_index
+            u2(&c);
+
             moduleName = utf8(&pool, nameIdx);
             if (moduleName == NULL)
                 break;
@@ -231,7 +259,7 @@ LIBMATTI_JL_ModuleDescriptor *LIBMATTI_JL_ModuleDescriptor_ReadWithFlags(const u
             if (moduleFlags & MODULE_ACC_OPEN)
                 LIBMATTI_JL_ModuleDescriptor_AddModifier(descriptor, LIBMATTI_JL_MODIFIER_OPEN);
 
-            // Java: the requires table
+// Java: the requires table
             uint16_t requiresCount = u2(&c);
             for (uint16_t r = 0; r < requiresCount && !c.failed; r++)
             {
@@ -256,7 +284,7 @@ LIBMATTI_JL_ModuleDescriptor *LIBMATTI_JL_ModuleDescriptor_ReadWithFlags(const u
                 }
             }
 
-            // Java: the exports table
+// Java: the exports table
             uint16_t exportsCount = u2(&c);
             for (uint16_t e = 0; e < exportsCount && !c.failed; e++)
             {
@@ -284,7 +312,7 @@ LIBMATTI_JL_ModuleDescriptor *LIBMATTI_JL_ModuleDescriptor_ReadWithFlags(const u
                 (void) exportFlags;
             }
 
-            // Java: the opens table
+// Java: the opens table
             uint16_t opensCount = u2(&c);
             for (uint16_t o = 0; o < opensCount && !c.failed; o++)
             {
@@ -312,7 +340,7 @@ LIBMATTI_JL_ModuleDescriptor *LIBMATTI_JL_ModuleDescriptor_ReadWithFlags(const u
                 (void) openFlags;
             }
 
-            // Java: the uses table
+// Java: the uses table
             uint16_t usesCount = u2(&c);
             for (uint16_t u = 0; u < usesCount && !c.failed; u++)
             {
@@ -322,7 +350,7 @@ LIBMATTI_JL_ModuleDescriptor *LIBMATTI_JL_ModuleDescriptor_ReadWithFlags(const u
                     LIBMATTI_JL_ModuleDescriptor_AddUses(descriptor, use);
             }
 
-            // Java: the provides table
+// Java: the provides table
             uint16_t providesCount = u2(&c);
             for (uint16_t p = 0; p < providesCount && !c.failed; p++)
             {
@@ -350,7 +378,7 @@ LIBMATTI_JL_ModuleDescriptor *LIBMATTI_JL_ModuleDescriptor_ReadWithFlags(const u
         }
         else if (strcmp(attributeName, "ModulePackages") == 0 && descriptor != NULL)
         {
-            // Java: package_count + package_index[]
+// Java: package_count + package_index[]
             uint16_t packageCount = u2(&c);
             for (uint16_t p = 0; p < packageCount && !c.failed; p++)
             {
@@ -375,7 +403,7 @@ LIBMATTI_JL_ModuleDescriptor *LIBMATTI_JL_ModuleDescriptor_ReadWithFlags(const u
                 LIBMATTI_JL_ModuleDescriptor_SetVersion(descriptor, version);
         }
 
-        // Java: the attribute walk continues at the declared length
+// Java: the attribute walk continues at the declared length
         c.position = attributeEnd;
     }
 

@@ -1,4 +1,5 @@
-// Port of java.util.zip (the surface the loader and game need).
+
+
 
 #ifndef MATTICRAFT_JAVA_UTIL_ZIP_H
 #define MATTICRAFT_JAVA_UTIL_ZIP_H
@@ -41,7 +42,8 @@ int LIBMATTI_JU_Deflater_Finished(const LIBMATTI_JU_Deflater *deflater);
 // Java: public void finish()
 void LIBMATTI_JU_Deflater_Finish(LIBMATTI_JU_Deflater *deflater);
 
-// Convenience: one-shot deflate - caller frees, *outLength set
+
+
 unsigned char *LIBMATTI_JU_Deflater_Compress(const unsigned char *input, size_t length, size_t *outLength);
 
 // ---------------------------------------------------------------------------
@@ -72,4 +74,4 @@ int LIBMATTI_JU_Inflater_NeedsInput(const LIBMATTI_JU_Inflater *inflater);
 unsigned char *LIBMATTI_JU_Inflater_Decompress(const unsigned char *input, size_t length,
                                                size_t outCapacityHint, size_t *outLength);
 
-#endif //MATTICRAFT_JAVA_UTIL_ZIP_H
+#endif

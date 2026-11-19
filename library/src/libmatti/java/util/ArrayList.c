@@ -5,14 +5,14 @@
 
 static void ensure_capacity(LIBMATTI_JU_ArrayList *list, size_t needed)
 {
-    // Java: grow(int minCapacity) - newCapacity = old + (old >> 1), at least the needed size
+// Java: grow(int minCapacity) - newCapacity = old + (old >> 1), at least the needed size
     if (needed <= list->capacity)
         return;
     size_t newCapacity = list->capacity + (list->capacity >> 1);
     if (newCapacity < needed)
         newCapacity = needed;
     if (newCapacity < 10)
-        newCapacity = 10; // Java: DEFAULT_CAPACITY
+        newCapacity = 10;// Java: DEFAULT_CAPACITY
     list->elements = realloc(list->elements, sizeof(void *) * newCapacity);
     list->capacity = newCapacity;
 }
@@ -67,7 +67,7 @@ int LIBMATTI_JU_ArrayList_AddAt(LIBMATTI_JU_ArrayList *list, size_t index, void 
     ensure_capacity(list, list->size + 1);
     if (list->elements == NULL)
         return 0;
-    // Java: System.arraycopy(elementData, index, elementData, index + 1, size - index)
+// Java: System.arraycopy(elementData, index, elementData, index + 1, size - index)
     memmove(list->elements + index + 1, list->elements + index, sizeof(void *) * (list->size - index));
     list->elements[index] = element;
     list->size++;
@@ -76,7 +76,7 @@ int LIBMATTI_JU_ArrayList_AddAt(LIBMATTI_JU_ArrayList *list, size_t index, void 
 
 void *LIBMATTI_JU_ArrayList_Get(const LIBMATTI_JU_ArrayList *list, size_t index)
 {
-    // Java: Objects.checkIndex -> IndexOutOfBoundsException
+// Java: Objects.checkIndex -> IndexOutOfBoundsException
     if (index >= list->size)
         return NULL;
     return list->elements[index];
@@ -96,7 +96,7 @@ void *LIBMATTI_JU_ArrayList_RemoveAt(LIBMATTI_JU_ArrayList *list, size_t index)
     if (index >= list->size)
         return NULL;
     void *removed = list->elements[index];
-    // Java: System.arraycopy(elementData, index + 1, elementData, index, size - index - 1)
+// Java: System.arraycopy(elementData, index + 1, elementData, index, size - index - 1)
     memmove(list->elements + index, list->elements + index + 1, sizeof(void *) * (list->size - index - 1));
     list->size--;
     return removed;
@@ -118,7 +118,7 @@ int LIBMATTI_JU_ArrayList_Contains(const LIBMATTI_JU_ArrayList *list, const void
 
 long LIBMATTI_JU_ArrayList_IndexOf(const LIBMATTI_JU_ArrayList *list, const void *element)
 {
-    // Java: indexOf - null-safe equality; the port compares pointers (default equals)
+// Java: indexOf - null-safe equality; the port compares pointers (default equals)
     for (size_t i = 0; i < list->size; i++)
         if (list->elements[i] == element)
             return (long) i;
@@ -137,7 +137,7 @@ void LIBMATTI_JU_ArrayList_EnsureCapacity(LIBMATTI_JU_ArrayList *list, size_t mi
 
 void LIBMATTI_JU_ArrayList_Sort(LIBMATTI_JU_ArrayList *list, int (*comparator)(const void *a, const void *b))
 {
-    // Java: Arrays.sort -> TimSort; qsort is the C equivalent
+// Java: Arrays.sort -> TimSort; qsort is the C equivalent
     if (list->size > 1 && comparator != NULL)
         qsort(list->elements, list->size, sizeof(void *), comparator);
 }

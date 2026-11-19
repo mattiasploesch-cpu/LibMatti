@@ -1,14 +1,16 @@
-// Port of com.mojang.datafixers.DataFixerUpper (the versioned update chain)
-// and the Dynamic value tree the fixes walk.
+
+
+
 
 #include "libmatti/com/mojang/datafixers/DataFixer.h"
 
 #include <stdlib.h>
 #include <string.h>
 
-// ---------------------------------------------------------------------------
-// Dynamic
-// ---------------------------------------------------------------------------
+
+
+
+
 
 LIBMATTI_DFUP_Dynamic *LIBMATTI_DFUP_Dynamic_Empty(void)
 {
@@ -58,7 +60,7 @@ void LIBMATTI_DFUP_Dynamic_Free(LIBMATTI_DFUP_Dynamic *dynamic)
 LIBMATTI_DFUP_Dynamic *LIBMATTI_DFUP_Dynamic_Set(LIBMATTI_DFUP_Dynamic *dynamic, const char *key,
                                                  LIBMATTI_DFUP_Dynamic *value)
 {
-    // Java: Dynamic.set(key, value)
+// Java: Dynamic.set(key, value)
     for (size_t i = 0; i < dynamic->mapCount; i++)
     {
         if (strcmp(dynamic->map[i].key, key) == 0)
@@ -77,7 +79,7 @@ LIBMATTI_DFUP_Dynamic *LIBMATTI_DFUP_Dynamic_Set(LIBMATTI_DFUP_Dynamic *dynamic,
 
 LIBMATTI_DFUP_Dynamic *LIBMATTI_DFUP_Dynamic_Get(const LIBMATTI_DFUP_Dynamic *dynamic, const char *key)
 {
-    // Java: Dynamic.get(key) -> Optional
+// Java: Dynamic.get(key) -> Optional
     for (size_t i = 0; i < dynamic->mapCount; i++)
         if (strcmp(dynamic->map[i].key, key) == 0)
             return dynamic->map[i].value;
@@ -106,9 +108,10 @@ const char *LIBMATTI_DFUP_Dynamic_AsString(const LIBMATTI_DFUP_Dynamic *dynamic,
     return dynamic->type == LIBMATTI_DFUP_ValueType_STRING ? dynamic->stringValue : fallback;
 }
 
-// ---------------------------------------------------------------------------
-// DataFixerUpper
-// ---------------------------------------------------------------------------
+
+
+
+
 
 void LIBMATTI_DFUP_DataFixerUpper_Add(LIBMATTI_DFUP_DataFixerUpper *fixer, int version, const char *name,
                                       LIBMATTI_DFUP_Fix fix, void *self)
@@ -130,14 +133,14 @@ LIBMATTI_DFUP_Dynamic *LIBMATTI_DFUP_DataFixerUpper_Update(LIBMATTI_DFUP_DataFix
                                                            LIBMATTI_DFUP_Dynamic *input, int dataVersion,
                                                            int currentVersion)
 {
-    // Java: if (dataVersion >= currentVersion) return input;
+// Java: if (dataVersion >= currentVersion) return input;
     if (dataVersion >= currentVersion)
         return input;
 
     LIBMATTI_DFUP_Dynamic *data = input;
     for (size_t i = 0; i < fixer->fixCount; i++)
     {
-        // Java: the fix for the version above dataVersion applies
+// Java: the fix for the version above dataVersion applies
         if (fixer->fixes[i].version <= dataVersion)
             continue;
         if (fixer->fixes[i].version > currentVersion)
@@ -163,7 +166,8 @@ void LIBMATTI_DFUP_DataFixerUpper_Free(LIBMATTI_DFUP_DataFixerUpper *fixer)
 LIBMATTI_DFUP_Dynamic *LIBMATTI_DFUP_DataFixUtils_UpdateNamed(LIBMATTI_DFUP_Dynamic *data, const char *oldName,
                                                               const char *newName)
 {
-    // Renames the top-level "Name"/"id" style entry when it matches oldName
+
+
     LIBMATTI_DFUP_Dynamic *name = LIBMATTI_DFUP_Dynamic_Get(data, "Name");
     if (name != NULL && name->type == LIBMATTI_DFUP_ValueType_STRING &&
         strcmp(name->stringValue, oldName) == 0)

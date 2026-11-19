@@ -15,4 +15,4 @@
 // Java: static final String VERSION
 extern const char *const LIBMATTI_FML_FMLVersionProperties_VERSION;
 
-#endif //MATTICRAFT_FML_FMLVERSIONPROPERTIES_H
+#endif

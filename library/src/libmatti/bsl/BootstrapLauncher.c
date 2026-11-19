@@ -1,9 +1,10 @@
-//
-// Created by administrator on 09.09.26.
-//
-// Port of cpw.mods.bootstraplauncher.BootstrapLauncher to C.
-// The orchestration logic mirrors the Java file 1:1; components that live in
-// external libraries in Java (jarhandling, module class loader) are the ported sjh.
+
+
+
+
+
+
+
 
 #include "BootstrapLauncher.h"
 
@@ -21,9 +22,10 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-// ---------------------------------------------------------------------------
-// small helpers
-// ---------------------------------------------------------------------------
+
+
+
+
 
 static char *path_get_filename(const char *path)
 {
@@ -45,8 +47,9 @@ static int string_list_contains(char **list, size_t count, const char *value)
     return 0;
 }
 
-// Add value to the list if not already present (set semantics, like the
-// HashSet/Set.copyOf usage in BootstrapLauncher.java)
+
+
+
 static int string_set_add(char ***list, size_t *count, const char *value)
 {
     if (string_list_contains(*list, *count, value)) return 0;
@@ -68,7 +71,8 @@ static void string_list_free(char **list, size_t count)
     free(list);
 }
 
-// First index of name inside order, or -1 (order.indexOf in Java)
+
+
 static long order_index(char **order, size_t orderCount, const char *name)
 {
     for (size_t i = 0; i < orderCount; i++)
@@ -164,9 +168,10 @@ static LIBMATTI_BSL_MergeMapEntry *merge_map_get_or_create(LIBMATTI_BSL_MergeMap
 // mergeModules handling (Java: private static getMergeFilenameMap)
 // ---------------------------------------------------------------------------
 
-// `mergeModules` is a semicolon-separated set of comma-separated filenames,
-// where each group of filenames is combined into a single module.
-// example: filename1.jar,filename2.jar;filename3.jar
+
+
+
+
 int LIBMATTI_BSL_FS_GetMergeFilenameMap(LIBMATTI_BSL_FilenameMap **map)
 {
     *map = NULL;
@@ -176,7 +181,7 @@ int LIBMATTI_BSL_FS_GetMergeFilenameMap(LIBMATTI_BSL_FilenameMap **map)
 
     const char *mergeModules = getenv("mergeModules");
 
-    // Java: System.getProperty("mergeModules") == null -> Map.of()
+// Java: System.getProperty("mergeModules") == null -> Map.of()
     if (mergeModules == NULL)
     {
         *map = result;
@@ -231,7 +236,7 @@ int LIBMATTI_BSL_FS_GetMergeFilenameMap(LIBMATTI_BSL_FilenameMap **map)
 
 int LIBMATTI_BSL_JAR_GetModuleName(const char *path, char **name)
 {
-    // Java: try (var jarContent = JarContents.of(path)) {
+// Java: try (var jarContent = JarContents.of(path)) {
     //          moduleName = JarMetadata.from(jarContent).name(); }
     //      catch (UncheckedIOException | IOException e) { skip; }
     *name = NULL;
@@ -246,7 +251,7 @@ int LIBMATTI_BSL_JAR_GetModuleName(const char *path, char **name)
     LIBMATTI_JH_JarMetadata *metadata = LIBMATTI_JH_JarMetadata_From(contents);
     if (metadata == NULL)
     {
-        // Java: JarMetadata.from returns NULL on a malformed module-info.class or an
+// Java: JarMetadata.from returns NULL on a malformed module-info.class or an
         // unparseable version - the file is skipped
         LIBMATTI_JH_JarContents_Close(contents);
         *name = strdup("");
@@ -335,15 +340,18 @@ static void package_tracker_free(LIBMATTI_BSL_PackageTracker *tracker)
 // out (its package is already claimed by a previous module).
 static int package_tracker_test(const LIBMATTI_BSL_PackageTracker *tracker, const char *path, const char *basePath)
 {
-    (void)basePath; // UnionPathFilter contract, unused like in Java
+    (void)basePath;
+
 
     if (tracker->packageCount == 0 || strncmp(path, "META-INF/", 9) == 0)
         return 1;
 
     const char *lastSlash = strrchr(path, '/');
 
-    if (lastSlash == NULL) return 1;    // resources at the root may co-exist
-    if (lastSlash[1] == '\0') return 1; // directories may co-exist
+    if (lastSlash == NULL) return 1;
+
+    if (lastSlash[1] == '\0') return 1;
+
 
     size_t len = (size_t)(lastSlash - path);
     char *package = malloc(len + 1);
@@ -376,9 +384,10 @@ void LIBMATTI_BSL_SetLaunchConsumer(LIBMATTI_BSL_LaunchConsumer consumer)
     launchConsumer = consumer;
 }
 
-// ---------------------------------------------------------------------------
-// public API
-// ---------------------------------------------------------------------------
+
+
+
+
 
 int LIBMATTI_BSL_RUN(int isolation, int argc, char *argv[], int debug)
 {
@@ -407,14 +416,16 @@ int LIBMATTI_BSL_RUN(int isolation, int argc, char *argv[], int debug)
     LIBMATTI_JL_Configuration *configuration = NULL;
     LIBMATTI_CL_ModuleClassLoader *moduleClassLoader = NULL;
 
-    // Load the legacy class path (loadLegacyClassPath in BootstrapLauncher.java)
+
+
     if (LIBMATTI_BSL_CLASSPATH_LoadLegacyClasspath(&legacyClasspath) != 0)
         goto cleanup;
 
     while (legacyClasspath[legacyClasspathCount] != NULL) legacyClasspathCount++;
 
-    // Mirror System.setProperty("legacyClassPath", ...) for backwards
-    // compatibility if somebody reads this value later on
+
+
+
     size_t length = 1;
     for (size_t i = 0; i < legacyClasspathCount; i++)
         length += strlen(legacyClasspath[i]) + 1;
@@ -432,12 +443,14 @@ int LIBMATTI_BSL_RUN(int isolation, int argc, char *argv[], int debug)
     if (setenv("legacyClassPath", joined, 1) != 0)
         goto cleanup;
 
-    // Loaded modules (name -> fs location), mirroring findLoadedModules()
+
+
     if (LIBMATTI_BSL_MODULES_FindLoadedModules(&loadedModules) != 0)
         goto cleanup;
 
-    // The ignore list exempts files whose name starts with one of the keywords
-    // from being turned into modules (e.g. existing modules)
+
+
+
     const char *ignoreList = getenv("ignoreList");
     if (ignoreList == NULL) ignoreList = "asm,securejarhandler";
 
@@ -459,26 +472,29 @@ int LIBMATTI_BSL_RUN(int isolation, int argc, char *argv[], int debug)
         free(copy);
     }
 
-    // Tracks all previously encountered packages so that subsequent modules
-    // cannot include packages from previous modules (disallowed by the module
-    // system)
+
+
+
+
     pathLookup = calloc(1, sizeof(LIBMATTI_BSL_PathLookup));
     mergeMap = calloc(1, sizeof(LIBMATTI_BSL_MergeMap));
 
     if (pathLookup == NULL || mergeMap == NULL)
         goto cleanup;
 
-    // Java: getMergeFilenameMap() - the mergeModules property handling
+// Java: getMergeFilenameMap() - the mergeModules property handling
     if (LIBMATTI_BSL_FS_GetMergeFilenameMap(&filenameMap) != 0)
         goto cleanup;
 
-    // Main loop over the legacy class path (outer: in BootstrapLauncher.java)
+
+
     for (size_t i = 0; i < legacyClasspathCount; i++)
     {
         const char *legacy = legacyClasspath[i];
         char *filename = path_get_filename(legacy);
 
-        // Skip files whose name starts with an ignore keyword
+
+
         int ignored = 0;
         for (size_t f = 0; f < ignoreCount; f++)
         {
@@ -500,15 +516,17 @@ int LIBMATTI_BSL_RUN(int isolation, int argc, char *argv[], int debug)
         if (debug)
             printf("bsl: encountered path '%s'\n", legacy);
 
-        // Skip entries that do not exist (Files.notExists in Java)
+
+
         if (!path_exists(legacy))
         {
             free(filename);
             continue;
         }
 
-        // Compute the module name for this artifact
-        // (JarContents.of + JarMetadata.from(...).name() in Java)
+
+
+
         char *moduleName = NULL;
         if (LIBMATTI_BSL_JAR_GetModuleName(legacy, &moduleName) != 0)
         {
@@ -526,8 +544,9 @@ int LIBMATTI_BSL_RUN(int isolation, int argc, char *argv[], int debug)
             continue;
         }
 
-        // If a module of the same name is already loaded, skip it; if it is
-        // loaded from a different location, that is a hard error
+
+
+
         const LIBMATTI_BSL_BoostrapLauncher_Module *existing = NULL;
         for (size_t m = 0; loadedModules[m] != NULL; m++)
         {
@@ -557,7 +576,8 @@ int LIBMATTI_BSL_RUN(int isolation, int argc, char *argv[], int debug)
             continue;
         }
 
-        // jarname = pathLookup.computeIfAbsent(path, k -> filenameMap.getOrDefault(filename, moduleName))
+
+
         const char *jarname = NULL;
 
         for (size_t p = 0; p < pathLookup->count; p++)
@@ -582,7 +602,8 @@ int LIBMATTI_BSL_RUN(int isolation, int argc, char *argv[], int debug)
             }
         }
 
-        // order.add(jarname)
+
+
         char **grownOrder = realloc(order, sizeof(char *) * (orderCount + 1));
         if (grownOrder == NULL)
         {
@@ -600,7 +621,8 @@ int LIBMATTI_BSL_RUN(int isolation, int argc, char *argv[], int debug)
         }
         orderCount++;
 
-        // mergeMap.computeIfAbsent(jarname, k -> new ArrayList<>()).add(path)
+
+
         LIBMATTI_BSL_MergeMapEntry *mergeEntry = merge_map_get_or_create(mergeMap, jarname);
         if (mergeEntry == NULL)
         {
@@ -630,7 +652,7 @@ int LIBMATTI_BSL_RUN(int isolation, int argc, char *argv[], int debug)
         free(filename);
     }
 
-    // Merge phase: combine all paths sharing the same jarname into one module,
+// Merge phase: combine all paths sharing the same jarname into one module,
     // sorted by first occurrence in the order list
     // (Java: mergeMap.entrySet().stream().sorted(Comparator.comparingInt(
     //          e -> order.indexOf(e.getKey()))))
@@ -652,16 +674,17 @@ int LIBMATTI_BSL_RUN(int isolation, int argc, char *argv[], int debug)
     {
         LIBMATTI_BSL_MergeMapEntry *entry = &mergeMap->entries[i];
 
-        // Skip empty paths (a single path that does not exist)
+
+
         if (entry->pathCount == 1 && !path_exists(entry->paths[0]))
             continue;
 
-        // Java: new PackageTracker(Set.copyOf(previousPackages), pathsArray)
+// Java: new PackageTracker(Set.copyOf(previousPackages), pathsArray)
         LIBMATTI_BSL_PackageTracker *tracker = package_tracker_create(previousPackages, previousPackageCount,
                                                                       entry->paths, entry->pathCount);
         if (tracker == NULL) goto cleanup;
 
-        // Java: new JarContentsBuilder().paths(pathsArray).pathFilter(tracker).build()
+// Java: new JarContentsBuilder().paths(pathsArray).pathFilter(tracker).build()
         LIBMATTI_UNION_UnionPathFilter filter = {package_tracker_filter_test, tracker};
         LIBMATTI_JH_JarContentsBuilder *builder = LIBMATTI_JH_JarContentsBuilder_New();
         if (builder == NULL)
@@ -680,17 +703,17 @@ int LIBMATTI_BSL_RUN(int isolation, int argc, char *argv[], int debug)
             goto cleanup;
         }
 
-        // Java: SecureJar.from(jarContents)
+// Java: SecureJar.from(jarContents)
         LIBMATTI_JH_SecureJar *jar = LIBMATTI_JH_SecureJar_FromContents(contents);
         if (jar == NULL)
         {
-            // Java: JarMetadata.from returned NULL (malformed module descriptor)
+// Java: JarMetadata.from returned NULL (malformed module descriptor)
             LIBMATTI_JH_JarContents_Close(contents);
             package_tracker_free(tracker);
             goto cleanup;
         }
 
-        // Java: jar.moduleDataProvider().descriptor().packages()
+// Java: jar.moduleDataProvider().descriptor().packages()
         // The descriptor is owned and cached by the metadata (LazyJarMetadata);
         // it must not be freed here.
         LIBMATTI_JH_ModuleDataProvider *provider = LIBMATTI_JH_SecureJar_ModuleDataProvider(jar);
@@ -708,7 +731,8 @@ int LIBMATTI_BSL_RUN(int isolation, int argc, char *argv[], int debug)
                 printf("bsl:    %s\n", packages[p]);
         }
 
-        // previousPackages.addAll(packages)
+
+
         for (size_t p = 0; p < packageCount; p++)
         {
             if (string_set_add(&previousPackages, &previousPackageCount, packages[p]) != 0)
@@ -718,7 +742,7 @@ int LIBMATTI_BSL_RUN(int isolation, int argc, char *argv[], int debug)
             }
         }
 
-        // Java: the tracker stays alive as the filesystem's pathFilter; keep it
+// Java: the tracker stays alive as the filesystem's pathFilter; keep it
         // until cleanup (the jar's contents reference it via the filesystem)
         LIBMATTI_BSL_PackageTracker **grownTrackers = realloc(trackers, sizeof(LIBMATTI_BSL_PackageTracker *) * (trackerCount + 1));
         if (grownTrackers == NULL)
@@ -735,13 +759,13 @@ int LIBMATTI_BSL_RUN(int isolation, int argc, char *argv[], int debug)
         jars[jarCount++] = jar;
     }
 
-    // Java: var jarModuleFinder = JarModuleFinder.of(secureJarsArray);
+// Java: var jarModuleFinder = JarModuleFinder.of(secureJarsArray);
     finder = LIBMATTI_CL_JarModuleFinder_Of(jars, jarCount);
     if (finder == NULL) goto cleanup;
 
     refs = LIBMATTI_CL_JarModuleFinder_FindAll(finder, &refCount);
 
-    // Java: allTargets = Arrays.stream(secureJarsArray).map(SecureJar::name).toList()
+// Java: allTargets = Arrays.stream(secureJarsArray).map(SecureJar::name).toList()
     for (size_t i = 0; i < jarCount; i++)
     {
         char **grown = realloc(allTargets, sizeof(char *) * (allTargetsCount + 1));
@@ -752,23 +776,23 @@ int LIBMATTI_BSL_RUN(int isolation, int argc, char *argv[], int debug)
         allTargetsCount++;
     }
 
-    // Java: bootModuleConfiguration.resolveAndBind(jarModuleFinder, ModuleFinder.ofSystem(), allTargets)
+// Java: bootModuleConfiguration.resolveAndBind(jarModuleFinder, ModuleFinder.ofSystem(), allTargets)
     // The binding pass pulls providers of used services into the graph. The 'after'
     // finder (ModuleFinder.ofSystem(), JVM boot modules) is external and omitted.
     configuration = LIBMATTI_JL_Configuration_ResolveAndBind((LIBMATTI_JL_ModuleReference **)refs, refCount,
                                                              (const char **)allTargets, allTargetsCount);
     if (configuration == NULL) goto cleanup;
 
-    // Java: new ModuleClassLoader("MC-BOOTSTRAP", bootstrapConfiguration, List.of(ModuleLayer.boot()), parentLoader)
+// Java: new ModuleClassLoader("MC-BOOTSTRAP", bootstrapConfiguration, List.of(ModuleLayer.boot()), parentLoader)
     // The parentLoader (controlled by the isolation flag) feeds the JVM-external
     // fallback class loader and is therefore omitted here.
     (void)isolation;
     moduleClassLoader = LIBMATTI_CL_ModuleClassLoader_New("MC-BOOTSTRAP", configuration);
     if (moduleClassLoader == NULL) goto cleanup;
 
-    // Java: Thread.currentThread().setContextClassLoader(moduleClassLoader) - no C equivalent
+// Java: Thread.currentThread().setContextClassLoader(moduleClassLoader) - no C equivalent
 
-    // Java: ServiceLoader.load(layer.layer(), Consumer.class).stream().findFirst().orElseThrow().get().accept(args)
+// Java: ServiceLoader.load(layer.layer(), Consumer.class).stream().findFirst().orElseThrow().get().accept(args)
     // The mod-launcher BootstrapLaunchConsumer is external; the host registers the
     // C equivalent via LIBMATTI_BSL_SetLaunchConsumer.
     if (launchConsumer != NULL)
@@ -854,7 +878,7 @@ int LIBMATTI_BSL_MODULES_FindLoadedModules(LIBMATTI_BSL_BoostrapLauncher_Module 
 {
     size_t count = 0;
 
-    // Java: ModuleLayer.boot().configuration().modules() - the modules already on the JVM's
+// Java: ModuleLayer.boot().configuration().modules() - the modules already on the JVM's
     // boot module path. The port's launcher runs before any boot layer exists (the process
     // IS the boot), so the set is empty exactly like a plain -cp launch.
     *modules = calloc(count + 1, sizeof(LIBMATTI_BSL_BoostrapLauncher_Module *));
@@ -867,7 +891,7 @@ int LIBMATTI_BSL_CLASSPATH_LoadLegacyClasspath(char ***classpath)
 {
     *classpath = NULL;
 
-    // legacyClassPath.file -> one path per line
+// legacyClassPath.file -> one path per line
     // (Java: System.getProperty("legacyClassPath.file"))
     const char *legacyCpPath = getenv("legacyClassPath.file");
 
@@ -895,7 +919,8 @@ int LIBMATTI_BSL_CLASSPATH_LoadLegacyClasspath(char ***classpath)
         {
             buffer[strcspn(buffer, "\r\n")] = '\0';
 
-            // Skip empty lines; Java's Files.readAllLines does not produce them
+
+
             if (buffer[0] == '\0') continue;
 
             entries[i] = strdup(buffer);
@@ -915,7 +940,7 @@ int LIBMATTI_BSL_CLASSPATH_LoadLegacyClasspath(char ***classpath)
         return 0;
     }
 
-    // Fallback: legacyClassPath, split by the path separator
+// Fallback: legacyClassPath, split by the path separator
     // (Java: System.getProperty("legacyClassPath", ...) split by File.pathSeparator)
     const char *legacyClasspath = getenv("legacyClassPath");
 

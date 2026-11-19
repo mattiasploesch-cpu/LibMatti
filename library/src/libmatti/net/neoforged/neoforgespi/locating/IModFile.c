@@ -6,7 +6,7 @@
 LIBMATTI_NEOFORGESPI_IModFile *LIBMATTI_NEOFORGESPI_IModFile_Create(
     LIBMATTI_FML_JarContents *contents, LIBMATTI_NEOFORGESPI_ModFileInfoParser parser, void *parserUserdata)
 {
-    // Java: return new ModFile(contents, parser, ModFileDiscoveryAttributes.DEFAULT);
+// Java: return new ModFile(contents, parser, ModFileDiscoveryAttributes.DEFAULT);
     LIBMATTI_NEOFORGESPI_ModFileDiscoveryAttributes attributes =
         LIBMATTI_NEOFORGESPI_ModFileDiscoveryAttributes_Default();
     return LIBMATTI_NEOFORGESPI_IModFile_CreateWithAttributes(contents, parser, parserUserdata, &attributes);
@@ -17,7 +17,7 @@ LIBMATTI_NEOFORGESPI_IModFile *LIBMATTI_NEOFORGESPI_IModFile_CreateWithMetadata(
     LIBMATTI_FML_JarContents *contents, LIBMATTI_FML_JarModuleInfo *metadata,
     LIBMATTI_NEOFORGESPI_ModFileInfoParser parser, void *parserUserdata)
 {
-    // Java: return new ModFile(contents, metadata, parser, ModFileDiscoveryAttributes.DEFAULT);
+// Java: return new ModFile(contents, metadata, parser, ModFileDiscoveryAttributes.DEFAULT);
     LIBMATTI_NEOFORGESPI_ModFileDiscoveryAttributes attributes =
         LIBMATTI_NEOFORGESPI_ModFileDiscoveryAttributes_Default();
     return LIBMATTI_FML_ModFile_AsModFile(
@@ -29,7 +29,7 @@ LIBMATTI_NEOFORGESPI_IModFile *LIBMATTI_NEOFORGESPI_IModFile_CreateWithAttribute
     LIBMATTI_FML_JarContents *contents, LIBMATTI_NEOFORGESPI_ModFileInfoParser parser, void *parserUserdata,
     const LIBMATTI_NEOFORGESPI_ModFileDiscoveryAttributes *attributes)
 {
-    // Java: return new ModFile(contents, parser, attributes);
+// Java: return new ModFile(contents, parser, attributes);
     return LIBMATTI_FML_ModFile_AsModFile(
         LIBMATTI_FML_ModFile_New(contents, parser, parserUserdata, attributes));
 }
@@ -40,7 +40,7 @@ LIBMATTI_NEOFORGESPI_IModFile *LIBMATTI_NEOFORGESPI_IModFile_CreateWithMetadataA
     LIBMATTI_NEOFORGESPI_ModFileInfoParser parser, void *parserUserdata, LIBMATTI_NEOFORGESPI_IModFile_Type type,
     const LIBMATTI_NEOFORGESPI_ModFileDiscoveryAttributes *attributes)
 {
-    // Java: return new ModFile(contents, metadata, parser, type, attributes);
+// Java: return new ModFile(contents, metadata, parser, type, attributes);
     return LIBMATTI_FML_ModFile_AsModFile(LIBMATTI_FML_ModFile_NewWithMetadataAndType(
         contents, metadata, parser, parserUserdata, type, attributes));
 }
@@ -50,7 +50,7 @@ LIBMATTI_NEOFORGESPI_IModFile *LIBMATTI_NEOFORGESPI_IModFile_CreateWithType(
     LIBMATTI_FML_JarContents *contents, LIBMATTI_NEOFORGESPI_ModFileInfoParser parser, void *parserUserdata,
     LIBMATTI_NEOFORGESPI_IModFile_Type type, const LIBMATTI_NEOFORGESPI_ModFileDiscoveryAttributes *attributes)
 {
-    // Java: return new ModFile(contents, null, parser, type, attributes);
+// Java: return new ModFile(contents, null, parser, type, attributes);
     return LIBMATTI_FML_ModFile_AsModFile(LIBMATTI_FML_ModFile_NewWithMetadataAndType(
         contents, NULL, parser, parserUserdata, type, attributes));
 }

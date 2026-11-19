@@ -1,4 +1,5 @@
-// Port of net.neoforged.bus.api.Event.
+
+
 
 #include "libmatti/net/neoforged/bus/api/Event.h"
 

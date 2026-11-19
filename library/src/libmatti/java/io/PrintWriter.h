@@ -3,10 +3,11 @@
 
 #include "libmatti/java/io/Writer.h"
 
-// Port of java.io.PrintWriter.
+
+
 typedef struct
 {
-    // Java: the underlying Writer
+// Java: the underlying Writer
     LIBMATTI_JI_Writer *out;
 } LIBMATTI_JI_PrintWriter;
 
@@ -21,4 +22,4 @@ void LIBMATTI_JI_PrintWriter_Println(LIBMATTI_JI_PrintWriter *writer, const char
 // Java: public void flush()
 void LIBMATTI_JI_PrintWriter_Flush(LIBMATTI_JI_PrintWriter *writer);
 
-#endif //MATTICRAFT_JAVA_IO_PRINTWRITER_H
+#endif

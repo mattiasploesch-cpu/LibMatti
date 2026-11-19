@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.loading.progress.StartupNotificationManager.
+
+
 
 #ifndef MATTICRAFT_FML_PROGRESS_STARTUPNOTIFICATIONMANAGER_H
 #define MATTICRAFT_FML_PROGRESS_STARTUPNOTIFICATIONMANAGER_H
@@ -44,4 +45,4 @@ LIBMATTI_FML_StartupNotificationManager_Consumer LIBMATTI_FML_StartupNotificatio
 // Java: public static Optional<Consumer<String>> mcLoaderConsumer()
 LIBMATTI_FML_StartupNotificationManager_Consumer LIBMATTI_FML_StartupNotificationManager_McLoaderConsumer(void);
 
-#endif //MATTICRAFT_FML_PROGRESS_STARTUPNOTIFICATIONMANAGER_H
+#endif

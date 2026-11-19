@@ -13,7 +13,7 @@ add_library(matti_mobile SHARED libmatti_jni.c)
 target_include_directories(matti_mobile PRIVATE "${LIBMATTI_ROOT}/library/src")
 
 if(TARGET matti)
-    target_link_libraries(matti_mobile PRIVATE $<LINK_LIBRARY:WHOLE_ARCHIVE,matti>)
+    target_link_libraries(matti_mobile PRIVATE matti)
     if(TARGET matti_rust)
         target_link_libraries(matti_mobile PRIVATE matti_rust)
     endif()

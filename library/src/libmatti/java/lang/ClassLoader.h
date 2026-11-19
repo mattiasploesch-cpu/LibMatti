@@ -1,9 +1,10 @@
-// Port of java.lang.ClassLoader.
-// The JVM creates the loaders and searches its internal class path (ucp); the C
-// port keeps the surface the loader uses: name, parent, the class path entries
-// and the resource lookup over them.
-// Note: cpw.mods.cl.ModuleClassLoader (bsl/sjh) declares the same Java class as
-// the opaque LIBMATTI_CL_ClassLoader handle.
+
+
+
+
+
+
+
 
 #ifndef MATTICRAFT_JAVA_LANG_CLASSLOADER_H
 #define MATTICRAFT_JAVA_LANG_CLASSLOADER_H
@@ -16,11 +17,11 @@ typedef struct LIBMATTI_JL_ClassLoader LIBMATTI_JL_ClassLoader;
 
 struct LIBMATTI_JL_ClassLoader
 {
-    // Java: String getName()
+// Java: String getName()
     char *name;
-    // Java: ClassLoader getParent()
+// Java: ClassLoader getParent()
     LIBMATTI_JL_ClassLoader *parent;
-    // Java: the class path this loader searches (the VM's java.class.path for the system loader)
+// Java: the class path this loader searches (the VM's java.class.path for the system loader)
     char **classPath;
     size_t classPathCount;
 };
@@ -58,4 +59,4 @@ void LIBMATTI_JL_ClassLoader_SetClassPath(LIBMATTI_JL_ClassLoader *classLoader, 
 // Java: URLClassLoader.addURL(URL)
 void LIBMATTI_JL_ClassLoader_AddClassPathEntry(LIBMATTI_JL_ClassLoader *classLoader, const char *entry);
 
-#endif //MATTICRAFT_JAVA_LANG_CLASSLOADER_H
+#endif

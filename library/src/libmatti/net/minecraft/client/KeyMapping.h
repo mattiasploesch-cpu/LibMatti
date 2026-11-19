@@ -1,9 +1,10 @@
-// Port of net.minecraft.client.KeyMapping (the key-bind registry). Java keeps
-// two statics - ALL (name -> mapping) and MAP (key -> mappings) - the port
-// mirrors them with flat arrays; the key is the InputConstants.Key value the
-// GLFW port hands over (KEYSYM codes, MOUSE_BUTTON codes, UNKNOWN = -1).
-// ToggleKeyMapping (sneak/sprint/use/attack) rides the isToggle flag + the
-// toggle-provider pointer the Options port fills.
+
+
+
+
+
+
+
 
 #ifndef MATTICRAFT_NET_MINECRAFT_CLIENT_KEYMAPPING_H
 #define MATTICRAFT_NET_MINECRAFT_CLIENT_KEYMAPPING_H
@@ -44,20 +45,20 @@ typedef enum LIBMATTI_MC_KeyMappingCategory
 // Java: public class KeyMapping implements Comparable<KeyMapping>
 typedef struct LIBMATTI_MC_KeyMapping
 {
-    // Java: private final String name (the translation key, "key.forward")
+// Java: private final String name (the translation key, "key.forward")
     char *name;
-    // Java: private final InputConstants.Key defaultKey / protected Key key
+// Java: private final InputConstants.Key defaultKey / protected Key key
     int defaultKey;
     int key;
     LIBMATTI_MC_InputConstants_Type keyType;
-    // Java: private final KeyMapping.Category category
+// Java: private final KeyMapping.Category category
     LIBMATTI_MC_KeyMappingCategory category;
-    // Java: private final int order
+// Java: private final int order
     int order;
-    // Java: private boolean isDown / private int clickCount
+// Java: private boolean isDown / private int clickCount
     bool isDown;
     int clickCount;
-    // Java: ToggleKeyMapping - the flag + the needsToggle provider (the toggle
+// Java: ToggleKeyMapping - the flag + the needsToggle provider (the toggle
     // option, default off; NULL = plain mapping). Java: setDown flips the state
     // only when needsToggle() is true, isDown() stays the plain field.
     bool isToggle;
@@ -139,4 +140,4 @@ LIBMATTI_MC_KeyMapping *LIBMATTI_MC_KeyMapping_Hotbar(int slot);
 }
 #endif
 
-#endif //MATTICRAFT_NET_MINECRAFT_CLIENT_KEYMAPPING_H
+#endif

@@ -1,4 +1,5 @@
-// Port of net.neoforged.bus.api.BusBuilder.
+
+
 
 #include "libmatti/net/neoforged/bus/api/BusBuilder.h"
 
@@ -16,7 +17,7 @@ static void marker_type_check(void *self, LIBMATTI_JL_Class *eventType)
     LIBMATTI_JL_Class *markerInterface = self;
     if (LIBMATTI_JL_Class_IsAssignableFrom(markerInterface, eventType)) return;
 
-    // Java: throw new IllegalArgumentException("This bus only accepts subclasses of " + markerInterface + ", which " + eventType + " is not.")
+// Java: throw new IllegalArgumentException("This bus only accepts subclasses of " + markerInterface + ", which " + eventType + " is not.")
     LIBMATTI_ML_Logger_Error(LOGGER(), NULL, "This bus only accepts subclasses of {}, which {} is not.",
                              LIBMATTI_JL_Class_GetName(markerInterface), LIBMATTI_JL_Class_GetName(eventType));
 }
@@ -44,7 +45,7 @@ LIBMATTI_BUS_BusBuilder *LIBMATTI_BUS_BusBuilder_CheckTypesOnDispatch(LIBMATTI_B
 LIBMATTI_BUS_BusBuilder *LIBMATTI_BUS_BusBuilder_MarkerType(LIBMATTI_BUS_BusBuilder *builder,
                                                            LIBMATTI_JL_Class *markerInterface)
 {
-    // Java: if (!markerInterface.isInterface()) throw new IllegalArgumentException("Cannot specify a class marker type")
+// Java: if (!markerInterface.isInterface()) throw new IllegalArgumentException("Cannot specify a class marker type")
     if (!LIBMATTI_JL_Class_IsInterface(markerInterface))
     {
         LIBMATTI_ML_Logger_Error(LOGGER(), NULL, "Cannot specify a class marker type");

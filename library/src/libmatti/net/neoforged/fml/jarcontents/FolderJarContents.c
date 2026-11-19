@@ -21,7 +21,7 @@ typedef struct FileResource
 {
     LIBMATTI_FML_JarResource base;
     char *path;
-    // Java: private final boolean mutable
+// Java: private final boolean mutable
     int mutable;
     int retained;
 } FileResource;
@@ -30,7 +30,7 @@ typedef struct
 {
     LIBMATTI_FML_JarContents base;
     char *path;
-    LIBMATTI_JU_Manifest *cachedManifest; // Java: private Manifest cachedManifest
+    LIBMATTI_JU_Manifest *cachedManifest;// Java: private Manifest cachedManifest
 } FolderJarContents;
 
 // Java: pathToFile.toUri()
@@ -50,7 +50,7 @@ static LIBMATTI_JN_URI *fileUri(const char *path)
 // Java: private Path fromRelativePath(String relativePath)
 static char *fromRelativePath(FolderJarContents *contents, const char *relativePath)
 {
-    // Java: path.resolve(relativePath) - checking for normalization here prevents path escapes
+// Java: path.resolve(relativePath) - checking for normalization here prevents path escapes
     char *normalized = LIBMATTI_FML_PathNormalization_Normalize(relativePath);
     char *result = LIBMATTI_JNF_Path_Resolve(contents->path, normalized);
     free(normalized);
@@ -77,12 +77,13 @@ static void fileAttributes(void *self, LIBMATTI_FML_JarResourceAttributes *out)
     if (stat(resource->path, &status) != 0)
         return;
 
-    // Java: attributes.lastModifiedTime()
+// Java: attributes.lastModifiedTime()
     out->lastModifiedMillis = (long)status.st_mtime * 1000;
     out->size = (long)status.st_size;
 }
 
-// Java has no release; the port frees the handle a get() allocated.
+
+
 static void fileResourceFree(void *self)
 {
     freeFileResource(self);
@@ -217,7 +218,7 @@ static LIBMATTI_JU_Manifest *getManifest(void *self)
             free(bytes);
         }
 
-        // Java: catch (NoSuchFileException ignored) { manifest = EmptyManifest.INSTANCE; }
+// Java: catch (NoSuchFileException ignored) { manifest = EmptyManifest.INSTANCE; }
         if (contents->cachedManifest == NULL)
             contents->cachedManifest = LIBMATTI_FML_EmptyManifest_Instance();
 
@@ -281,7 +282,7 @@ static void visitContent(void *self, const char *startingFolder, LIBMATTI_FML_Ja
                               : LIBMATTI_JNF_Path_Normalize(LIBMATTI_JNF_Path_Resolve(contents->path, normalizedFolder));
     free(normalizedFolder);
 
-    // Java: if (!Files.isDirectory(startingPoint)) return;
+// Java: if (!Files.isDirectory(startingPoint)) return;
     if (!LIBMATTI_JNF_Files_IsDirectory(startingPoint))
     {
         free(startingPoint);
@@ -291,7 +292,7 @@ static void visitContent(void *self, const char *startingFolder, LIBMATTI_FML_Ja
     VisitContext context = {visitor, userdata, contents->path};
     LIBMATTI_JNF_SimpleFileVisitor fileVisitor = {.self = &context, .visitFile = visitFile};
 
-    // Java: try (var stream = Files.walk(startingPoint))
+// Java: try (var stream = Files.walk(startingPoint))
     LIBMATTI_JNF_Files_WalkFileTree(startingPoint, 0, INT_MAX, &fileVisitor);
 
     free(startingPoint);
@@ -301,7 +302,7 @@ static void visitContent(void *self, const char *startingFolder, LIBMATTI_FML_Ja
 static void closeContents(void *self)
 {
     FolderJarContents *contents = self;
-    // Java: the empty manifest is the shared EmptyManifest.INSTANCE
+// Java: the empty manifest is the shared EmptyManifest.INSTANCE
     if (contents->cachedManifest != NULL && contents->cachedManifest != LIBMATTI_FML_EmptyManifest_Instance())
         LIBMATTI_JU_Manifest_Free(contents->cachedManifest);
     free(contents->path);

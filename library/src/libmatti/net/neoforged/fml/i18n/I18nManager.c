@@ -1,5 +1,6 @@
-// Port of net.neoforged.fml.i18n.I18nManager over the Gson port.
-// The translation JSONs are {key: value} objects at /lang/<locale>.json.
+
+
+
 
 #include "libmatti/net/neoforged/fml/i18n/I18nManager.h"
 
@@ -13,7 +14,8 @@
 static LIBMATTI_FML_I18nManager_TranslationMap *defaultTranslations = NULL;
 static LIBMATTI_FML_I18nManager_TranslationMap *currentLocale = NULL;
 
-// parses a {key: value} JSON object into the map
+
+
 static LIBMATTI_FML_I18nManager_TranslationMap *parse_translations(const char *text)
 {
     LIBMATTI_FML_I18nManager_TranslationMap *map = calloc(1, sizeof(LIBMATTI_FML_I18nManager_TranslationMap));
@@ -56,7 +58,8 @@ static LIBMATTI_FML_I18nManager_TranslationMap *parse_translations(const char *t
 // resources are files on disk here).
 static char *read_lang_resource(const char *language)
 {
-    // the lang folder ships next to the FML loader ("lang/en_us.json")
+
+
     char *paths[] = {"lang/en_us.json", NULL};
     (void) paths;
 
@@ -71,7 +74,7 @@ LIBMATTI_FML_I18nManager_TranslationMap *LIBMATTI_FML_I18nManager_DefaultTransla
 {
     if (defaultTranslations == NULL)
     {
-        // Java: Collections.unmodifiableMap(loadTranslations(DEFAULT_LOCALE))
+// Java: Collections.unmodifiableMap(loadTranslations(DEFAULT_LOCALE))
         char *text = read_lang_resource(LIBMATTI_FML_I18nManager_DEFAULT_LOCALE);
         defaultTranslations = parse_translations(text);
         free(text);
@@ -86,7 +89,7 @@ LIBMATTI_FML_I18nManager_TranslationMap *LIBMATTI_FML_I18nManager_CurrentLocale(
 
 void LIBMATTI_FML_I18nManager_InjectTranslations(LIBMATTI_FML_I18nManager_TranslationMap *translations)
 {
-    // Java: currentLocale = Collections.unmodifiableMap(translations)
+// Java: currentLocale = Collections.unmodifiableMap(translations)
     currentLocale = translations;
 }
 

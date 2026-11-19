@@ -1,4 +1,5 @@
-// Port of com.electronwill.nightconfig.toml.TomlVersion.
+
+
 
 #ifndef MATTICRAFT_NC_TOML_TOMLVERSION_H
 #define MATTICRAFT_NC_TOML_TOMLVERSION_H
@@ -10,4 +11,4 @@ typedef enum
     LIBMATTI_NC_TOMLVERSION_V1_1
 } LIBMATTI_NC_TomlVersion;
 
-#endif //MATTICRAFT_NC_TOML_TOMLVERSION_H
+#endif

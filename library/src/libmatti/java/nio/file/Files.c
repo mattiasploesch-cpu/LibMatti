@@ -197,7 +197,7 @@ char *LIBMATTI_JNF_Files_ReadString(const char *path)
     unsigned char *bytes = LIBMATTI_JNF_Files_ReadAllBytes(path, &length);
     if (bytes == NULL)
         return NULL;
-    // Java: decoded UTF-8; the port's strings are UTF-8 already
+// Java: decoded UTF-8; the port's strings are UTF-8 already
     bytes[length] = '\0';
     return (char *) bytes;
 }
@@ -206,7 +206,7 @@ char *LIBMATTI_JNF_Files_ReadString(const char *path)
 int LIBMATTI_JNF_Files_CreateFile(const char *path)
 {
     if (LIBMATTI_JNF_Files_Exists(path))
-        return 0; // Java: FileAlreadyExistsException
+        return 0;// Java: FileAlreadyExistsException
     FILE *file = fopen(path, "wb");
     if (file == NULL)
         return 0;

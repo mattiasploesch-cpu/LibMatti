@@ -13,8 +13,9 @@
 
 #include "stb_truetype.h"
 
-// The Monocraft font ships inside the executable (cmake/MattiNative.cmake);
-// the source-tree copy is the fallback for a build without the embedding.
+
+
+
 #define UI_FONT_SECTION ".matti_font_monocraft"
 #define UI_FONT_RESOURCE \
     MATTI_SOURCE_DIR "/vendor/FancyModLoader/earlydisplay/src/main/resources/net/neoforged/fml/earlydisplay/theme/Monocraft.ttf"
@@ -56,9 +57,10 @@ static char backend[16] = "none";
 static char requested_selection[64] = "auto:auto";
 static char last_error[256] = "";
 
-// ---------------------------------------------------------------------------
-// Font (stb_truetype -> framebuffer)
-// ---------------------------------------------------------------------------
+
+
+
+
 
 static unsigned char *read_file(const char *path, size_t *out_size)
 {
@@ -167,8 +169,9 @@ int LIBMATTI_UI_TextWidth(const char *text, int scale)
     return width_total;
 }
 
-// Source-over blend into the CPU framebuffer (the render API stores opaque
-// pixels, so only the colour channels are mixed).
+
+
+
 static void blend_pixel(int x, int y, uint32_t argb, unsigned int coverage)
 {
     if (renderer == NULL || x < 0 || y < 0 || x >= width || y >= height)
@@ -238,9 +241,10 @@ void LIBMATTI_UI_DrawText(const char *text, int x, int y, uint32_t argb, int sca
     }
 }
 
-// ---------------------------------------------------------------------------
-// Window / renderer
-// ---------------------------------------------------------------------------
+
+
+
+
 
 static void set_error(const char *message)
 {
@@ -266,8 +270,9 @@ int LIBMATTI_UI_WindowOpen(const LIBMATTI_UI_WindowConfig *config)
         requested = LIBMATTI_Platform_DefaultRenderer();
     snprintf(requested_selection, sizeof(requested_selection), "%s", requested);
 
-    // The early window hands over here: Rust now owns the game window, so the
-    // splash window of the port's early display is destroyed first.
+
+
+
     LIBMATTI_FML_DisplayWindow *early = LIBMATTI_FML_DisplayWindow_Current();
     if (early != NULL)
     {
@@ -364,9 +369,10 @@ double LIBMATTI_UI_Time(void)
     return renderer != NULL ? LIBMATTI_Render_GetTime(renderer) : 0.0;
 }
 
-// ---------------------------------------------------------------------------
-// Drawing
-// ---------------------------------------------------------------------------
+
+
+
+
 
 void LIBMATTI_UI_Clear(uint32_t argb)
 {
@@ -404,9 +410,10 @@ void LIBMATTI_UI_Present(void)
         LIBMATTI_Render_Present(renderer);
 }
 
-// ---------------------------------------------------------------------------
-// Textures
-// ---------------------------------------------------------------------------
+
+
+
+
 
 void LIBMATTI_UI_DrawTextureRegion(const LIBMATTI_UI_Texture *texture, int x, int y, int rect_width,
                                    int rect_height, int source_x, int source_y, int source_width,
@@ -477,9 +484,10 @@ int LIBMATTI_UI_SaveScreenshot(const char *path)
     return LIBMATTI_Render_SavePPM(renderer, path);
 }
 
-// ---------------------------------------------------------------------------
-// Input
-// ---------------------------------------------------------------------------
+
+
+
+
 
 int LIBMATTI_UI_MouseX(void)
 {

@@ -17,7 +17,7 @@
 // Java: public class RuntimeEnumExtender implements ClassProcessor
 typedef struct LIBMATTI_FML_RuntimeEnumExtender
 {
-    // Java: implements ClassProcessor
+// Java: implements ClassProcessor
     LIBMATTI_NEOFORGESPI_ClassProcessor processor;
 } LIBMATTI_FML_RuntimeEnumExtender;
 
@@ -40,4 +40,4 @@ void LIBMATTI_FML_RuntimeEnumExtender_LoadEnumPrototypes(const LIBMATTI_NEOFORGE
 // Java: public static String validateNameParameter(String fieldName, String owningMod)
 const char *LIBMATTI_FML_RuntimeEnumExtender_ValidateNameParameter(const char *fieldName, const char *owningMod);
 
-#endif //MATTICRAFT_FML_COMMON_ASM_ENUMEXTENSION_RUNTIMEENUMEXTENDER_H
+#endif

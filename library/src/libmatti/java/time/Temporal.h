@@ -1,7 +1,8 @@
-// Port of the java.time types the TOML layer needs: LocalDate, LocalTime, LocalDateTime and
-// OffsetDateTime. Java keeps them as separate immutable classes behind java.time.temporal.Temporal;
-// the port is one tagged struct with the same fields and accessor semantics (LocalTime's
-// SECOND_OF_MINUTE / NANO_OF_SECOND exist on every instance, defaulting to 0).
+
+
+
+
+
 
 #ifndef MATTICRAFT_JAVA_TIME_TEMPORAL_H
 #define MATTICRAFT_JAVA_TIME_TEMPORAL_H
@@ -19,18 +20,20 @@ typedef struct LIBMATTI_JT_Temporal
 {
     LIBMATTI_JT_TemporalKind kind;
 
-    // LocalDate / LocalDateTime / OffsetDateTime
+
+
     int year;
-    int month;      // Java: MONTH_OF_YEAR, 1-12
-    int dayOfMonth; // Java: DAY_OF_MONTH
+    int month;// Java: MONTH_OF_YEAR, 1-12
+    int dayOfMonth;// Java: DAY_OF_MONTH
 
-    // LocalTime / LocalDateTime / OffsetDateTime
-    int hour;       // Java: HOUR_OF_DAY
-    int minute;     // Java: MINUTE_OF_HOUR
-    int second;     // Java: SECOND_OF_MINUTE
-    int nano;       // Java: NANO_OF_SECOND
 
-    // OffsetDateTime only: Java: ZoneOffset, kept as total seconds
+
+    int hour;// Java: HOUR_OF_DAY
+    int minute;// Java: MINUTE_OF_HOUR
+    int second;// Java: SECOND_OF_MINUTE
+    int nano;// Java: NANO_OF_SECOND
+
+// OffsetDateTime only: Java: ZoneOffset, kept as total seconds
     int offsetSeconds;
 } LIBMATTI_JT_Temporal;
 
@@ -51,4 +54,4 @@ int LIBMATTI_JT_Temporal_SupportsYear(const LIBMATTI_JT_Temporal *temporal);
 int LIBMATTI_JT_Temporal_SupportsHour(const LIBMATTI_JT_Temporal *temporal);
 int LIBMATTI_JT_Temporal_SupportsOffsetSeconds(const LIBMATTI_JT_Temporal *temporal);
 
-#endif //MATTICRAFT_JAVA_TIME_TEMPORAL_H
+#endif

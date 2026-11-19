@@ -136,7 +136,7 @@ impl LaunchPlan {
         })
     }
 
-    /// Start and wait for the process (headless/CI path).
+/// Start and wait for the process (headless/CI path).
     pub fn run(&self) -> Result<LaunchStatus> {
         let mut child = self.spawn()?;
         let pid = child.id();
@@ -180,15 +180,19 @@ fn find_resource(name: &str) -> Option<PathBuf> {
     let exe = std::env::current_exe().ok()?;
     let dir = exe.parent()?;
     let mut candidates = vec![
-        // Portable package: resources next to the launcher.
+
+
         dir.join(name),
-        // Unix install prefix: <prefix>/bin/launcher -> <prefix>/share/matticraft.
+
+
         dir.join("..").join("share").join("matticraft").join(name),
-        // macOS app bundle: Contents/MacOS/launcher -> Contents/Resources.
+
+
         dir.join("..").join("Resources").join(name),
     ];
     if name == "assets" {
-        // Development tree: launchers/target/<profile>/launcher.
+
+
         candidates.push(
             dir.join("..")
                 .join("..")
@@ -262,8 +266,9 @@ fn local_candidates() -> Vec<PathBuf> {
                 candidates.push(dir.join(name));
                 candidates.push(dir.join("..").join(name));
             }
-            // Development tree: launchers/target/<profile>/launcher ->
-            // <repo>/build/runClient and <repo>/build/matticraft.
+
+
+
             candidates.push(dir.join("../../../build").join(binary_names()[0]));
             candidates.push(dir.join("../../../build").join(binary_names()[1]));
         }

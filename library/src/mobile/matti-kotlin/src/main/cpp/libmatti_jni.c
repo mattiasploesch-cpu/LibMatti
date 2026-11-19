@@ -1,8 +1,9 @@
-// JNI bridge for the Android build. The renderer selection is the same
-// layer:api string the desktop uses; libmatti detects Android/arm64 itself.
-//
-// The main CMake library glob compiles every C file under library/src, so the
-// file is empty in desktop builds (jni.h only exists in the Android NDK).
+
+
+
+
+
+
 
 #if defined(__ANDROID__)
 
@@ -13,7 +14,8 @@
 #include "libmatti/matti/Platform.h"
 #include "libmatti/matti/ui/bridge.h"
 
-// Exported by the Rust window crate (library/src/libmatti/rs).
+
+
 extern int matti_rs_init(int argc, const char *const *argv);
 
 static char **build_argv(JNIEnv *env, jobjectArray args, int *out_count)
@@ -72,7 +74,8 @@ Java_dev_matticraft_libmatti_LibMatti_setSurface(JNIEnv *env, jobject self, jobj
     (void) env;
     (void) self;
     (void) surface;
-    // M2: hand ANativeWindow_fromSurface() to the SDL/Android window backend.
+
+
 }
 
 JNIEXPORT void JNICALL
@@ -82,7 +85,8 @@ Java_dev_matticraft_libmatti_LibMatti_resize(JNIEnv *env, jobject self, jint wid
     (void) self;
     (void) width;
     (void) height;
-    // M2: forward to the renderer's logical framebuffer resize.
+
+
 }
 
 JNIEXPORT void JNICALL
@@ -90,7 +94,8 @@ Java_dev_matticraft_libmatti_LibMatti_pressEscape(JNIEnv *env, jobject self)
 {
     (void) env;
     (void) self;
-    // M2: inject KEY_ESCAPE into the C menu input state.
+
+
 }
 
 JNIEXPORT void JNICALL
@@ -101,4 +106,4 @@ Java_dev_matticraft_libmatti_LibMatti_shutdown(JNIEnv *env, jobject self)
     LIBMATTI_UI_RequestClose();
 }
 
-#endif // __ANDROID__
+#endif

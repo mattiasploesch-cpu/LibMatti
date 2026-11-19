@@ -1,5 +1,6 @@
-// Port of net.neoforged.fml.javafmlmod.FMLJavaModLanguageProvider.
-// Java streams over the scan data's @Mod annotations; the port keeps the same filters and sort.
+
+
+
 
 #ifndef MATTICRAFT_FML_JAVAFMLMOD_FMLJAVAMODLANGUAGEPROVIDER_H
 #define MATTICRAFT_FML_JAVAFMLMOD_FMLJAVAMODLANGUAGEPROVIDER_H
@@ -18,4 +19,4 @@ LIBMATTI_NEOFORGESPI_IModLanguageLoader *LIBMATTI_FML_FMLJavaModLanguageProvider
 // AutomaticEventSubscriber.getSides uses.
 size_t LIBMATTI_FML_FMLJavaModLanguageProvider_GetDepends(const char *data, const char **depends, size_t capacity);
 
-#endif //MATTICRAFT_FML_JAVAFMLMOD_FMLJAVAMODLANGUAGEPROVIDER_H
+#endif

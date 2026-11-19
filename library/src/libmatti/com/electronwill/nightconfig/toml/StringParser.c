@@ -1,4 +1,5 @@
-// Port of com.electronwill.nightconfig.toml.StringParser.
+
+
 
 #include "libmatti/com/electronwill/nightconfig/toml/StringParser.h"
 
@@ -214,7 +215,8 @@ char *LIBMATTI_NC_StringParser_ParseMultiBasic(LIBMATTI_NC_ReaderInput *input, L
             if (next == '\n' || (next == '\r' && LIBMATTI_NC_ReaderInput_PeekChar(input) == '\n') ||
                 ((next == '\t' || next == ' ') && lineIsWhitespace))
             {
-                // Goes to the next non-space char (skips newlines too)
+
+
                 int nextNonSpace = LIBMATTI_NC_Toml_ReadNonSpaceChar(input, 1);
                 LIBMATTI_NC_ReaderInput_PushBack(input, (char) nextNonSpace);
                 continue;
@@ -247,7 +249,8 @@ char *LIBMATTI_NC_StringParser_ParseMultiBasic(LIBMATTI_NC_ReaderInput *input, L
         }
     }
 
-    LIBMATTI_NC_ReaderInput_SkipPeeks(input); // Don't include the closing quotes in the String
+    LIBMATTI_NC_ReaderInput_SkipPeeks(input);
+
     if (LIBMATTI_NC_ReaderInput_Peek(input) == '"')
     {
         LIBMATTI_NC_ReaderInput_SkipPeeks(input);
@@ -288,7 +291,8 @@ char *LIBMATTI_NC_StringParser_ParseMultiLiteral(LIBMATTI_NC_ReaderInput *input,
         LIBMATTI_NC_CharsWrapper_Builder_AppendChar(builder, (char) c);
     }
 
-    LIBMATTI_NC_ReaderInput_SkipPeeks(input); // Don't include the closing quotes in the String
+    LIBMATTI_NC_ReaderInput_SkipPeeks(input);
+
     if (LIBMATTI_NC_ReaderInput_Peek(input) == '\'')
     {
         LIBMATTI_NC_ReaderInput_SkipPeeks(input);

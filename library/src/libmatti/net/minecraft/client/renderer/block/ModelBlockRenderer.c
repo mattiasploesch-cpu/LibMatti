@@ -1,11 +1,12 @@
-// Port of net.minecraft.client.renderer.block.ModelBlockRenderer (implementation)
-// - the tesselate slice: calculateShape's face-shape bookkeeping, the AO
-// per-corner brightness through the AdjacencyInfo corner tables, the
-// non-cubic weights, the lightmap blending and the tint resolution.
-//
-// The world queries (getBlockState/getShade/getLightEngine) ride on the
-// port's Level/BlockGetter surface; every formula follows the vendored
-// 1.21.11 source line by line.
+
+
+
+
+
+
+
+
+
 
 #include "libmatti/net/minecraft/client/renderer/block/ModelBlockRenderer.h"
 
@@ -41,10 +42,10 @@ enum
 // (DOWN: W, E, N, S ...). Extents 0/1 replace the DirectionalRelativePos.
 typedef struct AdjacencyInfo
 {
-    signed char corners[4][3];   // Java: final Direction[] corners
-    float brightness;            // Java: (unused by the AO path; Java keeps 0.5/1.0/0.8/0.6)
-    int doNonCubicWeight;        // Java: final boolean doNonCubicWeight
-    signed char vert0Weights[8]; // Java: the four SizeInfo[] tables
+    signed char corners[4][3];// Java: final Direction[] corners
+    float brightness;// Java: (unused by the AO path; Java keeps 0.5/1.0/0.8/0.6)
+    int doNonCubicWeight;// Java: final boolean doNonCubicWeight
+    signed char vert0Weights[8];// Java: the four SizeInfo[] tables
     signed char vert1Weights[8];
     signed char vert2Weights[8];
     signed char vert3Weights[8];
@@ -188,7 +189,7 @@ static int state_light_block(const LIBMATTI_MC_BlockState *state)
 {
     if (state_solid_render(state))
         return 15;
-    // Java: propagatesSkylightDown() ? 0 : 1 - the port's proxy is the air flag
+// Java: propagatesSkylightDown() ? 0 : 1 - the port's proxy is the air flag
     const LIBMATTI_MC_Block *block = LIBMATTI_MC_BlockState_GetBlock(state);
     if (block != NULL && block->properties != NULL && block->properties->isAir)
         return 0;
@@ -209,7 +210,7 @@ float LIBMATTI_MC_ModelBlockRenderer_GetShadeBrightness(
 {
     (void) level;
     (void) pos;
-    // Java: protected float getShadeBrightness - isCollisionShapeFullBlock ? 0.2F : 1.0F
+// Java: protected float getShadeBrightness - isCollisionShapeFullBlock ? 0.2F : 1.0F
     return state_full_block(state) ? 0.2f : 1.0f;
 }
 
@@ -223,7 +224,7 @@ int LIBMATTI_MC_ModelBlockRenderer_GetLightColor(
     const LIBMATTI_MC_BlockPos *pos)
 {
     (void) state;
-    // Java: BrightnessGetter.DEFAULT - getBrightness(SKY) << 20 | getBrightness(BLOCK) << 4
+// Java: BrightnessGetter.DEFAULT - getBrightness(SKY) << 20 | getBrightness(BLOCK) << 4
     struct LIBMATTI_MC_Level *lv = (struct LIBMATTI_MC_Level *) level;
     int sky = LIBMATTI_MC_LevelReader_CanSeeSky(lv, pos) ? 15 : 0;
     int block = 0;
@@ -231,7 +232,7 @@ int LIBMATTI_MC_ModelBlockRenderer_GetLightColor(
     const LIBMATTI_MC_Block *b = LIBMATTI_MC_BlockState_GetBlock(state);
     if (b != NULL && b->properties != NULL && b->properties->lightEmission > 0)
         emission = b->properties->lightEmission;
-    // Java: LightTexture.pack(block, sky) = block << 4 | sky << 20
+// Java: LightTexture.pack(block, sky) = block << 4 | sky << 20
     return (block & 15) << 4 | (sky & 15) << 20;
 }
 
@@ -293,7 +294,7 @@ static void calculate_shape(RenderContext *ctx, const LIBMATTI_MC_BakedQuad *qua
         f5 = f5 > z ? f5 : z;
     }
 
-    // Java: the AmbientOcclusionRenderStorage branch fills the faceShape slots
+// Java: the AmbientOcclusionRenderStorage branch fills the faceShape slots
     ctx->faceShape[SI_WEST] = f;
     ctx->faceShape[SI_EAST] = f3;
     ctx->faceShape[SI_DOWN] = f1;
@@ -377,7 +378,7 @@ static void ao_calculate(RenderContext *ctx, LIBMATTI_MC_Direction facing, int s
     struct LIBMATTI_MC_BlockAndTintGetter *level = ctx->level;
     struct LIBMATTI_MC_Level *lv = (struct LIBMATTI_MC_Level *) level;
 
-    // Java: BlockPos blockpos = faceCubic ? pos.relative(facing) : pos
+// Java: BlockPos blockpos = faceCubic ? pos.relative(facing) : pos
     LIBMATTI_MC_BlockPos blockpos;
     if (st->faceCubic)
     {
@@ -390,7 +391,7 @@ static void ao_calculate(RenderContext *ctx, LIBMATTI_MC_Direction facing, int s
         blockpos = *ctx->pos;
     }
 
-    // Java: the four corner states with their light + shade brightness
+// Java: the four corner states with their light + shade brightness
     LIBMATTI_MC_BlockPos scratch;
     int light[4];
     float shadeBrightness[4];
@@ -410,7 +411,7 @@ static void ao_calculate(RenderContext *ctx, LIBMATTI_MC_Direction facing, int s
         shadeBrightness[c] = LIBMATTI_MC_ModelBlockRenderer_GetShadeBrightness(cornerState, level, &scratch);
     }
 
-    // Java: the four diagonal-above states (corner + facing) for the open check
+// Java: the four diagonal-above states (corner + facing) for the open check
     int open[4];
     for (int c = 0; c < 4; c++)
     {
@@ -421,7 +422,7 @@ static void ao_calculate(RenderContext *ctx, LIBMATTI_MC_Direction facing, int s
         open[c] = aboveState == NULL || !state_view_blocking(aboveState) || state_light_block(aboveState) == 0;
     }
 
-    // Java: the three inner diagonals (f4/f5/f6/f7 with their lights)
+// Java: the three inner diagonals (f4/f5/f6/f7 with their lights)
     float f4 = shadeBrightness[0], f5 = shadeBrightness[0], f6 = shadeBrightness[0], f7 = shadeBrightness[0];
     int i1 = light[0], j1 = light[0], k1 = light[0], l1 = light[0];
     if (open[2] || open[0])
@@ -473,7 +474,7 @@ static void ao_calculate(RenderContext *ctx, LIBMATTI_MC_Direction facing, int s
         }
     }
 
-    // Java: i3 - the light of the face itself (the neighbour when the face is
+// Java: i3 - the light of the face itself (the neighbour when the face is
     // cubic or the neighbour is not solid render)
     int i3 = LIBMATTI_MC_ModelBlockRenderer_GetLightColor(ctx->state, level, ctx->pos);
     LIBMATTI_MC_BlockPos facePos = {
@@ -484,7 +485,7 @@ static void ao_calculate(RenderContext *ctx, LIBMATTI_MC_Direction facing, int s
     if (faceState != NULL && (st->faceCubic || !state_solid_render(faceState)))
         i3 = LIBMATTI_MC_ModelBlockRenderer_GetLightColor(faceState, level, &facePos);
 
-    // Java: f8 - the block's own shade brightness (cubic: the neighbour's)
+// Java: f8 - the block's own shade brightness (cubic: the neighbour's)
     float f8;
     if (st->faceCubic)
     {
@@ -497,7 +498,7 @@ static void ao_calculate(RenderContext *ctx, LIBMATTI_MC_Direction facing, int s
         f8 = LIBMATTI_MC_ModelBlockRenderer_GetShadeBrightness(ctx->state, level, ctx->pos);
     }
 
-    // Java: the corner brightness sums (f29..f33 / f9..f12 naming)
+// Java: the corner brightness sums (f29..f33 / f9..f12 naming)
     float b0 = (shadeBrightness[3] + shadeBrightness[0] + f5 + f8) * 0.25f;
     float b1 = (shadeBrightness[2] + shadeBrightness[0] + f4 + f8) * 0.25f;
     float b2 = (shadeBrightness[2] + shadeBrightness[1] + f6 + f8) * 0.25f;
@@ -505,7 +506,7 @@ static void ao_calculate(RenderContext *ctx, LIBMATTI_MC_Direction facing, int s
 
     if (st->facePartial && adj->doNonCubicWeight)
     {
-        // Java: the non-cubic weights - the faceShape products per vertex
+// Java: the non-cubic weights - the faceShape products per vertex
         float w[4][8];
         const signed char *tables[4] = {adj->vert0Weights, adj->vert1Weights, adj->vert2Weights, adj->vert3Weights};
         for (int v = 0; v < 4; v++)
@@ -522,7 +523,7 @@ static void ao_calculate(RenderContext *ctx, LIBMATTI_MC_Direction facing, int s
         st->brightness[remap->vert2] = fminf(fmaxf(b0 * w[2][0] + b1 * w[2][1] + b2 * w[2][2] + b3 * w[2][3], 0.0f), 1.0f);
         st->brightness[remap->vert3] = fminf(fmaxf(b0 * w[3][0] + b1 * w[3][1] + b2 * w[3][2] + b3 * w[3][3], 0.0f), 1.0f);
 
-        // Java: the lightmap blends - the two-level weighted average
+// Java: the lightmap blends - the two-level weighted average
         int i2 = blend4(l1, light[0], j1, i3);
         int j2 = blend4(light[2], light[0], i1, i3);
         int k2 = blend4(light[2], light[1], k1, i3);
@@ -544,7 +545,7 @@ static void ao_calculate(RenderContext *ctx, LIBMATTI_MC_Direction facing, int s
         st->brightness[remap->vert3] = b3;
     }
 
-    // Java: the directional shade multiplies every corner
+// Java: the directional shade multiplies every corner
     float faceShade = LIBMATTI_MC_ModelBlockRenderer_GetShade(facing, shade);
     for (int v = 0; v < 4; v++)
         st->brightness[v] = st->brightness[v] * faceShade;
@@ -559,7 +560,7 @@ typedef struct SinkInfo
     void (*sink)(void *userdata, int corner, const float vertexPos[3],
                  const LIBMATTI_MC_BakedQuad *quad, float r, float g, float b, int lightmap);
     void *userdata;
-    // Java: the renderer owning the storage (the tint cache and BlockColors)
+// Java: the renderer owning the storage (the tint cache and BlockColors)
     LIBMATTI_MC_ModelBlockRenderer *renderer;
 } SinkInfo;
 
@@ -594,7 +595,7 @@ static void put_quad_data(RenderContext *ctx, const LIBMATTI_MC_BakedQuad *quad,
         f2 = 1.0f;
     }
 
-    // Java: putBulkData(pose, quad, brightness[], r, g, b, 1.0F, lightmap[],
+// Java: putBulkData(pose, quad, brightness[], r, g, b, 1.0F, lightmap[],
     // overlay) - the per-vertex brightness folds into the vertex color.
     for (int corner = 0; corner < 4; corner++)
     {
@@ -605,9 +606,10 @@ static void put_quad_data(RenderContext *ctx, const LIBMATTI_MC_BakedQuad *quad,
     }
 }
 
-// ---------------------------------------------------------------------------
-// The tesselate paths
-// ---------------------------------------------------------------------------
+
+
+
+
 
 static void render_face_list_ao(RenderContext *ctx, const LIBMATTI_MC_BakedQuad *quads, size_t count, const SinkInfo *sink)
 {
@@ -626,7 +628,7 @@ static void render_face_list_flat(RenderContext *ctx, const LIBMATTI_MC_BakedQua
     {
         const LIBMATTI_MC_BakedQuad *quad = &quads[q];
         LIBMATTI_MC_ModelBlockRenderer_Storage *st = ctx->storage;
-        // Java: float f = level.getShade(quad.direction(), quad.shade()) - the
+// Java: float f = level.getShade(quad.direction(), quad.shade()) - the
         // one shade value goes into all four brightness slots.
         float shade = LIBMATTI_MC_ModelBlockRenderer_GetShade(quad->direction, quad->shade);
         st->brightness[0] = shade;
@@ -690,7 +692,7 @@ static void tesselate_impl(LIBMATTI_MC_ModelBlockRenderer *renderer,
         }
     }
 
-    // Java: getQuads(null) - the unculled list
+// Java: getQuads(null) - the unculled list
     size_t unculled = 0;
     const LIBMATTI_MC_BakedQuad *unculledQuads = LIBMATTI_MC_QuadCollection_GetUnculled(model, &unculled);
     if (unculled != 0)

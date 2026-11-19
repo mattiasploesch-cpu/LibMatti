@@ -1,18 +1,20 @@
-// Port-only: the M4 + M2 mixin backends. See MixinHookTable.h and matti_mixin.h.
-//
-// The descriptors in .matti_mixins carry function pointers the dynamic linker has already relocated,
-// so their values are only correct in the mapped object, never in the file. The two sources are
-// therefore split: section placement (headers, name table, relocations) is read from the file the
-// object was mapped from - these tables are typically not mapped at all, since they carry no
-// SHF_ALLOC - while the descriptor data itself is read from memory at load bias + sh_addr.
-//
-// The load bias is the link map's l_addr: 0 for a non-PIE executable, whose link-time addresses are
-// absolute, and the map base for every shared object. l_addr + sh_addr is the descriptor address in
-// both cases; the ELF header of the object is never dereferenced in memory (for a non-PIE executable
-// it sits before the first mapped segment header and is not addressable through the bias).
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 #ifndef _GNU_SOURCE
-#define _GNU_SOURCE // dlinfo / RTLD_DI_LINKMAP
+#define _GNU_SOURCE
+
 #endif
 
 #include "libmatti/matti/mixin/MixinHookTable.h"
@@ -35,24 +37,28 @@ static LIBMATTI_ML_Logger *LOGGER(void)
     return LIBMATTI_ML_LogManager_GetLogger();
 }
 
-// The descriptor section the two matti_mixin.h macros fill
+
+
 static const char MIXIN_SECTION[] = MATTI_MIXIN_SECTION;
 
-// ---------------------------------------------------------------------------
-// Mapped-object access
-// ---------------------------------------------------------------------------
 
-// The file the object's section headers and relocations are read from. The main program exposes no
-// path through the link map (l_name is ""), so /proc/self/exe stands in; mod files carry their path.
+
+
+
+
+
+
+
 static const char *object_file_path(const char *path)
 {
     if (path == NULL || path[0] == '\0') return "/proc/self/exe";
     return path;
 }
 
-// The handle of the mapped object for 'path'; NULL (or /proc/self/exe) selects the host process
-// itself - the main executable cannot be dlopen'ed by path, but dlopen(NULL) is its handle.
-// A not-yet-loaded path is loaded, so an owner can hand the hook table a mod file it will load later.
+
+
+
+
 static void *object_handle(const char *path)
 {
     if (path == NULL || strcmp(path, "/proc/self/exe") == 0) return dlopen(NULL, RTLD_LAZY);
@@ -80,9 +86,10 @@ static int object_load_bias(void *handle, unsigned char **outBias)
     return 1;
 }
 
-// The section header of 'sectionName' of the object file 'filePath'. Returns 0 when the file is not
-// a readable ELF64 object or carries no such section. 'outAddr' is the section's virtual address
-// (sh_addr) and 'outSize' its size; 'outType' is optional.
+
+
+
+
 static int read_file_section(const char *filePath, const char *sectionName, Elf64_Addr *outAddr,
                              Elf64_Xword *outSize, Elf64_Word *outType)
 {
@@ -125,9 +132,10 @@ static int read_file_section(const char *filePath, const char *sectionName, Elf6
     return found;
 }
 
-// ---------------------------------------------------------------------------
-// The hook table
-// ---------------------------------------------------------------------------
+
+
+
+
 
 struct LIBMATTI_MIXIN_HookTable
 {
@@ -173,9 +181,10 @@ LIBMATTI_MIXIN_HookTable *LIBMATTI_MIXIN_HookTable_Default(void)
     return defaultTable;
 }
 
-// The target entry (MATTI_MIXIN_TARGET) is its owner's marker: it registers the original. The
-// collision-free shape is (handler = the function, no userdata, HEAD, priority 0, no mod id); a
-// handler hook always names its mod.
+
+
+
+
 static int entry_is_target_marker(const MattiMixinEntry *entry)
 {
     return entry->modId == NULL && entry->userdata == NULL && entry->at == MATTI_MIXIN_AT_HEAD &&
@@ -205,8 +214,9 @@ size_t LIBMATTI_MIXIN_HookTable_AddObject(LIBMATTI_MIXIN_HookTable *table, const
         return 0;
     }
 
-    // The descriptors live in mapped memory (SHF_ALLOC); their function pointers are the ones the
-    // dynamic linker already resolved.
+
+
+
     const MattiMixinEntry *entries = (const MattiMixinEntry *) (base + sectionAddress);
     size_t taken = 0;
     for (size_t i = 0; i < sectionSize / sizeof(MattiMixinEntry); i++)
@@ -228,9 +238,10 @@ size_t LIBMATTI_MIXIN_HookTable_AddObject(LIBMATTI_MIXIN_HookTable *table, const
         taken++;
     }
 
-    // Every descriptor's storage (target marker or hook handler) stays referenced by the table, so
-    // the object must stay mapped whenever any was taken - the same rule as Java, where the classes
-    // stay defined for the layer's lifetime. Only the reference this lookup itself took is dropped.
+
+
+
+
     if (taken == 0) dlclose(handle);
     return taken;
 }
@@ -303,7 +314,7 @@ int LIBMATTI_MIXIN_Invoke(const LIBMATTI_MIXIN_HookTable *table, const char *tar
 
         if (result != NULL) *result = MATTI_MIXIN_CANCEL;
 
-        // Java: a cancellation at HEAD skips the target and the rest of the chain; a cancellation
+// Java: a cancellation at HEAD skips the target and the rest of the chain; a cancellation
         // after the target ran (RETURN/TAIL) only stops the remaining handlers.
         return entry->hooks[i].at == MATTI_MIXIN_AT_HEAD ? 0 : 1;
     }
@@ -327,9 +338,10 @@ void LIBMATTI_MIXIN_HookTable_Free(LIBMATTI_MIXIN_HookTable *table)
     free(table);
 }
 
-// ---------------------------------------------------------------------------
-// M2: GOT patching (see MixinHookTable.h)
-// ---------------------------------------------------------------------------
+
+
+
+
 
 typedef struct GotPatch
 {
@@ -368,8 +380,9 @@ void *LIBMATTI_MIXIN_GotOriginal(const char *path, const char *symbolName)
     return patch != NULL ? patch->original : NULL;
 }
 
-// GOT pages sit under RELRO (read-only) when the object binds now; the patch unprotects the page for
-// the write and leaves it writable - the patch is permanent for the object's lifetime.
+
+
+
 static int make_writable(void *address)
 {
     long pageSize = sysconf(_SC_PAGESIZE);
@@ -378,9 +391,10 @@ static int make_writable(void *address)
     return mprotect((void *) page, (size_t) pageSize, PROT_READ | PROT_WRITE);
 }
 
-// The relocation table of a loaded object is not mapped; like the section headers it is read from
-// the file the object was mapped from ('relaOffset'/'relaSize' from its section header). The GOT
-// slots themselves live in mapped memory at load bias + r_offset.
+
+
+
+
 static void got_patch_relocations(FILE *file, const Elf64_Shdr *relaSection, const Elf64_Sym *symbols,
                                   const char *strtab, unsigned char *base, const char *path,
                                   const char *const *symbolNames, size_t symbolCount,
@@ -414,8 +428,9 @@ static void got_patch_relocations(FILE *file, const Elf64_Shdr *relaSection, con
             if (got_patch_record(path, symbolName, *slot) == NULL) continue;
         }
 
-        // The handler receives the invocation; the original stays reachable through
-        // LIBMATTI_MIXIN_GotOriginal for the re-invocation of the target.
+
+
+
         if (make_writable(slot) != 0) continue;
         *slot = *(void **) &hook;
         (*rewritten)++;
@@ -458,9 +473,10 @@ size_t LIBMATTI_MIXIN_GotPatch(const char *path, const char *const *symbolNames,
                     const Elf64_Shdr *relaSection = &sections[i];
                     if (relaSection->sh_type != SHT_RELA) continue;
 
-                    // SHT_RELA: sh_link is the symbol table the relocations index into, and the
-                    // symbol table's sh_link is its string table. (sh_info is the first-symbol
-                    // index, not a section index.)
+
+
+
+
                     const Elf64_Shdr *symtab = &sections[relaSection->sh_link];
                     if (symtab->sh_type != SHT_DYNSYM) continue;
                     const Elf64_Shdr *strtabHeader = &sections[symtab->sh_link];
@@ -489,8 +505,9 @@ size_t LIBMATTI_MIXIN_GotPatch(const char *path, const char *const *symbolNames,
         fclose(file);
     }
 
-    // The patch lives in the object's own GOT; dropping the reference this lookup took changes
-    // nothing for an object that is mapped anyway (mods stay mapped for their descriptors).
+
+
+
     dlclose(handle);
     return rewritten;
 }

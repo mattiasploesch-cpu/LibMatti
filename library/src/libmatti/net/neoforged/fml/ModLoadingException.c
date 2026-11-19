@@ -32,7 +32,7 @@ static char *replace_newlines(const char *text)
 // Java: private void appendIssue(ModLoadingIssue issue, StringBuilder result)
 static void append_issue(const LIBMATTI_FML_ModLoadingIssue *issue, LIBMATTI_JL_StringBuilder *result)
 {
-    // Java: try { translation = FMLTranslations.stripControlCodes(FMLTranslations.translateIssueEnglish(issue)); }
+// Java: try { translation = FMLTranslations.stripControlCodes(FMLTranslations.translateIssueEnglish(issue)); }
     //       catch (Exception e) { translation = issue.toString(); } // Fall back to *something* readable in case the translation fails
     char *translation = LIBMATTI_FML_FMLTranslations_TranslateIssueEnglish(issue);
     if (translation == NULL)
@@ -49,7 +49,7 @@ static void append_issue(const LIBMATTI_FML_ModLoadingIssue *issue, LIBMATTI_JL_
     char *indented = replace_newlines(translation);
     free(translation);
 
-    // Java: result.append("\t- ").append(translation).append("\n");
+// Java: result.append("\t- ").append(translation).append("\n");
     LIBMATTI_JL_StringBuilder_Append(result, "\t- ");
     LIBMATTI_JL_StringBuilder_Append(result, indented);
     LIBMATTI_JL_StringBuilder_Append(result, "\n");
@@ -60,10 +60,10 @@ static void append_issue(const LIBMATTI_FML_ModLoadingIssue *issue, LIBMATTI_JL_
 // Java: @Override public String getMessage()
 char *LIBMATTI_FML_ModLoadingException_GetMessage(const LIBMATTI_FML_ModLoadingException *exception)
 {
-    // Java: var result = new StringBuilder();
+// Java: var result = new StringBuilder();
     LIBMATTI_JL_StringBuilder *result = LIBMATTI_JL_StringBuilder_New();
 
-    // Java: var errors = issues.stream().filter(i -> i.severity() == ERROR).toList();
+// Java: var errors = issues.stream().filter(i -> i.severity() == ERROR).toList();
     //       if (!errors.isEmpty()) { result.append("Loading errors encountered:\n"); for (var error : errors) appendIssue(error, result); }
     int hasErrors = 0;
     for (size_t i = 0; i < exception->issueCount; i++)
@@ -81,7 +81,7 @@ char *LIBMATTI_FML_ModLoadingException_GetMessage(const LIBMATTI_FML_ModLoadingE
         }
     }
 
-    // Java: var warnings = issues.stream().filter(i -> i.severity() == WARNING).toList();
+// Java: var warnings = issues.stream().filter(i -> i.severity() == WARNING).toList();
     //       if (!warnings.isEmpty()) { result.append("Loading warnings encountered:\n"); for (var warning : warnings) appendIssue(warning, result); }
     int hasWarnings = 0;
     for (size_t i = 0; i < exception->issueCount; i++)
@@ -114,8 +114,9 @@ static LIBMATTI_FML_ModLoadingException *new_exception(LIBMATTI_FML_ModLoadingIs
     for (size_t i = 0; i < issueCount; i++)
         exception->issues[i] = issues[i];
 
-    // Java computes getMessage() on demand; the C port stores it on the throwable as well so the
-    // existing printStackTrace surface shows the same text.
+
+
+
     exception->base.message = LIBMATTI_FML_ModLoadingException_GetMessage(exception);
     return exception;
 }
@@ -123,7 +124,7 @@ static LIBMATTI_FML_ModLoadingException *new_exception(LIBMATTI_FML_ModLoadingIs
 // Java: public ModLoadingException(ModLoadingIssue issue)
 LIBMATTI_FML_ModLoadingException *LIBMATTI_FML_ModLoadingException_New(LIBMATTI_FML_ModLoadingIssue *issue)
 {
-    // Java: this(List.of(issue));
+// Java: this(List.of(issue));
     LIBMATTI_FML_ModLoadingIssue *issues[1] = {issue};
     return new_exception(issues, 1);
 }

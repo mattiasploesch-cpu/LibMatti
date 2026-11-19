@@ -196,7 +196,7 @@ pub fn tail(path: &Path, max_lines: usize) -> Result<Vec<String>> {
 #[cfg(feature = "upload")]
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum UploadOutcome {
-    /// Consent was not given.
+/// Consent was not given.
     Disabled,
     Uploaded(u16),
 }

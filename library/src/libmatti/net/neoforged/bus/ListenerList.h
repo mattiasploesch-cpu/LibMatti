@@ -16,27 +16,27 @@ typedef struct LIBMATTI_BUS_ListenerList LIBMATTI_BUS_ListenerList;
 
 struct LIBMATTI_BUS_ListenerList
 {
-    // Java: private boolean rebuild = true;
+// Java: private boolean rebuild = true;
     int rebuild;
-    // Java: private final AtomicReference<EventListener[]> listeners
+// Java: private final AtomicReference<EventListener[]> listeners
     LIBMATTI_BUS_EventListener **listeners;
     size_t listenerCount;
-    // Java: private final AtomicReference<EventListener[][]> perPhaseListeners
+// Java: private final AtomicReference<EventListener[][]> perPhaseListeners
     LIBMATTI_BUS_EventListener ***perPhaseListeners;
     size_t perPhaseCounts[LIBMATTI_BUS_EventPriority_COUNT];
-    // Java: private final ArrayList<ArrayList<EventListener>> priorities
+// Java: private final ArrayList<ArrayList<EventListener>> priorities
     LIBMATTI_BUS_EventListener **priorities[LIBMATTI_BUS_EventPriority_COUNT];
     size_t priorityCounts[LIBMATTI_BUS_EventPriority_COUNT];
-    // Java: @Nullable private final ListenerList parent;
+// Java: @Nullable private final ListenerList parent;
     LIBMATTI_BUS_ListenerList *parent;
-    // Java: private List<ListenerList> children;
+// Java: private List<ListenerList> children;
     LIBMATTI_BUS_ListenerList **children;
     size_t childCount;
-    // Java: private final boolean canUnwrapListeners;
+// Java: private final boolean canUnwrapListeners;
     int canUnwrapListeners;
-    // Java: private final boolean buildPerPhaseList;
+// Java: private final boolean buildPerPhaseList;
     int buildPerPhaseList;
-    // Java: private final Semaphore writeLock = new Semaphore(1, true);
+// Java: private final Semaphore writeLock = new Semaphore(1, true);
     pthread_mutex_t writeLock;
 };
 
@@ -61,4 +61,4 @@ void LIBMATTI_BUS_ListenerList_Register(LIBMATTI_BUS_ListenerList *list, LIBMATT
 // Java: public void unregister(EventListener listener)
 void LIBMATTI_BUS_ListenerList_Unregister(LIBMATTI_BUS_ListenerList *list, LIBMATTI_BUS_EventListener *listener);
 
-#endif //MATTICRAFT_BUS_LISTENERLIST_H
+#endif

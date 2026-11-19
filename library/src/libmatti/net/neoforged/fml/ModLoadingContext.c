@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.ModLoadingContext.
+
+
 
 #include "libmatti/net/neoforged/fml/ModLoadingContext.h"
 
@@ -41,7 +42,7 @@ LIBMATTI_FML_ModContainer *LIBMATTI_FML_ModLoadingContext_GetActiveContainer(LIB
         modList != NULL ? LIBMATTI_FML_ModList_GetModContainerById(modList, "minecraft") : NULL;
 
     if (container == NULL)
-        // Java: orElseThrow(() -> new RuntimeException("Where is minecraft???!"))
+// Java: orElseThrow(() -> new RuntimeException("Where is minecraft???!"))
         LIBMATTI_ML_Logger_Error(LOGGER(), NULL, "Where is minecraft?!");
 
     return container;

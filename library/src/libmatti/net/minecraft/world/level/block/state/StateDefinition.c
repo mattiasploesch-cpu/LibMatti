@@ -1,4 +1,5 @@
-// Port of net.minecraft.world.level.block.state.StateDefinition.
+
+
 
 #include "libmatti/net/minecraft/world/level/block/state/StateDefinition.h"
 
@@ -36,13 +37,13 @@ static void validate_property(void *owner, LIBMATTI_MC_StateDefinition_Builder *
     const char *name = property->name;
     if (!matches_name_pattern(name))
     {
-        // Java: throw new IllegalArgumentException(owner + " has invalidly named property: " + s)
+// Java: throw new IllegalArgumentException(owner + " has invalidly named property: " + s)
         LIBMATTI_ML_Logger_Error(logger, NULL, "has invalidly named property: {}", name);
         exit(1);
     }
     if (property->valueCount <= 1)
     {
-        // Java: throw new IllegalArgumentException(owner + " attempted use property " + s + " with <= 1 possible values")
+// Java: throw new IllegalArgumentException(owner + " attempted use property " + s + " with <= 1 possible values")
         LIBMATTI_ML_Logger_Error(logger, NULL, "attempted use property {} with <= 1 possible values", name);
         exit(1);
     }
@@ -50,7 +51,7 @@ static void validate_property(void *owner, LIBMATTI_MC_StateDefinition_Builder *
     {
         if (!matches_name_pattern(LIBMATTI_MC_Property_ValueName(property, property->values[i])))
         {
-            // Java: throw new IllegalArgumentException(owner + " has property: " + s + " with invalidly named value: " + s1)
+// Java: throw new IllegalArgumentException(owner + " has property: " + s + " with invalidly named value: " + s1)
             LIBMATTI_ML_Logger_Error(logger, NULL, "has property: {} with invalidly named value", name);
             exit(1);
         }
@@ -59,7 +60,7 @@ static void validate_property(void *owner, LIBMATTI_MC_StateDefinition_Builder *
     {
         if (strcmp(builder->properties[i]->name, name) == 0)
         {
-            // Java: throw new IllegalArgumentException(owner + " has duplicate property: " + s)
+// Java: throw new IllegalArgumentException(owner + " has duplicate property: " + s)
             LIBMATTI_ML_Logger_Error(logger, NULL, "has duplicate property: {}", name);
             exit(1);
         }
@@ -76,7 +77,7 @@ LIBMATTI_MC_StateDefinition_Builder *LIBMATTI_MC_StateDefinition_Builder_Add(LIB
         builder->capacity = builder->capacity > 0 ? builder->capacity * 2 : 4;
         builder->properties = realloc(builder->properties, sizeof(LIBMATTI_MC_Property *) * builder->capacity);
     }
-    // Java: properties.put(property.getName(), property) - the port keeps the insertion
+// Java: properties.put(property.getName(), property) - the port keeps the insertion
     // order (Java sorts the map by name when copying; the state table product order then
     // follows the sorted property order, which the port reproduces below at create())
     builder->properties[builder->propertyCount++] = property;
@@ -99,17 +100,17 @@ LIBMATTI_MC_StateDefinition *LIBMATTI_MC_StateDefinition_Builder_Create(LIBMATTI
     definition->propertyCount = builder->propertyCount;
     definition->properties = malloc(sizeof(LIBMATTI_MC_Property *) * (builder->propertyCount > 0 ? builder->propertyCount : 1));
     memcpy(definition->properties, builder->properties, sizeof(LIBMATTI_MC_Property *) * builder->propertyCount);
-    // Java: ImmutableSortedMap.copyOf(properties) - the sorted property order drives the table
+// Java: ImmutableSortedMap.copyOf(properties) - the sorted property order drives the table
     qsort(definition->properties, definition->propertyCount, sizeof(LIBMATTI_MC_Property *), compare_property_names);
 
-    // Java: the state count is the product of every property's value count
+// Java: the state count is the product of every property's value count
     int stateCount = 1;
     for (int i = 0; i < definition->propertyCount; i++)
         stateCount *= definition->properties[i]->valueCount;
     definition->stateCount = stateCount;
     definition->states = malloc(sizeof(LIBMATTI_MC_StateHolder *) * (stateCount > 0 ? stateCount : 1));
 
-    // Java: the cartesian product in declaration order - the last property varies fastest
+// Java: the cartesian product in declaration order - the last property varies fastest
     int *cursor = calloc(definition->propertyCount > 0 ? definition->propertyCount : 1, sizeof(int));
     for (int s = 0; s < stateCount; s++)
     {
@@ -122,7 +123,8 @@ LIBMATTI_MC_StateDefinition *LIBMATTI_MC_StateDefinition_Builder_Create(LIBMATTI
             state->values[i] = definition->properties[i]->values[cursor[i]];
         definition->states[s] = state;
 
-        // odometer increment: last property fastest
+
+
         for (int i = definition->propertyCount - 1; i >= 0; i--)
         {
             if (++cursor[i] < definition->properties[i]->valueCount)
@@ -132,7 +134,7 @@ LIBMATTI_MC_StateDefinition *LIBMATTI_MC_StateDefinition_Builder_Create(LIBMATTI
     }
     free(cursor);
 
-    // Java: for (S s : list) s.populateNeighbours(map)
+// Java: for (S s : list) s.populateNeighbours(map)
     for (int s = 0; s < stateCount; s++)
         LIBMATTI_MC_StateHolder_PopulateNeighbours(definition->states[s], definition->states, stateCount);
 

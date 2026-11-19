@@ -1,4 +1,5 @@
-// Port of net.minecraft.ChatFormatting.
+
+
 
 #include "libmatti/net/minecraft/ChatFormatting.h"
 
@@ -68,7 +69,7 @@ int LIBMATTI_MC_ChatFormatting_IsFormat(LIBMATTI_MC_ChatFormatting formatting)
 
 const char *LIBMATTI_MC_ChatFormatting_ToString(LIBMATTI_MC_ChatFormatting formatting)
 {
-    // Java: "\u00a7" + code - one static buffer per value keeps the pointers stable
+// Java: "\u00a7" + code - one static buffer per value keeps the pointers stable
     static char strings[COUNT][3];
     static int ready;
     if (!ready)

@@ -1,4 +1,5 @@
-// Port of net.minecraft.world.level.material.MapColor.
+
+
 
 #include "libmatti/net/minecraft/world/level/material/MapColor.h"
 
@@ -10,14 +11,14 @@ static const LIBMATTI_MC_MapColor *materialColors[COLOR_COUNT];
 
 const LIBMATTI_MC_MapColor *LIBMATTI_MC_MapColor_Create(int id, int col)
 {
-    // Java: the constructor stores the singleton in MATERIAL_COLORS; the port keeps
+// Java: the constructor stores the singleton in MATERIAL_COLORS; the port keeps
     // a static instance per call site, so repeated creates are shared through the table
     static LIBMATTI_MC_MapColor instances[COLOR_COUNT];
     static int used[COLOR_COUNT];
 
     if (id < 0 || id >= COLOR_COUNT)
     {
-        // Java: throw new IndexOutOfBoundsException("Map colour ID must be between 0 and 63 (inclusive)")
+// Java: throw new IndexOutOfBoundsException("Map colour ID must be between 0 and 63 (inclusive)")
         return LIBMATTI_MC_MapColor_NONE();
     }
     if (!used[id])
@@ -36,7 +37,7 @@ const LIBMATTI_MC_MapColor *LIBMATTI_MC_MapColor_ById(int id)
     if (id < 0 || id >= COLOR_COUNT)
         return LIBMATTI_MC_MapColor_NONE();
     const LIBMATTI_MC_MapColor *color = materialColors[id];
-    // Java: byIdUnsafe falls back to NONE
+// Java: byIdUnsafe falls back to NONE
     return color != NULL ? color : LIBMATTI_MC_MapColor_NONE();
 }
 
@@ -49,7 +50,8 @@ const LIBMATTI_MC_MapColor *LIBMATTI_MC_MapColor_NONE(void)
     return &none;
 }
 
-// The remaining constants, 1:1 in declaration order (id, col).
+
+
 const LIBMATTI_MC_MapColor *LIBMATTI_MC_MapColor_GRASS(void) { return LIBMATTI_MC_MapColor_Create(1, 8368696); }
 const LIBMATTI_MC_MapColor *LIBMATTI_MC_MapColor_SAND(void) { return LIBMATTI_MC_MapColor_Create(2, 16247203); }
 const LIBMATTI_MC_MapColor *LIBMATTI_MC_MapColor_WOOL(void) { return LIBMATTI_MC_MapColor_Create(3, 13092807); }

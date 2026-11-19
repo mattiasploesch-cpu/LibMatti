@@ -1,4 +1,5 @@
-// Port of cpw.mods.modlauncher.TransformStore.
+
+
 
 #include "libmatti/cpw/modlauncher/TransformStore.h"
 
@@ -22,7 +23,7 @@ LIBMATTI_ML_TransformStore *LIBMATTI_ML_TransformStore_New(void)
 {
     LIBMATTI_ML_TransformStore *store = calloc(1, sizeof(LIBMATTI_ML_TransformStore));
 
-    // Java: for (TargetType<?> type : TargetType.VALUES) transformers.put(type, new TransformList<>(type.getNodeType()))
+// Java: for (TargetType<?> type : TargetType.VALUES) transformers.put(type, new TransformList<>(type.getNodeType()))
     size_t count = 0;
     const LIBMATTI_MLA_TargetType **values = LIBMATTI_MLA_TargetType_Values(&count);
     for (size_t i = 0; i < count; i++)
@@ -77,7 +78,7 @@ void LIBMATTI_ML_TransformStore_AddTransformer(LIBMATTI_ML_TransformStore *store
                              "Adding transformer {} to {}", "", labelString);
     free(labelString);
 
-    // Java: classNeedsTransforming.add(targetLabel.getClassName().getInternalName())
+// Java: classNeedsTransforming.add(targetLabel.getClassName().getInternalName())
     char *internalName = LIBMATTI_ASM_Type_GetInternalName(
         LIBMATTI_ML_TransformTargetLabel_GetClassName(targetLabel));
 
@@ -100,7 +101,7 @@ void LIBMATTI_ML_TransformStore_AddTransformer(LIBMATTI_ML_TransformStore *store
         free(internalName);
     }
 
-    // Java: new TransformerHolder<>(transformer, service)
+// Java: new TransformerHolder<>(transformer, service)
     LIBMATTI_ML_TransformerHolder *holder = LIBMATTI_ML_TransformerHolder_New(transformer, service);
     LIBMATTI_ML_TransformList_AddTransformer(store->transformers[target_index(
                                                    LIBMATTI_ML_TransformTargetLabel_GetTargetType(targetLabel))],

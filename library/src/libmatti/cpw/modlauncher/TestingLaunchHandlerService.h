@@ -1,4 +1,5 @@
-// Port of cpw.mods.modlauncher.TestingLaunchHandlerService.
+
+
 
 #ifndef MATTICRAFT_MODLAUNCHER_TESTINGLAUNCHHANDLERSERVICE_H
 #define MATTICRAFT_MODLAUNCHER_TESTINGLAUNCHHANDLERSERVICE_H
@@ -25,4 +26,4 @@ typedef struct
 LIBMATTI_ML_TestingLaunchHandlerService *LIBMATTI_ML_TestingLaunchHandlerService_New(void);
 void LIBMATTI_ML_TestingLaunchHandlerService_Free(LIBMATTI_ML_TestingLaunchHandlerService *service);
 
-#endif //MATTICRAFT_MODLAUNCHER_TESTINGLAUNCHHANDLERSERVICE_H
+#endif

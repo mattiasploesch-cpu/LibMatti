@@ -1,4 +1,5 @@
-// Port of org.objectweb.asm.ClassWriter.
+
+
 
 #include "libmatti/org/objectweb/asm/ClassWriter.h"
 
@@ -59,9 +60,10 @@ static void write_bytes(Buffer *buffer, const unsigned char *data, size_t length
     buffer->length += length;
 }
 
-// ---------------------------------------------------------------------------
-// instruction encoding
-// ---------------------------------------------------------------------------
+
+
+
+
 
 static int is_wide_constant(const LIBMATTI_ASM_Object *object)
 {
@@ -246,7 +248,7 @@ static void write_instruction(Buffer *code, LIBMATTI_ASMT_AbstractInsnNode *node
                                                                   : method->itf));
         if (node->opcode == LIBMATTI_ASM_INVOKEINTERFACE)
         {
-            // Java: the argument count (in slots) plus a zero byte
+// Java: the argument count (in slots) plus a zero byte
             int arguments = 1;
             const char *descriptor = method->desc;
             for (const char *c = descriptor; *c != ')' && *c != '\0'; c++)
@@ -403,7 +405,8 @@ static void write_code_attribute(Buffer *attributes, LIBMATTI_ASM_ConstantPool *
     Buffer codeAttributes = {0};
     int codeAttributeCount = 0;
 
-    // LineNumberTable
+
+
     size_t lineCount = 0;
     for (LIBMATTI_ASMT_AbstractInsnNode *node = method->instructions.first; node != NULL; node = node->next)
         if (node->type == LIBMATTI_ASMT_LINE_NUMBER) lineCount++;
@@ -427,7 +430,8 @@ static void write_code_attribute(Buffer *attributes, LIBMATTI_ASM_ConstantPool *
         codeAttributeCount++;
     }
 
-    // StackMapTable (expanded frames are re-emitted as full frames)
+
+
     size_t frameCount = 0;
     for (LIBMATTI_ASMT_AbstractInsnNode *node = method->instructions.first; node != NULL; node = node->next)
         if (node->type == LIBMATTI_ASMT_FRAME) frameCount++;
@@ -481,9 +485,10 @@ static void write_code_attribute(Buffer *attributes, LIBMATTI_ASM_ConstantPool *
     free(codeAttributes.data);
 }
 
-// ---------------------------------------------------------------------------
-// ClassWriter
-// ---------------------------------------------------------------------------
+
+
+
+
 
 LIBMATTI_ASM_ClassWriter *LIBMATTI_ASM_ClassWriter_New(int flags, LIBMATTI_ASMT_ClassNode *clazz)
 {
@@ -650,7 +655,7 @@ unsigned char *LIBMATTI_ASM_ClassWriter_ToByteArray(LIBMATTI_ASM_ClassWriter *wr
 
     Buffer out = {0};
     write_u4(&out, 0xCAFEBABEL);
-    // Java: ClassNode.version = (minor << 16) | major
+// Java: ClassNode.version = (minor << 16) | major
     write_u2(&out, clazz->version >> 16);
     write_u2(&out, clazz->version & 0xFFFF);
     write_u2(&out, (int)pool->count);

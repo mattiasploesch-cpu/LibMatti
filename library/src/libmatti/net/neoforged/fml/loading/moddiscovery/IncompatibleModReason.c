@@ -21,7 +21,7 @@ static const char *const NAMES[] = {
 // Java: public String getReason()
 char *LIBMATTI_FML_IncompatibleModReason_GetReason(LIBMATTI_FML_IncompatibleModReason reason)
 {
-    // Java: "fml.modloadingissue.brokenfile." + StringUtils.toLowerCase(name())
+// Java: "fml.modloadingissue.brokenfile." + StringUtils.toLowerCase(name())
     const char *name = NAMES[reason];
     size_t length = strlen("fml.modloadingissue.brokenfile.") + strlen(name) + 1;
     char *result = malloc(length);

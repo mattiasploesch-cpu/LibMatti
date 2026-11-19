@@ -1,11 +1,12 @@
-// Example mod "examplemod".
-//
-// A Matticraft mod is a plain ELF shared object. libmatti loads the .so at
-// runtime, so the mod is not linked against the library: it includes the
-// libmatti headers and uses the library the running game process provides.
-//
-// The manifest (".matti_manifest") and every entry below resources/ are embedded
-// by matti_add_mod() - see ../CMakeLists.txt.
+
+
+
+
+
+
+
+
+
 
 #include "libmatti/cpw/modlauncher/LogManager.h"
 #include "libmatti/matti_mixin.h"
@@ -36,29 +37,33 @@ int examplemod_version(void)
     return 100;
 }
 
-// What a mod can do today: use the loader's own services, for example log
-// through the launcher's LogManager.
+
+
+
 void examplemod_log(const char *message)
 {
     LIBMATTI_ML_Logger_Info(LIBMATTI_ML_LogManager_GetLogger(), NULL, "examplemod: {}", message);
 }
 
-// A mixin: this handler runs in the game target's hook chain. The game binary
-// declares its mixable functions with MATTI_MIXIN_TARGET (see client/src/main.c)
-// and dispatches them through LIBMATTI_MIXIN_Invoke; the handler below runs
-// before the target body and can cancel it.
+
+
+
+
+
 static void examplemod_mixin_demo(MattiMixinCallbackInfo *info, void *userdata)
 {
     (void) userdata;
-    // The port's logger substitutes {} with strings only.
+
+
     char detail[96];
     snprintf(detail, sizeof(detail), "%s (%zu argument(s))", info->target, info->argCount);
     LIBMATTI_ML_Logger_Info(LIBMATTI_ML_LogManager_GetLogger(), NULL, "examplemod: mixin into {}", detail);
 }
 static void examplemod_mixin_run(MattiMixinCallbackInfo *info, void *userdata)
 {
-    (void) userdata;    
-    // The port's logger substitutes {} with strings only.
+    (void) userdata;
+
+
     char detail[96];
     snprintf(detail, sizeof(detail), "%s (%zu argument(s))", info->target, info->argCount);
     LIBMATTI_ML_Logger_Info(LIBMATTI_ML_LogManager_GetLogger(), NULL, "examplemod: mixin into {}", detail);
@@ -89,7 +94,7 @@ static void examplemod_register_accept(void *self, void *value)
     LIBMATTI_NEOFORGE_Registries_RegisterEvent *event = value;
     if (strcmp(event->registryName, "minecraft:block") == 0)
     {
-        // Java: new Block(BlockBehaviour.Properties.of().setId(key)) - the registry write
+// Java: new Block(BlockBehaviour.Properties.of().setId(key)) - the registry write
         // itself happens through event.register below, like NeoForge's RegisterEvent
         LIBMATTI_MC_Identifier *identifier = LIBMATTI_MC_Identifier_Parse("examplemod:example_block");
         LIBMATTI_MC_ResourceKey *key = LIBMATTI_MC_ResourceKey_Create(LIBMATTI_MC_Registries_BLOCK(), identifier);
@@ -102,7 +107,7 @@ static void examplemod_register_accept(void *self, void *value)
     }
     else if (strcmp(event->registryName, "minecraft:item") == 0)
     {
-        // Java: new BlockItem(block, new Item.Properties()) with the registry id set
+// Java: new BlockItem(block, new Item.Properties()) with the registry id set
         // before construction (the register() helper) - the description id resolves
         // through the key like any vanilla item
         LIBMATTI_MC_Identifier *identifier = LIBMATTI_MC_Identifier_Parse("examplemod:example_item");
@@ -119,9 +124,10 @@ static void examplemod_register_accept(void *self, void *value)
 static const LIBMATTI_JU_Consumer examplemod_register_listener = {
     NULL, examplemod_register_accept};
 
-// The mod's entry point. The loader loads the mod file and calls "<modid>_init"
-// once during mod construction, with the same arguments Java injects into a
-// mod's constructor.
+
+
+
+
 void examplemod_init(const LIBMATTI_FML_FMLModContainer_ConstructorArgs *args)
 {
     LIBMATTI_ML_Logger_Info(LIBMATTI_ML_LogManager_GetLogger(), NULL, "examplemod: {} constructed for {}",
@@ -130,7 +136,7 @@ void examplemod_init(const LIBMATTI_FML_FMLModContainer_ConstructorArgs *args)
     examplemod_log("Hallo Papa das ist ein test!");
     examplemod_log("thats another test");
 
-    // Java: the vanilla content is bootstrapped before the mods construct - read it like any
+// Java: the vanilla content is bootstrapped before the mods construct - read it like any
     // registry access: BuiltInRegistries.BLOCK.getValue(Identifier.parse("minecraft:stone"))
     LIBMATTI_MC_Block *stone = LIBMATTI_MC_VanillaBlocks_GetByName("STONE");
     const char *stoneId = LIBMATTI_MC_VanillaBlocks_IdOf(stone);
@@ -141,13 +147,13 @@ void examplemod_init(const LIBMATTI_FML_FMLModContainer_ConstructorArgs *args)
                             stoneId != NULL ? stoneId : "?",
                             LIBMATTI_MC_VanillaItems_IdOf(diamondSword) != NULL ? "ok" : "?");
 
-    // Java: modEventBus.addListener(this::register) - the mod listens on its mod event bus for
+// Java: modEventBus.addListener(this::register) - the mod listens on its mod event bus for
     // the RegisterEvent and puts its own entries next to the vanilla ones
     LIBMATTI_BUS_IEventBus_AddListenerDefault(args->eventBus,
                                               LIBMATTI_NEOFORGE_Registries_RegisterEvent_Class(),
                                               &examplemod_register_listener);
 
-    // Java: public ClientNeoForgeMod(IEventBus modEventBus, ModContainer container) {
+// Java: public ClientNeoForgeMod(IEventBus modEventBus, ModContainer container) {
     //           container.registerConfig(ModConfig.Type.CLIENT, NeoForgeClientConfig.SPEC); }
     examplemod_client_spec = LIBMATTI_FML_ModConfigSpec_New();
     LIBMATTI_FML_ModContainer_RegisterConfig(args->modContainer, LIBMATTI_FML_ModConfig_TYPE_CLIENT,

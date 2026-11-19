@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.classloading.transformation.ClassProcessorAuditSource.
+
+
 
 #include "libmatti/net/neoforged/fml/classloading/transformation/ClassProcessorAuditSource.h"
 

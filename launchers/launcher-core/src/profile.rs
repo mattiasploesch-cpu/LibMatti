@@ -178,7 +178,7 @@ fn default_height() -> u32 {
 }
 
 impl Profile {
-    /// Create the profile and its directory layout below `instances_root`.
+/// Create the profile and its directory layout below `instances_root`.
     pub fn new(
         instances_root: &Path,
         name: &str,
@@ -211,7 +211,7 @@ impl Profile {
         Ok(profile)
     }
 
-    /// Load `instance_dir/profile.json`.
+/// Load `instance_dir/profile.json`.
     pub fn load(instance_dir: &Path) -> Result<Self> {
         let path = instance_dir.join(PROFILE_FILE);
         let data = std::fs::read(&path).map_err(|error| {

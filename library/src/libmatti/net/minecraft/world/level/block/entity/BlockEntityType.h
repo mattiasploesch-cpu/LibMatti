@@ -1,4 +1,5 @@
-// Port of net.minecraft.world.level.block.entity.BlockEntityType.
+
+
 
 #ifndef MATTICRAFT_MC_WORLD_LEVEL_BLOCKENTITY_BLOCKENTITYTYPE_H
 #define MATTICRAFT_MC_WORLD_LEVEL_BLOCKENTITY_BLOCKENTITYTYPE_H
@@ -19,12 +20,12 @@ extern "C" {
 // content)
 typedef struct LIBMATTI_MC_BlockEntityType
 {
-    // Java: the registered id (registry key path)
+// Java: the registered id (registry key path)
     const char *id;
-    // Java: private final Set<Block> validBlocks - resolved VanillaBlocks constants
+// Java: private final Set<Block> validBlocks - resolved VanillaBlocks constants
     const void **validBlocks;
     size_t validBlockCount;
-    // Java: BlockEntityType.BlockEntitySupplier<T> - creates the instance
+// Java: BlockEntityType.BlockEntitySupplier<T> - creates the instance
     void *(*factory)(const struct LIBMATTI_MC_BlockEntityType *type, const LIBMATTI_MC_BlockPos *pos, LIBMATTI_MC_BlockState *state);
 } LIBMATTI_MC_BlockEntityType;
 
@@ -94,4 +95,4 @@ const LIBMATTI_MC_BlockEntityType *LIBMATTI_MC_BlockEntityType_COPPER_GOLEM_STAT
 }
 #endif
 
-#endif //MATTICRAFT_MC_WORLD_LEVEL_BLOCKENTITY_BLOCKENTITYTYPE_H
+#endif

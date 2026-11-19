@@ -1,7 +1,8 @@
-// Port of net.neoforged.fml.ModList.
-// Java's Stream/Function/BiConsumer results become callbacks with userdata. Java's
-// completableFutureFromExceptionList/gather (the dispatch helpers) run through the
-// java.util.concurrent.CompletableFuture port.
+
+
+
+
+
 
 #ifndef MATTICRAFT_FML_MODLIST_H
 #define MATTICRAFT_FML_MODLIST_H
@@ -34,23 +35,23 @@ typedef struct LIBMATTI_FML_ModList LIBMATTI_FML_ModList;
 
 struct LIBMATTI_FML_ModList
 {
-    // Java: private final List<IModFileInfo> modFiles
+// Java: private final List<IModFileInfo> modFiles
     LIBMATTI_NEOFORGESPI_IModFileInfo **modFiles;
     size_t modFileCount;
-    // Java: private final List<IModInfo> sortedList
+// Java: private final List<IModInfo> sortedList
     LIBMATTI_NEOFORGESPI_IModInfo **sortedList;
     size_t sortedCount;
     LIBMATTI_FML_ModList_ModFileById *fileById;
     size_t fileByIdCount;
-    // Java: private List<ModContainer> mods
+// Java: private List<ModContainer> mods
     LIBMATTI_FML_ModContainer **mods;
     size_t modCount;
     LIBMATTI_FML_ModList_IndexedMod *indexedMods;
     size_t indexedModCount;
-    // Java: private List<ModFileScanData> modFileScanData
+// Java: private List<ModFileScanData> modFileScanData
     LIBMATTI_NEOFORGESPI_ModFileScanData **modFileScanData;
     size_t modFileScanDataCount;
-    // Java: private List<ModContainer> sortedContainers
+// Java: private List<ModContainer> sortedContainers
     LIBMATTI_FML_ModContainer **sortedContainers;
     size_t sortedContainerCount;
 };
@@ -126,4 +127,4 @@ void LIBMATTI_FML_ModList_ApplyForEachModContainer(const LIBMATTI_FML_ModList *m
 // Java: @ApiStatus.Internal public static void clear()
 void LIBMATTI_FML_ModList_Clear(void);
 
-#endif //MATTICRAFT_FML_MODLIST_H
+#endif

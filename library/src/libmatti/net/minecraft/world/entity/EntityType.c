@@ -1,4 +1,5 @@
-// Port of net.minecraft.world.entity.EntityType (implementation).
+
+
 
 #include "libmatti/net/minecraft/world/entity/EntityType.h"
 
@@ -43,7 +44,7 @@ LIBMATTI_MC_EntityTypeBuilder *LIBMATTI_MC_EntityTypeBuilder_Of(LIBMATTI_MC_Enti
         return NULL;
     builder->factory = factory;
     builder->category = category;
-    // Java: serialize = true, summon = true, clientTrackingRange = 5,
+// Java: serialize = true, summon = true, clientTrackingRange = 5,
     // updateInterval = 3, dimensions = scalable(0.6, 1.8), spawnDimensionsScale = 1
     builder->serialize = true;
     builder->summon = true;
@@ -72,7 +73,7 @@ LIBMATTI_MC_EntityTypeBuilder *LIBMATTI_MC_EntityTypeBuilder_Sized(LIBMATTI_MC_E
     if (builder == NULL)
         return NULL;
     LIBMATTI_MC_EntityDimensions_Free(builder->dimensions);
-    // Java: this.dimensions = EntityDimensions.scalable(width, height) (the eye
+// Java: this.dimensions = EntityDimensions.scalable(width, height) (the eye
     // height defaults through the dimensions again)
     builder->dimensions = LIBMATTI_MC_EntityDimensions_Scalable(width, height);
     return self(builder);
@@ -185,10 +186,10 @@ LIBMATTI_MC_EntityType *LIBMATTI_MC_EntityTypeBuilder_Build(LIBMATTI_MC_EntityTy
     type->clientTrackingRange = builder->clientTrackingRange;
     type->updateInterval = builder->updateInterval;
     type->allowedInPeaceful = builder->allowedInPeaceful;
-    // Java: the id + description derive from the resource key
+// Java: the id + description derive from the resource key
     type->id = strdup(id);
     {
-        // Java: Util.makeDescriptionId("entity", identifier) - "entity.<ns>.<path>"
+// Java: Util.makeDescriptionId("entity", identifier) - "entity.<ns>.<path>"
         LIBMATTI_MC_Identifier *identifier = LIBMATTI_MC_Identifier_Parse(id);
         if (identifier != NULL)
         {
@@ -205,9 +206,10 @@ LIBMATTI_MC_EntityType *LIBMATTI_MC_EntityTypeBuilder_Build(LIBMATTI_MC_EntityTy
     return type;
 }
 
-// ---------------------------------------------------------------------------
-// EntityType surface
-// ---------------------------------------------------------------------------
+
+
+
+
 
 struct LIBMATTI_MC_Entity *LIBMATTI_MC_EntityType_Create(const LIBMATTI_MC_EntityType *type, struct LIBMATTI_MC_Level *level)
 {
@@ -222,7 +224,7 @@ struct LIBMATTI_MC_Entity *LIBMATTI_MC_EntityType_CreateAt(const LIBMATTI_MC_Ent
     struct LIBMATTI_MC_Entity *entity = LIBMATTI_MC_EntityType_Create(type, level);
     if (entity == NULL)
         return NULL;
-    // Java: moveTo(x, y, z, 0, 0) on the fresh entity
+// Java: moveTo(x, y, z, 0, 0) on the fresh entity
     LIBMATTI_MC_Entity_SetPos(entity, (double) pos->base.x + 0.5, (double) pos->base.y, (double) pos->base.z + 0.5);
     return entity;
 }
@@ -279,7 +281,7 @@ int LIBMATTI_MC_EntityType_UpdateInterval(const LIBMATTI_MC_EntityType *type)
 
 bool LIBMATTI_MC_EntityType_TrackDeltas(const LIBMATTI_MC_EntityType *type)
 {
-    // Java: trackDeltas - everything except a small known set syncs deltas; the
+// Java: trackDeltas - everything except a small known set syncs deltas; the
     // port names PLAYER/LLAMA_SPIT/WITHER/BAT/ITEM_FRAME/... by id
     if (type == NULL || type->id == NULL)
         return false;

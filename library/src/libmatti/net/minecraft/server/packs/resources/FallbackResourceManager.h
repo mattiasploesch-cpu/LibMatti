@@ -1,4 +1,5 @@
-// Port of net.minecraft.server.packs.resources.FallbackResourceManager.
+
+
 
 #ifndef MATTICRAFT_MC_PACKS_RESOURCES_FALLBACKRESOURCEMANAGER_H
 #define MATTICRAFT_MC_PACKS_RESOURCES_FALLBACKRESOURCEMANAGER_H
@@ -16,11 +17,11 @@ typedef void (*LIBMATTI_MC_ResourceOutput)(void *userData, const char *namespace
 
 typedef struct LIBMATTI_MC_FallbackResourceManager
 {
-    // Java: private final PackType packType
+// Java: private final PackType packType
     int packType;
-    // Java: private final String namespace
+// Java: private final String namespace
     char *namespace;
-    // Java: protected final List<PackResources> packs (fallback order: later packs win)
+// Java: protected final List<PackResources> packs (fallback order: later packs win)
     LIBMATTI_MC_PackResources **packs;
     size_t packCount;
 } LIBMATTI_MC_FallbackResourceManager;

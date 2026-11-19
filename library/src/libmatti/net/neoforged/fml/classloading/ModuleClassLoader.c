@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.classloading.ModuleClassLoader.
+
+
 
 #include "libmatti/net/neoforged/fml/classloading/ModuleClassLoader.h"
 
@@ -14,7 +15,7 @@ LIBMATTI_FML_ModuleInfo *LIBMATTI_FML_ModuleInfo_New(LIBMATTI_JL_ClassLoader *cl
     LIBMATTI_FML_ModuleInfo *moduleInfo = calloc(1, sizeof(LIBMATTI_FML_ModuleInfo));
     moduleInfo->name = strdup(name);
     moduleInfo->moduleReference = moduleReference;
-    // Java: var codeSource = new CodeSource(toURL(moduleReference.location()), (CodeSigner[]) null);
+// Java: var codeSource = new CodeSource(toURL(moduleReference.location()), (CodeSigner[]) null);
     //       var perms = new Permissions(); perms.add(new AllPermission());
     //       this.protectionDomain = new ProtectionDomain(codeSource, perms, classLoader, null);
     // TODO: java.security.CodeSource / Permissions / ProtectionDomain are JVM-backed
@@ -24,12 +25,12 @@ LIBMATTI_FML_ModuleInfo *LIBMATTI_FML_ModuleInfo_New(LIBMATTI_JL_ClassLoader *cl
 
 LIBMATTI_FML_JarContentsModuleReader *LIBMATTI_FML_ModuleInfo_GetReader(LIBMATTI_FML_ModuleInfo *moduleInfo)
 {
-    // Java: if (closed) throw new IOException("Module " + name + " has been closed");
+// Java: if (closed) throw new IOException("Module " + name + " has been closed");
     if (moduleInfo->closed) return NULL;
-    // Java: ModuleReader reader = cachedReader; if (reader != null) return reader;
+// Java: ModuleReader reader = cachedReader; if (reader != null) return reader;
     if (moduleInfo->cachedReader != NULL) return moduleInfo->cachedReader;
 
-    // Java: reader = moduleReference.open(); cachedReader = reader; return reader;
+// Java: reader = moduleReference.open(); cachedReader = reader; return reader;
     moduleInfo->cachedReader = LIBMATTI_FML_JarContentsModuleReference_Open(
         (const LIBMATTI_FML_JarContentsModuleReference *) moduleInfo->moduleReference);
     return moduleInfo->cachedReader;
@@ -37,7 +38,7 @@ LIBMATTI_FML_JarContentsModuleReader *LIBMATTI_FML_ModuleInfo_GetReader(LIBMATTI
 
 void LIBMATTI_FML_ModuleInfo_Close(LIBMATTI_FML_ModuleInfo *moduleInfo)
 {
-    // Java: if (!closed) { closed = true; if (cachedReader != null) { cachedReader.close(); cachedReader = null; } }
+// Java: if (!closed) { closed = true; if (cachedReader != null) { cachedReader.close(); cachedReader = null; } }
     if (moduleInfo->closed) return;
     moduleInfo->closed = 1;
     if (moduleInfo->cachedReader != NULL)
@@ -115,16 +116,16 @@ LIBMATTI_FML_ModuleClassLoader *LIBMATTI_FML_ModuleClassLoader_NewWithParent(
     size_t parentLayerCount, LIBMATTI_JL_ClassLoader *parentLoader)
 {
     LIBMATTI_FML_ModuleClassLoader *classLoader = calloc(1, sizeof(LIBMATTI_FML_ModuleClassLoader));
-    // Java: super(name, parentLoader)
+// Java: super(name, parentLoader)
     classLoader->base.name = strdup(name);
     classLoader->base.parent = parentLoader;
     classLoader->maybeTransformClassBytes = default_maybe_transform;
-    // Java: this.fallbackClassLoader = Objects.requireNonNullElse(parentLoader, ClassLoader.getPlatformClassLoader());
+// Java: this.fallbackClassLoader = Objects.requireNonNullElse(parentLoader, ClassLoader.getPlatformClassLoader());
     // getPlatformClassLoader() is JVM-backed (external); NULL means "no fallback" (ClassNotFoundException)
     classLoader->fallbackClassLoader = parentLoader;
     classLoader->configuration = configuration;
 
-    // Java: for (var m : configuration.modules()) { moduleInfoCache.put(moduleName, new ModuleInfo(this, moduleName, m.reference())); }
+// Java: for (var m : configuration.modules()) { moduleInfoCache.put(moduleName, new ModuleInfo(this, moduleName, m.reference())); }
     size_t moduleCount = 0;
     LIBMATTI_JL_ResolvedModule **modules = LIBMATTI_JL_Configuration_Modules(configuration, &moduleCount);
     classLoader->moduleInfos = calloc(moduleCount > 0 ? moduleCount : 1, sizeof(*classLoader->moduleInfos));
@@ -135,7 +136,7 @@ LIBMATTI_FML_ModuleClassLoader *LIBMATTI_FML_ModuleClassLoader_NewWithParent(
             &classLoader->base, moduleName, LIBMATTI_JL_ResolvedModule_Reference(modules[i]));
     }
 
-    // Java: for (var moduleInfo : moduleInfoCache.values()) for (var pk : descriptor.packages()) packageLookup.put(pk, moduleInfo)
+// Java: for (var moduleInfo : moduleInfoCache.values()) for (var pk : descriptor.packages()) packageLookup.put(pk, moduleInfo)
     for (size_t i = 0; i < classLoader->moduleInfoCount; i++)
     {
         LIBMATTI_FML_ModuleInfo *moduleInfo = classLoader->moduleInfos[i];
@@ -154,7 +155,7 @@ LIBMATTI_FML_ModuleClassLoader *LIBMATTI_FML_ModuleClassLoader_NewWithParent(
         }
     }
 
-    // Java: for (var rm : configuration.modules()) for (var other : rm.reads()) {
+// Java: for (var rm : configuration.modules()) for (var other : rm.reads()) {
     //          ClassLoader cl = classLoaderMap.computeIfAbsent(other, findClassLoader);
     //          ... descriptor.packages() / descriptor.exports() -> parentLoaders.put(pn, cl); }
     // findClassLoader: moduleInfoCache.containsKey(k.name()) ? this : parentLayers.findLoader / platform loader
@@ -177,7 +178,7 @@ LIBMATTI_FML_ModuleClassLoader *LIBMATTI_FML_ModuleClassLoader_NewWithParent(
 
             if (LIBMATTI_JL_ModuleDescriptor_IsAutomatic(descriptor))
             {
-                // Java: processedAutomaticDescriptors.add(descriptor) - one pass per automatic module
+// Java: processedAutomaticDescriptors.add(descriptor) - one pass per automatic module
                 int processed = 0;
                 for (size_t p = 0; p < processedCount; p++)
                 {
@@ -198,7 +199,7 @@ LIBMATTI_FML_ModuleClassLoader *LIBMATTI_FML_ModuleClassLoader_NewWithParent(
             }
             else
             {
-                // Java: descriptor.exports().filter(e -> !e.isQualified() || (e.isQualified() && other.configuration() == configuration && e.targets().contains(rm.name())))
+// Java: descriptor.exports().filter(e -> !e.isQualified() || (e.isQualified() && other.configuration() == configuration && e.targets().contains(rm.name())))
                 size_t exportCount = 0;
                 LIBMATTI_JL_ModuleDescriptor_Exports **exports = LIBMATTI_JL_ModuleDescriptor_GetExports(descriptor,
                                                                                                        &exportCount);
@@ -228,7 +229,7 @@ LIBMATTI_FML_ModuleClassLoader *LIBMATTI_FML_ModuleClassLoader_NewWithParent(
     for (size_t i = 0; i < processedCount; i++) free(processedAutomatic[i]);
     free(processedAutomatic);
 
-    // Java: parentLayers.forEach(p -> forLayerAndParents(p, visitedLayers, l -> bindToLayer(this, l)));
+// Java: parentLayers.forEach(p -> forLayerAndParents(p, visitedLayers, l -> bindToLayer(this, l)));
     // bindToLoader is JVM-internal, no C equivalent.
     (void) parentLayers;
     (void) parentLayerCount;
@@ -257,7 +258,7 @@ void LIBMATTI_FML_ModuleClassLoader_Free(LIBMATTI_FML_ModuleClassLoader *classLo
 
 void LIBMATTI_FML_ModuleClassLoader_Close(LIBMATTI_FML_ModuleClassLoader *classLoader)
 {
-    // Java: if (closed) return; closed = true; for (ModuleInfo moduleInfo : moduleInfoCache.values()) moduleInfo.close();
+// Java: if (closed) return; closed = true; for (ModuleInfo moduleInfo : moduleInfoCache.values()) moduleInfo.close();
     //       moduleInfoCache.clear();
     if (classLoader->closed) return;
     classLoader->closed = 1;
@@ -284,7 +285,7 @@ static LIBMATTI_JN_URI *reader_to_url(LIBMATTI_FML_ModuleInfo *moduleInfo, const
 // Java: private static byte[] getClassBytes(ModuleInfo moduleInfo, String name) throws IOException
 static unsigned char *get_class_bytes(LIBMATTI_FML_ModuleInfo *moduleInfo, const char *name, size_t *outLength)
 {
-    // Java: var cname = name.replace('.', '/') + ".class";
+// Java: var cname = name.replace('.', '/') + ".class";
     size_t nameLength = strlen(name);
     char *cname = malloc(nameLength + 7);
     for (size_t i = 0; i < nameLength; i++) cname[i] = name[i] == '.' ? '/' : name[i];
@@ -297,7 +298,7 @@ static unsigned char *get_class_bytes(LIBMATTI_FML_ModuleInfo *moduleInfo, const
     free(cname);
     if (bytes == NULL)
     {
-        // Java: return new byte[0];
+// Java: return new byte[0];
         *outLength = 0;
         return NULL;
     }
@@ -316,12 +317,12 @@ static void *reader_to_class(LIBMATTI_FML_ModuleClassLoader *classLoader, LIBMAT
     free(bytes);
     if (transformedLength == 0)
     {
-        // Java: Transformers decided to skip the class
+// Java: Transformers decided to skip the class
         free(transformed);
         return NULL;
     }
 
-    // Java: return defineClass(name, bytes, 0, bytes.length, moduleInfo.protectionDomain);
+// Java: return defineClass(name, bytes, 0, bytes.length, moduleInfo.protectionDomain);
     // defineClass is JVM-backed (external); a C port has no class definition.
     free(transformed);
     return NULL;
@@ -330,7 +331,7 @@ static void *reader_to_class(LIBMATTI_FML_ModuleClassLoader *classLoader, LIBMAT
 unsigned char *LIBMATTI_FML_ModuleClassLoader_MaybeTransformClassBytes(const unsigned char *bytes, size_t length,
                                                                       size_t *outLength)
 {
-    // Java: protected byte[] maybeTransformClassBytes(...) { return bytes; }
+// Java: protected byte[] maybeTransformClassBytes(...) { return bytes; }
     unsigned char *copy = malloc(length == 0 ? 1 : length);
     if (length > 0) memcpy(copy, bytes, length);
     *outLength = length;
@@ -360,7 +361,7 @@ void LIBMATTI_FML_ModuleClassLoader_SetMaybeTransformClassBytes(
 // Java: @Nullable private static String packageName(String className)
 static char *package_name(const char *className)
 {
-    // Java: var lastSeparator = className.lastIndexOf('.'); if (lastSeparator <= 0) return null;
+// Java: var lastSeparator = className.lastIndexOf('.'); if (lastSeparator <= 0) return null;
     const char *lastSeparator = strrchr(className, '.');
     if (lastSeparator == NULL || lastSeparator == className) return NULL;
     return strndup(className, (size_t) (lastSeparator - className));
@@ -369,7 +370,7 @@ static char *package_name(const char *className)
 void *LIBMATTI_FML_ModuleClassLoader_LoadClass(LIBMATTI_FML_ModuleClassLoader *classLoader, const char *name,
                                               int resolve)
 {
-    // Java: synchronized (getClassLoadingLock(name)) {
+// Java: synchronized (getClassLoadingLock(name)) {
     //          var c = findLoadedClass(name);                              // JVM (external) -> null
     //          if (c == null) { var packageName = packageName(name);
     //              if (packageName != null) { var localModule = packageLookup.get(packageName);
@@ -385,11 +386,11 @@ void *LIBMATTI_FML_ModuleClassLoader_LoadClass(LIBMATTI_FML_ModuleClassLoader *c
         LIBMATTI_FML_ModuleInfo *localModule = package_module(classLoader, packageName);
         free(packageName);
         if (localModule != NULL) return reader_to_class(classLoader, localModule, name);
-        // Java: parentLoaders.getOrDefault(packageName, fallbackClassLoader).loadClass(name)
+// Java: parentLoaders.getOrDefault(packageName, fallbackClassLoader).loadClass(name)
         // ClassLoader.loadClass is JVM-backed (external)
         return NULL;
     }
-    // Java: fallbackClassLoader.loadClass(name)
+// Java: fallbackClassLoader.loadClass(name)
     (void) resolve;
     return NULL;
 }
@@ -398,7 +399,7 @@ void *LIBMATTI_FML_ModuleClassLoader_LoadClass(LIBMATTI_FML_ModuleClassLoader *c
 static LIBMATTI_JN_URI **enumerate_resources(LIBMATTI_FML_ModuleClassLoader *classLoader, const char *name,
                                              size_t *count)
 {
-    // Java: var idx = name.lastIndexOf('/'); var pkgname = (idx == -1 || idx == name.length() - 1) ? ""
+// Java: var idx = name.lastIndexOf('/'); var pkgname = (idx == -1 || idx == name.length() - 1) ? ""
     //          : name.substring(0, idx).replace('/', '.');
     const char *lastSlash = strrchr(name, '/');
     size_t nameLength = strlen(name);
@@ -416,7 +417,7 @@ static LIBMATTI_JN_URI **enumerate_resources(LIBMATTI_FML_ModuleClassLoader *cla
 
         if (localModule != NULL)
         {
-            // Java: var url = readerToURL(localModule, name); return url != null ? singletonEnumeration(url) : emptyEnumeration()
+// Java: var url = readerToURL(localModule, name); return url != null ? singletonEnumeration(url) : emptyEnumeration()
             LIBMATTI_JN_URI *url = reader_to_url(localModule, name);
             if (url == NULL) return NULL;
             result = malloc(sizeof(*result));
@@ -426,7 +427,7 @@ static LIBMATTI_JN_URI **enumerate_resources(LIBMATTI_FML_ModuleClassLoader *cla
         }
     }
 
-    // Java: for (var moduleInfo : moduleInfoCache.values()) { var url = toURL(moduleInfo.getReader().find(name)); ... }
+// Java: for (var moduleInfo : moduleInfoCache.values()) { var url = toURL(moduleInfo.getReader().find(name)); ... }
     for (size_t i = 0; i < classLoader->moduleInfoCount; i++)
     {
         LIBMATTI_JN_URI *url = reader_to_url(classLoader->moduleInfos[i], name);
@@ -440,7 +441,7 @@ static LIBMATTI_JN_URI **enumerate_resources(LIBMATTI_FML_ModuleClassLoader *cla
 LIBMATTI_JN_URI *LIBMATTI_FML_ModuleClassLoader_GetResource(LIBMATTI_FML_ModuleClassLoader *classLoader,
                                                             const char *name)
 {
-    // Java: var reslist = enumerateResources(name);
+// Java: var reslist = enumerateResources(name);
     //       if (reslist.hasMoreElements()) return reslist.nextElement();
     //       else return fallbackClassLoader.getResource(name);
     size_t count = 0;
@@ -452,14 +453,15 @@ LIBMATTI_JN_URI *LIBMATTI_FML_ModuleClassLoader_GetResource(LIBMATTI_FML_ModuleC
         return first;
     }
     free(resources);
-    // ClassLoader.getResource is JVM-backed (external)
+
+
     return NULL;
 }
 
 LIBMATTI_JN_URI *LIBMATTI_FML_ModuleClassLoader_FindResourceForModule(LIBMATTI_FML_ModuleClassLoader *classLoader,
                                                                      const char *moduleName, const char *name)
 {
-    // Java: var localModule = moduleInfoCache.get(moduleName);
+// Java: var localModule = moduleInfoCache.get(moduleName);
     //       if (localModule == null) return null; // This method only finds resources for locally defined modules
     LIBMATTI_FML_ModuleInfo *localModule = module_info_for(classLoader, moduleName);
     if (localModule == NULL) return NULL;
@@ -469,7 +471,7 @@ LIBMATTI_JN_URI *LIBMATTI_FML_ModuleClassLoader_FindResourceForModule(LIBMATTI_F
 LIBMATTI_JN_URI **LIBMATTI_FML_ModuleClassLoader_GetResources(LIBMATTI_FML_ModuleClassLoader *classLoader,
                                                              const char *name, size_t *count)
 {
-    // Java: var localUrls = enumerateResources(name); var parentUrls = fallbackClassLoader.getResources(name);
+// Java: var localUrls = enumerateResources(name); var parentUrls = fallbackClassLoader.getResources(name);
     //       return local results first, then the parent's
     size_t localCount = 0;
     LIBMATTI_JN_URI **localUrls = enumerate_resources(classLoader, name, &localCount);
@@ -479,21 +481,22 @@ LIBMATTI_JN_URI **LIBMATTI_FML_ModuleClassLoader_GetResources(LIBMATTI_FML_Modul
     *count = localCount;
     free(localUrls);
 
-    // ClassLoader.getResources is JVM-backed (external)
+
+
     return result;
 }
 
 LIBMATTI_JN_URI **LIBMATTI_FML_ModuleClassLoader_FindResources(LIBMATTI_FML_ModuleClassLoader *classLoader,
                                                               const char *name, size_t *count)
 {
-    // Java: return enumerateResources(name);
+// Java: return enumerateResources(name);
     return enumerate_resources(classLoader, name, count);
 }
 
 void *LIBMATTI_FML_ModuleClassLoader_FindClassInModule(LIBMATTI_FML_ModuleClassLoader *classLoader,
                                                        const char *moduleName, const char *name)
 {
-    // Java: var localModule = moduleInfoCache.get(moduleName);
+// Java: var localModule = moduleInfoCache.get(moduleName);
     //       if (localModule != null) { try { var c = readerToClass(localModule, name); if (c != null) return c; }
     //                                  catch (ClassNotFoundException ignored) {} } return null;
     LIBMATTI_FML_ModuleInfo *localModule = module_info_for(classLoader, moduleName);
@@ -503,7 +506,7 @@ void *LIBMATTI_FML_ModuleClassLoader_FindClassInModule(LIBMATTI_FML_ModuleClassL
 
 void *LIBMATTI_FML_ModuleClassLoader_FindClass(LIBMATTI_FML_ModuleClassLoader *classLoader, const char *name)
 {
-    // Java: var packageName = packageName(name); if (packageName != null) { var localModule = packageLookup.get(packageName);
+// Java: var packageName = packageName(name); if (packageName != null) { var localModule = packageLookup.get(packageName);
     //          if (localModule != null) { var c = readerToClass(localModule, name); if (c != null) return c; } }
     //       throw new ClassNotFoundException(name);
     char *packageName = package_name(name);
@@ -517,14 +520,14 @@ void *LIBMATTI_FML_ModuleClassLoader_FindClass(LIBMATTI_FML_ModuleClassLoader *c
             if (clazz != NULL) return clazz;
         }
     }
-    return NULL; // Java: ClassNotFoundException
+    return NULL;// Java: ClassNotFoundException
 }
 
 unsigned char *LIBMATTI_FML_ModuleClassLoader_GetMaybeTransformedClassBytes(LIBMATTI_FML_ModuleClassLoader *classLoader,
                                                                           const char *name, const char *context,
                                                                           size_t *outLength)
 {
-    // Java: byte[] bytes = new byte[0]; Throwable suppressed = null;
+// Java: byte[] bytes = new byte[0]; Throwable suppressed = null;
     //       var pname = packageName(name);
     //       if (pname != null) { var localModule = packageLookup.get(pname);
     //           if (localModule != null) bytes = getClassBytes(localModule, name);
@@ -566,7 +569,7 @@ unsigned char *LIBMATTI_FML_ModuleClassLoader_GetMaybeTransformedClassBytes(LIBM
     if (*outLength == 0)
     {
         free(transformed);
-        return NULL; // Java: ClassNotFoundException
+        return NULL;// Java: ClassNotFoundException
     }
     return transformed;
 }

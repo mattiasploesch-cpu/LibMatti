@@ -14,7 +14,7 @@ typedef struct LIBMATTI_FML_ModLoadingContext LIBMATTI_FML_ModLoadingContext;
 
 struct LIBMATTI_FML_ModLoadingContext
 {
-    // Java: private ModContainer activeContainer
+// Java: private ModContainer activeContainer
     LIBMATTI_FML_ModContainer *activeContainer;
 };
 
@@ -34,4 +34,4 @@ void LIBMATTI_FML_ModLoadingContext_RegisterExtensionPoint(LIBMATTI_FML_ModLoadi
                                                           LIBMATTI_FML_IExtensionPoint point,
                                                           LIBMATTI_JU_Supplier extension);
 
-#endif //MATTICRAFT_FML_MODLOADINGCONTEXT_H
+#endif

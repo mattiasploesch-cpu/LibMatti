@@ -1,5 +1,6 @@
-// Shared rendering frontend: owns the CPU framebuffer and dispatches the
-// window/presentation calls to the selected backend. See render.h.
+
+
+
 
 #include "libmatti/matti/render/render_internal.h"
 
@@ -11,7 +12,8 @@
 #include <string.h>
 #include <strings.h>
 
-// The last failure the backend reported (render.h exposes it read-only).
+
+
 static char last_error[512];
 
 void LIBMATTI_Render_SetLastError(const char *format, ...)
@@ -137,8 +139,9 @@ int LIBMATTI_Render_ParseSelection(const char *text, LIBMATTI_RenderSelection *o
     else if (parse_api_token(first, &api))
     {
         out->api = api;
-        // DirectX and Metal have no GLFW window path in this port: they run
-        // through the SDL layer.
+
+
+
         out->layer = (api == LIBMATTI_RENDER_API_DIRECTX || api == LIBMATTI_RENDER_API_METAL)
                          ? LIBMATTI_RENDER_LAYER_SDL
                          : LIBMATTI_RENDER_LAYER_NATIVE;
@@ -343,7 +346,8 @@ LIBMATTI_Renderer *LIBMATTI_Render_InitSelection(const LIBMATTI_RenderSelection 
         chosen.layer = LIBMATTI_RENDER_LAYER_NATIVE;
     if (chosen.layer == LIBMATTI_RENDER_LAYER_AUTO && chosen.api == LIBMATTI_RENDER_API_AUTO)
     {
-        // Auto keeps the historical order: the native GL/Vulkan path first.
+
+
         chosen.layer = LIBMATTI_RENDER_LAYER_NATIVE;
     }
 

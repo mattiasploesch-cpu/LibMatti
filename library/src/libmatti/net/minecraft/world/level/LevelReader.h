@@ -1,4 +1,5 @@
-// Port of net.minecraft.world.level.LevelReader (interface).
+
+
 
 #ifndef MATTICRAFT_MC_WORLD_LEVEL_LEVELREADER_H
 #define MATTICRAFT_MC_WORLD_LEVEL_LEVELREADER_H
@@ -40,4 +41,4 @@ bool LIBMATTI_MC_LevelReader_CanSeeSky(struct LIBMATTI_MC_Level *level, const LI
 }
 #endif
 
-#endif //MATTICRAFT_MC_WORLD_LEVEL_LEVELREADER_H
+#endif

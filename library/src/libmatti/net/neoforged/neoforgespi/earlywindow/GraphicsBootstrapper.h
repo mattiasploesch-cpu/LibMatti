@@ -1,4 +1,5 @@
-// Port of net.neoforged.neoforgespi.earlywindow.GraphicsBootstrapper.
+
+
 
 #ifndef MATTICRAFT_NEOFORGESPI_EARLYWINDOW_GRAPHICSBOOTSTRAPPER_H
 #define MATTICRAFT_NEOFORGESPI_EARLYWINDOW_GRAPHICSBOOTSTRAPPER_H
@@ -12,9 +13,9 @@ struct LIBMATTI_NEOFORGESPI_GraphicsBootstrapper
 {
     void *self;
 
-    // Java: String name()
+// Java: String name()
     const char *(*name)(void *self);
-    // Java: void bootstrap(String[] arguments)
+// Java: void bootstrap(String[] arguments)
     void (*bootstrap)(void *self, const char *const *arguments, size_t argumentCount);
 };
 
@@ -24,4 +25,4 @@ const char *LIBMATTI_NEOFORGESPI_GraphicsBootstrapper_Name(const LIBMATTI_NEOFOR
 void LIBMATTI_NEOFORGESPI_GraphicsBootstrapper_Bootstrap(const LIBMATTI_NEOFORGESPI_GraphicsBootstrapper *bootstrapper,
                                                          const char *const *arguments, size_t argumentCount);
 
-#endif //MATTICRAFT_NEOFORGESPI_EARLYWINDOW_GRAPHICSBOOTSTRAPPER_H
+#endif

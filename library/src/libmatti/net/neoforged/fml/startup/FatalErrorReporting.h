@@ -17,4 +17,4 @@ void LIBMATTI_FML_FatalErrorReporting_ReportFatalErrorOnConsole(LIBMATTI_JL_Thro
 // Java: public static void reportFatalError(String message)
 void LIBMATTI_FML_FatalErrorReporting_ReportFatalErrorMessage(const char *message);
 
-#endif //MATTICRAFT_FML_FATALERRORREPORTING_H
+#endif

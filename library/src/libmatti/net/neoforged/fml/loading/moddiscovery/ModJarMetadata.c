@@ -25,25 +25,25 @@ static LIBMATTI_JL_ModuleDescriptor *createDescriptor(void *self, LIBMATTI_FML_J
 {
     LIBMATTI_FML_ModJarMetadata *metadata = self;
 
-    // Java: var bld = ModuleDescriptor.newAutomaticModule(name()).version(version());
+// Java: var bld = ModuleDescriptor.newAutomaticModule(name()).version(version());
     LIBMATTI_JL_ModuleDescriptor *builder = LIBMATTI_JL_ModuleDescriptor_Create(name(self), NULL, 0);
     LIBMATTI_JL_ModuleDescriptor_AddModifier(builder, LIBMATTI_JL_MODIFIER_AUTOMATIC);
     const char *versionString = version(self);
     if (versionString != NULL)
         LIBMATTI_JL_ModuleDescriptor_SetVersion(builder, versionString);
 
-    // Java: JarModuleInfo.scanAutomaticModule(contents, bld, "assets", "data");
+// Java: JarModuleInfo.scanAutomaticModule(contents, bld, "assets", "data");
     const char *excluded[] = {"assets", "data"};
     LIBMATTI_FML_JarModuleInfo_ScanAutomaticModule(contents, builder, excluded, 2);
 
-    // Java: modFile.getModFileInfo().usesServices().forEach(bld::uses);
+// Java: modFile.getModFileInfo().usesServices().forEach(bld::uses);
     size_t serviceCount = 0;
     char **services = LIBMATTI_NEOFORGESPI_IModFileInfo_UsesServices(
         LIBMATTI_NEOFORGESPI_IModFile_GetModFileInfo(metadata->modFile), &serviceCount);
     for (size_t i = 0; i < serviceCount; i++)
         LIBMATTI_JL_ModuleDescriptor_AddUses(builder, services[i]);
 
-    // Java: return bld.build();
+// Java: return bld.build();
     return builder;
 }
 

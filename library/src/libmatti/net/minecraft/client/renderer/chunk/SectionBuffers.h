@@ -1,5 +1,6 @@
-// Port of net.minecraft.client.renderer.chunk.SectionBuffers - the uploaded
-// GPU buffer pair of one section layer.
+
+
+
 
 #ifndef MATTICRAFT_MC_CLIENT_RENDERER_CHUNK_SECTIONBUFFERS_H
 #define MATTICRAFT_MC_CLIENT_RENDERER_CHUNK_SECTIONBUFFERS_H
@@ -14,10 +15,10 @@ extern "C" {
 // Java: public final class SectionBuffers implements AutoCloseable
 typedef struct LIBMATTI_MC_SectionBuffers
 {
-    // Java: private GpuBuffer vertexBuffer / @Nullable indexBuffer
+// Java: private GpuBuffer vertexBuffer / @Nullable indexBuffer
     LIBMATTI_B3D_GpuBuffer *vertexBuffer;
     LIBMATTI_B3D_GpuBuffer *indexBuffer;
-    // Java: private int indexCount / VertexFormat.IndexType indexType
+// Java: private int indexCount / VertexFormat.IndexType indexType
     int indexCount;
     LIBMATTI_B3D_VertexFormat_IndexType indexType;
 } LIBMATTI_MC_SectionBuffers;
@@ -50,4 +51,4 @@ void LIBMATTI_MC_SectionBuffers_SetIndexType(LIBMATTI_MC_SectionBuffers *buffers
 }
 #endif
 
-#endif //MATTICRAFT_MC_CLIENT_RENDERER_CHUNK_SECTIONBUFFERS_H
+#endif

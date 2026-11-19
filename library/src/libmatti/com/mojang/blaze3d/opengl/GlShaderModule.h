@@ -1,4 +1,5 @@
-// Port of com.mojang.blaze3d.opengl.GlShaderModule.
+
+
 
 #ifndef MATTICRAFT_BLAZE3D_OPENGL_GLSHADERMODULE_H
 #define MATTICRAFT_BLAZE3D_OPENGL_GLSHADERMODULE_H
@@ -14,8 +15,8 @@ extern "C"
 // The port keeps the id as a char* (Java: Identifier) and the GL shader id.
 typedef struct LIBMATTI_B3D_GlShaderModule
 {
-    char *id;      // Java: private final Identifier id
-    int shaderId;  // Java: private int shaderId (NOT_ALLOCATED = -1)
+    char *id;// Java: private final Identifier id
+    int shaderId;// Java: private int shaderId (NOT_ALLOCATED = -1)
     LIBMATTI_B3D_ShaderType type;
 } LIBMATTI_B3D_GlShaderModule;
 

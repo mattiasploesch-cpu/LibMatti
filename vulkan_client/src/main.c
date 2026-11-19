@@ -1,6 +1,7 @@
-//
-// Created by administrator on 08.09.26.
-//
+
+
+
+
 
 #include "libmatti/main.h"
 
@@ -22,10 +23,11 @@ const char MATTICRAFT_MANIFEST[] =
     "Specification-Version: 11.0\n"
     "\n";
 
-// Release packages (AppImage / portable zip) ship with defaults baked in, so
-// the game starts with zero arguments: version, launchTarget, the FML version
-// markers and the account fields the Java launcher reads from the offline
-// profile. An explicit flag on the command line wins over a default.
+
+
+
+
+
 static const char *arg_for(int argc, char *argv[], const char *flag, const char *fallback)
 {
     size_t flen = strlen(flag);
@@ -102,10 +104,11 @@ int main(int argc, char *argv[], char *envp[])
         return 0;
     }
 
-    // The selftest phase: the tests of libmatti live in the client, so one run
-    // of matticraft builds and executes every harness (the same commands ctest
-    // runs). Skipped with --no-tests, or compiled out for runClient (the plain
-    // client target has no test harnesses as dependencies).
+
+
+
+
+
 #if MATTICRAFT_CLIENT_ONLY
     int runSelftests = 0;
 #else
@@ -114,10 +117,11 @@ int main(int argc, char *argv[], char *envp[])
     if (has_flag(argc, argv, "--no-tests"))
         runSelftests = 0;
 
-    // C has no META-INF/services: declare the demo providers before the
-    // launcher reads the registry inside start_from_bsl. Without this the
-    // launcher has no launch handler for "neoforge" and ValidateLaunchTarget
-    // aborts with "Cannot find launch target".
+
+
+
+
+
     demo_register_services();
 
     if (runSelftests && selftest_run_all() != 0)
@@ -127,9 +131,10 @@ int main(int argc, char *argv[], char *envp[])
         return 1;
     }
 
-    // Release defaults: the packages start without any manual arguments. An
-    // explicitly passed flag wins (arg_for scans the argv first), the defaults
-    // are appended after - joption's first-value-wins keeps the explicit ones.
+
+
+
+
     const char *defaults[] = {
         "--launchTarget", "neoforge",
         "--gameDir", ".",
@@ -151,7 +156,8 @@ int main(int argc, char *argv[], char *envp[])
         fullArgv[fullArgc++] = argv[i];
     for (int i = 0; i < defaultCount; i += 2)
     {
-        // Only inject a default when the flag (or flag=value form) is absent.
+
+
         char flag[64];
         snprintf(flag, sizeof(flag), "%s", defaults[i]);
         if (arg_for(fullArgc, fullArgv, flag, NULL) == NULL)
@@ -161,14 +167,19 @@ int main(int argc, char *argv[], char *envp[])
         }
     }
 
-    // Java: BootstrapLauncher.run(...) ends in ModLauncher, which hands over to
+// Java: BootstrapLauncher.run(...) ends in ModLauncher, which hands over to
     // the launch target's game main (net.minecraft.client.main.Main). The
     // process exit status is the game's: start_from_bsl propagates the status
     // the game main returned through the launcher chain.
     // The vulkanClient target defaults to the native Vulkan layer. Explicit
     // --layer/--api arguments win over these environment defaults.
+#if defined(_WIN32)
+    _putenv_s("MATTI_LAYER", "native");
+    _putenv_s("MATTI_API", "vulkan");
+#else
     setenv("MATTI_LAYER", "native", 0);
     setenv("MATTI_API", "vulkan", 0);
+#endif
     int status = start_from_bsl(fullArgc, fullArgv, envp);
     free(fullArgv);
     return status;

@@ -30,9 +30,10 @@
 #include <sys/sysctl.h>
 #endif
 
-// ---------------------------------------------------------------------------
-// Platform primitives
-// ---------------------------------------------------------------------------
+
+
+
+
 
 static void *platform_open(const char *path)
 {
@@ -52,7 +53,8 @@ static int platform_directory_separator(char character)
 #endif
 }
 
-// The directory of the running module (executable or shared library).
+
+
 static int module_directory(char *buffer, size_t size)
 {
 #if defined(_WIN32)
@@ -68,7 +70,8 @@ static int module_directory(char *buffer, size_t size)
     size_t length = size;
     if (sysctl(name, 4, buffer, &length, NULL, 0) != 0 || length == 0)
         return 0;
-    buffer[length - 1] = '\0'; // sysctl may keep the trailing NUL in length
+    buffer[length - 1] = '\0';
+
 #else
     ssize_t written = readlink("/proc/self/exe", buffer, size - 1);
     if (written <= 0)
@@ -135,8 +138,9 @@ static void *try_module_directories(const char *const *names)
             return handle;
     }
 
-    // Installed layout: bin/<exe> and lib/<library>, macOS .app bundle
-    // Contents/MacOS/<exe> and Contents/Frameworks/<dylib>.
+
+
+
     static const char *const relative[] = {"../lib", "../Frameworks", "../lib64", NULL};
     for (int index = 0; relative[index] != NULL; index++)
     {
@@ -164,9 +168,10 @@ static const char *const default_directories[] = {
     "/usr/lib",
     NULL};
 #else
-// The locations the Nix profile setup installs runtime libraries into. The
-// fixed entries keep a bare session working (a systemd unit or a cron job has
-// no NIX_PROFILES), the environment variable covers the active profiles.
+
+
+
+
 static const char *const default_directories[] = {
     "/run/current-system/sw/lib",
     "/nix/var/nix/profiles/default/lib",
@@ -181,8 +186,9 @@ void *LIBMATTI_NATIVE_OpenLibrary(const char *const *names)
     if (names == NULL)
         return NULL;
 
-    // The normal loader search: LD_LIBRARY_PATH/PATH, the host's default
-    // paths, the module directory and anything already loaded.
+
+
+
     for (int i = 0; names[i] != NULL; i++)
     {
         void *handle = platform_open(names[i]);
@@ -194,7 +200,8 @@ void *LIBMATTI_NATIVE_OpenLibrary(const char *const *names)
     if (handle != NULL)
         return handle;
 
-    // Explicit override for installs that live somewhere else.
+
+
     const char *override_path = getenv("MATTI_LIBRARY_PATH");
     if (override_path != NULL)
     {
@@ -204,8 +211,9 @@ void *LIBMATTI_NATIVE_OpenLibrary(const char *const *names)
     }
 
 #if !defined(_WIN32)
-    // NIX_PROFILES is space separated, e.g.
-    //   /run/current-system/sw ~/.nix-profile
+
+
+
     const char *profiles = getenv("NIX_PROFILES");
     if (profiles != NULL)
     {
@@ -237,7 +245,8 @@ void *LIBMATTI_NATIVE_OpenLibrary(const char *const *names)
         }
     }
 
-    // The per-user profile, which NIX_PROFILES only lists after a login shell.
+
+
     const char *home = getenv("HOME");
 #if defined(_WIN32)
     if (home == NULL)
@@ -267,13 +276,14 @@ void *LIBMATTI_NATIVE_OpenLibrary(const char *const *names)
     return NULL;
 }
 
-// ---------------------------------------------------------------------------
-// Libraries embedded into the executable
-// ---------------------------------------------------------------------------
-//
-// Linux/FreeBSD: ELF section table.
-// Windows: PE section table.
-// macOS: no section injection (the .app ships dylibs in Frameworks).
+
+
+
+
+
+
+
+
 
 #if defined(__linux__) || defined(__FreeBSD__)
 static int read_section_from_file(const char *path, const char *section_name, unsigned char **out_data,
@@ -359,7 +369,8 @@ static int read_section_from_file(const char *path, const char *section_name, un
         return 0;
     }
 
-    // Skip the optional header (PE32 or PE32+); section headers follow it.
+
+
     if (fseek(file, file_header.SizeOfOptionalHeader, SEEK_CUR) != 0)
     {
         fclose(file);
@@ -408,9 +419,10 @@ static int read_section_from_file(const char *path, const char *section_name, un
 }
 #endif
 
-// Embedded sections live in whichever module carries the build-time payloads:
-// the executable for the classic single-binary clients, the shared library for
-// the one-file libmatti. Resolve the running module and read its section table.
+
+
+
+
 static int read_self_section(const char *section_name, unsigned char **out_data, size_t *out_size)
 {
 #if defined(__linux__) || defined(__APPLE__) || defined(__FreeBSD__)
@@ -441,7 +453,8 @@ static int read_self_section(const char *section_name, unsigned char **out_data,
     char executable[4096];
     int written = snprintf(executable, sizeof(executable), "%s", path);
     (void) written;
-    // module_directory() stripped the file name; rebuild the executable path.
+
+
 #if defined(__FreeBSD__)
     int name[4] = {CTL_KERN, KERN_PROC, KERN_PROC_PATHNAME, -1};
     size_t length = sizeof(executable);
@@ -497,7 +510,8 @@ void *LIBMATTI_NATIVE_OpenEmbeddedLibrary(const char *section_name)
             fclose(file);
         }
     }
-    // The mapping keeps the file alive; remove it from the directory.
+
+
     DeleteFileA(temporary_file);
     free(data);
     return handle;
@@ -529,7 +543,8 @@ void *LIBMATTI_NATIVE_OpenEmbeddedLibrary(const char *section_name)
             close(fd);
             if (ok)
                 handle = platform_open(path);
-            // The mapping keeps the file alive; the path itself should not stay.
+
+
             unlink(path);
         }
     }

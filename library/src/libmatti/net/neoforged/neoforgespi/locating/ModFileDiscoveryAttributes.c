@@ -74,7 +74,7 @@ char *LIBMATTI_NEOFORGESPI_ModFileDiscoveryAttributes_ToString(
 
     if (attributes->parent != NULL)
     {
-        // Java: result.append("parent: "); result.append(parent.getFilePath().getFileName());
+// Java: result.append("parent: "); result.append(parent.getFilePath().getFileName());
         const char *filePath = LIBMATTI_NEOFORGESPI_IModFile_GetFilePath(attributes->parent);
         const char *fileName = filePath != NULL ? strrchr(filePath, '/') : NULL;
         fileName = fileName != NULL ? fileName + 1 : filePath;
@@ -86,7 +86,7 @@ char *LIBMATTI_NEOFORGESPI_ModFileDiscoveryAttributes_ToString(
         length += addition;
     }
 
-    // Java: if (locator != null) { if (result.length() > 1) result.append(", "); result.append("locator: "); result.append(locator); }
+// Java: if (locator != null) { if (result.length() > 1) result.append(", "); result.append("locator: "); result.append(locator); }
     if (attributes->locator != NULL)
     {
         char *locatorString = LIBMATTI_NEOFORGESPI_IModFileCandidateLocator_ToString(attributes->locator);
@@ -99,7 +99,7 @@ char *LIBMATTI_NEOFORGESPI_ModFileDiscoveryAttributes_ToString(
     }
     if (attributes->dependencyLocator != NULL)
     {
-        // Java: result.append(dependencyLocator); - the ordered provider carries no toString,
+// Java: result.append(dependencyLocator); - the ordered provider carries no toString,
         //       so the port prints the pointer identity like Java's default Object.toString.
         char identity[2 * sizeof(void *) + 3];
         snprintf(identity, sizeof(identity), "@%zx", (size_t) attributes->dependencyLocator);
@@ -111,7 +111,7 @@ char *LIBMATTI_NEOFORGESPI_ModFileDiscoveryAttributes_ToString(
     }
     if (attributes->reader != NULL)
     {
-        // Java: result.append(reader); - same pointer-identity fallback as dependencyLocator
+// Java: result.append(reader); - same pointer-identity fallback as dependencyLocator
         char identity[2 * sizeof(void *) + 3];
         snprintf(identity, sizeof(identity), "@%zx", (size_t) attributes->reader);
         const char *label = length > 1 ? ", reader: " : "reader: ";

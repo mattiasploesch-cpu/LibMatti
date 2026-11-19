@@ -1,4 +1,5 @@
-// Port of com.mojang.brigadier.context.ParsedArgument.
+
+
 
 #include "libmatti/com/mojang/brigadier/context/ParsedArgument.h"
 

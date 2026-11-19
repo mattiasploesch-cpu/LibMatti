@@ -82,7 +82,7 @@ LIBMATTI_FML_ProgramArgs *LIBMATTI_FML_ProgramArgs_From(int argc, char *argv[])
     {
         if (!ended)
         {
-            // Java: if ("--".equals(args[x])) ended = true;
+// Java: if ("--".equals(args[x])) ended = true;
             if (strcmp("--", argv[x]) == 0)
             {
                 ended = 1;
@@ -97,7 +97,7 @@ LIBMATTI_FML_ProgramArgs *LIBMATTI_FML_ProgramArgs_From(int argc, char *argv[])
                 char *key = equals == NULL ? strdup(argv[x]) : strndup(argv[x], (size_t) (equals - argv[x]));
                 const char *value = equals == NULL ? NULL : equals[1] == '\0' ? "" : equals + 1;
 
-                // Java: if (idx == -1 && x + 1 < args.length && !args[x + 1].startsWith("-"))
+// Java: if (idx == -1 && x + 1 < args.length && !args[x + 1].startsWith("-"))
                 if (equals == NULL && x + 1 < argc && argv[x + 1][0] != '-')
                 {
                     LIBMATTI_FML_ProgramArgs_AddArg(programArgs, 1, key, argv[x + 1]);
@@ -137,7 +137,7 @@ void LIBMATTI_FML_ProgramArgs_Free(LIBMATTI_FML_ProgramArgs *programArgs)
 // Java: public void addRaw(String arg)
 void LIBMATTI_FML_ProgramArgs_AddRaw(LIBMATTI_FML_ProgramArgs *programArgs, const char *arg)
 {
-    // Java: entries.add(() -> new String[] { arg });
+// Java: entries.add(() -> new String[] { arg });
     EntryValue entry = {0};
     entry.raw = 1;
     entry.rawValue = strdup(arg);
@@ -148,7 +148,7 @@ void LIBMATTI_FML_ProgramArgs_AddRaw(LIBMATTI_FML_ProgramArgs *programArgs, cons
 void LIBMATTI_FML_ProgramArgs_AddArg(LIBMATTI_FML_ProgramArgs *programArgs, int split, const char *raw,
                                      const char *value)
 {
-    // Java: int idx = raw.startsWith("--") ? 2 : 1;
+// Java: int idx = raw.startsWith("--") ? 2 : 1;
     size_t index = raw[0] == '-' && raw[1] == '-' ? 2 : 1;
 
     EntryValue entry = {0};
@@ -159,11 +159,11 @@ void LIBMATTI_FML_ProgramArgs_AddArg(LIBMATTI_FML_ProgramArgs *programArgs, int 
 
     if (find_entry(programArgs, entry.key) != NULL)
     {
-        // Java: LOGGER.info("Duplicate entries for {} Unindexable", key);
+// Java: LOGGER.info("Duplicate entries for {} Unindexable", key);
         LIBMATTI_ML_Logger_Info(LOGGER(), NULL, "Duplicate entries for {} Unindexable", entry.key);
     }
 
-    // Java: entries.add(entry);
+// Java: entries.add(entry);
     append_entry(programArgs, entry);
 }
 
@@ -196,7 +196,7 @@ char **LIBMATTI_FML_ProgramArgs_GetArguments(const LIBMATTI_FML_ProgramArgs *pro
             continue;
         }
 
-        // Java: return new String[] { prefix + getKey() + '=' + getValue() };
+// Java: return new String[] { prefix + getKey() + '=' + getValue() };
         size_t length = strlen(entry->prefix) + strlen(entry->key) + strlen(entry->value) + 2;
         char *joined = malloc(length);
         snprintf(joined, length, "%s%s=%s", entry->prefix, entry->key, entry->value);
@@ -210,14 +210,14 @@ char **LIBMATTI_FML_ProgramArgs_GetArguments(const LIBMATTI_FML_ProgramArgs *pro
 // Java: public boolean hasValue(String key)
 int LIBMATTI_FML_ProgramArgs_HasValue(const LIBMATTI_FML_ProgramArgs *programArgs, const char *key)
 {
-    // Java: return getOrDefault(key, null) != null;
+// Java: return getOrDefault(key, null) != null;
     return LIBMATTI_FML_ProgramArgs_GetOrDefault(programArgs, key, NULL) != NULL;
 }
 
 // Java: public String get(String key)
 const char *LIBMATTI_FML_ProgramArgs_Get(const LIBMATTI_FML_ProgramArgs *programArgs, const char *key)
 {
-    // Java: EntryValue ent = values.get(key); return ent == null ? null : ent.getValue();
+// Java: EntryValue ent = values.get(key); return ent == null ? null : ent.getValue();
     EntryValue *entry = find_entry((LIBMATTI_FML_ProgramArgs *) programArgs, key);
     return entry == NULL ? NULL : entry->value;
 }
@@ -226,7 +226,7 @@ const char *LIBMATTI_FML_ProgramArgs_Get(const LIBMATTI_FML_ProgramArgs *program
 const char *LIBMATTI_FML_ProgramArgs_GetOrDefault(const LIBMATTI_FML_ProgramArgs *programArgs, const char *key,
                                                   const char *value)
 {
-    // Java: return ent == null ? value : ent.getValue() == null ? value : ent.getValue();
+// Java: return ent == null ? value : ent.getValue() == null ? value : ent.getValue();
     EntryValue *entry = find_entry((LIBMATTI_FML_ProgramArgs *) programArgs, key);
     if (entry == NULL || entry->value == NULL) return value;
     return entry->value;
@@ -239,7 +239,7 @@ void LIBMATTI_FML_ProgramArgs_Put(LIBMATTI_FML_ProgramArgs *programArgs, const c
 
     if (entry == NULL)
     {
-        // Java: entry = new EntryValue(true, "--", key, value); values.put(key, entry); entries.add(entry);
+// Java: entry = new EntryValue(true, "--", key, value); values.put(key, entry); entries.add(entry);
         EntryValue added = {0};
         added.prefix = strdup("--");
         added.key = strdup(key);
@@ -249,7 +249,7 @@ void LIBMATTI_FML_ProgramArgs_Put(LIBMATTI_FML_ProgramArgs *programArgs, const c
         return;
     }
 
-    // Java: entry.setValue(value);
+// Java: entry.setValue(value);
     free(entry->value);
     entry->value = strdup(value);
 }
@@ -261,7 +261,7 @@ void LIBMATTI_FML_ProgramArgs_PutLazy(LIBMATTI_FML_ProgramArgs *programArgs, con
 
     if (entry == NULL)
     {
-        // Java: addArg(true, "--" + key, value);
+// Java: addArg(true, "--" + key, value);
         size_t length = strlen(key) + 3;
         char *raw = malloc(length);
         snprintf(raw, length, "--%s", key);
@@ -272,7 +272,7 @@ void LIBMATTI_FML_ProgramArgs_PutLazy(LIBMATTI_FML_ProgramArgs *programArgs, con
 
     if (entry->value == NULL)
     {
-        // Java: ent.setValue(value);
+// Java: ent.setValue(value);
         entry->value = strdup(value);
     }
 }
@@ -280,7 +280,7 @@ void LIBMATTI_FML_ProgramArgs_PutLazy(LIBMATTI_FML_ProgramArgs *programArgs, con
 // Java: public String remove(String key)
 char *LIBMATTI_FML_ProgramArgs_Remove(LIBMATTI_FML_ProgramArgs *programArgs, const char *key)
 {
-    // Java: EntryValue ent = values.remove(key); if (ent == null) return null; entries.remove(ent); return ent.getValue();
+// Java: EntryValue ent = values.remove(key); if (ent == null) return null; entries.remove(ent); return ent.getValue();
     EntryValue *entry = find_entry(programArgs, key);
     if (entry == NULL) return NULL;
 

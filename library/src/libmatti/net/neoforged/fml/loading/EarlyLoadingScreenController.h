@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.loading.EarlyLoadingScreenController.
+
+
 
 #ifndef MATTICRAFT_FML_LOADING_EARLYLOADINGSCREENCONTROLLER_H
 #define MATTICRAFT_FML_LOADING_EARLYLOADINGSCREENCONTROLLER_H
@@ -10,13 +11,13 @@ struct LIBMATTI_FML_EarlyLoadingScreenController
 {
     void *self;
 
-    // Java: long takeOverGlfwWindow()
+// Java: long takeOverGlfwWindow()
     long (*takeOverGlfwWindow)(void *self);
-    // Java: void periodicTick()
+// Java: void periodicTick()
     void (*periodicTick)(void *self);
-    // Java: void updateProgress(String label)
+// Java: void updateProgress(String label)
     void (*updateProgress)(void *self, const char *label);
-    // Java: void completeProgress()
+// Java: void completeProgress()
     void (*completeProgress)(void *self);
 };
 
@@ -33,4 +34,4 @@ void LIBMATTI_FML_EarlyLoadingScreenController_UpdateProgress(const LIBMATTI_FML
 // Java: public void completeProgress()
 void LIBMATTI_FML_EarlyLoadingScreenController_CompleteProgress(const LIBMATTI_FML_EarlyLoadingScreenController *controller);
 
-#endif //MATTICRAFT_FML_LOADING_EARLYLOADINGSCREENCONTROLLER_H
+#endif

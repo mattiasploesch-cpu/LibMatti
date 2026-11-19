@@ -23,20 +23,20 @@ extern "C"
 // Java: public class VertexFormat
 typedef struct LIBMATTI_B3D_VertexFormat
 {
-    LIBMATTI_B3D_VertexFormat_Mode mode;  // the port binds one mode per format (Java passes it per begin())
+    LIBMATTI_B3D_VertexFormat_Mode mode;// the port binds one mode per format (Java passes it per begin())
     // Java: List<VertexFormatElement> elements - NULL-terminated pointer array,
     // the elements stay owned by the creator (the shared ELEMENT_* constants).
     const LIBMATTI_B3D_VertexFormatElement **elements;
-    // Java: List<String> names - parallel array of attribute names.
+// Java: List<String> names - parallel array of attribute names.
     char **names;
     int elementCount;
-    int *offsets;       // Java: the builder's IntList offsets
-    int vertexSize;     // Java: private final int vertexSize
-    int elementsMask;   // Java: private final int elementsMask
+    int *offsets;// Java: the builder's IntList offsets
+    int vertexSize;// Java: private final int vertexSize
+    int elementsMask;// Java: private final int elementsMask
     // Java: private final int[] offsetsByElement = new int[32] - indexed by
     // element id, UNKNOWN_ELEMENT where the format lacks the element.
     int offsetsByElement[32];
-    // Java: private @Nullable GpuBuffer immediateDrawVertexBuffer/IndexBuffer
+// Java: private @Nullable GpuBuffer immediateDrawVertexBuffer/IndexBuffer
     LIBMATTI_B3D_GpuBuffer *immediateDrawVertexBuffer;
     LIBMATTI_B3D_GpuBuffer *immediateDrawIndexBuffer;
 } LIBMATTI_B3D_VertexFormat;
@@ -67,7 +67,8 @@ const LIBMATTI_B3D_VertexFormatElement *LIBMATTI_B3D_VertexFormat_GetElement(con
 // Java: public int getOffset(VertexFormatElement) - via the element id table.
 int LIBMATTI_B3D_VertexFormat_GetOffsetOfElement(const LIBMATTI_B3D_VertexFormat *format,
                                                  const LIBMATTI_B3D_VertexFormatElement *element);
-// The slot-based variant the render path uses (POSITION=0..LINE_WIDTH=5, UV0/1/2).
+
+
 int LIBMATTI_B3D_VertexFormat_GetOffset(const LIBMATTI_B3D_VertexFormat *format, int elementIndex);
 // Java: public int[] getOffsetsByElement()
 const int *LIBMATTI_B3D_VertexFormat_GetOffsetsByElement(const LIBMATTI_B3D_VertexFormat *format);

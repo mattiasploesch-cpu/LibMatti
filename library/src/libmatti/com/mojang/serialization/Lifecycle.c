@@ -1,4 +1,5 @@
-// Port of com.mojang.serialization.Lifecycle.
+
+
 
 #include "libmatti/com/mojang/serialization/Lifecycle.h"
 

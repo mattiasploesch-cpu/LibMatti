@@ -16,10 +16,10 @@ static LIBMATTI_ML_Logger *LOGGER(void)
 typedef struct
 {
     LIBMATTI_FML_JarModuleInfo base;
-    // Java: private final byte[] originalDescriptorBytes
+// Java: private final byte[] originalDescriptorBytes
     unsigned char *originalDescriptorBytes;
     size_t originalDescriptorByteCount;
-    // Java: private final ModuleDescriptor originalDescriptor
+// Java: private final ModuleDescriptor originalDescriptor
     LIBMATTI_JL_ModuleDescriptor *originalDescriptor;
 } ModuleJarModuleInfo;
 
@@ -28,12 +28,12 @@ static LIBMATTI_JL_ModuleDescriptor *createDescriptor(void *self, LIBMATTI_FML_J
 {
     ModuleJarModuleInfo *moduleInfo = self;
 
-    // Java: var fullDescriptor = ModuleDescriptor.read(ByteBuffer.wrap(originalDescriptorBytes),
+// Java: var fullDescriptor = ModuleDescriptor.read(ByteBuffer.wrap(originalDescriptorBytes),
     //             () -> ModuleDescriptorFactory.scanModulePackages(contents));
     LIBMATTI_JL_ModuleDescriptor *fullDescriptor = LIBMATTI_JL_ModuleDescriptor_Read(
         moduleInfo->originalDescriptorBytes, moduleInfo->originalDescriptorByteCount);
 
-    // Java: we do inherit the name and version, as well as the package list
+// Java: we do inherit the name and version, as well as the package list
     LIBMATTI_JL_ModuleDescriptor *builder =
         LIBMATTI_JL_ModuleDescriptor_Create(moduleInfo->originalDescriptor->name, NULL, 0);
     LIBMATTI_JL_ModuleDescriptor_AddModifier(builder, LIBMATTI_JL_MODIFIER_AUTOMATIC);
@@ -47,7 +47,7 @@ static LIBMATTI_JL_ModuleDescriptor *createDescriptor(void *self, LIBMATTI_FML_J
     for (size_t i = 0; i < packageCount; i++)
         LIBMATTI_JL_ModuleDescriptor_AddPackage(builder, packages[i]);
 
-    // Java: fullDescriptor.provides().forEach(builder::provides)
+// Java: fullDescriptor.provides().forEach(builder::provides)
     size_t providesCount = 0;
     LIBMATTI_JL_ModuleDescriptor_Provides **provides =
         LIBMATTI_JL_ModuleDescriptor_GetProvides(moduleInfo->originalDescriptor, &providesCount);
@@ -86,7 +86,7 @@ LIBMATTI_FML_JarModuleInfo *LIBMATTI_FML_ModuleJarModuleInfo_New(LIBMATTI_FML_Ja
 {
     ModuleJarModuleInfo *result = calloc(1, sizeof(ModuleJarModuleInfo));
 
-    // Java: this.originalDescriptorBytes = moduleInfo.readAllBytes()
+// Java: this.originalDescriptorBytes = moduleInfo.readAllBytes()
     // Java throws UncheckedIOException("Failed to read module-info.class from " + moduleInfo)
     // on a read failure; the port logs the same text and continues with NULL bytes, which
     // makes the descriptor parse below fail the same way.
@@ -95,7 +95,7 @@ LIBMATTI_FML_JarModuleInfo *LIBMATTI_FML_ModuleJarModuleInfo_New(LIBMATTI_FML_Ja
     if (result->originalDescriptorBytes == NULL)
         LIBMATTI_ML_Logger_Error(LOGGER(), NULL, "Failed to read module-info.class from {}", "JarResource");
 
-    // Java: this.originalDescriptor = ModuleDescriptor.read(ByteBuffer.wrap(originalDescriptorBytes))
+// Java: this.originalDescriptor = ModuleDescriptor.read(ByteBuffer.wrap(originalDescriptorBytes))
     LIBMATTI_JL_ModuleDescriptor *originalDescriptor = LIBMATTI_JL_ModuleDescriptor_Read(
         result->originalDescriptorBytes, result->originalDescriptorByteCount);
     if (originalDescriptor != NULL)
@@ -104,7 +104,7 @@ LIBMATTI_FML_JarModuleInfo *LIBMATTI_FML_ModuleJarModuleInfo_New(LIBMATTI_FML_Ja
     }
     else
     {
-        // Java: InvalidModuleDescriptorException wrapped in UncheckedIOException
+// Java: InvalidModuleDescriptorException wrapped in UncheckedIOException
         LIBMATTI_ML_Logger_Error(LOGGER(), NULL, "Failed to parse module-info.class: InvalidModuleDescriptorException");
         result->originalDescriptor = LIBMATTI_JL_ModuleDescriptor_Create("", NULL, 0);
     }

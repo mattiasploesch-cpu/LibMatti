@@ -28,18 +28,24 @@ struct LIBMATTI_MAVEN_Item
 {
     LIBMATTI_MAVEN_ItemType type;
 
-    // IntItem
+
+
     int intValue;
-    // LongItem
+
+
     long longValue;
-    // BigIntegerItem
+
+
     char *digits;
-    // StringItem
+
+
     char *stringValue;
-    // CombinationItem
+
+
     LIBMATTI_MAVEN_Item *stringPart;
     LIBMATTI_MAVEN_Item *digitPart;
-    // ListItem
+
+
     LIBMATTI_MAVEN_Item **items;
     size_t count;
     size_t capacity;
@@ -61,4 +67,4 @@ const char *LIBMATTI_MAVEN_ComparableVersion_ToString(const LIBMATTI_MAVEN_Compa
 // Java: public String getCanonical()
 char *LIBMATTI_MAVEN_ComparableVersion_GetCanonical(LIBMATTI_MAVEN_ComparableVersion *version);
 
-#endif //MATTICRAFT_MAVEN_ARTIFACT_VERSIONING_COMPARABLEVERSION_H
+#endif

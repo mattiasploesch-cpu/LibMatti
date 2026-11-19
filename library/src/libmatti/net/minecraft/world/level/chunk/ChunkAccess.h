@@ -51,32 +51,32 @@ typedef struct PostProcessingList
 // Java: public abstract class ChunkAccess
 typedef struct LIBMATTI_MC_ChunkAccess
 {
-    // Java: protected final ChunkPos chunkPos
+// Java: protected final ChunkPos chunkPos
     LIBMATTI_MC_ChunkPos chunkPos;
-    // Java: protected final LevelHeightAccessor levelHeightAccessor
+// Java: protected final LevelHeightAccessor levelHeightAccessor
     LIBMATTI_MC_LevelHeightAccessor levelHeightAccessor;
-    // Java: protected final LevelChunkSection[] sections
+// Java: protected final LevelChunkSection[] sections
     LIBMATTI_MC_LevelChunkSection **sections;
     int sectionCount;
-    // Java: protected final Map<Heightmap.Types, Heightmap> heightmaps - indexed by
+// Java: protected final Map<Heightmap.Types, Heightmap> heightmaps - indexed by
     // the Types ordinal (Java's EnumMap)
     struct LIBMATTI_MC_Heightmap *heightmaps[LIBMATTI_MC_Heightmap_TYPES_COUNT];
-    // Java: protected final Map<BlockPos, BlockEntity> blockEntities
+// Java: protected final Map<BlockPos, BlockEntity> blockEntities
     LIBMATTI_MC_ChunkBlockEntityEntry *blockEntities;
     int blockEntityCount;
     int blockEntityCapacity;
-    // Java: protected final Map<BlockPos, CompoundTag> pendingBlockEntities
+// Java: protected final Map<BlockPos, CompoundTag> pendingBlockEntities
     LIBMATTI_MC_PendingBlockEntityEntry *pendingBlockEntities;
     int pendingBlockEntityCount;
     int pendingBlockEntityCapacity;
-    // Java: protected final @Nullable ShortList[] postProcessing
+// Java: protected final @Nullable ShortList[] postProcessing
     LIBMATTI_MC_PostProcessingList *postProcessing;
     int postProcessingCount;
-    // Java: private volatile boolean unsaved / isLightCorrect, private long inhabitedTime
+// Java: private volatile boolean unsaved / isLightCorrect, private long inhabitedTime
     bool unsaved;
     bool isLightCorrect;
     int64_t inhabitedTime;
-    // Java: protected @Nullable NoiseChunk noiseChunk / UpgradeData / BlendingData -
+// Java: protected @Nullable NoiseChunk noiseChunk / UpgradeData / BlendingData -
     // game-port content, kept as opaque slots
     void *noiseChunk;
     void *upgradeData;
@@ -90,8 +90,9 @@ void LIBMATTI_MC_ChunkAccess_Init(LIBMATTI_MC_ChunkAccess *chunk, const LIBMATTI
 // Java: public LevelChunkSection[] getSections() / getSection(int)
 LIBMATTI_MC_LevelChunkSection **LIBMATTI_MC_ChunkAccess_GetSections(LIBMATTI_MC_ChunkAccess *chunk);
 LIBMATTI_MC_LevelChunkSection *LIBMATTI_MC_ChunkAccess_GetSection(LIBMATTI_MC_ChunkAccess *chunk, int index);
-// the xyz block read through the section array (chunk-local x/z 0..15) - the shared
-// body of ChunkAccess.getBlockState/LevelChunk.getBlockState
+
+
+
 LIBMATTI_MC_BlockState *LIBMATTI_MC_ChunkAccess_GetBlockStateXYZ(const LIBMATTI_MC_ChunkAccess *chunk, int x, int y, int z);
 // Java: public int getHighestFilledSectionIndex() / getHighestSectionPosition()
 int LIBMATTI_MC_ChunkAccess_GetHighestFilledSectionIndex(const LIBMATTI_MC_ChunkAccess *chunk);
@@ -140,4 +141,4 @@ void LIBMATTI_MC_ChunkAccess_Free(LIBMATTI_MC_ChunkAccess *chunk);
 }
 #endif
 
-#endif //MATTICRAFT_MC_WORLD_LEVEL_CHUNK_CHUNKACCESS_H
+#endif

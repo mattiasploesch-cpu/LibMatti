@@ -1,4 +1,5 @@
-// Port of net.minecraft.nbt.CompoundTag.
+
+
 
 #include "libmatti/net/minecraft/nbt/CompoundTag.h"
 
@@ -25,7 +26,8 @@ LIBMATTI_MC_Nbt_Tag *LIBMATTI_MC_Nbt_CompoundTag_CopyTag(const LIBMATTI_MC_Nbt_C
     return (LIBMATTI_MC_Nbt_Tag *) copy;
 }
 
-// the LIBMATTI_MC_Nbt_Tag_Free dispatch for TAG_COMPOUND
+
+
 void LIBMATTI_MC_Nbt_CompoundTag_FreeEntries(LIBMATTI_MC_Nbt_CompoundTag *compound)
 {
     if (compound == NULL)

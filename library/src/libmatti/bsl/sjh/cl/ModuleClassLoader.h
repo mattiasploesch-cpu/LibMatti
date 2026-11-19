@@ -1,4 +1,5 @@
-// Port of cpw.mods.cl.ModuleClassLoader.
+
+
 
 #ifndef MATTICRAFT_MODULECLASSLODER_H
 #define MATTICRAFT_MODULECLASSLODER_H
@@ -8,13 +9,17 @@
 
 #include <stddef.h>
 
-// external (JVM-backed), opaque: java.lang.module.ModuleLayer
+
+
 typedef struct LIBMATTI_CL_ModuleLayer LIBMATTI_CL_ModuleLayer;
-// external (JVM-backed), opaque: java.lang.ClassLoader
+
+
 typedef struct LIBMATTI_CL_ClassLoader LIBMATTI_CL_ClassLoader;
-// external (JVM-backed), opaque: java.lang.Module
+
+
 typedef struct LIBMATTI_CL_Module LIBMATTI_CL_Module;
-// external (JVM-backed), opaque: java.lang.Package
+
+
 typedef struct LIBMATTI_CL_Package LIBMATTI_CL_Package;
 
 // Java: Map<String, JarModuleReference> resolvedRoots
@@ -49,9 +54,9 @@ typedef struct LIBMATTI_CL_ModuleClassLoader
     LIBMATTI_CL_ResolvedRoots resolvedRoots;
     LIBMATTI_CL_PackageLookup packageLookup;
     LIBMATTI_CL_ParentLoaders parentLoaders;
-    // Java: @Nullable ClassLoader fallbackClassLoader (NULL until set)
+// Java: @Nullable ClassLoader fallbackClassLoader (NULL until set)
     LIBMATTI_CL_ClassLoader *fallbackClassLoader;
-    // Java: protected byte[] maybeTransformClassBytes(byte[] bytes, String name, String context)
+// Java: protected byte[] maybeTransformClassBytes(byte[] bytes, String name, String context)
     // Java overrides this in TransformingClassLoader; the C port uses a function pointer.
     unsigned char *(*maybeTransformClassBytes)(struct LIBMATTI_CL_ModuleClassLoader *self,
                                                const unsigned char *bytes, size_t length, const char *name,
@@ -107,4 +112,4 @@ unsigned char *LIBMATTI_CL_ModuleClassLoader_GetMaybeTransformedClassBytes(LIBMA
 // Java: void setFallbackClassLoader(ClassLoader)
 void LIBMATTI_CL_ModuleClassLoader_SetFallbackClassLoader(LIBMATTI_CL_ModuleClassLoader *classLoader, LIBMATTI_CL_ClassLoader *fallbackClassLoader);
 
-#endif //MATTICRAFT_MODULECLASSLODER_H
+#endif

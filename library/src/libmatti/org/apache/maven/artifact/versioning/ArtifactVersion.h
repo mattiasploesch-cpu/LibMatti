@@ -1,7 +1,8 @@
-// Port of org.apache.maven.artifact.versioning.ArtifactVersion and its only implementation,
-// DefaultArtifactVersion. The port keeps the concrete class for the interface.
-// Java's equals is "compareTo == 0" and hashCode is 11 + comparable.orderingHashCode(); the port
-// exposes both.
+
+
+
+
+
 
 #ifndef MATTICRAFT_MAVEN_ARTIFACT_VERSIONING_ARTIFACTVERSION_H
 #define MATTICRAFT_MAVEN_ARTIFACT_VERSIONING_ARTIFACTVERSION_H
@@ -12,9 +13,9 @@ typedef struct LIBMATTI_MAVEN_ArtifactVersion LIBMATTI_MAVEN_ArtifactVersion;
 
 struct LIBMATTI_MAVEN_ArtifactVersion
 {
-    // Java: private final ComparableVersion comparable - toString() returns comparable.toString()
+// Java: private final ComparableVersion comparable - toString() returns comparable.toString()
     char *version;
-    // Java: private Integer majorVersion / minorVersion / incrementalVersion / buildNumber (null = absent)
+// Java: private Integer majorVersion / minorVersion / incrementalVersion / buildNumber (null = absent)
     int majorVersion;
     int majorVersionPresent;
     int minorVersion;
@@ -23,7 +24,7 @@ struct LIBMATTI_MAVEN_ArtifactVersion
     int incrementalVersionPresent;
     int buildNumber;
     int buildNumberPresent;
-    // Java: private String qualifier
+// Java: private String qualifier
     char *qualifier;
     LIBMATTI_MAVEN_ComparableVersion *comparable;
 };
@@ -50,4 +51,4 @@ int LIBMATTI_MAVEN_ArtifactVersion_GetBuildNumber(const LIBMATTI_MAVEN_ArtifactV
 // Java: public String getQualifier()
 const char *LIBMATTI_MAVEN_ArtifactVersion_GetQualifier(const LIBMATTI_MAVEN_ArtifactVersion *version);
 
-#endif //MATTICRAFT_MAVEN_ARTIFACT_VERSIONING_ARTIFACTVERSION_H
+#endif

@@ -33,7 +33,7 @@ struct LIBMATTI_FML_ModVersion
     LIBMATTI_NEOFORGESPI_IModInfo_Ordering ordering;
     LIBMATTI_NEOFORGESPI_IModInfo_DependencySide side;
     int referralUrlPresent;
-    void *referralUrl; // Java: Optional<URL> referralUrl
+    void *referralUrl;// Java: Optional<URL> referralUrl
 };
 
 // Java: public class ModInfo implements IModInfo, IConfigurable
@@ -53,16 +53,16 @@ struct LIBMATTI_FML_ModInfo
     char *logoFile;
     int logoBlur;
     int updateURLPresent;
-    void *updateJSONURL; // Java: Optional<URL> updateJSONURL
+    void *updateJSONURL;// Java: Optional<URL> updateJSONURL
     LIBMATTI_FML_ModVersion **dependencies;
     size_t dependencyCount;
     LIBMATTI_NEOFORGESPI_ForgeFeature_Bound *features;
-    void **featurePointers; // Java: List<Bound>
+    void **featurePointers;// Java: List<Bound>
     size_t featureCount;
-    LIBMATTI_JU_HashMap *properties; // Java: Map<String, Object> modProperties
+    LIBMATTI_JU_HashMap *properties;// Java: Map<String, Object> modProperties
     LIBMATTI_NEOFORGESPI_IConfigurable *config;
     int modUrlPresent;
-    void *modUrl; // Java: Optional<URL> modUrl
+    void *modUrl;// Java: Optional<URL> modUrl
 };
 
 // Java: public ModInfo(ModFileInfo owningFile, IConfigurable config) - NULL on InvalidModFileException
@@ -114,4 +114,4 @@ void LIBMATTI_FML_ModVersion_Free(LIBMATTI_FML_ModVersion *modVersion);
 // Java: public final class ModInfo implements IModInfo ... the port needs the concrete class for the sorter
 LIBMATTI_FML_ModInfo *LIBMATTI_FML_ModInfo_AsConcrete(const LIBMATTI_NEOFORGESPI_IModInfo *modInfo);
 
-#endif //MATTICRAFT_FML_LOADING_MODDISCOVERY_MODINFO_H
+#endif

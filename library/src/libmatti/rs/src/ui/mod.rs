@@ -10,16 +10,16 @@ pub mod ffi;
 /// The launch state the C main passes through `argv`/environment.
 #[derive(Clone)]
 pub struct LaunchOptions {
-    /// Layer of the renderer selection (`native`, `sdl`); empty means auto.
+/// Layer of the renderer selection (`native`, `sdl`); empty means auto.
     pub layer: String,
-    /// API of the renderer selection (`opengl`, `vulkan`, ...); empty means auto.
+/// API of the renderer selection (`opengl`, `vulkan`, ...); empty means auto.
     pub api: String,
     pub width: i32,
     pub height: i32,
     pub fullscreen: bool,
-    /// Draw exactly one frame and return (verification/headless runs).
+/// Draw exactly one frame and return (verification/headless runs).
     pub once: bool,
-    /// Screen to start on: main, options, pause or world (QA runs).
+/// Screen to start on: main, options, pause or world (QA runs).
     pub screen: String,
 }
 
@@ -61,7 +61,7 @@ fn environment_selection() -> (String, String) {
 }
 
 impl LaunchOptions {
-    /// Accepts a full `layer:api` string or a legacy single backend name.
+/// Accepts a full `layer:api` string or a legacy single backend name.
     fn set_selection(&mut self, selection: &str) {
         let selection = selection.trim();
         if selection.is_empty() || selection.eq_ignore_ascii_case("auto") {
@@ -87,7 +87,7 @@ impl LaunchOptions {
         }
     }
 
-    /// The string handed to C. Empty leaves the choice to `MATTI_RENDERER`
+/// The string handed to C. Empty leaves the choice to `MATTI_RENDERER`
     /// (set by the vulkanClient target) and then to the platform default.
     fn selection(&self) -> String {
         if self.layer.is_empty() && self.api.is_empty() {
@@ -121,8 +121,9 @@ impl LaunchOptions {
                 None => (argument.clone(), None),
             };
 
-            // Only options that take a value consume the following argument;
-            // a bare flag must not swallow the next option.
+
+
+
             let take_value = |inline: Option<String>, index: &mut usize| -> Option<String> {
                 inline.or_else(|| {
                     if *index + 1 < args.len() {

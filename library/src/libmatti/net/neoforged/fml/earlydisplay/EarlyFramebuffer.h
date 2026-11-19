@@ -1,8 +1,9 @@
-// Port of net.neoforged.fml.earlydisplay.render.EarlyFramebuffer.
-// Java renders the theme layout into this offscreen framebuffer and blits it to
-// the screen with a vertically flipped source rectangle ("src Y are flipped,
-// since our FB is flipped"). That flip is what keeps the y-down screen-pixel
-// coordinate system of the element shaders upright on the default framebuffer.
+
+
+
+
+
+
 
 #ifndef MATTICRAFT_FML_EARLYDISPLAY_EARLYFRAMEBUFFER_H
 #define MATTICRAFT_FML_EARLYDISPLAY_EARLYFRAMEBUFFER_H
@@ -40,4 +41,4 @@ int LIBMATTI_FML_EarlyFramebuffer_Height(const LIBMATTI_FML_EarlyFramebuffer *fr
 }
 #endif
 
-#endif //MATTICRAFT_FML_EARLYDISPLAY_EARLYFRAMEBUFFER_H
+#endif

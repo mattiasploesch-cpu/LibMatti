@@ -1,6 +1,7 @@
-// Port of com.electronwill.nightconfig.toml.TableParser.
-// Java throws a ParsingException; the port returns NULL / 0 and records the failure in the parser.
-// Java's List<String> keys become LIBMATTI_NC_KeyList.
+
+
+
+
 
 #ifndef MATTICRAFT_NC_TOML_TABLEPARSER_H
 #define MATTICRAFT_NC_TOML_TABLEPARSER_H
@@ -41,4 +42,4 @@ LIBMATTI_NC_KeyList *LIBMATTI_NC_TableParser_ParseDottedKey(LIBMATTI_NC_ReaderIn
 char *LIBMATTI_NC_TableParser_ParseNonDottedKey(LIBMATTI_NC_ReaderInput *input, char firstChar,
                                                LIBMATTI_NC_TomlParser *parser);
 
-#endif //MATTICRAFT_NC_TOML_TABLEPARSER_H
+#endif

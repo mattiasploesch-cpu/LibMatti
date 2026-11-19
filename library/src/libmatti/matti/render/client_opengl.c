@@ -1,7 +1,8 @@
-// OpenGL renderer backend: GLFW window + OpenGL 3.2 core context, a
-// fullscreen triangle and a streaming RGBA texture. The CPU framebuffer from
-// render.c is uploaded once per Present. This is the backend that matches the
-// current game renderer's GLFW/OpenGL window setup.
+
+
+
+
+
 
 #include "libmatti/matti/render/render_internal.h"
 
@@ -89,8 +90,9 @@ static unsigned int create_program(void)
     return program;
 }
 
-// The CPU framebuffer can grow after init (the UI bridge resizes it to the
-// fullscreen window size), so the streaming texture is reallocated on demand.
+
+
+
 static int opengl_ensure_texture(LIBMATTI_Renderer *renderer, LIBMATTI_OpenGLBackend *backend)
 {
     if (backend->texture == 0)
@@ -143,8 +145,9 @@ static void opengl_backend_free(LIBMATTI_OpenGLBackend *backend)
 
 static int opengl_is_available(void)
 {
-    // The GLFW/GL bindings are dlopen-based: the libraries only have to be
-    // present at runtime. Init reports a useful error if they are missing.
+
+
+
     return 1;
 }
 
@@ -179,10 +182,11 @@ static int opengl_init(LIBMATTI_Renderer *renderer)
                                 renderer->config.fullscreen ? LIBMATTI_GLFW_FALSE
                                                             : LIBMATTI_GLFW_TRUE);
 
-    // Fullscreen is a borderless window at the current desktop mode, not a
-    // monitor mode change. glfwCreateWindow(..., monitor, ...) switches the
-    // monitor (and remote-streaming hosts such as Sunshine capture that tiny
-    // mode). A decorated-free window at the desktop size never changes it.
+
+
+
+
+
     int window_width = renderer->width;
     int window_height = renderer->height;
     int monitor_x = 0, monitor_y = 0;
@@ -222,8 +226,9 @@ static int opengl_init(LIBMATTI_Renderer *renderer)
     if (renderer->config.fullscreen)
     {
         LIBMATTI_GLFW_glfwSetWindowPos(backend->window, monitor_x, monitor_y);
-        // The UI is drawn in native window pixels. Keeping it at 854x480 and
-        // scaling it in Present would enlarge the already GUI-scaled menus.
+
+
+
         if (!LIBMATTI_Render_Resize(renderer, window_width, window_height))
         {
             LIBMATTI_Render_SetLastError("could not allocate the fullscreen framebuffer");

@@ -1,5 +1,6 @@
-// Port of net.minecraft.world.level.BlockAndTintGetter (the interface slice
-// the render paths need on top of BlockGetter: getShade, getBlockTint).
+
+
+
 
 #ifndef MATTICRAFT_MC_WORLD_LEVEL_BLOCKANDTINTGETTER_H
 #define MATTICRAFT_MC_WORLD_LEVEL_BLOCKANDTINTGETTER_H
@@ -28,4 +29,4 @@ float LIBMATTI_MC_BlockAndTintGetter_GetShade(LIBMATTI_MC_Direction direction, i
 }
 #endif
 
-#endif //MATTICRAFT_MC_WORLD_LEVEL_BLOCKANDTINTGETTER_H
+#endif

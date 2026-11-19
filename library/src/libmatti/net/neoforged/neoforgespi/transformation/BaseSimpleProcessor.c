@@ -1,4 +1,5 @@
-// Port of net.neoforged.neoforgespi.transformation.BaseSimpleProcessor.
+
+
 
 #include "libmatti/net/neoforged/neoforgespi/transformation/BaseSimpleProcessor.h"
 
@@ -6,14 +7,14 @@
 
 void LIBMATTI_NEOFORGESPI_BaseSimpleProcessor_Link(const LIBMATTI_NEOFORGESPI_ClassProcessor_LinkContext *context)
 {
-    // Java: ClassProcessor.super.link(context) - the ClassProcessor default is empty
+// Java: ClassProcessor.super.link(context) - the ClassProcessor default is empty
     (void) context;
 }
 
 void LIBMATTI_NEOFORGESPI_BaseSimpleProcessor_AfterProcessing(
     const LIBMATTI_NEOFORGESPI_ClassProcessor_AfterProcessingContext *context)
 {
-    // Java: ClassProcessor.super.afterProcessing(context) - the ClassProcessor default is empty
+// Java: ClassProcessor.super.afterProcessing(context) - the ClassProcessor default is empty
     (void) context;
 }
 

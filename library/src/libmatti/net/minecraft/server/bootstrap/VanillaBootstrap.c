@@ -1,7 +1,8 @@
-// Port of the vanilla content bootstrap (the RegistryBootstrap bodies that fill BLOCK and
-// ITEM). Java's createContents() runs the per-registry loaders - the BLOCK loader runs
-// Blocks.registerAll(), the ITEM loader Items.registerAll(), and both register every static
-// through Registry.register into the BuiltInRegistries; the port mirrors exactly that.
+
+
+
+
+
 
 #include "libmatti/net/minecraft/server/bootstrap/VanillaBootstrap.h"
 

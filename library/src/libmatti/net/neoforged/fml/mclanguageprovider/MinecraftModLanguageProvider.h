@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.mclanguageprovider.MinecraftModLanguageProvider.
+
+
 
 #ifndef MATTICRAFT_FML_MCLANGUAGEPROVIDER_MINECRAFTMODLANGUAGEPROVIDER_H
 #define MATTICRAFT_FML_MCLANGUAGEPROVIDER_MINECRAFTMODLANGUAGEPROVIDER_H
@@ -12,4 +13,4 @@
 // Java: the instance used as an IModLanguageLoader
 LIBMATTI_NEOFORGESPI_IModLanguageLoader *LIBMATTI_FML_MinecraftModLanguageProvider_AsLanguageLoader(void);
 
-#endif //MATTICRAFT_FML_MCLANGUAGEPROVIDER_MINECRAFTMODLANGUAGEPROVIDER_H
+#endif

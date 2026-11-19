@@ -1,6 +1,7 @@
-// Port of net.neoforged.fml.loading.modscan.ModClassVisitor.
-// Java extends ClassVisitor and is fed by ClassReader.accept; the port's ClassReader
-// only accepts a ClassNode, so VisitNode below replays the ClassNode into the visitor.
+
+
+
+
 
 #ifndef MATTICRAFT_FML_LOADING_MODSCAN_MODCLASSVISITOR_H
 #define MATTICRAFT_FML_LOADING_MODSCAN_MODCLASSVISITOR_H
@@ -47,4 +48,4 @@ void LIBMATTI_FML_ModClassVisitor_BuildData(LIBMATTI_FML_ModClassVisitor *visito
 void LIBMATTI_FML_ModClassVisitor_VisitNode(LIBMATTI_FML_ModClassVisitor *visitor,
                                             const LIBMATTI_ASMT_ClassNode *node);
 
-#endif //MATTICRAFT_FML_LOADING_MODSCAN_MODCLASSVISITOR_H
+#endif

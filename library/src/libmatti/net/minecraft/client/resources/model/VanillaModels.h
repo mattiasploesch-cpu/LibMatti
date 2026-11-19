@@ -1,7 +1,8 @@
-// The vanilla block models, embedded. Java ships them in
-// assets/minecraft/models/block/*.json; the port carries the handful the
-// demo level needs (cube_all family + stone/dirt) as C strings so the bake
-// runs without a resource pack on disk.
+
+
+
+
+
 
 #ifndef MATTICRAFT_MC_CLIENT_RESOURCES_MODEL_VANILLAMODELS_H
 #define MATTICRAFT_MC_CLIENT_RESOURCES_MODEL_VANILLAMODELS_H
@@ -31,4 +32,4 @@ const char *LIBMATTI_MC_VanillaModels_ModelById(const char *modelId);
 }
 #endif
 
-#endif //MATTICRAFT_MC_CLIENT_RESOURCES_MODEL_VANILLAMODELS_H
+#endif

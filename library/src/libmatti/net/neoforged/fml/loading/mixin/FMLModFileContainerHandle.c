@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.loading.mixin.FMLModFileContainerHandle.
+
+
 
 #include "libmatti/net/neoforged/fml/loading/mixin/FMLModFileContainerHandle.h"
 

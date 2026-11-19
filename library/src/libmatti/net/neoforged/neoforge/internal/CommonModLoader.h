@@ -1,6 +1,7 @@
-// Port of net.neoforged.neoforge.internal.CommonModLoader.
-// Java's Executors are the port's ModWorkManager executors; both run on the caller's thread,
-// so begin/load/finish keep Java's submission order.
+
+
+
+
 
 #ifndef MATTICRAFT_NEOFORGE_INTERNAL_COMMONMODLOADER_H
 #define MATTICRAFT_NEOFORGE_INTERNAL_COMMONMODLOADER_H
@@ -19,4 +20,4 @@ void LIBMATTI_NEOFORGE_CommonModLoader_Load(void);
 // Java: protected static void finish(Executor syncExecutor, Executor parallelExecutor)
 void LIBMATTI_NEOFORGE_CommonModLoader_Finish(void);
 
-#endif //MATTICRAFT_NEOFORGE_INTERNAL_COMMONMODLOADER_H
+#endif

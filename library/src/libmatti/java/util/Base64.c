@@ -11,7 +11,7 @@ unsigned char *LIBMATTI_JU_Base64_Encode(const unsigned char *src, size_t length
 {
     const char *alphabet = urlAlphabet ? URL_ALPHABET : BASIC_ALPHABET;
 
-    // Java: MIME separates every 76 output chars with \r\n
+// Java: MIME separates every 76 output chars with \r\n
     size_t separators = 0;
     size_t outputChars = ((length + 2) / 3) * 4;
     if (mimeLineLength == 76 && outputChars > 76)
@@ -55,8 +55,10 @@ static int decode_table_value(unsigned char c, int mime)
     if (c >= '0' && c <= '9') return c - '0' + 52;
     if (c == '+') return mime ? 62 : 62;
     if (c == '/') return 63;
-    if (c == '-') return 62; // URL alphabet
-    if (c == '_') return 63; // URL alphabet
+    if (c == '-') return 62;
+
+    if (c == '_') return 63;
+
     if (mime && (c == '\r' || c == '\n' || c == '\t' || c == ' ' || c == '\f' || c == '\v')) return -2;
     return -1;
 }
@@ -80,7 +82,7 @@ unsigned char *LIBMATTI_JU_Base64_Decode(const unsigned char *src, size_t length
             padding++;
             if (padding > 2)
             {
-                // Java: IllegalArgumentException("Input byte array has incorrect ending byte")
+// Java: IllegalArgumentException("Input byte array has incorrect ending byte")
                 free(out);
                 return NULL;
             }
@@ -92,13 +94,13 @@ unsigned char *LIBMATTI_JU_Base64_Decode(const unsigned char *src, size_t length
             continue;
         if (value == -1)
         {
-            // Java: IllegalArgumentException("Illegal base64 character")
+// Java: IllegalArgumentException("Illegal base64 character")
             free(out);
             return NULL;
         }
         if (done || padding > 0)
         {
-            // Java: data after padding is illegal (except MIME whitespace)
+// Java: data after padding is illegal (except MIME whitespace)
             free(out);
             return NULL;
         }
@@ -116,7 +118,7 @@ unsigned char *LIBMATTI_JU_Base64_Decode(const unsigned char *src, size_t length
 
     if (padding == 1 && bits >= 6)
     {
-        // Java: a single '=' still ends a full quantum correctly in most inputs
+// Java: a single '=' still ends a full quantum correctly in most inputs
     }
     if (outLength)
         *outLength = outIndex;

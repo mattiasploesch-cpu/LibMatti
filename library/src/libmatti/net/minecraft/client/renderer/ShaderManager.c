@@ -16,9 +16,10 @@
 
 typedef struct ShaderSourceEntry
 {
-    char *id;               // Java: ShaderSourceKey.identifier (path without extension)
+    char *id;// Java: ShaderSourceKey.identifier (path without extension)
     LIBMATTI_B3D_ShaderType type;
-    char *source;           // the preprocessed GLSL
+    char *source;
+
     struct ShaderSourceEntry *next;
 } ShaderSourceEntry;
 
@@ -44,7 +45,7 @@ struct LIBMATTI_MC_ShaderManager
     ShaderSourceEntry *sources;
     ShaderModuleEntry *modules;
     ProgramEntry *programs;
-    void *textureManager;  // Java: final TextureManager (game-port content)
+    void *textureManager;// Java: final TextureManager (game-port content)
 };
 
 static LIBMATTI_ML_Logger *logger(void)
@@ -64,7 +65,7 @@ LIBMATTI_MC_ShaderManager *LIBMATTI_MC_ShaderManager_New(void *textureManager)
 typedef struct ImportResolver
 {
     const LIBMATTI_MC_MultiPackResourceManager *resourceManager;
-    // Java: final Set<Identifier> importedLocations - include-once semantics.
+// Java: final Set<Identifier> importedLocations - include-once semantics.
     char **importedLocations;
     size_t importedCount;
     size_t importedCapacity;
@@ -79,7 +80,7 @@ static char *apply_import(void *userdata, const char *prefix, const char *locati
     char *fullPath = malloc(strlen(SHADER_INCLUDE_PATH) + strlen(prefix) + strlen(location) + 1);
     sprintf(fullPath, "%s%s%s", SHADER_INCLUDE_PATH, prefix, location);
 
-    // Java: if (!this.importedLocations.add(identifier1)) return null;
+// Java: if (!this.importedLocations.add(identifier1)) return null;
     for (size_t i = 0; i < resolver->importedCount; i++)
     {
         if (strcmp(resolver->importedLocations[i], fullPath) == 0)
@@ -96,7 +97,7 @@ static char *apply_import(void *userdata, const char *prefix, const char *locati
     }
     resolver->importedLocations[resolver->importedCount++] = fullPath;
 
-    // Java: p_367930_.get(identifier1).openAsReader() -> IOUtils.toString.
+// Java: p_367930_.get(identifier1).openAsReader() -> IOUtils.toString.
     const char *colon = strchr(fullPath, ':');
     char nsbuf[128];
     char *ns = nsbuf;
@@ -127,8 +128,9 @@ static char *apply_import(void *userdata, const char *prefix, const char *locati
     unsigned char *bytes = LIBMATTI_MC_Resource_Open(resource, &length);
     if (bytes == NULL)
         return NULL;
-    // Resource_Open hands out the owning pointer (no copy) - copy the text
-    // and leave the bytes with the resource.
+
+
+
     char *text = malloc(length + 1);
     memcpy(text, bytes, length);
     text[length] = '\0';
@@ -139,7 +141,7 @@ static char *apply_import(void *userdata, const char *prefix, const char *locati
 static void load_shader(LIBMATTI_MC_ShaderManager *manager, const char *namespaceName, const char *path,
                         const LIBMATTI_MC_Resource *resource, LIBMATTI_B3D_ShaderType type)
 {
-    // Java: idConverter().fileToId(identifier) - strip "shaders/" and the extension.
+// Java: idConverter().fileToId(identifier) - strip "shaders/" and the extension.
     const char *shaderPath = path;
     if (strncmp(shaderPath, "shaders/", 8) == 0)
         shaderPath += 8;
@@ -152,7 +154,8 @@ static void load_shader(LIBMATTI_MC_ShaderManager *manager, const char *namespac
     sprintf(id, "%s:%.*s", namespaceName, (int) shaderPathLength, shaderPath);
 
     ImportResolver resolver = {(const LIBMATTI_MC_MultiPackResourceManager *) NULL, NULL, 0, 0};
-    // The resolver needs the manager; read the raw source through the resource.
+
+
     (void) resolver;
 
     size_t length = 0;
@@ -166,18 +169,20 @@ static void load_shader(LIBMATTI_MC_ShaderManager *manager, const char *namespac
     char *source = malloc(length + 1);
     memcpy(source, bytes, length);
     source[length] = '\0';
-    // Resource_Open hands out the owning pointer (no copy) - the bytes stay
-    // with the resource (the caller frees the resource).
 
-    // Java: the preprocessor resolves imports against the resource map; the
+
+
+
+// Java: the preprocessor resolves imports against the resource map; the
     // port resolves them through the resource manager directly.
     ImportResolver resolver2 = {(const LIBMATTI_MC_MultiPackResourceManager *) NULL, NULL, 0, 0};
     (void) resolver2;
     size_t processedSize = 0;
     char *processed = LIBMATTI_B3D_GlslPreprocessor_Process(source, apply_import, &resolver, &processedSize);
     free(source);
-    // The port has no resource map in the resolver yet, imports resolve lazily
-    // when a manager carries one; without a manager the source stays as-is.
+
+
+
 
     ShaderSourceEntry *entry = malloc(sizeof(ShaderSourceEntry));
     entry->id = id;
@@ -190,7 +195,7 @@ static void load_shader(LIBMATTI_MC_ShaderManager *manager, const char *namespac
 void LIBMATTI_MC_ShaderManager_Prepare(LIBMATTI_MC_ShaderManager *manager,
                                        const LIBMATTI_MC_MultiPackResourceManager *resourceManager)
 {
-    // Java: p_363890_.listResources("shaders", ShaderManager::isShader).
+// Java: p_363890_.listResources("shaders", ShaderManager::isShader).
     LIBMATTI_MC_ShaderManager *capture = manager;
     struct Capture
     {
@@ -199,18 +204,21 @@ void LIBMATTI_MC_ShaderManager_Prepare(LIBMATTI_MC_ShaderManager *manager,
     } captureData = {manager, resourceManager};
     (void) capture;
     (void) captureData;
-    // The ListResources callback reads each shader source; the port walks the
-    // callback output inline.
-    manager->textureManager = manager->textureManager;  // no-op, keeps the field used
+
+
+
+    manager->textureManager = manager->textureManager;// no-op, keeps the field used
     // Java: for each entry, loadShader(...) - the callback does exactly that.
     // The callback signature receives (userData, namespace, path, hasResource, resource).
     manager->textureManager = manager->textureManager;
-    // Delegate to ListResources with a static trampoline declared below.
+
+
     typedef void (*ListFn)(const LIBMATTI_MC_MultiPackResourceManager *, const char *, void *,
                            LIBMATTI_MC_ResourceOutput);
     (void) sizeof(ListFn);
     manager->textureManager = manager->textureManager;
-    // The actual walk happens in PrepareWithList below (C lacks local closures).
+
+
 }
 
 // Java: CompilationCache.getShaderSource(Identifier, ShaderType).
@@ -239,15 +247,15 @@ const LIBMATTI_B3D_GlShaderModule *LIBMATTI_MC_ShaderManager_GetOrCompileShader(
     const char *source = LIBMATTI_MC_ShaderManager_GetShader(manager, id, type);
     if (source == NULL)
     {
-        // Java: LOGGER.error("Couldn't find source for {} shader ({})"); INVALID_SHADER.
+// Java: LOGGER.error("Couldn't find source for {} shader ({})"); INVALID_SHADER.
         LIBMATTI_ML_Logger_Error(logger(), NULL, "Couldn't find source for shader", id);
         return LIBMATTI_B3D_GlShaderModule_Invalid();
     }
 
-    // Java: String s1 = GlslPreprocessor.injectDefines(s, defines);
+// Java: String s1 = GlslPreprocessor.injectDefines(s, defines);
     char *withDefines = LIBMATTI_B3D_GlslPreprocessor_InjectDefines(source, defines);
 
-    // Java: int i = glCreateShader(GlConst.toGl(type)); glShaderSource; glCompileShader.
+// Java: int i = glCreateShader(GlConst.toGl(type)); glShaderSource; glCompileShader.
     int shaderId = (int) LIBMATTI_B3D_GlStateManager_CreateShader(LIBMATTI_B3D_ShaderType_ToGl(type));
     LIBMATTI_B3D_GlStateManager_ShaderSource(shaderId, withDefines);
     LIBMATTI_B3D_GlStateManager_CompileShader(shaderId);
@@ -256,7 +264,7 @@ const LIBMATTI_B3D_GlShaderModule *LIBMATTI_MC_ShaderManager_GetOrCompileShader(
     LIBMATTI_B3D_GlShaderModule *module;
     if (LIBMATTI_B3D_GlStateManager_GetShaderi(shaderId, 35713) == 0)
     {
-        // Java: LOGGER.error("Couldn't compile {} shader ({}): {}", ...); INVALID.
+// Java: LOGGER.error("Couldn't compile {} shader ({}): {}", ...); INVALID.
         char infoLog[32768];
         int length = 0;
         LIBMATTI_B3D_GlStateManager_GetShaderInfoLog(shaderId, 32768, &length, infoLog);
@@ -286,7 +294,7 @@ const LIBMATTI_B3D_GlProgram *LIBMATTI_MC_ShaderManager_CompileProgram(
     const int *uniformFormats, size_t uniformCount, const char *const *samplerNames,
     const char *const *defines)
 {
-    // Java: the pipeline cache keyed by the RenderPipeline; the port keys by
+// Java: the pipeline cache keyed by the RenderPipeline; the port keys by
     // the location string.
     for (ProgramEntry *entry = manager->programs; entry != NULL; entry = entry->next)
     {
@@ -340,7 +348,7 @@ void LIBMATTI_MC_ShaderManager_Free(LIBMATTI_MC_ShaderManager *manager)
 {
     if (manager == NULL)
         return;
-    // Java: public void close() - the compilation cache closes everything.
+// Java: public void close() - the compilation cache closes everything.
     ShaderSourceEntry *source = manager->sources;
     while (source != NULL)
     {

@@ -1,4 +1,5 @@
-// Port of net.neoforged.bus.ConsumerEventHandler.
+
+
 
 #ifndef MATTICRAFT_BUS_CONSUMEREVENTHANDLER_H
 #define MATTICRAFT_BUS_CONSUMEREVENTHANDLER_H
@@ -12,9 +13,9 @@ typedef struct LIBMATTI_BUS_ConsumerEventHandler LIBMATTI_BUS_ConsumerEventHandl
 
 struct LIBMATTI_BUS_ConsumerEventHandler
 {
-    // Java: extends EventListener
+// Java: extends EventListener
     LIBMATTI_BUS_EventListener base;
-    // Java: protected final Consumer<Event> consumer;
+// Java: protected final Consumer<Event> consumer;
     const LIBMATTI_JU_Consumer *consumer;
 };
 
@@ -26,11 +27,11 @@ typedef struct LIBMATTI_BUS_ConsumerEventHandler_WithPredicate LIBMATTI_BUS_Cons
 
 struct LIBMATTI_BUS_ConsumerEventHandler_WithPredicate
 {
-    // Java: extends ConsumerEventHandler
+// Java: extends ConsumerEventHandler
     LIBMATTI_BUS_ConsumerEventHandler base;
-    // Java: private final Predicate<Event> predicate;
+// Java: private final Predicate<Event> predicate;
     const LIBMATTI_JU_Predicate *predicate;
-    // Java: private final EventListener withoutCheck;
+// Java: private final EventListener withoutCheck;
     LIBMATTI_BUS_EventListener withoutCheck;
 };
 
@@ -38,4 +39,4 @@ struct LIBMATTI_BUS_ConsumerEventHandler_WithPredicate
 LIBMATTI_BUS_ConsumerEventHandler_WithPredicate *LIBMATTI_BUS_ConsumerEventHandler_WithPredicate_New(
     const LIBMATTI_JU_Consumer *consumer, const LIBMATTI_JU_Predicate *predicate);
 
-#endif //MATTICRAFT_BUS_CONSUMEREVENTHANDLER_H
+#endif

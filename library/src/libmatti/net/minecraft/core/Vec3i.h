@@ -1,6 +1,7 @@
-// Port of net.minecraft.core.Vec3i - the immutable integer triple BlockPos and
-// ChunkPos build on. Java carries x/y/z as final ints; the C port keeps the same
-// struct layout so the accessors are the Java methods.
+
+
+
+
 
 #ifndef MATTICRAFT_NET_MINECRAFT_CORE_VEC3I_H
 #define MATTICRAFT_NET_MINECRAFT_CORE_VEC3I_H
@@ -8,7 +9,7 @@
 // Java: public class Vec3i
 typedef struct LIBMATTI_MC_Vec3i
 {
-    // Java: private final int x / y / z
+// Java: private final int x / y / z
     int x;
     int y;
     int z;
@@ -52,4 +53,4 @@ int LIBMATTI_MC_Vec3i_Equals(const LIBMATTI_MC_Vec3i *a, const LIBMATTI_MC_Vec3i
 // Java: public int hashCode()
 int LIBMATTI_MC_Vec3i_HashCode(const LIBMATTI_MC_Vec3i *v);
 
-#endif //MATTICRAFT_NET_MINECRAFT_CORE_VEC3I_H
+#endif

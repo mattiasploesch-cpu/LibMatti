@@ -1,5 +1,6 @@
-// Implementation of SpriteContents, TextureAtlasSprite and the
-// MipmapGenerator (the mean/cutout/dark_cutout strategies over ARGB pixels).
+
+
+
 
 #include "libmatti/net/minecraft/client/renderer/texture/TextureAtlasSprite.h"
 
@@ -14,9 +15,10 @@
 #define ALPHA_CUTOFF 0.5f
 #define STRICT_ALPHA_CUTOFF 0.3f
 
-// ---------------------------------------------------------------------------
-// SpriteContents
-// ---------------------------------------------------------------------------
+
+
+
+
 
 LIBMATTI_MC_SpriteContents *LIBMATTI_MC_SpriteContents_New(LIBMATTI_MC_Identifier *name, LIBMATTI_MC_FrameSize frameSize,
                                                            LIBMATTI_B3D_NativeImage *image,
@@ -30,11 +32,11 @@ LIBMATTI_MC_SpriteContents *LIBMATTI_MC_SpriteContents_New(LIBMATTI_MC_Identifie
     contents->byMipLevel = malloc(sizeof(LIBMATTI_B3D_NativeImage *));
     contents->byMipLevel[0] = image;
     contents->mipLevelCount = 1;
-    // Java: MipmapStrategy.AUTO default, alphaCutoffBias 0.0F
+// Java: MipmapStrategy.AUTO default, alphaCutoffBias 0.0F
     contents->mipmapStrategy = 0;
     contents->alphaCutoffBias = 0.0f;
 
-    // Java: the AnimatedTexture - the port keeps the frame layout:
+// Java: the AnimatedTexture - the port keeps the frame layout:
     // the animation divides the image into the frame grid.
     if (animation != NULL)
     {
@@ -173,12 +175,13 @@ static int darkened_alpha_blend(int a, int b, int c, int d)
 // Java: public void increaseMipLevel(int) / MipmapGenerator.generateMipLevels
 void LIBMATTI_MC_SpriteContents_IncreaseMipLevel(LIBMATTI_MC_SpriteContents *contents, int mipLevel)
 {
-    // Java: resolve AUTO from the transparent pixel
+// Java: resolve AUTO from the transparent pixel
     int strategy = contents->mipmapStrategy;
     if (strategy == 0)
-        strategy = has_transparent_pixel(contents->byMipLevel[0]) ? 2 : 1; // CUTOUT : MEAN
+        strategy = has_transparent_pixel(contents->byMipLevel[0]) ? 2 : 1;
 
-    if (contents->mipLevelCount == 1 && !contents->originalImage->width) { /* unreachable guard */ }
+
+    if (contents->mipLevelCount == 1 && !contents->originalImage->width) {   }
 
     if ((size_t) (mipLevel + 1) <= contents->mipLevelCount)
         return;
@@ -216,12 +219,12 @@ void LIBMATTI_MC_SpriteContents_IncreaseMipLevel(LIBMATTI_MC_SpriteContents *con
             mips[i] = dst;
         }
 
-        // Java: if (flag) scaleAlphaToCoverage(anativeimage[i], f1, f, bias)
+// Java: if (flag) scaleAlphaToCoverage(anativeimage[i], f1, f, bias)
         if (cutoutFamily)
             scale_alpha_to_coverage(mips[i], targetCoverage, cutoff, contents->alphaCutoffBias);
     }
 
-    // Java: the old array is replaced; the images are owned by the contents
+// Java: the old array is replaced; the images are owned by the contents
     free(contents->byMipLevel);
     contents->byMipLevel = mips;
     contents->mipLevelCount = (size_t) mipLevel + 1;
@@ -231,7 +234,7 @@ void LIBMATTI_MC_SpriteContents_Free(LIBMATTI_MC_SpriteContents *contents)
 {
     if (contents == NULL)
         return;
-    // Java: close() closes every byMipLevel image; the port frees them all
+// Java: close() closes every byMipLevel image; the port frees them all
     for (size_t i = 0; i < contents->mipLevelCount; i++)
         LIBMATTI_B3D_NativeImage_Free(contents->byMipLevel[i]);
     free(contents->byMipLevel);
@@ -239,9 +242,10 @@ void LIBMATTI_MC_SpriteContents_Free(LIBMATTI_MC_SpriteContents *contents)
     free(contents);
 }
 
-// ---------------------------------------------------------------------------
-// TextureAtlasSprite
-// ---------------------------------------------------------------------------
+
+
+
+
 
 LIBMATTI_MC_TextureAtlasSprite *LIBMATTI_MC_TextureAtlasSprite_New(LIBMATTI_MC_Identifier *atlas,
                                                                    LIBMATTI_MC_SpriteContents *contents,
@@ -253,7 +257,7 @@ LIBMATTI_MC_TextureAtlasSprite *LIBMATTI_MC_TextureAtlasSprite_New(LIBMATTI_MC_I
     sprite->contents = contents;
     sprite->x = x + padding;
     sprite->y = y + padding;
-    // Java: this.width = contents.width(); this.height = contents.height()
+// Java: this.width = contents.width(); this.height = contents.height()
     // clipped to the atlas bounds (the padding the Stitcher adds is around)
     sprite->width = contents->width;
     sprite->height = contents->height;

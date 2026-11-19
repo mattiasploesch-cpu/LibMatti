@@ -1,4 +1,5 @@
-// Port of net.minecraft.world.level.block.state.BlockBehaviour - the Properties part.
+
+
 
 #include "libmatti/net/minecraft/world/level/block/state/BlockBehaviour.h"
 
@@ -96,7 +97,7 @@ LIBMATTI_MC_BlockBehaviour_Properties *LIBMATTI_MC_BlockBehaviour_Properties_Of(
 LIBMATTI_MC_BlockBehaviour_Properties *LIBMATTI_MC_BlockBehaviour_Properties_OfLegacyCopy(void *block)
 {
     (void) block;
-    // Java: copies every data field from the other block's properties; the port keeps
+// Java: copies every data field from the other block's properties; the port keeps
     // the of() defaults because the caller re-applies every field it needs
     LIBMATTI_MC_BlockBehaviour_Properties *properties = malloc(sizeof(LIBMATTI_MC_BlockBehaviour_Properties));
     init_defaults(properties);
@@ -369,7 +370,7 @@ LIBMATTI_MC_BlockBehaviour_Properties *LIBMATTI_MC_BlockBehaviour_Properties_Rep
 LIBMATTI_MC_BlockBehaviour_Properties *LIBMATTI_MC_BlockBehaviour_Properties_SetId(
         LIBMATTI_MC_BlockBehaviour_Properties *properties, LIBMATTI_MC_ResourceKey *id)
 {
-    // Java: throws IllegalStateException when the id was already set; the port resets
+// Java: throws IllegalStateException when the id was already set; the port resets
     // the derived description id so the next effectiveDescription() rebuilds it
     properties->id = id;
     free(properties->descriptionId);
@@ -390,7 +391,7 @@ const char *LIBMATTI_MC_BlockBehaviour_Properties_EffectiveDescription(
     if (properties->descriptionId != NULL)
         return properties->descriptionId;
 
-    // Java: Util.makeDescriptionId("block", identifier)
+// Java: Util.makeDescriptionId("block", identifier)
     const LIBMATTI_MC_Identifier *identifier = LIBMATTI_MC_ResourceKey_Identifier(properties->id);
     if (identifier == NULL)
         return "block.unnamed";

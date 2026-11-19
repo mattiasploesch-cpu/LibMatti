@@ -6,10 +6,14 @@
 
 // Java: the enum's colours
 static const float COLOURS[LIBMATTI_FML_MESSAGE_MESSAGE_TYPE_COUNT][3] = {
-    {1.0f, 1.0f, 1.0f}, // MC
-    {0.0f, 0.0f, 0.5f}, // ML
-    {0.0f, 0.5f, 0.0f}, // LOC
-    {0.5f, 0.0f, 0.0f}, // MOD
+    {1.0f, 1.0f, 1.0f},
+
+    {0.0f, 0.0f, 0.5f},
+
+    {0.0f, 0.5f, 0.0f},
+
+    {0.5f, 0.0f, 0.0f},
+
 };
 
 static const char *const NAMES[LIBMATTI_FML_MESSAGE_MESSAGE_TYPE_COUNT] = {"MC", "ML", "LOC", "MOD"};

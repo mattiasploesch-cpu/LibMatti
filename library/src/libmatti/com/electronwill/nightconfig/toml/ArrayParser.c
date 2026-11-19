@@ -1,4 +1,5 @@
-// Port of com.electronwill.nightconfig.toml.ArrayParser.
+
+
 
 #include "libmatti/com/electronwill/nightconfig/toml/ArrayParser.h"
 
@@ -19,11 +20,13 @@ LIBMATTI_NC_ValueResult LIBMATTI_NC_ArrayParser_Parse(LIBMATTI_NC_ReaderInput *i
             LIBMATTI_NC_TomlParser_Error(parser, "Invalid array, the closing bracket is missing");
             goto fail;
         }
-        if (firstChar == ']') // End of the array
+        if (firstChar == ']')
+
         {
             return LIBMATTI_NC_ValueResult_Ok(list);
         }
-        if (firstChar == ',') // Handles [,] or [v1,,] which are both invalid
+        if (firstChar == ',')
+
         {
             LIBMATTI_NC_TomlParser_Error(
                 parser, first ? "Invalid array: [,]" : "Invalid double comma in array.");
@@ -35,11 +38,13 @@ LIBMATTI_NC_ValueResult LIBMATTI_NC_ArrayParser_Parse(LIBMATTI_NC_ReaderInput *i
         LIBMATTI_NC_Value_ListAppend(&list, value.value);
 
         int after = LIBMATTI_NC_Toml_ReadUsefulChar(input);
-        if (after == ']') // End of the array
+        if (after == ']')
+
         {
             return LIBMATTI_NC_ValueResult_Ok(list);
         }
-        if (after != ',') // Invalid character between two elements of the array
+        if (after != ',')
+
         {
             LIBMATTI_NC_TomlParser_Error(parser, "Invalid separator in array");
             goto fail;

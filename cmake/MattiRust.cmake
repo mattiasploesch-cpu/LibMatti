@@ -113,8 +113,44 @@ function(matti_add_rust_staticlib target)
         set(_matti_rust_profile_dir "debug")
     endif()
 
-    # MSVC writes <name>.lib without the "lib" prefix.
-    if(WIN32)
+    set(_matti_cargo_target "")
+    set(_matti_cargo_env "CARGO_TARGET_DIR=${ARG_TARGET_DIR}")
+    if(ANDROID)
+        if(CMAKE_ANDROID_ARCH_ABI STREQUAL "arm64-v8a")
+            set(_matti_cargo_target "aarch64-linux-android")
+        elseif(CMAKE_ANDROID_ARCH_ABI STREQUAL "x86_64")
+            set(_matti_cargo_target "x86_64-linux-android")
+        else()
+            message(FATAL_ERROR
+                    "matti_add_rust_staticlib(${target}): unsupported Android ABI ${CMAKE_ANDROID_ARCH_ABI}")
+        endif()
+    elseif(WIN32 AND CMAKE_CROSSCOMPILING)
+        if(CMAKE_SYSTEM_PROCESSOR MATCHES "^(arm64|aarch64)$")
+            set(_matti_cargo_target "aarch64-pc-windows-gnullvm")
+        elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "^(x86|i[3-6]86)$")
+            set(_matti_cargo_target "i686-pc-windows-gnu")
+        else()
+            set(_matti_cargo_target "x86_64-pc-windows-gnu")
+        endif()
+    endif()
+
+    set(_matti_cargo_target_args "")
+    if(_matti_cargo_target)
+        set(_matti_rust_profile_dir "${_matti_cargo_target}/${_matti_rust_profile_dir}")
+        set(_matti_cargo_target_args --target "${_matti_cargo_target}")
+        string(TOUPPER "${_matti_cargo_target}" _matti_target_env)
+        string(REPLACE "-" "_" _matti_target_env "${_matti_target_env}")
+        list(APPEND _matti_cargo_env
+                "CARGO_TARGET_${_matti_target_env}_LINKER=${CMAKE_C_COMPILER}")
+        if(CMAKE_AR)
+            list(APPEND _matti_cargo_env
+                    "CARGO_TARGET_${_matti_target_env}_AR=${CMAKE_AR}")
+        endif()
+    endif()
+
+    # MSVC writes <name>.lib without the "lib" prefix. MinGW and the GNU
+    # Windows targets use the usual lib<name>.a.
+    if(WIN32 AND NOT _matti_cargo_target MATCHES "windows-gnu")
         set(_matti_rust_lib
                 "${ARG_TARGET_DIR}/${_matti_rust_profile_dir}/${ARG_LIB_NAME}.lib")
     else()
@@ -143,10 +179,11 @@ function(matti_add_rust_staticlib target)
     add_custom_command(
             OUTPUT "${_matti_rust_lib}" ${_matti_rust_bin_paths}
             COMMAND ${CMAKE_COMMAND} -E env
-                    "CARGO_TARGET_DIR=${ARG_TARGET_DIR}"
+                    ${_matti_cargo_env}
                     "${MATTI_CARGO}" build
                     --manifest-path "${ARG_MANIFEST}"
                     --profile "${_matti_rust_profile}"
+                    ${_matti_cargo_target_args}
             DEPENDS ${_matti_rust_sources}
             COMMENT "Building Rust crate ${ARG_LIB_NAME} (${_matti_rust_profile})"
             VERBATIM)
@@ -183,6 +220,10 @@ endfunction()
 # binaries and libraries part of the shipped executable so nothing is missing
 # from the artefact.
 function(matti_embed_rust_artifacts executable crate_target section_prefix)
+    if(APPLE OR WIN32)
+        return()
+    endif()
+
     get_target_property(_matti_artifacts ${crate_target} MATTI_RUST_ARTIFACTS)
     if(NOT _matti_artifacts)
         return()

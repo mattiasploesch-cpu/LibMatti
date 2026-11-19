@@ -1,4 +1,5 @@
-// Port of com.electronwill.nightconfig.toml.Toml.
+
+
 
 #ifndef MATTICRAFT_NC_TOML_TOML_H
 #define MATTICRAFT_NC_TOML_TOML_H
@@ -37,4 +38,4 @@ int LIBMATTI_NC_Toml_IsValidBareKey(const LIBMATTI_NC_CharsWrapper *wrapper, int
 // Java: static boolean isKeyValueSeparator(char c, boolean lenient)
 int LIBMATTI_NC_Toml_IsKeyValueSeparator(char c, int lenient);
 
-#endif //MATTICRAFT_NC_TOML_TOML_H
+#endif

@@ -1,4 +1,5 @@
-// Port of org.objectweb.asm.commons.GeneratorAdapter.
+
+
 
 #include "libmatti/org/objectweb/asm/commons/GeneratorAdapter.h"
 
@@ -78,7 +79,7 @@ static void emit_ldc(LIBMATTI_ASM_COMMONS_GeneratorAdapter *adapter, const LIBMA
 static void invoke_insn(LIBMATTI_ASM_COMMONS_GeneratorAdapter *adapter, int opcode, const LIBMATTI_ASM_Type *type,
                         const LIBMATTI_ASM_COMMONS_Method *method, int isInterface)
 {
-    // Java: String owner = type.getSort() == Type.ARRAY ? type.getDescriptor() : type.getInternalName();
+// Java: String owner = type.getSort() == Type.ARRAY ? type.getDescriptor() : type.getInternalName();
     char *owner = internal_name_of(type);
     emit_method_insn(adapter, opcode, owner, LIBMATTI_ASM_COMMONS_Method_GetName(method),
                      LIBMATTI_ASM_COMMONS_Method_GetDescriptor(method), isInterface);
@@ -97,7 +98,7 @@ LIBMATTI_ASM_COMMONS_GeneratorAdapter *LIBMATTI_ASM_COMMONS_GeneratorAdapter_New
     adapter->name = name != NULL ? strdup(name) : NULL;
     adapter->descriptor = descriptor != NULL ? strdup(descriptor) : NULL;
 
-    // Java: LocalVariablesSorter computes the first local slot from the static flag
+// Java: LocalVariablesSorter computes the first local slot from the static flag
     LIBMATTI_ASM_Type *methodType = LIBMATTI_ASM_Type_GetMethodType(descriptor);
     size_t argumentCount = 0;
     LIBMATTI_ASM_Type **argumentTypes = LIBMATTI_ASM_Type_GetArgumentTypes(methodType, &argumentCount);
@@ -127,7 +128,7 @@ void LIBMATTI_ASM_COMMONS_GeneratorAdapter_Free(LIBMATTI_ASM_COMMONS_GeneratorAd
 int LIBMATTI_ASM_COMMONS_GeneratorAdapter_NewLocal(LIBMATTI_ASM_COMMONS_GeneratorAdapter *adapter,
                                                    const LIBMATTI_ASM_Type *type)
 {
-    // Java: LocalVariablesSorter.newLocal - the port hands out the next free slot
+// Java: LocalVariablesSorter.newLocal - the port hands out the next free slot
     int local = adapter->nextLocal;
     adapter->nextLocal += LIBMATTI_ASM_Type_GetSize(type);
     return local;
@@ -224,7 +225,7 @@ void LIBMATTI_ASM_COMMONS_GeneratorAdapter_PushType(LIBMATTI_ASM_COMMONS_Generat
         return;
     }
 
-    // Java: the primitive class literals are read from the wrapper TYPE fields
+// Java: the primitive class literals are read from the wrapper TYPE fields
     switch (LIBMATTI_ASM_Type_GetSort(value))
     {
         case LIBMATTI_ASM_TYPE_BOOLEAN:
@@ -448,7 +449,7 @@ static const char *boxed_internal_name(const LIBMATTI_ASM_Type *type)
 void LIBMATTI_ASM_COMMONS_GeneratorAdapter_Box(LIBMATTI_ASM_COMMONS_GeneratorAdapter *adapter,
                                                const LIBMATTI_ASM_Type *type)
 {
-    // Java: only the primitive sorts are boxed; the object sorts are returned unchanged
+// Java: only the primitive sorts are boxed; the object sorts are returned unchanged
     const char *boxed = boxed_internal_name(type);
     if (boxed == NULL) return;
 
@@ -470,7 +471,7 @@ void LIBMATTI_ASM_COMMONS_GeneratorAdapter_Box(LIBMATTI_ASM_COMMONS_GeneratorAda
 void LIBMATTI_ASM_COMMONS_GeneratorAdapter_ValueOf(LIBMATTI_ASM_COMMONS_GeneratorAdapter *adapter,
                                                    const LIBMATTI_ASM_Type *type)
 {
-    // Java: only the primitive sorts are boxed; the object sorts are returned unchanged
+// Java: only the primitive sorts are boxed; the object sorts are returned unchanged
     const char *boxed = boxed_internal_name(type);
     if (boxed == NULL) return;
 
@@ -492,7 +493,7 @@ void LIBMATTI_ASM_COMMONS_GeneratorAdapter_ValueOf(LIBMATTI_ASM_COMMONS_Generato
 void LIBMATTI_ASM_COMMONS_GeneratorAdapter_Unbox(LIBMATTI_ASM_COMMONS_GeneratorAdapter *adapter,
                                                  const LIBMATTI_ASM_Type *type)
 {
-    // Java: Type t = NUMBER_TYPE; Method sig = null;
+// Java: Type t = NUMBER_TYPE; Method sig = null;
     const char *targetDescriptor = NUMBER_DESCRIPTOR;
     const char *targetName = "java/lang/Number";
     const char *methodName = "intValue";
@@ -533,7 +534,7 @@ void LIBMATTI_ASM_COMMONS_GeneratorAdapter_Unbox(LIBMATTI_ASM_COMMONS_GeneratorA
     LIBMATTI_ASM_Type *targetType = LIBMATTI_ASM_Type_GetType(targetDescriptor);
     LIBMATTI_ASM_COMMONS_Method *valueMethod = LIBMATTI_ASM_COMMONS_Method_New(methodName, methodDescriptor);
 
-    // Java: checkCast(t); invokeVirtual(t, sig);
+// Java: checkCast(t); invokeVirtual(t, sig);
     char *internalName = internal_name_of(targetType);
     emit_type_insn(adapter, LIBMATTI_ASM_CHECKCAST, internalName);
     free(internalName);
@@ -550,7 +551,7 @@ void LIBMATTI_ASM_COMMONS_GeneratorAdapter_Cast(LIBMATTI_ASM_COMMONS_GeneratorAd
 {
     if (LIBMATTI_ASM_Type_Equals(from, to)) return;
 
-    // Java: the primitive conversions (pop/push pairs), then the object casts
+// Java: the primitive conversions (pop/push pairs), then the object casts
     switch (LIBMATTI_ASM_Type_GetSort(from))
     {
         case LIBMATTI_ASM_TYPE_INT:
@@ -571,14 +572,14 @@ void LIBMATTI_ASM_COMMONS_GeneratorAdapter_Cast(LIBMATTI_ASM_COMMONS_GeneratorAd
                     emit_insn(adapter, LIBMATTI_ASM_I2D);
                     return;
                 default:
-                    // Java: box(from); if (to.getSort() != OBJECT) cast(to);
+// Java: box(from); if (to.getSort() != OBJECT) cast(to);
                     LIBMATTI_ASM_COMMONS_GeneratorAdapter_Box(adapter, from);
                     if (LIBMATTI_ASM_Type_GetSort(to) != LIBMATTI_ASM_TYPE_OBJECT)
                         LIBMATTI_ASM_COMMONS_GeneratorAdapter_Cast(adapter, from, to);
                     return;
             }
         default:
-            // Java: if (from.getSort() == OBJECT) { if (to is primitive) unbox(to); else checkCast(to); }
+// Java: if (from.getSort() == OBJECT) { if (to is primitive) unbox(to); else checkCast(to); }
             if (LIBMATTI_ASM_Type_GetSort(from) == LIBMATTI_ASM_TYPE_OBJECT)
             {
                 switch (LIBMATTI_ASM_Type_GetSort(to))
@@ -602,7 +603,7 @@ void LIBMATTI_ASM_COMMONS_GeneratorAdapter_Cast(LIBMATTI_ASM_COMMONS_GeneratorAd
 // Java: public void returnValue()
 void LIBMATTI_ASM_COMMONS_GeneratorAdapter_ReturnValue(LIBMATTI_ASM_COMMONS_GeneratorAdapter *adapter)
 {
-    // Java: getReturnType().getOpcode(IRETURN)
+// Java: getReturnType().getOpcode(IRETURN)
     LIBMATTI_ASM_Type *methodType = LIBMATTI_ASM_Type_GetMethodType(adapter->descriptor);
     LIBMATTI_ASM_Type *returnType = LIBMATTI_ASM_Type_GetReturnType(methodType);
     emit_insn(adapter, LIBMATTI_ASM_Type_GetOpcode(returnType, LIBMATTI_ASM_IRETURN));

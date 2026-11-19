@@ -1,6 +1,7 @@
-// Port of com.mojang.blaze3d.platform.TextureUtil - the image preprocessing
-// helpers MipmapGenerator routes to (the GL texture setup the Java file also
-// carries lives in the GlStateManager texture path).
+
+
+
+
 
 #ifndef MATTICRAFT_BLAZE3D_PLATFORM_TEXTUREUTIL_H
 #define MATTICRAFT_BLAZE3D_PLATFORM_TEXTUREUTIL_H
@@ -23,4 +24,4 @@ void LIBMATTI_B3D_TextureUtil_FillEmptyAreasWithDarkColor(LIBMATTI_B3D_NativeIma
 }
 #endif
 
-#endif //MATTICRAFT_BLAZE3D_PLATFORM_TEXTUREUTIL_H
+#endif

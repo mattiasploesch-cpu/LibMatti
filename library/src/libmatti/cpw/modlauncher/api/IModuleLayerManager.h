@@ -1,6 +1,7 @@
-//
-// Port of cpw.mods.modlauncher.api.IModuleLayerManager.
-//
+
+
+
+
 
 #ifndef MATTICRAFT_MODLAUNCHER_IMODULELAYERMANAGER_H
 #define MATTICRAFT_MODLAUNCHER_IMODULELAYERMANAGER_H
@@ -30,4 +31,4 @@ typedef struct LIBMATTI_MLA_IModuleLayerManager LIBMATTI_MLA_IModuleLayerManager
 LIBMATTI_JL_ModuleLayer *LIBMATTI_MLA_IModuleLayerManager_GetLayer(LIBMATTI_MLA_IModuleLayerManager *manager,
                                                                    LIBMATTI_MLA_Layer layer);
 
-#endif //MATTICRAFT_MODLAUNCHER_IMODULELAYERMANAGER_H
+#endif

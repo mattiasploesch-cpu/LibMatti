@@ -1,5 +1,6 @@
-// Port of com.mojang.blaze3d.opengl.Uniform - the sealed interface with the
-// Sampler/Ubo/Utb records GlProgram.setupUniforms fills.
+
+
+
 
 #ifndef MATTICRAFT_BLAZE3D_OPENGL_UNIFORM_H
 #define MATTICRAFT_BLAZE3D_OPENGL_UNIFORM_H
@@ -22,18 +23,18 @@ typedef struct LIBMATTI_B3D_Uniform
     LIBMATTI_B3D_UniformKind kind;
     union
     {
-        // Java: record Sampler(int location, int samplerIndex)
+// Java: record Sampler(int location, int samplerIndex)
         struct
         {
             int location;
             int samplerIndex;
         } sampler;
-        // Java: record Ubo(int blockBinding)
+// Java: record Ubo(int blockBinding)
         struct
         {
             int blockBinding;
         } ubo;
-        // Java: record Utb(int location, int samplerIndex, TextureFormat format, int texture)
+// Java: record Utb(int location, int samplerIndex, TextureFormat format, int texture)
         struct
         {
             int location;

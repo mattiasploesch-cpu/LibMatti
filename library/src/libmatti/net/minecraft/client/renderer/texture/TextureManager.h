@@ -1,5 +1,6 @@
-// Port of net.minecraft.client.renderer.texture.TextureManager (the
-// Identifier -> AbstractTexture registry with the load-on-demand path).
+
+
+
 
 #ifndef MATTICRAFT_MC_CLIENT_RENDERER_TEXTURE_TEXTUREMANAGER_H
 #define MATTICRAFT_MC_CLIENT_RENDERER_TEXTURE_TEXTUREMANAGER_H
@@ -19,14 +20,14 @@ extern "C"
 // Java: public class TextureManager implements PreparableReloadListener, AutoCloseable
 typedef struct LIBMATTI_MC_TextureManager
 {
-    // Java: private final Map<Identifier, AbstractTexture> byPath - keyed by
+// Java: private final Map<Identifier, AbstractTexture> byPath - keyed by
     // the "namespace:path" string (the port's key format)
     LIBMATTI_JU_HashMap *byPath;
-    // Java: private final Set<TickableTexture> tickableTextures
+// Java: private final Set<TickableTexture> tickableTextures
     LIBMATTI_MC_AbstractTexture **tickableTextures;
     size_t tickableCount;
     size_t tickableCapacity;
-    // Java: private final ResourceManager resourceManager
+// Java: private final ResourceManager resourceManager
     const LIBMATTI_MC_MultiPackResourceManager *resourceManager;
 } LIBMATTI_MC_TextureManager;
 
@@ -52,4 +53,4 @@ void LIBMATTI_MC_TextureManager_Release(LIBMATTI_MC_TextureManager *manager, con
 }
 #endif
 
-#endif //MATTICRAFT_MC_CLIENT_RENDERER_TEXTURE_TEXTUREMANAGER_H
+#endif

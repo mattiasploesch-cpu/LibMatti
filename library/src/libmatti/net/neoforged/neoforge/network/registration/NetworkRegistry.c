@@ -1,4 +1,5 @@
-// Port of net.neoforged.neoforge.network.registration.NetworkRegistry.
+
+
 
 #include "libmatti/net/neoforged/neoforge/network/registration/NetworkRegistry.h"
 
@@ -21,7 +22,7 @@ static int setup = 0;
 // Java: public static void setup()
 void LIBMATTI_NEOFORGE_NetworkRegistry_Setup(void)
 {
-    // Java: if (setup) throw new IllegalStateException("The network registry can only be setup once.")
+// Java: if (setup) throw new IllegalStateException("The network registry can only be setup once.")
     if (setup)
     {
         LIBMATTI_ML_Logger_Error(LIBMATTI_ML_LogManager_GetLogger(), NULL,
@@ -29,12 +30,13 @@ void LIBMATTI_NEOFORGE_NetworkRegistry_Setup(void)
         return;
     }
 
-    // Java: ModLoader.postEvent(new RegisterPayloadHandlersEvent())
+// Java: ModLoader.postEvent(new RegisterPayloadHandlersEvent())
     LIBMATTI_NEOFORGE_Network_RegisterPayloadHandlersEvent *event =
         LIBMATTI_NEOFORGE_Network_RegisterPayloadHandlersEvent_New();
     LIBMATTI_FML_ModLoader_PostEvent(&event->base);
 
-    // the registrations the mods handed in stay for the negotiation (game port side)
+
+
     for (size_t i = 0; i < event->registrationCount; i++)
     {
         if (payloadCount == payloadCapacity)

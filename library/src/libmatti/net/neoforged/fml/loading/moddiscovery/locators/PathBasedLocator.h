@@ -1,5 +1,6 @@
-// Port of net.neoforged.fml.loading.moddiscovery.locators.PathBasedLocator.
-// "Locates" mods from a fixed set of paths.
+
+
+
 
 #ifndef MATTICRAFT_FML_LOADING_MODDISCOVERY_LOCATORS_PATHBASEDLOCATOR_H
 #define MATTICRAFT_FML_LOADING_MODDISCOVERY_LOCATORS_PATHBASEDLOCATOR_H
@@ -30,4 +31,4 @@ void LIBMATTI_FML_PathBasedLocator_FindCandidates(void *self, LIBMATTI_NEOFORGES
 // Java: public int getPriority() { return HIGHEST_SYSTEM_PRIORITY; }
 int LIBMATTI_FML_PathBasedLocator_GetPriority(void *self);
 
-#endif //MATTICRAFT_FML_LOADING_MODDISCOVERY_LOCATORS_PATHBASEDLOCATOR_H
+#endif

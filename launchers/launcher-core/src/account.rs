@@ -26,7 +26,7 @@ pub struct Account {
     pub kind: AccountKind,
     #[serde(default)]
     pub uuid: Option<String>,
-    /// Kept out of `Debug` output so a crash report cannot leak it.
+/// Kept out of `Debug` output so a crash report cannot leak it.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub access_token: Option<String>,
 }
@@ -83,7 +83,7 @@ impl Account {
         Ok(())
     }
 
-    /// Arguments handed to the C client. The game derives an offline UUID when
+/// Arguments handed to the C client. The game derives an offline UUID when
     /// `--uuid` is absent.
     pub fn game_arguments(&self) -> Vec<String> {
         let mut args = vec![

@@ -120,7 +120,7 @@ void *LIBMATTI_JU_HashMap_Put(LIBMATTI_JU_HashMap *map, const char *key, void *v
         entry = entry->next;
     }
 
-    // Java: putVal - the node goes to the front of its bucket
+// Java: putVal - the node goes to the front of its bucket
     LIBMATTI_JU_HashMapEntry *node = malloc(sizeof(LIBMATTI_JU_HashMapEntry));
     if (node == NULL)
         return NULL;
@@ -132,7 +132,7 @@ void *LIBMATTI_JU_HashMap_Put(LIBMATTI_JU_HashMap *map, const char *key, void *v
     map->table[index] = node;
     map->size++;
 
-    // Java: if (++size > threshold) resize();
+// Java: if (++size > threshold) resize();
     if (map->size > map->capacity * 3 / 4)
         resize(map);
     return NULL;
@@ -212,7 +212,8 @@ char **LIBMATTI_JU_HashMap_KeySet(const LIBMATTI_JU_HashMap *map, size_t *count)
         for (LIBMATTI_JU_HashMapEntry *entry = map->table[i]; entry != NULL; entry = entry->next)
             keys[index++] = entry->key;
     *count = index;
-    // Note: the key strings are borrowed from the map's entries (freed by
-    // Clear/Free); the caller frees only the array.
+
+
+
     return keys;
 }

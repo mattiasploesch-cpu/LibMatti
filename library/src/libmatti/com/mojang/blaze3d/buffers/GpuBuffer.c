@@ -16,7 +16,7 @@ void LIBMATTI_B3D_GpuBuffer_Free(LIBMATTI_B3D_GpuBuffer *buffer)
 {
     if (buffer == NULL)
         return;
-    // Java: public void close() - unmap the persistent view, delete the handle.
+// Java: public void close() - unmap the persistent view, delete the handle.
     if (!buffer->closed)
     {
         buffer->closed = 1;

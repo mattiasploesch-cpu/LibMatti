@@ -60,13 +60,13 @@ LIBMATTI_CL_ModuleClassLoader *LIBMATTI_CL_ModuleClassLoader_New(const char *nam
     LIBMATTI_CL_ModuleClassLoader *classLoader = calloc(1, sizeof(LIBMATTI_CL_ModuleClassLoader));
     classLoader->name = strdup(name);
     classLoader->configuration = configuration;
-    // Java: maybeTransformClassBytes is the identity unless a subclass overrides it
+// Java: maybeTransformClassBytes is the identity unless a subclass overrides it
     classLoader->maybeTransformClassBytes = default_maybe_transform;
-    // Java: this.fallbackClassLoader = Objects.requireNonNullElse(parentLoader, ClassLoader.getPlatformClassLoader());
+// Java: this.fallbackClassLoader = Objects.requireNonNullElse(parentLoader, ClassLoader.getPlatformClassLoader());
     // getPlatformClassLoader() is JVM-backed (external); NULL means "no fallback" (ClassNotFoundException)
     classLoader->fallbackClassLoader = NULL;
 
-    // Java: this.resolvedRoots = configuration.modules().stream()
+// Java: this.resolvedRoots = configuration.modules().stream()
     //          .filter(m -> m.reference() instanceof JarModuleFinder.JarModuleReference)
     //          .peek(mod -> mod.reference().descriptor().packages().forEach(pk -> packageLookup.put(pk, mod)))
     //          .collect(toMap(mod -> mod.reference().descriptor().name(), mod -> (JarModuleReference)mod.reference()));
@@ -94,7 +94,7 @@ LIBMATTI_CL_ModuleClassLoader *LIBMATTI_CL_ModuleClassLoader_New(const char *nam
         }
     }
 
-    // Java: for (var rm : configuration.modules()) for (var other : rm.reads()) { ... }
+// Java: for (var rm : configuration.modules()) for (var other : rm.reads()) { ... }
     //          cl = classLoaderMap.computeIfAbsent(other, findClassLoader);
     //          findClassLoader: resolvedRoots.containsKey(k.name()) ? this : parentLayers/other loaders
     //          automatic modules: descriptor.packages() -> parentLoaders.put(pn, cl)
@@ -120,7 +120,7 @@ LIBMATTI_CL_ModuleClassLoader *LIBMATTI_CL_ModuleClassLoader_New(const char *nam
 
             if (LIBMATTI_JL_ModuleDescriptor_IsAutomatic(desc))
             {
-                // Java: processedAutomaticDescriptors.add(descriptor) - one per module here
+// Java: processedAutomaticDescriptors.add(descriptor) - one per module here
                 int processed = 0;
                 for (size_t p = 0; p < processedCount; p++)
                 {
@@ -164,7 +164,7 @@ LIBMATTI_CL_ModuleClassLoader *LIBMATTI_CL_ModuleClassLoader_New(const char *nam
     for (size_t i = 0; i < processedCount; i++) free(processedAutomatic[i]);
     free(processedAutomatic);
 
-    // Java: bindToLayer(this, layer) for all parent layers (reflection into JVM internals)
+// Java: bindToLayer(this, layer) for all parent layers (reflection into JVM internals)
     // ModuleLayer.bindToLoader is JVM-internal, no C equivalent
     return classLoader;
 }
@@ -191,13 +191,13 @@ void LIBMATTI_CL_ModuleClassLoader_Free(LIBMATTI_CL_ModuleClassLoader *classLoad
 // Java: Optional<URI> reader.find(name) -> toURL
 static LIBMATTI_JN_URI *readerToURL(LIBMATTI_CL_JarModuleReader *reader, const char *name)
 {
-    // Java: ModuleClassLoader.toURL(reader.find(name)); IOException -> null
+// Java: ModuleClassLoader.toURL(reader.find(name)); IOException -> null
     return LIBMATTI_CL_JarModuleReader_Find(reader, name);
 }
 
 void *LIBMATTI_CL_ModuleClassLoader_LoadClass(const LIBMATTI_CL_ModuleClassLoader *classLoader, const char *name, int resolve)
 {
-    // Java: synchronized (getClassLoadingLock(name)) {
+// Java: synchronized (getClassLoadingLock(name)) {
     //          var c = findLoadedClass(name);        // JVM (external) -> null
     //          if (c == null) { index = name.lastIndexOf('.');
     //              if (index >= 0) { pname = name.substring(0, index);
@@ -218,7 +218,7 @@ void *LIBMATTI_CL_ModuleClassLoader_LoadClass(const LIBMATTI_CL_ModuleClassLoade
                 return LIBMATTI_CL_ModuleClassLoader_FindClassInModule(classLoader, classLoader->packageLookup.moduleNames[i], name);
             }
         }
-        // Java: parentLoaders.getOrDefault(pname, fallbackClassLoader).loadClass(name)
+// Java: parentLoaders.getOrDefault(pname, fallbackClassLoader).loadClass(name)
         // ClassLoader.loadClass is JVM-backed (external)
     }
     (void)resolve;
@@ -227,7 +227,7 @@ void *LIBMATTI_CL_ModuleClassLoader_LoadClass(const LIBMATTI_CL_ModuleClassLoade
 
 void *LIBMATTI_CL_ModuleClassLoader_FindClass(const LIBMATTI_CL_ModuleClassLoader *classLoader, const char *name)
 {
-    // Java: String mname = classNameToModuleName(name); if (mname != null) return findClass(mname, name);
+// Java: String mname = classNameToModuleName(name); if (mname != null) return findClass(mname, name);
     //       else return super.findClass(name); // ClassNotFoundException (external)
     char *mname = LIBMATTI_CL_ModuleClassLoader_ClassNameToModuleName(classLoader, name);
     if (mname == NULL) return NULL;
@@ -248,7 +248,7 @@ static void *readerToClassLookup(LIBMATTI_CL_JarModuleReader *reader, LIBMATTI_C
     LIBMATTI_CL_ReaderToClassRequest *request = userData;
     const char *name = request->name;
 
-    // Java: bytes = maybeTransformClassBytes(getClassBytes(reader, ref, name), name, null);
+// Java: bytes = maybeTransformClassBytes(getClassBytes(reader, ref, name), name, null);
     //       if (bytes.length == 0) return null;
     size_t byteLen = 0;
     unsigned char *bytes = LIBMATTI_CL_ModuleClassLoader_GetClassBytes(reader, name, &byteLen);
@@ -262,7 +262,7 @@ static void *readerToClassLookup(LIBMATTI_CL_JarModuleReader *reader, LIBMATTI_C
         return NULL;
     }
 
-    // Java: ProtectionDomainHelper.tryDefinePackage(this, name, modroot.jar().getManifest(), ...);
+// Java: ProtectionDomainHelper.tryDefinePackage(this, name, modroot.jar().getManifest(), ...);
     //       createCodeSource(toURL(ref.location()), modroot.jar().verifyAndGetSigners(cname, bytes));
     //       defineClass(name, bytes, 0, bytes.length, createProtectionDomain(cs, this));
     //       trySetPackageModule(cls.getPackage(), cls.getModule());
@@ -275,7 +275,7 @@ static void *readerToClassLookup(LIBMATTI_CL_JarModuleReader *reader, LIBMATTI_C
 
 void *LIBMATTI_CL_ModuleClassLoader_FindClassInModule(const LIBMATTI_CL_ModuleClassLoader *classLoader, const char *moduleName, const char *name)
 {
-    // Java: try { return loadFromModule(moduleName, (reader, ref) -> this.readerToClass(reader, ref, name)); }
+// Java: try { return loadFromModule(moduleName, (reader, ref) -> this.readerToClass(reader, ref, name)); }
     //       catch (IOException e) { return null; }
     LIBMATTI_CL_ReaderToClassRequest request = {(LIBMATTI_CL_ModuleClassLoader *)classLoader, name};
     return LIBMATTI_CL_ModuleClassLoader_LoadFromModule(classLoader, moduleName, readerToClassLookup, &request);
@@ -283,7 +283,7 @@ void *LIBMATTI_CL_ModuleClassLoader_FindClassInModule(const LIBMATTI_CL_ModuleCl
 
 char *LIBMATTI_CL_ModuleClassLoader_ClassNameToModuleName(const LIBMATTI_CL_ModuleClassLoader *classLoader, const char *name)
 {
-    // Java: final var pname = name.substring(0, name.lastIndexOf('.'));
+// Java: final var pname = name.substring(0, name.lastIndexOf('.'));
     //       return Optional.ofNullable(this.packageLookup.get(pname)).map(ResolvedModule::name).orElse(null);
     const char *lastDot = strrchr(name, '.');
     if (lastDot == NULL) return NULL;
@@ -301,7 +301,7 @@ char *LIBMATTI_CL_ModuleClassLoader_ClassNameToModuleName(const LIBMATTI_CL_Modu
 
 LIBMATTI_JN_URI *LIBMATTI_CL_ModuleClassLoader_GetResource(const LIBMATTI_CL_ModuleClassLoader *classLoader, const char *name)
 {
-    // Java: var reslist = findResourceList(name); if (!reslist.isEmpty()) return reslist.get(0);
+// Java: var reslist = findResourceList(name); if (!reslist.isEmpty()) return reslist.get(0);
     //       else return fallbackClassLoader.getResource(name); // JVM (external)
     size_t count = 0;
     LIBMATTI_JN_URI **reslist = LIBMATTI_CL_ModuleClassLoader_FindResourceList(classLoader, name, &count);
@@ -329,7 +329,7 @@ LIBMATTI_JN_URI *LIBMATTI_CL_ModuleClassLoader_FindResource(const LIBMATTI_CL_Mo
 
 LIBMATTI_JN_URI **LIBMATTI_CL_ModuleClassLoader_FindResourceList(const LIBMATTI_CL_ModuleClassLoader *classLoader, const char *name, size_t *count)
 {
-    // Java: idx = name.lastIndexOf('/'); pkgname = (idx == -1 || idx == name.length()-1) ? "" : name.substring(0,idx).replace('/','.');
+// Java: idx = name.lastIndexOf('/'); pkgname = (idx == -1 || idx == name.length()-1) ? "" : name.substring(0,idx).replace('/','.');
     //       module = packageLookup.get(pkgname); if (module != null) { res = findResource(module.name(), name);
     //       return res != null ? List.of(res) : List.of(); }
     const char *lastSlash = strrchr(name, '/');
@@ -361,7 +361,7 @@ LIBMATTI_JN_URI **LIBMATTI_CL_ModuleClassLoader_FindResourceList(const LIBMATTI_
         return NULL;
     }
 
-    // Java: else return resolvedRoots.values().stream().map(JarModuleReference::jar)
+// Java: else return resolvedRoots.values().stream().map(JarModuleReference::jar)
     //              .map(jar -> jar.findFile(name)).map(toURL).filter(Objects::nonNull).toList();
     for (size_t i = 0; i < classLoader->resolvedRoots.count; i++)
     {
@@ -380,7 +380,7 @@ LIBMATTI_JN_URI **LIBMATTI_CL_ModuleClassLoader_FindResourceList(const LIBMATTI_
 
 unsigned char *LIBMATTI_CL_ModuleClassLoader_GetClassBytes(LIBMATTI_CL_JarModuleReader *reader, const char *name, size_t *outLength)
 {
-    // Java: var cname = name.replace('.','/') + ".class";
+// Java: var cname = name.replace('.','/') + ".class";
     //       try (var istream = closeHandler(Optional.of(reader).flatMap(r -> r.open(cname)))) {
     //           return istream.map(InputStream::readAllBytes).findFirst().orElseGet(() -> new byte[0]); }
     size_t nameLen = strlen(name);
@@ -403,7 +403,7 @@ unsigned char *LIBMATTI_CL_ModuleClassLoader_GetClassBytes(LIBMATTI_CL_JarModule
 
 unsigned char *LIBMATTI_CL_ModuleClassLoader_MaybeTransformClassBytes(const unsigned char *bytes, size_t length, size_t *outLength)
 {
-    // Java: protected byte[] maybeTransformClassBytes(...) { return bytes; }
+// Java: protected byte[] maybeTransformClassBytes(...) { return bytes; }
     unsigned char *copy = malloc(length == 0 ? 1 : length);
     if (length > 0) memcpy(copy, bytes, length);
     *outLength = length;
@@ -435,10 +435,10 @@ void LIBMATTI_CL_ModuleClassLoader_SetMaybeTransformClassBytes(
 void *LIBMATTI_CL_ModuleClassLoader_LoadFromModule(const LIBMATTI_CL_ModuleClassLoader *classLoader, const char *moduleName,
                                                    LIBMATTI_CL_Lookup lookup, void *userData)
 {
-    // Java: var module = configuration.findModule(moduleName); if (module.isEmpty()) throw new NoSuchFileException;
+// Java: var module = configuration.findModule(moduleName); if (module.isEmpty()) throw new NoSuchFileException;
     //       var ref = module.get().reference(); try (var reader = ref.open()) { return lookup.apply(reader, ref); }
     LIBMATTI_JL_ResolvedModule *module = LIBMATTI_JL_Configuration_FindModule(classLoader->configuration, moduleName);
-    if (module == NULL) return NULL; // Java: NoSuchFileException
+    if (module == NULL) return NULL;// Java: NoSuchFileException
     LIBMATTI_JL_ModuleReference *ref = LIBMATTI_JL_ResolvedModule_Reference(module);
     LIBMATTI_CL_JarModuleReader *reader = LIBMATTI_CL_JarModuleReference_Open((LIBMATTI_CL_JarModuleReference *)ref);
     void *result = lookup(reader, (LIBMATTI_CL_JarModuleReference *)ref, userData);
@@ -464,7 +464,7 @@ unsigned char *LIBMATTI_CL_ModuleClassLoader_GetMaybeTransformedClassBytes(LIBMA
                                                                            const char *name, const char *context,
                                                                            size_t *outLength)
 {
-    // Java: byte[] bytes = new byte[0]; Throwable suppressed = null;
+// Java: byte[] bytes = new byte[0]; Throwable suppressed = null;
     //       pname = name.substring(0, name.lastIndexOf('.'));
     //       if (packageLookup.containsKey(pname))
     //           bytes = loadFromModule(classNameToModuleName(name), (r, ref) -> getClassBytes(r, ref, name));
@@ -489,17 +489,17 @@ unsigned char *LIBMATTI_CL_ModuleClassLoader_GetMaybeTransformedClassBytes(LIBMA
                 break;
             }
         }
-        // Java: else if (parentLoaders.containsKey(pname)) ... getResourceAsStream (JVM, external)
+// Java: else if (parentLoaders.containsKey(pname)) ... getResourceAsStream (JVM, external)
     }
 
-    // Java: maybeTransformClassBytes(bytes, name, context); empty -> ClassNotFoundException
+// Java: maybeTransformClassBytes(bytes, name, context); empty -> ClassNotFoundException
     unsigned char *transformed = classLoader->maybeTransformClassBytes(classLoader, bytes, byteLen, name, context,
                                                                        outLength);
     free(bytes);
     if (*outLength == 0)
     {
         free(transformed);
-        return NULL; // Java: ClassNotFoundException
+        return NULL;// Java: ClassNotFoundException
     }
     return transformed;
 }

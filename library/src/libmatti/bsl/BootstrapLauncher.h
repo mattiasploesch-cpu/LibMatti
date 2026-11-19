@@ -1,6 +1,7 @@
-//
-// Created by administrator on 09.09.26.
-//
+
+
+
+
 
 #ifndef MATTICRAFT_BOOTSTRAPLAUNCHER_H
 #define MATTICRAFT_BOOTSTRAPLAUNCHER_H
@@ -22,7 +23,8 @@ typedef void (*LIBMATTI_BSL_LaunchConsumer)(const LIBMATTI_CL_ModuleClassLoader 
 // (Java: the consumer is discovered via ServiceLoader instead.)
 void LIBMATTI_BSL_SetLaunchConsumer(LIBMATTI_BSL_LaunchConsumer consumer);
 
-// Seam for the jar-metadata reading (the ported cpw jarhandling in libmatti/bsl/sjh/jarhandling).
+
+
 int LIBMATTI_BSL_JAR_GetModuleName(const char *path, char **name);
 
 // mergeModules handling (Java: private static getMergeFilenameMap).
@@ -31,4 +33,4 @@ int LIBMATTI_BSL_JAR_GetModuleName(const char *path, char **name);
 int LIBMATTI_BSL_FS_GetMergeFilenameMap(LIBMATTI_BSL_FilenameMap **map);
 
 
-#endif //MATTICRAFT_BOOTSTRAPLAUNCHER_H
+#endif

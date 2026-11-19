@@ -15,7 +15,7 @@ struct LIBMATTI_FML_JarContentsModuleReader
 // Java: private static URI getModuleLocation(JarContents contents)
 LIBMATTI_JN_URI *LIBMATTI_FML_JarContentsModuleReference_GetModuleLocation(LIBMATTI_FML_JarContents *contents)
 {
-    // Java: if (contents.getContentRoots().isEmpty()) return null;
+// Java: if (contents.getContentRoots().isEmpty()) return null;
     size_t rootCount = 0;
     const char **roots = LIBMATTI_FML_JarContents_GetContentRoots(contents, &rootCount);
     free(roots);
@@ -23,7 +23,7 @@ LIBMATTI_JN_URI *LIBMATTI_FML_JarContentsModuleReference_GetModuleLocation(LIBMA
     if (rootCount == 0)
         return NULL;
 
-    // Java: return contents.getPrimaryPath().toUri();
+// Java: return contents.getPrimaryPath().toUri();
     const char *primaryPath = LIBMATTI_FML_JarContents_GetPrimaryPath(contents);
     char *absolute = LIBMATTI_JNF_Path_ToAbsolutePath(primaryPath);
     size_t length = strlen(absolute) + 8;
@@ -41,7 +41,7 @@ LIBMATTI_FML_JarContentsModuleReference *LIBMATTI_FML_JarContentsModuleReference
     LIBMATTI_JL_ModuleDescriptor *descriptor, LIBMATTI_FML_JarContents *contents)
 {
     LIBMATTI_FML_JarContentsModuleReference *reference = calloc(1, sizeof(LIBMATTI_FML_JarContentsModuleReference));
-    // Java: super(descriptor, getModuleLocation(contents))
+// Java: super(descriptor, getModuleLocation(contents))
     reference->base.descriptor = descriptor;
     reference->base.location = LIBMATTI_FML_JarContentsModuleReference_GetModuleLocation(contents);
     reference->contents = contents;
@@ -92,7 +92,7 @@ static void collectPath(const char *relativePath, LIBMATTI_FML_JarResource *reso
     (void) resource;
     ContentSet *content = userdata;
 
-    // Java: LinkedHashSet - keep the insertion order and skip duplicates
+// Java: LinkedHashSet - keep the insertion order and skip duplicates
     for (size_t i = 0; i < content->count; i++)
         if (strcmp(content->paths[i], relativePath) == 0)
             return;

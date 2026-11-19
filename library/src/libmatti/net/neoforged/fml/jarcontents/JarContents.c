@@ -13,7 +13,7 @@
 LIBMATTI_FML_JarContents *LIBMATTI_FML_JarContents_OfFilteredPaths(const LIBMATTI_FML_FilteredPath *paths,
                                                                    size_t pathCount)
 {
-    // Java: if (paths.isEmpty()) throw new IllegalArgumentException("Cannot construct jar contents without any paths.")
+// Java: if (paths.isEmpty()) throw new IllegalArgumentException("Cannot construct jar contents without any paths.")
     if (pathCount == 0)
         return NULL;
 
@@ -37,11 +37,11 @@ LIBMATTI_FML_JarContents *LIBMATTI_FML_JarContents_OfFilteredPaths(const LIBMATT
     LIBMATTI_FML_JarContents *result = NULL;
     if (count == 0)
     {
-        // Java: throw new NoSuchFileException("At least one of the paths must exist when constructing jar contents: " + pathList)
+// Java: throw new NoSuchFileException("At least one of the paths must exist when constructing jar contents: " + pathList)
     }
     else if (count == 1 && filters[0] == NULL)
     {
-        // Java: uncommon case, but we'll still optimize for it
+// Java: uncommon case, but we'll still optimize for it
         result = contents[0];
     }
     else
@@ -58,7 +58,7 @@ LIBMATTI_FML_JarContents *LIBMATTI_FML_JarContents_OfFilteredPaths(const LIBMATT
 // Java: static JarContents ofPaths(Collection<Path> paths) throws IOException
 LIBMATTI_FML_JarContents *LIBMATTI_FML_JarContents_OfPaths(const char **paths, size_t pathCount)
 {
-    // Java: if (paths.isEmpty()) throw new IllegalArgumentException("Cannot construct jar contents without any paths.")
+// Java: if (paths.isEmpty()) throw new IllegalArgumentException("Cannot construct jar contents without any paths.")
     if (pathCount == 0)
         return NULL;
 
@@ -78,7 +78,7 @@ LIBMATTI_FML_JarContents *LIBMATTI_FML_JarContents_OfPaths(const char **paths, s
     LIBMATTI_FML_JarContents *result = NULL;
     if (count == 0)
     {
-        // Java: throw new NoSuchFileException("At least one of the paths must exist when constructing jar contents: " + paths)
+// Java: throw new NoSuchFileException("At least one of the paths must exist when constructing jar contents: " + paths)
     }
     else if (count == 1)
     {
@@ -101,7 +101,7 @@ LIBMATTI_FML_JarContents *LIBMATTI_FML_JarContents_OfPath(const char *path)
     if (LIBMATTI_JNF_Files_IsDirectory(path))
         return LIBMATTI_FML_FolderJarContents_New(path);
 
-    // Java: throw new NoSuchFileException("Cannot construct mod container from missing " + path)
+// Java: throw new NoSuchFileException("Cannot construct mod container from missing " + path)
     return NULL;
 }
 

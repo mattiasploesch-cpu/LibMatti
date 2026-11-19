@@ -1,5 +1,6 @@
-// Port of net.minecraft.client.renderer.chunk.CompiledSectionMesh - the
-// compiled section state: per-layer GPU buffers, visibility and transparency.
+
+
+
 
 #ifndef MATTICRAFT_MC_CLIENT_RENDERER_CHUNK_COMPILEDSECTIONMESH_H
 #define MATTICRAFT_MC_CLIENT_RENDERER_CHUNK_COMPILEDSECTIONMESH_H
@@ -21,11 +22,11 @@ extern "C" {
 // layers form; hasRenderedLayer reports the emptiness).
 typedef struct LIBMATTI_MC_CompiledSectionMesh
 {
-    // Java: private final Map<ChunkSectionLayer, SectionBuffers> buffers
+// Java: private final Map<ChunkSectionLayer, SectionBuffers> buffers
     LIBMATTI_MC_SectionBuffers *buffers[LIBMATTI_MC_ChunkSectionLayer_COUNT];
-    // Java: private final VisibilitySet visibilitySet
+// Java: private final VisibilitySet visibilitySet
     LIBMATTI_MC_VisibilitySet *visibilitySet;
-    // Java: private @Nullable MeshData.SortState transparencyState
+// Java: private @Nullable MeshData.SortState transparencyState
     LIBMATTI_B3D_MeshData_SortState *transparencyState;
 } LIBMATTI_MC_CompiledSectionMesh;
 
@@ -50,4 +51,4 @@ const LIBMATTI_MC_VisibilitySet *LIBMATTI_MC_CompiledSectionMesh_Visibility(cons
 }
 #endif
 
-#endif //MATTICRAFT_MC_CLIENT_RENDERER_CHUNK_COMPILEDSECTIONMESH_H
+#endif

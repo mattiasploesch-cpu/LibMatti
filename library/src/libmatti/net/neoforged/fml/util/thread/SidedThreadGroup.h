@@ -1,7 +1,8 @@
-// Port of net.neoforged.fml.util.thread.SidedThreadGroup.
-// Java extends ThreadGroup and implements ThreadFactory; C has neither, so the port keeps the
-// group identity in a registry (which is what EffectiveSide's `instanceof` tests) and models
-// newThread(Runnable) as starting a thread that runs the runnable.
+
+
+
+
+
 
 #ifndef MATTICRAFT_FML_UTIL_THREAD_SIDEDTHREADGROUP_H
 #define MATTICRAFT_FML_UTIL_THREAD_SIDEDTHREADGROUP_H
@@ -13,7 +14,7 @@ typedef struct LIBMATTI_FML_SidedThreadGroup LIBMATTI_FML_SidedThreadGroup;
 
 struct LIBMATTI_FML_SidedThreadGroup
 {
-    // Java: private final LogicalSide side
+// Java: private final LogicalSide side
     LIBMATTI_FML_LogicalSide side;
 };
 
@@ -31,4 +32,4 @@ LIBMATTI_FML_SidedThreadGroup *LIBMATTI_FML_SidedThreadGroup_GetThreadGroup(cons
 LIBMATTI_JL_Thread *LIBMATTI_FML_SidedThreadGroup_NewThread(LIBMATTI_FML_SidedThreadGroup *group,
                                                             void (*runnable)(void *), void *userdata);
 
-#endif //MATTICRAFT_FML_UTIL_THREAD_SIDEDTHREADGROUP_H
+#endif

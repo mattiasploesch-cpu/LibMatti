@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.util.thread.EffectiveSide.
+
+
 
 #include "libmatti/net/neoforged/fml/util/thread/EffectiveSide.h"
 

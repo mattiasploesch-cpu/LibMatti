@@ -7,6 +7,14 @@ include(MattiPlatform)
 
 project(Matticraft C)
 
+option(MATTI_MOBILE_ONLY "Build only libmatti for the Android JNI library" OFF)
+
+if(WIN32 AND CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
+    include_directories(BEFORE "${CMAKE_SOURCE_DIR}/cmake/compat/mingw")
+    add_compile_options("SHELL:-include ${CMAKE_SOURCE_DIR}/cmake/compat/mingw/matti_compat.h")
+    link_libraries(ws2_32)
+endif()
+
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 # gnu11: the port uses POSIX/GNU interfaces such as strndup, getline and dlinfo.
@@ -28,6 +36,8 @@ find_package(Threads REQUIRED)
 enable_testing()
 
 add_subdirectory(library)
+
+if(NOT MATTI_MOBILE_ONLY)
 add_subdirectory(client)
 add_subdirectory(vulkan_client)
 add_subdirectory(tests)
@@ -141,3 +151,4 @@ install(FILES
 # Launcher (Rust/egui) and its desktop entry. The library and the game are
 # installed above; the launcher is the entry point of every package.
 matti_add_launcher()
+endif()

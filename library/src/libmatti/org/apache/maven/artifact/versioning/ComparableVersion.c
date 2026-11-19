@@ -1,4 +1,5 @@
-// Port of org.apache.maven.artifact.versioning.ComparableVersion.
+
+
 
 #include "libmatti/org/apache/maven/artifact/versioning/ComparableVersion.h"
 
@@ -22,17 +23,18 @@ static LIBMATTI_ML_Logger *LOGGER(void)
 
 struct LIBMATTI_MAVEN_ComparableVersion
 {
-    // Java: private String value
+// Java: private String value
     char *value;
-    // Java: private String canonical
+// Java: private String canonical
     char *canonical;
-    // Java: private ListItem items
+// Java: private ListItem items
     LIBMATTI_MAVEN_Item *items;
 };
 
-// ---------------------------------------------------------------------------
-// StringBuilder (the port's own, the JDK one only joins strings)
-// ---------------------------------------------------------------------------
+
+
+
+
 
 typedef struct
 {
@@ -59,9 +61,10 @@ static void buffer_append_char(Buffer *buffer, char value)
     buffer_append(buffer, text);
 }
 
-// ---------------------------------------------------------------------------
-// Item
-// ---------------------------------------------------------------------------
+
+
+
+
 
 static LIBMATTI_MAVEN_Item *string_item(const char *value, int followedByDigit);
 static char *local_substring(const char *value, size_t start, size_t end);
@@ -126,7 +129,7 @@ static int item_is_null(const LIBMATTI_MAVEN_Item *item)
     {
     case LIBMATTI_MAVEN_Item_INT: return item->intValue == 0;
     case LIBMATTI_MAVEN_Item_LONG: return item->longValue == 0;
-    // Java: BigInteger.ZERO.equals(value)
+// Java: BigInteger.ZERO.equals(value)
     case LIBMATTI_MAVEN_Item_BIG_INTEGER: return strcmp(item->digits, "0") == 0;
     case LIBMATTI_MAVEN_Item_STRING: return item->stringValue == NULL || item->stringValue[0] == '\0';
     case LIBMATTI_MAVEN_Item_COMBINATION: return 0;
@@ -198,7 +201,7 @@ static int string_item_compare(const LIBMATTI_MAVEN_Item *item, const LIBMATTI_M
 
     switch (other->type)
     {
-    // Java: 1.any < 1.1
+// Java: 1.any < 1.1
     case LIBMATTI_MAVEN_Item_INT:
     case LIBMATTI_MAVEN_Item_LONG:
     case LIBMATTI_MAVEN_Item_BIG_INTEGER: return -1;
@@ -244,7 +247,7 @@ static int combination_item_compare(const LIBMATTI_MAVEN_Item *item, const LIBMA
         if (result == 0)
         {
             if (item_compare(item->stringPart, NULL) == 0) return item_compare(item->digitPart, NULL);
-            // Java: X1 > X
+// Java: X1 > X
             return 1;
         }
         return result;
@@ -267,7 +270,7 @@ static int list_item_compare(const LIBMATTI_MAVEN_Item *item, const LIBMATTI_MAV
 {
     if (other == NULL)
     {
-        if (item->count == 0) return 0; // Java: 1-0 = 1- (normalize) = 1
+        if (item->count == 0) return 0;// Java: 1-0 = 1- (normalize) = 1
         for (size_t i = 0; i < item->count; i++)
         {
             int result = item_compare(item->items[i], NULL);
@@ -278,7 +281,7 @@ static int list_item_compare(const LIBMATTI_MAVEN_Item *item, const LIBMATTI_MAV
 
     switch (other->type)
     {
-    // Java: 1-1 < 1.0.x
+// Java: 1-1 < 1.0.x
     case LIBMATTI_MAVEN_Item_INT:
     case LIBMATTI_MAVEN_Item_LONG:
     case LIBMATTI_MAVEN_Item_BIG_INTEGER: return -1;
@@ -300,7 +303,7 @@ static int list_item_compare(const LIBMATTI_MAVEN_Item *item, const LIBMATTI_MAV
             const LIBMATTI_MAVEN_Item *left = i < item->count ? item->items[i] : NULL;
             const LIBMATTI_MAVEN_Item *right = i < other->count ? other->items[i] : NULL;
 
-            // Java: if this is shorter, then invert the compare and mul with -1
+// Java: if this is shorter, then invert the compare and mul with -1
             int result = left == NULL ? (right == NULL ? 0 : -1 * item_compare(right, left))
                                       : item_compare(left, right);
             if (result != 0) return result;
@@ -317,20 +320,20 @@ static int item_hash_code(const LIBMATTI_MAVEN_Item *item)
 {
     switch (item->type)
     {
-    // Java: IntItem.hashCode() { return value; }
+// Java: IntItem.hashCode() { return value; }
     case LIBMATTI_MAVEN_Item_INT: return item->intValue;
-    // Java: LongItem.hashCode() { return (int) (value ^ (value >>> 32)); }
+// Java: LongItem.hashCode() { return (int) (value ^ (value >>> 32)); }
     case LIBMATTI_MAVEN_Item_LONG: return (int) ((uint32_t) item->longValue ^ (uint32_t) ((uint64_t) item->longValue >> 32));
-    // Java: BigIntegerItem.hashCode() { return value.hashCode(); }
+// Java: BigIntegerItem.hashCode() { return value.hashCode(); }
     case LIBMATTI_MAVEN_Item_BIG_INTEGER:
     {
-        // Java: String.hashCode
+// Java: String.hashCode
         uint32_t hash = 0;
         for (const unsigned char *p = (const unsigned char *) item->digits; *p != '\0'; p++)
             hash = 31 * hash + *p;
         return (int) hash;
     }
-    // Java: StringItem.hashCode() { return value.hashCode(); }
+// Java: StringItem.hashCode() { return value.hashCode(); }
     case LIBMATTI_MAVEN_Item_STRING:
     {
         uint32_t hash = 0;
@@ -338,7 +341,7 @@ static int item_hash_code(const LIBMATTI_MAVEN_Item *item)
             hash = 31 * hash + *p;
         return (int) hash;
     }
-    // Java: CombinationItem.hashCode() { return Objects.hash(stringPart, digitPart); }
+// Java: CombinationItem.hashCode() { return Objects.hash(stringPart, digitPart); }
     case LIBMATTI_MAVEN_Item_COMBINATION:
     {
         int hash = 1;
@@ -346,7 +349,7 @@ static int item_hash_code(const LIBMATTI_MAVEN_Item *item)
         hash = 31 * hash + item_hash_code(item->digitPart);
         return hash;
     }
-    // Java: ListItem.hashCode() { return super.hashCode(); } - AbstractList of the items
+// Java: ListItem.hashCode() { return super.hashCode(); } - AbstractList of the items
     case LIBMATTI_MAVEN_Item_LIST:
     {
         int hash = 1;
@@ -377,7 +380,7 @@ static int ordering_hash(const LIBMATTI_MAVEN_Item *item)
     case LIBMATTI_MAVEN_Item_LIST:
     {
         size_t end = item->count;
-        // Java: trailing items that compare as equal to null do not affect ordering: 1-ga == 1
+// Java: trailing items that compare as equal to null do not affect ordering: 1-ga == 1
         while (end > 0 && item_compare(item->items[end - 1], NULL) == 0)
             end--;
         if (end == 1) return ordering_hash(item->items[0]);
@@ -387,14 +390,14 @@ static int ordering_hash(const LIBMATTI_MAVEN_Item *item)
             hash = 31 * hash + ordering_hash(item->items[i]);
         return hash;
     }
-    // Java: qualifiers that compare as equal ("ga", "final", "release" and "") must hash alike
+// Java: qualifiers that compare as equal ("ga", "final", "release" and "") must hash alike
     case LIBMATTI_MAVEN_Item_STRING:
         return qualifier_hash_code(item->stringValue);
     case LIBMATTI_MAVEN_Item_COMBINATION:
         if (item_compare(item->stringPart, NULL) == 0 && item_compare(item->digitPart, NULL) == 0)
             return ordering_hash(item->stringPart);
         return 31 * qualifier_hash_code(item->stringPart->stringValue) + ordering_hash(item->digitPart);
-    // Java: numeric items only compare as equal to items of the same type with the same value
+// Java: numeric items only compare as equal to items of the same type with the same value
     default: return item_hash_code(item);
     }
 }
@@ -405,7 +408,7 @@ static int item_compare(const LIBMATTI_MAVEN_Item *item, const LIBMATTI_MAVEN_It
     switch (item->type)
     {
     case LIBMATTI_MAVEN_Item_INT:
-        if (other == NULL) return item->intValue == 0 ? 0 : 1; // Java: 1.0 == 1, 1.1 > 1
+        if (other == NULL) return item->intValue == 0 ? 0 : 1;// Java: 1.0 == 1, 1.1 > 1
         switch (other->type)
         {
         case LIBMATTI_MAVEN_Item_INT:
@@ -476,11 +479,11 @@ static void item_to_string(const LIBMATTI_MAVEN_Item *item, Buffer *buffer)
         break;
     case LIBMATTI_MAVEN_Item_LIST:
     {
-        // Java: ListItem.toString() builds its own StringBuilder, so the separators are per list
+// Java: ListItem.toString() builds its own StringBuilder, so the separators are per list
         Buffer inner = {0};
         for (size_t i = 0; i < item->count; i++)
         {
-            // Java: if (!buffer.isEmpty()) - an item that renders as nothing must not add a separator
+// Java: if (!buffer.isEmpty()) - an item that renders as nothing must not add a separator
             if (inner.length > 0)
                 buffer_append_char(&inner, item->items[i]->type == LIBMATTI_MAVEN_Item_LIST ? '-' : '.');
             item_to_string(item->items[i], &inner);
@@ -512,7 +515,7 @@ static void list_normalize(LIBMATTI_MAVEN_Item *list)
         }
     }
 
-    // Java: if (size() == 1 && get(0) instanceof ListItem list) { clear(); addAll(list); }
+// Java: if (size() == 1 && get(0) instanceof ListItem list) { clear(); addAll(list); }
     if (list->count == 1 && list->items[0]->type == LIBMATTI_MAVEN_Item_LIST)
     {
         LIBMATTI_MAVEN_Item *inner = list->items[0];
@@ -550,7 +553,7 @@ static LIBMATTI_MAVEN_Item *parse_item(int isCombination, int isDigit, const cha
 {
     if (isCombination)
     {
-        // Java: new CombinationItem(buf.replace("-", ""))
+// Java: new CombinationItem(buf.replace("-", ""))
         char *value = malloc(strlen(buf) + 1);
         size_t length = 0;
         for (const char *c = buf; *c != '\0'; c++)
@@ -571,7 +574,7 @@ static LIBMATTI_MAVEN_Item *parse_item(int isCombination, int isDigit, const cha
         stringPart[index] = '\0';
         item->stringPart = string_item(stringPart, 1);
         free(stringPart);
-        // Java: parseItem(true, value.substring(index)) - the two-argument overload adds isCombination = false
+// Java: parseItem(true, value.substring(index)) - the two-argument overload adds isCombination = false
         item->digitPart = parse_item(0, 1, value + index);
         free(value);
         return item;
@@ -603,7 +606,7 @@ static LIBMATTI_MAVEN_Item *parse_item(int isCombination, int isDigit, const cha
         return item;
     }
 
-    // Java: return new StringItem(buf, false);
+// Java: return new StringItem(buf, false);
     return string_item(buf, 0);
 }
 
@@ -613,7 +616,7 @@ static LIBMATTI_MAVEN_Item *string_item(const char *value, int followedByDigit)
     char *resolved = NULL;
     if (followedByDigit && strlen(value) == 1)
     {
-        // Java: a1 = alpha-1, b1 = beta-1, m1 = milestone-1
+// Java: a1 = alpha-1, b1 = beta-1, m1 = milestone-1
         switch (value[0])
         {
         case 'a': resolved = strdup("alpha");
@@ -627,7 +630,7 @@ static LIBMATTI_MAVEN_Item *string_item(const char *value, int followedByDigit)
     }
 
     if (resolved == NULL) resolved = strdup(value);
-    // Java: this.value = ALIASES.getProperty(value, value) - cr is the only alias
+// Java: this.value = ALIASES.getProperty(value, value) - cr is the only alias
     if (strcmp(resolved, "cr") == 0)
     {
         free(resolved);
@@ -642,10 +645,11 @@ static LIBMATTI_MAVEN_Item *string_item(const char *value, int followedByDigit)
 // Java: public final void parseVersion(String version)
 static void parse_version(LIBMATTI_MAVEN_ComparableVersion *version, const char *versionString)
 {
-    // Java: if (version.length() > MAX_VERSION_LENGTH) throw new IllegalArgumentException(...)
+// Java: if (version.length() > MAX_VERSION_LENGTH) throw new IllegalArgumentException(...)
     if (strlen(versionString) > MAX_VERSION_LENGTH)
     {
-        // the port aborts like the uncaught exception it would be
+
+
         char message[300];
         snprintf(message, sizeof(message), "Version string is too long (%zu > %d characters)",
                  strlen(versionString), (int) MAX_VERSION_LENGTH);
@@ -658,13 +662,13 @@ static void parse_version(LIBMATTI_MAVEN_ComparableVersion *version, const char 
     version->items = item_new(LIBMATTI_MAVEN_Item_LIST);
     LIBMATTI_MAVEN_Item *list = version->items;
 
-    // Java: version = version.toLowerCase(Locale.ENGLISH)
+// Java: version = version.toLowerCase(Locale.ENGLISH)
     char *lower = strdup(versionString);
     size_t length = strlen(lower);
     for (size_t i = 0; i < length; i++)
         lower[i] = (char)tolower((unsigned char)lower[i]);
 
-    // Java: Deque<Item> stack = new ArrayDeque<>(); stack.push(list)
+// Java: Deque<Item> stack = new ArrayDeque<>(); stack.push(list)
     LIBMATTI_MAVEN_Item **stack = NULL;
     size_t stackCount = 0;
     stack = realloc(stack, sizeof(*stack) * (stackCount + 1));
@@ -677,13 +681,14 @@ static void parse_version(LIBMATTI_MAVEN_ComparableVersion *version, const char 
     for (size_t i = 0; i < length; i++)
     {
         char c = lower[i];
-        // Java decodes a surrogate pair into one code point; the port skips the UTF-8 continuation bytes
+
+
         if ((c & 0xC0) == 0x80) continue;
 
         if (c == '.')
         {
             if (i == startIndex)
-                list_add(list, int_item(0)); // Java: IntItem.ZERO
+                list_add(list, int_item(0));// Java: IntItem.ZERO
             else
                 list_add(list, parse_item_range(isCombination, isDigit, lower, startIndex, i));
 
@@ -698,7 +703,7 @@ static void parse_version(LIBMATTI_MAVEN_ComparableVersion *version, const char 
             }
             else
             {
-                // Java: X-1 is going to be treated as X1
+// Java: X-1 is going to be treated as X1
                 if (!isDigit && i != length - 1 && isdigit((unsigned char)lower[i + 1]))
                 {
                     isCombination = 1;
@@ -722,7 +727,7 @@ static void parse_version(LIBMATTI_MAVEN_ComparableVersion *version, const char 
         {
             if (!isDigit && i > startIndex)
             {
-                // Java: X1
+// Java: X1
                 isCombination = 1;
 
                 if (list->count > 0)
@@ -758,7 +763,7 @@ static void parse_version(LIBMATTI_MAVEN_ComparableVersion *version, const char 
 
     if (length > startIndex)
     {
-        // Java: 1.0.0.X1 < 1.0.0-X2 - treat .X as -X for any string qualifier X
+// Java: 1.0.0.X1 < 1.0.0-X2 - treat .X as -X for any string qualifier X
         if (!isDigit && list->count > 0)
         {
             LIBMATTI_MAVEN_Item *nested = item_new(LIBMATTI_MAVEN_Item_LIST);

@@ -1,4 +1,5 @@
-// Port of cpw.mods.modlauncher.ArgumentHandler.
+
+
 
 #ifndef MATTICRAFT_MODLAUNCHER_ARGUMENTHANDLER_H
 #define MATTICRAFT_MODLAUNCHER_ARGUMENTHANDLER_H
@@ -22,10 +23,10 @@ typedef struct
 // Java: public class ArgumentHandler
 typedef struct LIBMATTI_ML_ArgumentHandler
 {
-    // Java: private String[] args
+// Java: private String[] args
     char **args;
     size_t argCount;
-    // Java: private OptionSet optionSet
+// Java: private OptionSet optionSet
     LIBMATTI_JOPT_OptionSet *optionSet;
     LIBMATTI_JOPT_OptionSpec *profileOption;
     LIBMATTI_JOPT_OptionSpec *gameDirOption;
@@ -57,7 +58,8 @@ void LIBMATTI_ML_ArgumentHandler_ProcessArguments(
 // Java: private ITransformationService.OptionResult optionResults(String serviceName, OptionSet set)
 LIBMATTI_MLA_ITransformationService_OptionResult *LIBMATTI_ML_ArgumentHandler_OptionResults(
     const char *serviceName, LIBMATTI_JOPT_OptionSet *set, void *userdata);
-// releases a result returned by OptionResults
+
+
 void LIBMATTI_ML_ArgumentHandler_FreeOptionResults(LIBMATTI_MLA_ITransformationService_OptionResult *result);
 
 // Java: String getLaunchTarget()
@@ -65,4 +67,4 @@ const char *LIBMATTI_ML_ArgumentHandler_GetLaunchTarget(const LIBMATTI_ML_Argume
 // Java: public String[] buildArgumentList()
 char **LIBMATTI_ML_ArgumentHandler_BuildArgumentList(const LIBMATTI_ML_ArgumentHandler *handler, size_t *count);
 
-#endif //MATTICRAFT_MODLAUNCHER_ARGUMENTHANDLER_H
+#endif

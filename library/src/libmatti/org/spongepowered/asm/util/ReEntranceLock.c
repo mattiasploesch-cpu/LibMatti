@@ -1,4 +1,5 @@
-// Port of org.spongepowered.asm.util.ReEntranceLock.
+
+
 
 #include "libmatti/org/spongepowered/asm/util/ReEntranceLock.h"
 

@@ -1,4 +1,5 @@
-// Port of net.neoforged.fml.LogicalSide.
+
+
 
 #ifndef MATTICRAFT_FML_LOGICALSIDE_H
 #define MATTICRAFT_FML_LOGICALSIDE_H
@@ -15,4 +16,4 @@ int LIBMATTI_FML_LogicalSide_IsServer(LIBMATTI_FML_LogicalSide side);
 // Java: public boolean isClient()
 int LIBMATTI_FML_LogicalSide_IsClient(LIBMATTI_FML_LogicalSide side);
 
-#endif //MATTICRAFT_FML_LOGICALSIDE_H
+#endif

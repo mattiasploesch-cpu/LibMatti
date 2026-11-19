@@ -1,7 +1,8 @@
-// Port of java.util.BitSet. Java backs the set with a growable long[] words
-// array (64 bits per word, little word order); the C port keeps the same
-// layout so the save-format serialisation (states, sections) can mirror the
-// Java word stream.
+
+
+
+
+
 
 #ifndef MATTICRAFT_JAVA_UTIL_BITSET_H
 #define MATTICRAFT_JAVA_UTIL_BITSET_H
@@ -17,11 +18,12 @@ extern "C" {
 // Java: public class BitSet implements Cloneable, java.io.Serializable
 typedef struct LIBMATTI_JU_BitSet
 {
-    // Java: private static final int BITS_PER_WORD = 64; the words array with
+// Java: private static final int BITS_PER_WORD = 64; the words array with
     // the trailing zero words trimmed (wordsInUse bookkeeping)
     uint64_t *words;
-    size_t wordCount;    // allocated words
-    size_t wordsInUse;   // Java: wordsInUse - the index of the highest used word + 1
+    size_t wordCount;
+
+    size_t wordsInUse;// Java: wordsInUse - the index of the highest used word + 1
 } LIBMATTI_JU_BitSet;
 
 // Java: public BitSet() / BitSet(int nbits)
@@ -73,4 +75,4 @@ uint32_t LIBMATTI_JU_BitSet_HashCode(const LIBMATTI_JU_BitSet *set);
 }
 #endif
 
-#endif //MATTICRAFT_JAVA_UTIL_BITSET_H
+#endif

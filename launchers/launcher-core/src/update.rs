@@ -16,11 +16,11 @@ pub const UPDATE_SCHEMA: u32 = 1;
 
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
 pub struct Artifact {
-    /// `linux`, `windows`, `macos`, `android`, `freebsd` or `any`.
+/// `linux`, `windows`, `macos`, `android`, `freebsd` or `any`.
     pub platform: String,
-    /// `x86_64`, `x86`, `arm64`, `arm` or `any`.
+/// `x86_64`, `x86`, `arm64`, `arm` or `any`.
     pub arch: String,
-    /// `tar.zst`, `deb`, `rpm`, `appimage`, `flatpak`, `msi`, `zip`, `dmg`,
+/// `tar.zst`, `deb`, `rpm`, `appimage`, `flatpak`, `msi`, `zip`, `dmg`,
     /// `pkg`, `apk` or `aab`.
     pub kind: String,
     pub name: String,
@@ -85,7 +85,7 @@ impl UpdateManifest {
         Ok(manifest)
     }
 
-    /// Canonical bytes the signature is computed over.
+/// Canonical bytes the signature is computed over.
     pub fn unsigned_bytes(&self) -> Vec<u8> {
         serde_json::to_vec(&Unsigned {
             schema: self.schema,
@@ -118,7 +118,7 @@ impl UpdateManifest {
             .map_err(|_| Error::Signature("update manifest signature does not verify".into()))
     }
 
-    /// Verify with the public key compiled into the launcher.
+/// Verify with the public key compiled into the launcher.
     pub fn verify_release(&self) -> Result<()> {
         let key = release_public_key().ok_or_else(|| {
             Error::Signature(
@@ -197,7 +197,7 @@ pub fn fetch_manifest(location: &str) -> Result<Vec<u8>> {
 }
 
 pub struct GeneratedKeyPair {
-    /// PKCS#8 DER, the format `ring::signature::Ed25519KeyPair::from_pkcs8`
+/// PKCS#8 DER, the format `ring::signature::Ed25519KeyPair::from_pkcs8`
     /// expects. Keep this file private.
     pub pkcs8: Vec<u8>,
     pub public_key_hex: String,
@@ -311,7 +311,8 @@ mod tests {
     }
 }
 
-// Convenience for `manifest.sign_manifest` in tests and the signing binary.
+
+
 impl UpdateManifest {
     pub fn sign_manifest(&mut self, pkcs8: &[u8]) -> Result<()> {
         sign_manifest(self, pkcs8)

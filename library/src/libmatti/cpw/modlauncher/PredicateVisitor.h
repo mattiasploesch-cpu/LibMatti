@@ -1,6 +1,7 @@
-// Port of cpw.mods.modlauncher.PredicateVisitor.
-// Java's PredicateVisitor is a ClassVisitor holding one of the three predicates;
-// the C port exposes one entry point per predicate.
+
+
+
+
 
 #ifndef MATTICRAFT_MODLAUNCHER_PREDICATEVISITOR_H
 #define MATTICRAFT_MODLAUNCHER_PREDICATEVISITOR_H
@@ -29,4 +30,4 @@ int LIBMATTI_ML_PredicateVisitor_ApplyMethod(const LIBMATTI_ASMT_MethodNode *nod
 int LIBMATTI_ML_PredicateVisitor_ApplyClass(const LIBMATTI_ASMT_ClassNode *node,
                                             LIBMATTI_ML_PredicateVisitor_ClassTest predicate, void *userdata);
 
-#endif //MATTICRAFT_MODLAUNCHER_PREDICATEVISITOR_H
+#endif

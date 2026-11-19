@@ -1,5 +1,6 @@
-// Port of org.joml.Matrix4f (the surface the game needs).
-// Formulas follow vendor/JOML src/main/java/org/joml/Matrix4f.java.
+
+
+
 
 #include "libmatti/org/joml/Matrix4f.h"
 
@@ -55,12 +56,13 @@ LIBMATTI_JOML_Matrix4f *LIBMATTI_JOML_Matrix4f_Set(LIBMATTI_JOML_Matrix4f *m,
 LIBMATTI_JOML_Matrix4f *LIBMATTI_JOML_Matrix4f_SetPerspective(LIBMATTI_JOML_Matrix4f *m, float fovy, float aspect,
                                                               float zNear, float zFar)
 {
-    // Java: MemUtil.INSTANCE.zero(this); float h = Math.tan(fovy * 0.5f)
+// Java: MemUtil.INSTANCE.zero(this); float h = Math.tan(fovy * 0.5f)
     LIBMATTI_JOML_Matrix4f_Zero(m);
     float h = tanf(fovy * 0.5f);
     m->m00 = 1.0f / (h * aspect);
     m->m11 = 1.0f / h;
-    // zZeroToOne = false: m22 = (zFar + zNear) / (zNear - zFar), m32 = 2 * zFar * zNear / (zNear - zFar)
+
+
     m->m22 = (zFar + zNear) / (zNear - zFar);
     m->m32 = (zFar + zFar) * zNear / (zNear - zFar);
     m->m23 = -1.0f;
@@ -96,7 +98,7 @@ LIBMATTI_JOML_Matrix4f *LIBMATTI_JOML_Matrix4f_Translation(LIBMATTI_JOML_Matrix4
 LIBMATTI_JOML_Matrix4f *LIBMATTI_JOML_Matrix4f_Rotation(LIBMATTI_JOML_Matrix4f *m, float angle, float x, float y,
                                                         float z)
 {
-    // Java: the fast paths for the unit axes
+// Java: the fast paths for the unit axes
     if (y == 0.0f && z == 0.0f && (x == 1.0f || x == -1.0f))
         return LIBMATTI_JOML_Matrix4f_RotationX(m, x * angle);
     if (x == 0.0f && z == 0.0f && (y == 1.0f || y == -1.0f))
@@ -109,7 +111,7 @@ LIBMATTI_JOML_Matrix4f *LIBMATTI_JOML_Matrix4f_Rotation(LIBMATTI_JOML_Matrix4f *
     float cos = cosf(angle);
     float oneMinusCos = 1.0f - cos;
 
-    // Java: normalization of the axis (rotationInternal assumes a unit axis but
+// Java: normalization of the axis (rotationInternal assumes a unit axis but
     // JOML divides by the length when it is not 1)
     float length = sqrtf(x * x + y * y + z * z);
     if (length != 1.0f)
@@ -122,7 +124,7 @@ LIBMATTI_JOML_Matrix4f *LIBMATTI_JOML_Matrix4f_Rotation(LIBMATTI_JOML_Matrix4f *
     float xx = x * x, yy = y * y, zz = z * z;
     float xy = x * y, xz = x * z, yz = y * z;
 
-    // Java: the standard axis-angle matrix (column-major layout in m00..m22)
+// Java: the standard axis-angle matrix (column-major layout in m00..m22)
     m->m00 = xx * oneMinusCos + cos;
     m->m01 = xy * oneMinusCos + z * sin;
     m->m02 = xz * oneMinusCos - y * sin;
@@ -185,7 +187,7 @@ LIBMATTI_JOML_Matrix4f *LIBMATTI_JOML_Matrix4f_Scaling(LIBMATTI_JOML_Matrix4f *m
 // Java: public Matrix4f translate(float x, float y, float z) - this = this * T
 LIBMATTI_JOML_Matrix4f *LIBMATTI_JOML_Matrix4f_Translate(LIBMATTI_JOML_Matrix4f *m, float x, float y, float z)
 {
-    // Java: translation deltas apply through the rotation part
+// Java: translation deltas apply through the rotation part
     m->m30 = m->m00 * x + m->m10 * y + m->m20 * z + m->m30;
     m->m31 = m->m01 * x + m->m11 * y + m->m21 * z + m->m31;
     m->m32 = m->m02 * x + m->m12 * y + m->m22 * z + m->m32;
@@ -196,7 +198,7 @@ LIBMATTI_JOML_Matrix4f *LIBMATTI_JOML_Matrix4f_Translate(LIBMATTI_JOML_Matrix4f 
 // Java: public Matrix4f rotate(float ang, float x, float y, float z) - this = this * R
 LIBMATTI_JOML_Matrix4f *LIBMATTI_JOML_Matrix4f_Rotate(LIBMATTI_JOML_Matrix4f *m, float ang, float x, float y, float z)
 {
-    // Java: rotate uses a quaternion internally
+// Java: rotate uses a quaternion internally
     LIBMATTI_JOML_Quaternionf q;
     LIBMATTI_JOML_Quaternionf_FromAxisAngleStack(&q, ang, x, y, z);
     return LIBMATTI_JOML_Matrix4f_Mul(m, LIBMATTI_JOML_Quaternionf_ToMatrix4fStack(&q, (LIBMATTI_JOML_Matrix4f[1]){{0}}),
@@ -271,10 +273,10 @@ LIBMATTI_JOML_Matrix4f *LIBMATTI_JOML_Matrix4f_Invert(const LIBMATTI_JOML_Matrix
     float b10 = a21 * a33 - a23 * a31;
     float b11 = a22 * a33 - a23 * a32;
 
-    // Java: det = b00 * b11 - b01 * b10 + b02 * b09 + b03 * b08 - b04 * b07 + b05 * b06
+// Java: det = b00 * b11 - b01 * b10 + b02 * b09 + b03 * b08 - b04 * b07 + b05 * b06
     float det = b00 * b11 - b01 * b10 + b02 * b09 + b03 * b08 - b04 * b07 + b05 * b06;
     if (det == 0.0f)
-        return NULL; // Java: throws SingularMatrixException
+        return NULL;// Java: throws SingularMatrixException
     float invDet = 1.0f / det;
 
     dest->m00 = (a11 * b11 - a12 * b10 + a13 * b09) * invDet;

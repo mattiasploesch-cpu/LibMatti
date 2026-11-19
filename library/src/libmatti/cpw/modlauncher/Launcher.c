@@ -1,10 +1,11 @@
-//
-// Port of cpw.mods.modlauncher.Launcher.
-//
-// Java reads JVM system properties (System.getProperty) and the package
-// metadata of the modlauncher jar; following the convention already used by the
-// BootstrapLauncher port, system properties are read from the environment.
-//
+
+
+
+
+
+
+
+
 
 #include "Launcher.h"
 
@@ -55,7 +56,8 @@ static char *artifact_manifest_value(const char *key)
 // Java: IEnvironment.class.getPackage().getImplementationVersion()
 static const char *implementation_version(void)
 {
-    // loaded once, like the package metadata of the jar
+
+
     static int loaded = 0;
     static char *version = NULL;
 
@@ -150,7 +152,8 @@ static void add_to_layer(LIBMATTI_ML_Launcher *launcher, LIBMATTI_MLA_Layer laye
 // Java: List.toString() -> "[a, b, c]" (used for the parameterized log messages)
 static char *format_string_list(char **items, size_t count)
 {
-    size_t length = 3; // "[]" + NUL
+    size_t length = 3;
+
     for (size_t i = 0; i < count; i++) length += strlen(items[i]) + 2;
 
     char *result = malloc(length);
@@ -167,9 +170,10 @@ static char *format_string_list(char **items, size_t count)
     return result;
 }
 
-// ---------------------------------------------------------------------------
-// the computePropertyIfAbsent value functions (Java lambdas)
-// ---------------------------------------------------------------------------
+
+
+
+
 
 // Java: s -> IEnvironment.class.getPackage().getSpecificationVersion()
 static void *specification_version_supplier(LIBMATTI_MLA_Key *key, void *userdata)
@@ -195,9 +199,10 @@ static void *mod_list_supplier(LIBMATTI_MLA_Key *key, void *userdata)
     return LIBMATTI_MLA_ModList_New();
 }
 
-// ---------------------------------------------------------------------------
-// Launcher
-// ---------------------------------------------------------------------------
+
+
+
+
 
 // Java: module-info provides cpw.mods.modlauncher.api.ILaunchHandlerService with
 //       DefaultLaunchHandlerService, TestingLaunchHandlerService
@@ -238,15 +243,15 @@ LIBMATTI_ML_Launcher *LIBMATTI_ML_Launcher_New(void)
     launcher->blackboard = LIBMATTI_MLA_TypesafeMap_New();
     launcher->environment = LIBMATTI_ML_Environment_New(launcher);
 
-    // Java: environment.computePropertyIfAbsent(Keys.MLSPEC_VERSION.get(), s -> ...specificationVersion())
+// Java: environment.computePropertyIfAbsent(Keys.MLSPEC_VERSION.get(), s -> ...specificationVersion())
     LIBMATTI_ML_Environment_ComputePropertyIfAbsent(launcher->environment,
                                                     LIBMATTI_MLA_IEnvironment_Keys_MlSpecVersion(),
                                                     specification_version_supplier, NULL);
-    // Java: environment.computePropertyIfAbsent(Keys.MLIMPL_VERSION.get(), s -> ...implementationVersion())
+// Java: environment.computePropertyIfAbsent(Keys.MLIMPL_VERSION.get(), s -> ...implementationVersion())
     LIBMATTI_ML_Environment_ComputePropertyIfAbsent(launcher->environment,
                                                     LIBMATTI_MLA_IEnvironment_Keys_MlImplVersion(),
                                                     implementation_version_supplier, NULL);
-    // Java: environment.computePropertyIfAbsent(Keys.MODLIST.get(), s -> new ArrayList<>())
+// Java: environment.computePropertyIfAbsent(Keys.MODLIST.get(), s -> new ArrayList<>())
     LIBMATTI_ML_Environment_ComputePropertyIfAbsent(launcher->environment,
                                                     LIBMATTI_MLA_IEnvironment_Keys_ModList(),
                                                     mod_list_supplier, NULL);
@@ -264,7 +269,7 @@ LIBMATTI_ML_Launcher *LIBMATTI_ML_Launcher_New(void)
 // Java: public static void main(String... args)
 int LIBMATTI_ML_Launcher_Main(int argc, char *argv[])
 {
-    // Java: var props = System.getProperties(); if (props.getProperty("java.vm.name").contains("OpenJ9"))
+// Java: var props = System.getProperties(); if (props.getProperty("java.vm.name").contains("OpenJ9"))
     const char *vmName = system_property("java.vm.name");
     if (vmName != NULL && strstr(vmName, "OpenJ9") != NULL)
     {
@@ -275,7 +280,7 @@ int LIBMATTI_ML_Launcher_Main(int argc, char *argv[])
                 system_property("java.vm.vendor"), vmName, system_property("java.vm.version"));
     }
 
-    // Java: () -> LaunchServiceHandler.hideAccessToken(args)
+// Java: () -> LaunchServiceHandler.hideAccessToken(args)
     size_t hiddenCount = 0;
     char **hidden = LIBMATTI_ML_LaunchServiceHandler_HideAccessToken(argc, argv, &hiddenCount);
     char *hiddenString = format_string_list(hidden, hiddenCount);
@@ -309,14 +314,14 @@ LIBMATTI_MLA_TypesafeMap *LIBMATTI_ML_Launcher_Blackboard(const LIBMATTI_ML_Laun
 // 0 = ran to completion, 1 = the Java method threw (the JVM exits non-zero)
 int LIBMATTI_ML_Launcher_Run(LIBMATTI_ML_Launcher *launcher, int argc, char *argv[])
 {
-    // Java: final ArgumentHandler.DiscoveryData discoveryData = this.argumentHandler.setArgs(args);
+// Java: final ArgumentHandler.DiscoveryData discoveryData = this.argumentHandler.setArgs(args);
     LIBMATTI_ML_ArgumentHandler_DiscoveryData discoveryData =
         LIBMATTI_ML_ArgumentHandler_SetArgs(launcher->argumentHandler, argc, argv);
 
-    // Java: this.transformationServicesHandler.discoverServices(discoveryData);
+// Java: this.transformationServicesHandler.discoverServices(discoveryData);
     LIBMATTI_ML_TransformationServicesHandler_DiscoverServices(launcher->transformationServicesHandler, discoveryData);
 
-    // Java: scanResults = initializeTransformationServices(argumentHandler, environment)
+// Java: scanResults = initializeTransformationServices(argumentHandler, environment)
     //                 .stream().collect(Collectors.groupingBy(ITransformationService.Resource::target))
     size_t scanResultCount = 0;
     LIBMATTI_MLA_ITransformationService_Resource *scanResults =
@@ -327,13 +332,13 @@ int LIBMATTI_ML_Launcher_Run(LIBMATTI_ML_Launcher *launcher, int argc, char *arg
     ResourceGroup scanGroups[4];
     group_by_target(scanResults, scanResultCount, scanGroups);
 
-    // Java: scanResults.getOrDefault(Layer.PLUGIN, List.of()) -> mapMulti(resources) -> addToLayer(PLUGIN, np)
+// Java: scanResults.getOrDefault(Layer.PLUGIN, List.of()) -> mapMulti(resources) -> addToLayer(PLUGIN, np)
     add_to_layer(launcher, LIBMATTI_MLA_LAYER_PLUGIN, &scanGroups[LIBMATTI_MLA_LAYER_PLUGIN]);
 
-    // Java: this.moduleLayerHandler.buildLayer(IModuleLayerManager.Layer.PLUGIN)
+// Java: this.moduleLayerHandler.buildLayer(IModuleLayerManager.Layer.PLUGIN)
     LIBMATTI_ML_ModuleLayerHandler_BuildLayer(launcher->moduleLayerHandler, LIBMATTI_MLA_LAYER_PLUGIN);
 
-    // Java: gameResults = triggerScanCompletion(moduleLayerHandler).stream().collect(groupingBy(Resource::target))
+// Java: gameResults = triggerScanCompletion(moduleLayerHandler).stream().collect(groupingBy(Resource::target))
     size_t gameResultCount = 0;
     LIBMATTI_MLA_ITransformationService_Resource *gameResults =
         LIBMATTI_ML_TransformationServicesHandler_TriggerScanCompletion(
@@ -343,7 +348,7 @@ int LIBMATTI_ML_Launcher_Run(LIBMATTI_ML_Launcher *launcher, int argc, char *arg
     ResourceGroup gameResultGroups[4];
     group_by_target(gameResults, gameResultCount, gameResultGroups);
 
-    // Java: Stream.of(scanResults, gameResults)
+// Java: Stream.of(scanResults, gameResults)
     //         .flatMap(m -> m.getOrDefault(Layer.GAME, List.of()).stream())
     //         .mapMulti((resource, action) -> resource.resources().forEach(action))
     //         .toList()
@@ -352,33 +357,33 @@ int LIBMATTI_ML_Launcher_Run(LIBMATTI_ML_Launcher *launcher, int argc, char *arg
     collect_resources(&gameContents, &gameContentCount, &scanGroups[LIBMATTI_MLA_LAYER_GAME]);
     collect_resources(&gameContents, &gameContentCount, &gameResultGroups[LIBMATTI_MLA_LAYER_GAME]);
 
-    // Java: gameContents.forEach(j -> this.moduleLayerHandler.addToLayer(Layer.GAME, j))
+// Java: gameContents.forEach(j -> this.moduleLayerHandler.addToLayer(Layer.GAME, j))
     for (size_t i = 0; i < gameContentCount; i++)
         LIBMATTI_ML_ModuleLayerHandler_AddToLayer(launcher->moduleLayerHandler, LIBMATTI_MLA_LAYER_GAME,
                                                   gameContents[i]);
 
-    // Java: this.transformationServicesHandler.initialiseServiceTransformers()
+// Java: this.transformationServicesHandler.initialiseServiceTransformers()
     LIBMATTI_ML_TransformationServicesHandler_InitialiseServiceTransformers(launcher->transformationServicesHandler);
 
-    // Java: this.launchPlugins.offerScanResultsToPlugins(gameContents)
+// Java: this.launchPlugins.offerScanResultsToPlugins(gameContents)
     LIBMATTI_ML_LaunchPluginHandler_OfferScanResultsToPlugins(launcher->launchPlugins, gameContents, gameContentCount);
 
-    // Java: this.launchService.validateLaunchTarget(this.argumentHandler)
+// Java: this.launchService.validateLaunchTarget(this.argumentHandler)
     int ran = LIBMATTI_ML_LaunchServiceHandler_ValidateLaunchTarget(launcher->launchService,
                                                                     launcher->argumentHandler);
-    // The game's exit status (Java: the JVM carries it out of main); 0 until the launch ran.
+// The game's exit status (Java: the JVM carries it out of main); 0 until the launch ran.
     int exitCode = 0;
 
     if (ran)
     {
-        // Java: this.classLoader = this.transformationServicesHandler.buildTransformingClassLoader(...)
+// Java: this.classLoader = this.transformationServicesHandler.buildTransformingClassLoader(...)
         launcher->classLoader = LIBMATTI_ML_TransformationServicesHandler_BuildTransformingClassLoader(
             launcher->transformationServicesHandler, launcher->launchPlugins, launcher->environment,
             launcher->moduleLayerHandler);
 
-        // Java: Thread.currentThread().setContextClassLoader(this.classLoader) - no C equivalent
+// Java: Thread.currentThread().setContextClassLoader(this.classLoader) - no C equivalent
 
-        // Java: this.launchService.launch(this.argumentHandler,
+// Java: this.launchService.launch(this.argumentHandler,
         //         this.moduleLayerHandler.getLayer(Layer.GAME).orElseThrow(), this.classLoader, this.launchPlugins)
         LIBMATTI_JL_ModuleLayer *gameLayer =
             LIBMATTI_ML_ModuleLayerHandler_GetLayer(launcher->moduleLayerHandler, LIBMATTI_MLA_LAYER_GAME);
@@ -426,7 +431,7 @@ LIBMATTI_MLA_ILaunchHandlerService *LIBMATTI_ML_Launcher_FindLaunchHandler(LIBMA
 // Java: public Optional<IModuleLayerManager> findLayerManager()
 LIBMATTI_MLA_IModuleLayerManager *LIBMATTI_ML_Launcher_FindLayerManager(LIBMATTI_ML_Launcher *launcher)
 {
-    // Java: Optional.ofNullable(this.moduleLayerHandler)
+// Java: Optional.ofNullable(this.moduleLayerHandler)
     return (LIBMATTI_MLA_IModuleLayerManager *)launcher->moduleLayerHandler;
 }
 
@@ -436,8 +441,9 @@ void LIBMATTI_ML_Launcher_Free(LIBMATTI_ML_Launcher *launcher)
 
     if (LIBMATTI_ML_Launcher_INSTANCE == launcher) LIBMATTI_ML_Launcher_INSTANCE = NULL;
 
-    // Java has no teardown for the launcher; the owned components are released
-    // in creation order.
+
+
+
     LIBMATTI_ML_LaunchPluginHandler_Free(launcher->launchPlugins);
     LIBMATTI_ML_ArgumentHandler_Free(launcher->argumentHandler);
     LIBMATTI_ML_TransformationServicesHandler_Free(launcher->transformationServicesHandler);

@@ -1,4 +1,5 @@
-// Port of com.electronwill.nightconfig.core.Config.
+
+
 
 #include "libmatti/com/electronwill/nightconfig/core/Config.h"
 
@@ -187,7 +188,7 @@ LIBMATTI_NC_Value *LIBMATTI_NC_Config_Get(const LIBMATTI_NC_Config *config, cons
         }
         else
         {
-            // Java: Arrays of tables resolve to their last element
+// Java: Arrays of tables resolve to their last element
             LIBMATTI_NC_Value *last = LIBMATTI_NC_Value_LastOfList(value);
             if (last == NULL || last->type != LIBMATTI_NC_VALUE_CONFIG) return NULL;
             current = last->config;
@@ -246,7 +247,7 @@ LIBMATTI_NC_Value *LIBMATTI_NC_Config_Set(LIBMATTI_NC_Config *config, const char
             continue;
         }
 
-        // Java: MERGE removes an incompatible intermediary level and sets a sub config instead
+// Java: MERGE removes an incompatible intermediary level and sets a sub config instead
         if (existing != NULL) LIBMATTI_NC_Value_Free(existing);
 
         LIBMATTI_NC_Value subConfig = LIBMATTI_NC_Value_OfConfig(LIBMATTI_NC_Config_CreateSubConfig(current));

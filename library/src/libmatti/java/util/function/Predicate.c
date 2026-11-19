@@ -1,4 +1,5 @@
-// Port of java.util.function.Predicate.
+
+
 
 #include "libmatti/java/util/function/Predicate.h"
 

@@ -9,7 +9,7 @@
 LIBMATTI_B3D_GpuBuffer *LIBMATTI_B3D_GlBuffer_New(int usage, long size)
 {
     LIBMATTI_B3D_GpuBuffer *buffer = LIBMATTI_B3D_GpuBuffer_New(usage, size);
-    // Java: this.handle = dsa.createBuffer(...); GlStateManager._glBindBuffer +
+// Java: this.handle = dsa.createBuffer(...); GlStateManager._glBindBuffer +
     // _glBufferData with the size for the pre-allocation.
     buffer->handle = LIBMATTI_B3D_GlStateManager_GenBuffers();
     LIBMATTI_B3D_GlStateManager_BindBuffer(LIBMATTI_GL_GL_ARRAY_BUFFER, buffer->handle);
@@ -32,7 +32,7 @@ void LIBMATTI_B3D_GlBuffer_Free(LIBMATTI_B3D_GpuBuffer *buffer)
 {
     if (buffer == NULL)
         return;
-    // Java: public void close() in GlBuffer - identical to the base port path.
+// Java: public void close() in GlBuffer - identical to the base port path.
     if (!buffer->closed)
     {
         buffer->closed = 1;
@@ -50,11 +50,11 @@ void *LIBMATTI_B3D_GlBuffer_MapRead(LIBMATTI_B3D_GpuBuffer *buffer)
 {
     if (buffer == NULL || buffer->closed)
         return NULL;
-    // Java: dsa.mapBuffer(handle, usage) with MAP_READ - the port maps the
+// Java: dsa.mapBuffer(handle, usage) with MAP_READ - the port maps the
     // whole buffer through GlStateManager (target ARRAY_BUFFER like GlDevice).
     LIBMATTI_B3D_GlStateManager_BindBuffer(LIBMATTI_GL_GL_ARRAY_BUFFER, buffer->handle);
     buffer->persistentBuffer = LIBMATTI_B3D_GlStateManager_MapBufferRange(
-        LIBMATTI_GL_GL_ARRAY_BUFFER, 0, buffer->size, 0x0001 /* GL_MAP_READ_BIT */);
+        LIBMATTI_GL_GL_ARRAY_BUFFER, 0, buffer->size, 0x0001  );
     LIBMATTI_B3D_GlStateManager_BindBuffer(LIBMATTI_GL_GL_ARRAY_BUFFER, 0);
     return buffer->persistentBuffer;
 }

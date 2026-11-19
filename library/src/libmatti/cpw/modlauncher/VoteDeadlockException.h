@@ -1,4 +1,5 @@
-// Port of cpw.mods.modlauncher.VoteDeadlockException.
+
+
 
 #ifndef MATTICRAFT_MODLAUNCHER_VOTEDEADLOCKEXCEPTION_H
 #define MATTICRAFT_MODLAUNCHER_VOTEDEADLOCKEXCEPTION_H
@@ -15,4 +16,4 @@ typedef struct
     const char *nodeType;
 } LIBMATTI_ML_VoteDeadlockException;
 
-#endif //MATTICRAFT_MODLAUNCHER_VOTEDEADLOCKEXCEPTION_H
+#endif

@@ -1,4 +1,5 @@
-// Port of cpw.mods.modlauncher.TransformerClassWriter.
+
+
 
 #ifndef MATTICRAFT_MODLAUNCHER_TRANSFORMERCLASSWRITER_H
 #define MATTICRAFT_MODLAUNCHER_TRANSFORMERCLASSWRITER_H
@@ -22,4 +23,4 @@ void LIBMATTI_ML_TransformerClassWriter_ComputeHierarchyForClassNode(LIBMATTI_ML
 void LIBMATTI_ML_TransformerClassWriter_ComputeHierarchy(LIBMATTI_ML_ClassTransformer *classTransformer,
                                                          const char *className);
 
-#endif //MATTICRAFT_MODLAUNCHER_TRANSFORMERCLASSWRITER_H
+#endif

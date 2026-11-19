@@ -126,7 +126,8 @@ pub(crate) fn write_json_atomic<T: serde::Serialize>(
     let bytes = serde_json::to_vec_pretty(value)?;
     std::fs::write(&tmp, bytes)?;
     if path.exists() {
-        // Windows cannot rename over an existing file.
+
+
         std::fs::remove_file(path)?;
     }
     std::fs::rename(&tmp, path)?;

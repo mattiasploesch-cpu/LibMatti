@@ -1,4 +1,5 @@
-// Port of cpw.mods.cl.UnionURLStreamHandler (ModularURLHandler.IURLProvider).
+
+
 
 #ifndef MATTICRAFT_UNIONURLSTREAMHANDLER_H
 #define MATTICRAFT_UNIONURLSTREAMHANDLER_H
@@ -21,4 +22,4 @@ long LIBMATTI_CL_UnionURLStreamHandler_GetContentLength(LIBMATTI_CL_URL *url);
 // The IURLProvider instance for the union protocol (Java: static unionHandler)
 LIBMATTI_CL_IURLProvider *LIBMATTI_CL_UnionURLStreamHandler_GetProvider(void);
 
-#endif //MATTICRAFT_UNIONURLSTREAMHANDLER_H
+#endif
