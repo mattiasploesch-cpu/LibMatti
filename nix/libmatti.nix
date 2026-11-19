@@ -19,6 +19,7 @@ stdenv.mkDerivation (finalAttrs: {
   pname = "libmatti";
   version = "0.1.0";
   inherit src;
+  outputs = [ "out" "dev" ];
 
   nativeBuildInputs = [ cmake ninja pkg-config rustc cargo ];
   buildInputs = [ zlib sdl3 vulkan-loader vulkan-headers ];
@@ -44,7 +45,7 @@ stdenv.mkDerivation (finalAttrs: {
   installPhase = ''
     runHook preInstall
 
-    mkdir -p "$out/lib" "$out/include/libmatti" "$out/share/doc/matticraft"
+    mkdir -p "$out/lib" "$dev/include/libmatti" "$out/share/doc/matticraft"
     cp library/libmatti.so.0.1.0 "$out/lib/"
     ln -s libmatti.so.0.1.0 "$out/lib/libmatti.so.0"
     ln -s libmatti.so.0 "$out/lib/libmatti.so"
@@ -52,7 +53,7 @@ stdenv.mkDerivation (finalAttrs: {
     (cd "${finalAttrs.src}/library/src/libmatti"
      find . -name '*.h' -print0 |
        while IFS= read -r -d "" header; do
-         install -Dm644 "$header" "$out/include/libmatti/''${header#./}"
+         install -Dm644 "$header" "$dev/include/libmatti/''${header#./}"
        done)
 
     if [ -d "${finalAttrs.src}/library/src/libmatti/matti/ui/assets" ]; then
@@ -75,5 +76,6 @@ stdenv.mkDerivation (finalAttrs: {
     license = licenses.mit;
     platforms = platforms.linux;
     maintainers = [ ];
+    outputsToInstall = [ "out" ];
   };
 })

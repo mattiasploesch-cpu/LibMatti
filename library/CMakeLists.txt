@@ -4,7 +4,7 @@ file(GLOB_RECURSE LIBMATTI_SOURCES
 )
 # The Android Gradle build keeps its CMake cache and compiler probes inside
 # the source tree (src/mobile/matti-kotlin/.cxx); never compile those objects.
-list(FILTER LIBMATTI_SOURCES EXCLUDE REGEX "/\\.cxx/|/CMakeFiles/|/build/")
+list(FILTER LIBMATTI_SOURCES EXCLUDE REGEX "/\\.cxx/|/CMakeFiles/")
 
 # The vendored stb_truetype (used by the LWJGL STBTruetype port) instantiates
 # in exactly one translation unit, like the upstream "easy to use" section says.

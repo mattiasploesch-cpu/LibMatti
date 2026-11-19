@@ -8,6 +8,7 @@ include(MattiPlatform)
 project(Matticraft C)
 
 option(MATTI_MOBILE_ONLY "Build only libmatti for the Android JNI library" OFF)
+option(MATTI_CLIENTS_SHARED "Link client executables against the shared libmatti" OFF)
 
 if(WIN32 AND CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
     include_directories(BEFORE "${CMAKE_SOURCE_DIR}/cmake/compat/mingw")
@@ -70,9 +71,13 @@ endif()
 # phase is skipped via --no-tests, so no harness binary is needed.
 add_executable(runClient)
 
-target_link_libraries(runClient PRIVATE
-        $<LINK_LIBRARY:WHOLE_ARCHIVE,matti> matti_rust
-)
+if(MATTI_CLIENTS_SHARED)
+    target_link_libraries(runClient PRIVATE matti_shared)
+else()
+    target_link_libraries(runClient PRIVATE
+            $<LINK_LIBRARY:WHOLE_ARCHIVE,matti> matti_rust
+    )
+endif()
 target_sources(runClient PRIVATE
         client/src/main.c
         client/src/selftest.c
@@ -97,9 +102,13 @@ matti_embed_rust_artifacts(runClient matti_rust ".matti_rust")
 
 add_executable(vulkanClient)
 
-target_link_libraries(vulkanClient PRIVATE
-        $<LINK_LIBRARY:WHOLE_ARCHIVE,matti> matti_rust
-)
+if(MATTI_CLIENTS_SHARED)
+    target_link_libraries(vulkanClient PRIVATE matti_shared)
+else()
+    target_link_libraries(vulkanClient PRIVATE
+            $<LINK_LIBRARY:WHOLE_ARCHIVE,matti> matti_rust
+    )
+endif()
 target_sources(vulkanClient PRIVATE
         vulkan_client/src/main.c
         vulkan_client/src/demo-service.c

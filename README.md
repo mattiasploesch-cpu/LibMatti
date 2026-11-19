@@ -120,14 +120,20 @@ library installed by the module.
 The flake exposes the standalone library and the client directly from source:
 
 ```bash
-nix build .#libmatti          # libmatti.so* + public headers in ./result
-nix profile install .#libmatti
-nix develop                   # CMake, Rust and the runtime libraries
+nix build .#matticraft        # client binaries in ./result/bin
+nix build .#libmatti          # libmatti.so* in ./result/lib
+nix build .#libmatti-dev      # public headers in ./result/include
 
-# Full game build inside the development shell:
-cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
-cmake --build build --target runClient vulkanClient -j "$(nproc)"
+nix profile install .#matticraft
+nix profile install .#libmatti
+
+nix develop                   # CMake, Rust and the runtime libraries
 ```
+
+`search.nix.org` indexes nixpkgs, not arbitrary flakes. The flake packages work
+immediately; the nixpkgs names are `matticraft`, `libmatti` and the `dev` output
+of `libmatti`. Making them appear on `search.nix.org` therefore requires a
+merged nixpkgs pull request.
 
 `libmatti` is also published as a standalone tarball
 (`libmatti-<version>-linux-<arch>.tar.zst`) next to the AppImage, deb and rpm.

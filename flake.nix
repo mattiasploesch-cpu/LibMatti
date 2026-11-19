@@ -31,7 +31,15 @@
             src = self;
             inherit stbTruetype stbImage monocraft;
           };
-          default = self.packages.${system}.libmatti;
+          libmatti-dev = pkgs.runCommand "libmatti-0.1.0-dev" { } ''
+            mkdir -p "$out"
+            cp -a ${self.packages.${system}.libmatti.dev}/. "$out/"
+          '';
+          matticraft = pkgs.callPackage ./nix/matticraft.nix {
+            src = self;
+            inherit stbTruetype stbImage monocraft;
+          };
+          default = self.packages.${system}.matticraft;
         });
 
       devShells = forAllSystems (system: pkgs: {
