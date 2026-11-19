@@ -18,9 +18,21 @@ import sys
 
 # kind, platform, arch matchers applied to the file name (first match wins).
 RULES = [
+    # Current release names: Matticraft-<version>-<platform>-<arch>.<ext>
+    (re.compile(r"^Matticraft-.+-linux-(?P<arch>x86_64|aarch64)\.AppImage$"), "linux", "appimage"),
+    (re.compile(r"^Matticraft-.+-linux-(?P<arch>x86_64|aarch64)\.deb$"), "linux", "deb"),
+    (re.compile(r"^Matticraft-.+-linux-(?P<arch>x86_64|aarch64)\.rpm$"), "linux", "rpm"),
+    (re.compile(r"^Matticraft-.+-linux-(?P<arch>x86_64|aarch64)\.tar\.zst$"), "linux", "tar.zst"),
+    # The standalone SDK archive is intentionally not a game update artifact.
+    (re.compile(r"^libmatti-.+-linux-(?P<arch>x86_64|aarch64)\.tar\.zst$"), "linux", "lib"),
+    (re.compile(r"^Matticraft-.+-macos-(?P<arch>arm64|x86_64)\.dmg$"), "macos", "dmg"),
+    (re.compile(r"^Matticraft-.+-macos-(?P<arch>arm64|x86_64)\.zip$"), "macos", "zip"),
+    (re.compile(r"^Matticraft-.+-windows-(?P<arch>x64|x86|arm64)\.msi$"), "windows", "msi"),
+    (re.compile(r"^Matticraft-.+-android\.apk$"), "android", "apk"),
+    (re.compile(r"^Matticraft-.+-android\.aab$"), "android", "aab"),
+    # Legacy names kept for older release directories.
     (re.compile(r"^matticraft_.+_(?P<arch>amd64|arm64|386|armhf)\.deb$"), "linux", "deb"),
     (re.compile(r"^matticraft-(?P<arch>[^.]+)\.rpm$"), "linux", "rpm"),
-    (re.compile(r"^Matticraft-.+-(?P<arch>x86_64|aarch64)\.AppImage$"), "linux", "appimage"),
     (re.compile(r"^org\.matticraft\.Matticraft.*\.flatpak$"), "linux", "flatpak"),
     (re.compile(r"^matticraft-.+-linux-(?P<arch>[^.]+)\.tar\.zst$"), "linux", "tar.zst"),
     (re.compile(r"^matticraft-.+-freebsd-(?P<arch>[^.]+)\.tar\.zst$"), "freebsd", "tar.zst"),
@@ -65,9 +77,7 @@ def classify(name):
         match = pattern.match(name)
         if match:
             arch = normalize_arch(match.groupdict().get("arch"))
-            if kind in ("dmg", "pkg", "aab", "flatpak"):
-                arch = "any"
-            elif kind == "msi":
+            if kind == "msi":
                 arch = "x86_64"
             return platform, arch, kind
     return None

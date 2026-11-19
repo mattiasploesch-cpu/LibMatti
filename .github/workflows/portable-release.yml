@@ -89,6 +89,7 @@ jobs:
       - name: Portable + system packages + AppImage
         run: |
           BUILD_DIR=build/linux-x64 VERSION="$MATTI_VERSION" packaging/linux/portable.sh
+          BUILD_DIR=build/linux-x64 VERSION="$MATTI_VERSION" packaging/linux/libmatti.sh
           BUILD_DIR=build/linux-x64 VERSION="$MATTI_VERSION" packaging/linux/nfpm.sh
           BUILD_DIR=build/linux-x64 VERSION="$MATTI_VERSION" packaging/linux/appimage.sh
       - uses: actions/upload-artifact@v4
@@ -277,10 +278,15 @@ jobs:
               exit 1
             fi
           done
-          (cd dist && sha256sum * > SHA256SUMS)
-          cat > dist/latest.json <<EOF
-          {"version":"$RELEASE_VERSION","channel":"$MATTI_CHANNEL","commit":"$GITHUB_SHA","artifacts":[]}
-          EOF
+          MATTI_RELEASED_AT="$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+            python3 tools/make_update_manifest.py \
+              --dist dist \
+              --version "$RELEASE_VERSION" \
+              --channel "$MATTI_CHANNEL" \
+              --base-url "https://github.com/${GITHUB_REPOSITORY}/releases/download/v${RELEASE_VERSION}" \
+              --out dist/latest.json
+          (cd dist && find . -maxdepth 1 -type f ! -name SHA256SUMS -printf '%f\n' |
+            sort | xargs sha256sum > SHA256SUMS)
       - name: Remove stale release assets
         env:
           GH_TOKEN: ${{ github.token }}

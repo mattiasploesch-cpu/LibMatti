@@ -115,6 +115,28 @@ CMake adds the Home Manager profile (`~/.nix-profile`) to `CMAKE_PREFIX_PATH`
 itself, so `find_package(ZLIB)` and the configure checks find the headers and
 library installed by the module.
 
+### NixOS flake (no AppImage needed)
+
+The flake exposes the standalone library and the client directly from source:
+
+```bash
+nix build .#libmatti          # libmatti.so* + public headers in ./result
+nix profile install .#libmatti
+nix develop                   # CMake, Rust and the runtime libraries
+
+# Full game build inside the development shell:
+cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
+cmake --build build --target runClient vulkanClient -j "$(nproc)"
+```
+
+`libmatti` is also published as a standalone tarball
+(`libmatti-<version>-linux-<arch>.tar.zst`) next to the AppImage, deb and rpm.
+Install it into `/usr/local` with:
+
+```bash
+tar --zstd -xf libmatti-0.1.0-linux-x86_64.tar.zst -C /usr/local
+```
+
 ### Run configurations (CLion)
 
 The project ships ready-made run configurations (`.idea/runConfigurations/`):
