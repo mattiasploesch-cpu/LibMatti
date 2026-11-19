@@ -279,6 +279,35 @@ jobs:
           cat > dist/latest.json <<EOF
           {"version":"$RELEASE_VERSION","channel":"$MATTI_CHANNEL","commit":"$GITHUB_SHA","artifacts":[]}
           EOF
+      - name: Remove stale release assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag="v${RELEASE_VERSION}"
+          # Old draft releases with this tag are leftovers from earlier runs.
+          # Delete them before the uploader runs; otherwise its parallel
+          # uploads race with the stale files and fail with already_exists.
+          gh api --paginate "repos/${GITHUB_REPOSITORY}/releases?per_page=100" \
+            --jq ".[] | select(.tag_name == \"${tag}\" and .draft) | .id" |
+          while read -r id; do
+            if [ -n "$id" ]; then
+              gh api -X DELETE "repos/${GITHUB_REPOSITORY}/releases/${id}"
+            fi
+          done
+          # A published release is kept, but its old assets are removed so
+          # the upload sees no stale PNG/TTF/Mach-O files or duplicate archives.
+          gh api --paginate "repos/${GITHUB_REPOSITORY}/releases?per_page=100" \
+            --jq ".[] | select(.tag_name == \"${tag}\" and (.draft | not)) | .id" |
+          while read -r id; do
+            [ -z "$id" ] && continue
+            gh api --paginate "repos/${GITHUB_REPOSITORY}/releases/${id}/assets?per_page=100" \
+              --jq '.[].id' |
+            while read -r asset; do
+              if [ -n "$asset" ]; then
+                gh api -X DELETE "repos/${GITHUB_REPOSITORY}/releases/assets/${asset}"
+              fi
+            done
+          done
       - uses: softprops/action-gh-release@v2
         with:
           draft: ${{ inputs.draft }}
