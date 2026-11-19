@@ -25,10 +25,17 @@ fi
 DESTDIR="$STAGE" cmake --install "$BUILD_DIR" --prefix /usr
 mkdir -p "$DIST"
 
-export ARCH VERSION PACKAGE_STAGE="$STAGE"
-nfpm package --config "$ROOT/packaging/linux/nfpm.yaml" --packager deb \
+# nfpm does not expand environment variables inside contents.src. Render the
+# staging path into a temporary config so the globs point at the install tree.
+CONFIG="$STAGE/nfpm.yaml"
+sed -e "s|\${PACKAGE_STAGE}|$STAGE|g" \
+    -e "s|\${ARCH}|$ARCH|g" \
+    -e "s|\${VERSION}|$VERSION|g" \
+    "$ROOT/packaging/linux/nfpm.yaml" > "$CONFIG"
+
+nfpm package --config "$CONFIG" --packager deb \
     --target "$DIST/matticraft_${VERSION}_${ARCH}.deb"
-nfpm package --config "$ROOT/packaging/linux/nfpm.yaml" --packager rpm \
+nfpm package --config "$CONFIG" --packager rpm \
     --target "$DIST/matticraft-${VERSION}.${ARCH}.rpm"
 
 ( cd "$DIST" && sha256sum matticraft_"${VERSION}"_"${ARCH}".deb matticraft-"${VERSION}"."${ARCH}".rpm > SHA256SUMS.packages )

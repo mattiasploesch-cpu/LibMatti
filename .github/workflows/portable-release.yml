@@ -123,7 +123,7 @@ jobs:
           if-no-files-found: error
 
   macos:
-    runs-on: macos-14
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
         with:
@@ -176,6 +176,9 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: "8.10.2"
+          # The vendor submodules ship unrelated historical wrapper JARs;
+          # this job runs the pinned Gradle distribution, not those wrappers.
+          validate-wrappers: false
       - name: Build APK and AAB
         env:
           ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
