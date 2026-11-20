@@ -60,6 +60,15 @@ if [ -s "$list_file" ]; then
     done < "$list_file"
 fi
 
+# The metadata is mandatory for the catalog; restore it from the package.
+objcopy -O binary --only-section=.matti_metadata "$file" "$tmp/metadata" 2>/dev/null || true
+if [ -s "$tmp/metadata" ]; then
+    cp "$tmp/metadata" "$target/metadata.matti"
+else
+    printf '{\n  "schema": 1,\n  "id": "%s",\n  "name": "%s",\n  "version": "%s",\n  "required": true\n}\n' \
+        "$mod_id" "$mod_id" "$mod_version" > "$target/metadata.matti"
+fi
+
 # The CMake file (fallback: a generated one when the MDK did not embed it).
 objcopy -O binary --only-section=matti_cmake "$file" "$tmp/cmake" 2>/dev/null || true
 if [ -s "$tmp/cmake" ]; then

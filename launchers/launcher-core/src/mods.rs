@@ -24,6 +24,10 @@ pub struct ModEntry {
     pub name: String,
     #[serde(default)]
     pub version: String,
+    #[serde(default)]
+    pub author: String,
+    #[serde(default)]
+    pub description: String,
     pub file: String,
     pub sha256: String,
     #[serde(default)]
@@ -141,14 +145,36 @@ pub fn build_manifest(dir: &Path) -> Result<ModManifest> {
     let mods = installed
         .into_iter()
         .map(|file| {
-            let id = Path::new(&file.file)
+            let path = dir.join(&file.file);
+            let metadata = crate::metadata::read_package(&path).ok();
+            let fallback_id = Path::new(&file.file)
                 .file_stem()
                 .map(|stem| stem.to_string_lossy().to_string())
                 .unwrap_or_else(|| file.file.clone());
+            let id = metadata
+                .as_ref()
+                .map(|metadata| metadata.id.clone())
+                .filter(|id| !id.is_empty())
+                .unwrap_or(fallback_id);
             ModEntry {
-                name: id.clone(),
+                name: metadata
+                    .as_ref()
+                    .map(|metadata| metadata.name.clone())
+                    .filter(|name| !name.is_empty())
+                    .unwrap_or_else(|| id.clone()),
                 id,
-                version: String::new(),
+                version: metadata
+                    .as_ref()
+                    .map(|metadata| metadata.version.clone())
+                    .unwrap_or_default(),
+                author: metadata
+                    .as_ref()
+                    .map(|metadata| metadata.author.clone())
+                    .unwrap_or_default(),
+                description: metadata
+                    .as_ref()
+                    .map(|metadata| metadata.description.clone())
+                    .unwrap_or_default(),
                 file: file.file,
                 sha256: file.sha256,
                 required: true,
@@ -286,6 +312,8 @@ mod tests {
                 id: "bad".into(),
                 name: "bad".into(),
                 version: String::new(),
+                author: String::new(),
+                description: String::new(),
                 file: "../evil.so".into(),
                 sha256: String::new(),
                 required: true,

@@ -22,6 +22,7 @@ upload = ["launcher-core/upload"]
 launcher-core.workspace = true
 egui.workspace = true
 eframe = { version = "0.31.1", default-features = false, features = ["glow", "default_fonts", "accesskit"] }
+image = { version = "0.25", default-features = false, features = ["jpeg", "png"] }
 
 [target.'cfg(any(target_os = "linux", target_os = "freebsd"))'.dependencies]
 eframe = { version = "0.31.1", default-features = false, features = ["glow", "default_fonts", "accesskit", "x11", "wayland"] }

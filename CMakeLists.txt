@@ -36,6 +36,13 @@ find_package(Threads REQUIRED)
 
 enable_testing()
 
+file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
+function(matti_copy_bin target)
+    add_custom_command(TARGET ${target} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy "$<TARGET_FILE:${target}>" "${CMAKE_BINARY_DIR}/bin/"
+            VERBATIM)
+endfunction()
+
 add_subdirectory(library)
 
 if(NOT MATTI_MOBILE_ONLY)
@@ -140,6 +147,9 @@ if(UNIX)
         add_dependencies(runClient vulkanClient demo_app demo_lib build_mods)
     endif()
 endif()
+
+matti_copy_bin(runClient)
+matti_copy_bin(vulkanClient)
 
 # Install rules used by packaging/ (tar.zst, deb, rpm, AppImage, Flatpak, MSI,
 # DMG/PKG). Assets are embedded in the binaries, so the staging tree only

@@ -33,6 +33,7 @@ target_compile_definitions(matticraft PRIVATE
 set_target_properties(matticraft PROPERTIES
         ENABLE_EXPORTS ON
 )
+matti_copy_bin(matticraft)
 
 # Ship the native libraries inside the binary: only glibc comes from the host.
 if(COMMAND matti_embed_native_bundle)

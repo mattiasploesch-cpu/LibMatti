@@ -21,6 +21,7 @@ pub struct LaunchOptions {
     pub once: bool,
     /// Screen to start on: main, options, pause or world (QA runs).
     pub screen: String,
+    pub server: String,
 }
 
 /// `auto` and empty both mean "let the platform decide".
@@ -119,6 +120,7 @@ impl LaunchOptions {
             fullscreen: false,
             once: false,
             screen: "main".to_string(),
+            server: String::new(),
         };
 
         let mut index = 1;
@@ -154,6 +156,12 @@ impl LaunchOptions {
                 "--ui-screen" => {
                     if let Some(screen) = take_value(inline, &mut index) {
                         options.screen = screen;
+                    }
+                }
+                "--server" => {
+                    if let Some(server) = take_value(inline, &mut index) {
+                        options.server = server;
+                        options.screen = "world".to_string();
                     }
                 }
                 "--layer" => {
