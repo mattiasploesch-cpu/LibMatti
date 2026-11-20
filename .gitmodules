@@ -68,3 +68,6 @@
 [submodule "vendor/horizon"]
 	path = vendor/horizon
 	url = https://github.com/horizon-rust/horizon.git
+[submodule "vendor/noriskclient-launcher"]
+	path = vendor/noriskclient-launcher
+	url = https://github.com/NoRiskClient/noriskclient-launcher.git
