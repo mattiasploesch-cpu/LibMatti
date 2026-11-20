@@ -204,7 +204,7 @@ fn find_resource(name: &str) -> Option<PathBuf> {
             dir.join("..")
                 .join("..")
                 .join("..")
-                .join("vendor/FancyModLoader/earlydisplay/src/main/resources/net/neoforged/fml/earlydisplay/theme/Monocraft.ttf"),
+                .join("library/src/libmatti/matti/ui/Monocraft.ttf"),
         );
     }
     candidates

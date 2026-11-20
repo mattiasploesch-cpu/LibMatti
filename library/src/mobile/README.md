@@ -8,9 +8,11 @@ Android project for the one `libmatti` library.
 - `mobile_client/` — Compose launcher that starts the client through
   `LibMatti.run(...)`.
 
-Status: scaffold for milestone M2 (see `planported.MD`). The Gradle build is
-not wired into the desktop CMake build yet; `libmatti_jni.c` and
-`MainActivity.kt` compile once the NDK/Compose toolchains are installed.
+Status: the launcher is portrait-first; Play starts `GameActivity`, which owns a
+landscape `SurfaceView`. `libmatti_jni.c` hands that surface to the Android EGL/
+GLES3 renderer, and the launcher's Material 3 settings are stored in the same
+`profile.json` shape as the desktop launcher. The Gradle build is not wired into
+the desktop CMake build yet; the NDK/Compose toolchains are supplied by CI.
 
 Build (after installing the Android SDK/NDK):
 

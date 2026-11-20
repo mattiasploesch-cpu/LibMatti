@@ -9,6 +9,7 @@
 //! tested headlessly on the CI hosts.
 
 pub mod account;
+pub mod game;
 pub mod launch;
 pub mod logs;
 pub mod mods;
@@ -18,6 +19,7 @@ pub mod store;
 pub mod update;
 
 pub use account::{Account, AccountKind};
+pub use game::GameRelease;
 pub use launch::{LaunchPlan, LaunchStatus};
 pub use profile::{parse_selection, Profile, PRESETS};
 pub use store::{Settings, Store};

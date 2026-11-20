@@ -8,6 +8,7 @@ include(MattiPlatform)
 project(Matticraft C)
 
 option(MATTI_MOBILE_ONLY "Build only libmatti for the Android JNI library" OFF)
+option(MATTI_CLIENTS_SHARED "Link client executables against the shared libmatti" OFF)
 
 if(WIN32 AND CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
     include_directories(BEFORE "${CMAKE_SOURCE_DIR}/cmake/compat/mingw")
@@ -42,9 +43,9 @@ add_subdirectory(client)
 add_subdirectory(vulkan_client)
 
 # The test fixtures and mods use ELF sections (objcopy/ELF section injection),
-# which Mach-O cannot represent. The macOS release still builds the game and
-# launcher; only the ELF-only development targets are omitted there.
-if(NOT APPLE)
+# which neither Mach-O nor COFF can represent. Release builds still build the
+# game and launcher; only the ELF-only development targets are omitted.
+if(UNIX AND NOT APPLE)
     add_subdirectory(tests)
 
     # The mods are a separate project: they only include the library headers, the
@@ -70,9 +71,13 @@ endif()
 # phase is skipped via --no-tests, so no harness binary is needed.
 add_executable(runClient)
 
-target_link_libraries(runClient PRIVATE
-        $<LINK_LIBRARY:WHOLE_ARCHIVE,matti> matti_rust
-)
+if(MATTI_CLIENTS_SHARED)
+    target_link_libraries(runClient PRIVATE matti_shared)
+else()
+    target_link_libraries(runClient PRIVATE
+            $<LINK_LIBRARY:WHOLE_ARCHIVE,matti> matti_rust
+    )
+endif()
 target_sources(runClient PRIVATE
         client/src/main.c
         client/src/selftest.c
@@ -97,9 +102,13 @@ matti_embed_rust_artifacts(runClient matti_rust ".matti_rust")
 
 add_executable(vulkanClient)
 
-target_link_libraries(vulkanClient PRIVATE
-        $<LINK_LIBRARY:WHOLE_ARCHIVE,matti> matti_rust
-)
+if(MATTI_CLIENTS_SHARED)
+    target_link_libraries(vulkanClient PRIVATE matti_shared)
+else()
+    target_link_libraries(vulkanClient PRIVATE
+            $<LINK_LIBRARY:WHOLE_ARCHIVE,matti> matti_rust
+    )
+endif()
 target_sources(vulkanClient PRIVATE
         vulkan_client/src/main.c
         vulkan_client/src/demo-service.c
@@ -122,11 +131,14 @@ matti_embed_native_bundle(vulkanClient)
 matti_embed_ui_assets(vulkanClient)
 matti_embed_rust_artifacts(vulkanClient matti_rust ".matti_rust")
 
-# The demo mods come with the client. build_mods is ELF-only.
-if(APPLE)
-    add_dependencies(runClient vulkanClient demo_app demo_lib)
-else()
-    add_dependencies(runClient vulkanClient demo_app demo_lib build_mods)
+# The demo mods come with the client. build_mods and the fixtures are
+# ELF-only development artifacts; Windows release builds ship the client alone.
+if(UNIX)
+    if(APPLE)
+        add_dependencies(runClient vulkanClient demo_app demo_lib)
+    else()
+        add_dependencies(runClient vulkanClient demo_app demo_lib build_mods)
+    endif()
 endif()
 
 # Install rules used by packaging/ (tar.zst, deb, rpm, AppImage, Flatpak, MSI,
@@ -139,7 +151,7 @@ if(CMAKE_INSTALL_LIBDIR MATCHES "lib64")
 endif()
 # Keep the documentation path identical to the package recipes.
 set(CMAKE_INSTALL_DOCDIR "share/doc/matticraft")
-install(TARGETS runClient vulkanClient vulkancraft
+install(TARGETS matticraft runClient vulkanClient vulkancraft
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 install(TARGETS matti_shared
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
@@ -155,7 +167,7 @@ install(FILES README.md planported.MD DESTINATION ${CMAKE_INSTALL_DOCDIR})
 install(DIRECTORY library/src/libmatti/matti/ui/assets/
         DESTINATION ${CMAKE_INSTALL_DATADIR}/matticraft/assets)
 install(FILES
-        vendor/FancyModLoader/earlydisplay/src/main/resources/net/neoforged/fml/earlydisplay/theme/Monocraft.ttf
+        library/src/libmatti/matti/ui/Monocraft.ttf
         DESTINATION ${CMAKE_INSTALL_DATADIR}/matticraft)
 
 # Launcher (Rust/egui) and its desktop entry. The library and the game are

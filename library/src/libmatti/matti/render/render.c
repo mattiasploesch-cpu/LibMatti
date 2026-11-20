@@ -158,6 +158,8 @@ LIBMATTI_RenderBackendKind LIBMATTI_Render_BackendFromName(const char *name)
 {
     if (name == NULL || name[0] == '\0' || strcasecmp(name, "auto") == 0)
         return LIBMATTI_RENDER_BACKEND_AUTO;
+    if (strcasecmp(name, "android") == 0)
+        return LIBMATTI_RENDER_BACKEND_ANDROID;
     if (strcasecmp(name, "opengl") == 0 || strcasecmp(name, "gl") == 0)
         return LIBMATTI_RENDER_BACKEND_OPENGL;
     if (strcasecmp(name, "vulkan") == 0 || strcasecmp(name, "vk") == 0)
@@ -172,6 +174,7 @@ const char *LIBMATTI_Render_BackendName(LIBMATTI_RenderBackendKind backend)
     switch (backend)
     {
         case LIBMATTI_RENDER_BACKEND_AUTO: return "auto";
+        case LIBMATTI_RENDER_BACKEND_ANDROID: return "android";
         case LIBMATTI_RENDER_BACKEND_OPENGL: return "opengl";
         case LIBMATTI_RENDER_BACKEND_VULKAN: return "vulkan";
         case LIBMATTI_RENDER_BACKEND_SDL3: return "sdl3";
@@ -183,6 +186,7 @@ static const LIBMATTI_RenderBackendOps *ops_for(LIBMATTI_RenderBackendKind backe
 {
     switch (backend)
     {
+        case LIBMATTI_RENDER_BACKEND_ANDROID: return LIBMATTI_Render_AndroidOps();
         case LIBMATTI_RENDER_BACKEND_OPENGL: return LIBMATTI_Render_OpenGLOps();
         case LIBMATTI_RENDER_BACKEND_VULKAN: return LIBMATTI_Render_VulkanOps();
         case LIBMATTI_RENDER_BACKEND_SDL3: return LIBMATTI_Render_SDL3Ops();
@@ -202,7 +206,8 @@ const char *LIBMATTI_Render_AvailableBackends(void)
 {
     static char available[96];
     available[0] = '\0';
-    const LIBMATTI_RenderBackendKind order[] = {LIBMATTI_RENDER_BACKEND_OPENGL,
+    const LIBMATTI_RenderBackendKind order[] = {LIBMATTI_RENDER_BACKEND_ANDROID,
+                                                 LIBMATTI_RENDER_BACKEND_OPENGL,
                                                  LIBMATTI_RENDER_BACKEND_VULKAN,
                                                  LIBMATTI_RENDER_BACKEND_SDL3};
     for (size_t i = 0; i < sizeof(order) / sizeof(order[0]); i++)
@@ -263,7 +268,8 @@ LIBMATTI_Renderer *LIBMATTI_Render_Init(LIBMATTI_RenderBackendKind backend,
     const LIBMATTI_RenderBackendOps *ops = NULL;
     if (backend == LIBMATTI_RENDER_BACKEND_AUTO)
     {
-        const LIBMATTI_RenderBackendKind order[] = {LIBMATTI_RENDER_BACKEND_OPENGL,
+        const LIBMATTI_RenderBackendKind order[] = {LIBMATTI_RENDER_BACKEND_ANDROID,
+                                                     LIBMATTI_RENDER_BACKEND_OPENGL,
                                                      LIBMATTI_RENDER_BACKEND_SDL3,
                                                      LIBMATTI_RENDER_BACKEND_VULKAN};
         for (size_t i = 0; i < sizeof(order) / sizeof(order[0]); i++)
@@ -355,12 +361,21 @@ LIBMATTI_Renderer *LIBMATTI_Render_InitSelection(const LIBMATTI_RenderSelection 
     render_config.api = chosen.api;
 
     LIBMATTI_RenderBackendKind backend = LIBMATTI_RENDER_BACKEND_AUTO;
+#if defined(__ANDROID__)
+    /* Android has no GLFW/SDL window; the Activity owns the SurfaceView and
+     * the EGL backend draws into it. */
+    if (chosen.layer != LIBMATTI_RENDER_LAYER_SDL)
+        backend = LIBMATTI_RENDER_BACKEND_ANDROID;
+    else
+        backend = LIBMATTI_RENDER_BACKEND_SDL3;
+#else
     if (chosen.layer == LIBMATTI_RENDER_LAYER_SDL)
         backend = LIBMATTI_RENDER_BACKEND_SDL3;
     else if (chosen.api == LIBMATTI_RENDER_API_OPENGL)
         backend = LIBMATTI_RENDER_BACKEND_OPENGL;
     else if (chosen.api == LIBMATTI_RENDER_API_VULKAN)
         backend = LIBMATTI_RENDER_BACKEND_VULKAN;
+#endif
 
     LIBMATTI_Renderer *renderer = LIBMATTI_Render_Init(backend, &render_config);
     if (renderer == NULL && backend != LIBMATTI_RENDER_BACKEND_AUTO)

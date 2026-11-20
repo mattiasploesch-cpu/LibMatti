@@ -11,7 +11,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <android/native_window_jni.h>
+
 #include "libmatti/matti/Platform.h"
+#include "libmatti/matti/render/android_surface.h"
 #include "libmatti/matti/ui/bridge.h"
 
 
@@ -71,11 +74,9 @@ Java_dev_matticraft_libmatti_LibMatti_run(JNIEnv *env, jobject self, jobjectArra
 JNIEXPORT void JNICALL
 Java_dev_matticraft_libmatti_LibMatti_setSurface(JNIEnv *env, jobject self, jobject surface)
 {
-    (void) env;
     (void) self;
-    (void) surface;
-
-
+    ANativeWindow *window = surface != NULL ? ANativeWindow_fromSurface(env, surface) : NULL;
+    LIBMATTI_Android_SetSurface(window);
 }
 
 JNIEXPORT void JNICALL
@@ -83,10 +84,7 @@ Java_dev_matticraft_libmatti_LibMatti_resize(JNIEnv *env, jobject self, jint wid
 {
     (void) env;
     (void) self;
-    (void) width;
-    (void) height;
-
-
+    LIBMATTI_Android_SetSize(width, height);
 }
 
 JNIEXPORT void JNICALL
@@ -94,8 +92,7 @@ Java_dev_matticraft_libmatti_LibMatti_pressEscape(JNIEnv *env, jobject self)
 {
     (void) env;
     (void) self;
-
-
+    LIBMATTI_UI_RequestClose();
 }
 
 JNIEXPORT void JNICALL

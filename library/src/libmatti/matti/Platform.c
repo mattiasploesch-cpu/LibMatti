@@ -106,7 +106,7 @@ int LIBMATTI_Platform_SupportsApi(const char *api)
 const char *LIBMATTI_Platform_DefaultRenderer(void)
 {
     if (LIBMATTI_Platform_IsAndroid())
-        return LIBMATTI_Platform_Bits() >= 64 ? "sdl:vulkan" : "sdl:opengl";
+        return "native:opengl";
     if (LIBMATTI_Platform_IsWindows())
         return "sdl:directx";
     if (LIBMATTI_Platform_IsMacOS())

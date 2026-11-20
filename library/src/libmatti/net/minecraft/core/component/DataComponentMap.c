@@ -4,6 +4,7 @@
 #include "libmatti/net/minecraft/core/component/DataComponentMap.h"
 
 #include <stdlib.h>
+#include <sys/types.h>
 
 // Java: DataComponentMap.EMPTY - a shared singleton
 LIBMATTI_MC_DataComponentMap *LIBMATTI_MC_DataComponentMap_Empty(void)

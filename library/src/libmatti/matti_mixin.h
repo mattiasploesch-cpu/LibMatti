@@ -34,6 +34,11 @@ extern "C" {
 
 
 #define MATTI_MIXIN_SECTION ".matti_mixins"
+#if defined(__APPLE__)
+#define MATTI_MIXIN_ATTRIBUTES __attribute__((used, aligned(8)))
+#else
+#define MATTI_MIXIN_ATTRIBUTES __attribute__((used, section(MATTI_MIXIN_SECTION), aligned(8)))
+#endif
 
 // Java: @Inject(at = @At("HEAD")) etc.
 typedef enum
@@ -93,7 +98,7 @@ typedef struct MattiMixinEntry
 // aligned(8) keeps the section a packed array: GCC otherwise aligns every static to its own
 // (larger) boundary, which would leave gaps the collector cannot skip.
 #define MATTI_MIXIN(modId, targetName, handlerFunction, handlerUserdata, atPoint, priorityValue)             \
-    __attribute__((used, section(MATTI_MIXIN_SECTION), aligned(8)))                                          \
+    MATTI_MIXIN_ATTRIBUTES                                                                                  \
     static const MattiMixinEntry MattiMixinEntry_##handlerFunction = {                                       \
         targetName, handlerFunction, handlerUserdata, (atPoint), (priorityValue), modId};
 
@@ -106,7 +111,7 @@ typedef struct MattiMixinEntry
 
 
 #define MATTI_MIXIN_TARGET(targetName, function)                                                             \
-    __attribute__((used, section(MATTI_MIXIN_SECTION), aligned(8)))                                          \
+    MATTI_MIXIN_ATTRIBUTES                                                                                  \
     static const MattiMixinEntry MattiMixinTargetEntry_##function = {                                        \
         targetName, (MattiMixinHandler) (function), NULL, MATTI_MIXIN_AT_HEAD, 0, NULL};
 

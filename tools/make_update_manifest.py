@@ -18,9 +18,24 @@ import sys
 
 # kind, platform, arch matchers applied to the file name (first match wins).
 RULES = [
+    # Current release names: Matticraft-<version>-<platform>-<arch>.<ext>
+    (re.compile(r"^Matticraft-Launcher-.+-linux-(?P<arch>x86_64|aarch64)\.tar\.zst$"), "linux", "launcher"),
+    (re.compile(r"^Matticraft-Launcher-.+-windows-x64\.zip$"), "windows", "launcher"),
+    (re.compile(r"^Matticraft-Launcher-.+-macos-(?P<arch>arm64|x86_64)\.zip$"), "macos", "launcher"),
+    (re.compile(r"^Matticraft-.+-linux-(?P<arch>x86_64|aarch64)\.AppImage$"), "linux", "appimage"),
+    (re.compile(r"^Matticraft-.+-linux-(?P<arch>x86_64|aarch64)\.deb$"), "linux", "deb"),
+    (re.compile(r"^Matticraft-.+-linux-(?P<arch>x86_64|aarch64)\.rpm$"), "linux", "rpm"),
+    (re.compile(r"^Matticraft-.+-linux-(?P<arch>x86_64|aarch64)\.tar\.zst$"), "linux", "tar.zst"),
+    # The standalone SDK archive is intentionally not a game update artifact.
+    (re.compile(r"^libmatti-.+-linux-(?P<arch>x86_64|aarch64)\.tar\.zst$"), "linux", "lib"),
+    (re.compile(r"^Matticraft-.+-macos-(?P<arch>arm64|x86_64)\.dmg$"), "macos", "dmg"),
+    (re.compile(r"^Matticraft-.+-macos-(?P<arch>arm64|x86_64)\.zip$"), "macos", "zip"),
+    (re.compile(r"^Matticraft-.+-windows-(?P<arch>x64|x86|arm64)\.msi$"), "windows", "msi"),
+    (re.compile(r"^Matticraft-.+-android\.apk$"), "android", "apk"),
+    (re.compile(r"^Matticraft-.+-android\.aab$"), "android", "aab"),
+    # Legacy names kept for older release directories.
     (re.compile(r"^matticraft_.+_(?P<arch>amd64|arm64|386|armhf)\.deb$"), "linux", "deb"),
     (re.compile(r"^matticraft-(?P<arch>[^.]+)\.rpm$"), "linux", "rpm"),
-    (re.compile(r"^Matticraft-.+-(?P<arch>x86_64|aarch64)\.AppImage$"), "linux", "appimage"),
     (re.compile(r"^org\.matticraft\.Matticraft.*\.flatpak$"), "linux", "flatpak"),
     (re.compile(r"^matticraft-.+-linux-(?P<arch>[^.]+)\.tar\.zst$"), "linux", "tar.zst"),
     (re.compile(r"^matticraft-.+-freebsd-(?P<arch>[^.]+)\.tar\.zst$"), "freebsd", "tar.zst"),
@@ -65,9 +80,7 @@ def classify(name):
         match = pattern.match(name)
         if match:
             arch = normalize_arch(match.groupdict().get("arch"))
-            if kind in ("dmg", "pkg", "aab", "flatpak"):
-                arch = "any"
-            elif kind == "msi":
+            if kind == "msi":
                 arch = "x86_64"
             return platform, arch, kind
     return None
@@ -80,6 +93,9 @@ def main():
     parser.add_argument("--channel", default="stable")
     parser.add_argument("--base-url", default="")
     parser.add_argument("--notes", default="")
+    parser.add_argument("--patch", default="", help="MATTICRAFTPATCH1 file for the game binary")
+    parser.add_argument("--patch-platform", default="linux")
+    parser.add_argument("--patch-arch", default="x86_64")
     parser.add_argument("--out", default="")
     args = parser.parse_args()
 
@@ -108,6 +124,30 @@ def main():
             "size": os.path.getsize(path),
         })
 
+    patch = None
+    if args.patch:
+        with open(args.patch, "rb") as handle:
+            magic = handle.read(16)
+            if magic != b"MATTICRAFTPATCH1":
+                print(f"not a MATTICRAFTPATCH1 file: {args.patch}", file=sys.stderr)
+                return 1
+            length = int.from_bytes(handle.read(4), "little")
+            header = json.loads(handle.read(length).decode("utf-8"))
+        patch_name = os.path.basename(args.patch)
+        patch = {
+            "platform": args.patch_platform,
+            "arch": normalize_arch(args.patch_arch),
+            "name": patch_name,
+            "fromVersion": header.get("fromVersion", ""),
+            "toVersion": header.get("toVersion", args.version.lstrip("v")),
+            "url": (args.base_url.rstrip("/") + "/" + patch_name) if args.base_url else patch_name,
+            "sha256": sha256(args.patch),
+            "size": os.path.getsize(args.patch),
+            "fromSha256": header["fromSha256"],
+            "toSha256": header["toSha256"],
+            "toSize": header["toSize"],
+        }
+
     manifest = {
         "schema": 1,
         "version": args.version.lstrip("v"),
@@ -115,6 +155,7 @@ def main():
         "released_at": os.environ.get("MATTI_RELEASED_AT", ""),
         "notes": args.notes,
         "artifacts": artifacts,
+        "patch": patch,
         "signature": "",
     }
 
@@ -125,6 +166,8 @@ def main():
     print(f"wrote {output}: {len(artifacts)} artifact(s)")
     for artifact in artifacts:
         print(f"  {artifact['platform']}/{artifact['arch']}/{artifact['kind']}  {artifact['name']}")
+    if patch:
+        print(f"  patch {patch['fromVersion']} -> {patch['toVersion']}  {patch['name']}")
     return 0
 
 

@@ -56,8 +56,6 @@ Thumbs.db
 # arrive with the repo (git clone --recurse-submodules) but stay outside this
 # repository's own code and history.
 vendor/*
-!vendor/stb/
-vendor/stb/*
 
 # ---- CMake generated ---------------------------------------------------
 CMakeCache.txt

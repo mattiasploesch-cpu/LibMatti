@@ -5,6 +5,11 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 BUILD_DIR="${BUILD_DIR:-$ROOT/build/macos-universal}"
 VERSION="${VERSION:-0.1.0}"
+ARCH="${ARCH:-$(uname -m)}"
+case "$ARCH" in
+    aarch64) ARCH=arm64 ;;
+    amd64) ARCH=x86_64 ;;
+esac
 DIST="${DIST:-$ROOT/dist}"
 APP="$DIST/Matticraft.app"
 STAGE="$(mktemp -d)"
@@ -45,11 +50,12 @@ if [ -n "${APPLE_SIGNING_IDENTITY:-}" ]; then
     fi
 fi
 
+DMG="$DIST/Matticraft-${VERSION}-macos-${ARCH}.dmg"
 if command -v create-dmg >/dev/null 2>&1; then
-    create-dmg --volname "Matticraft" --app-drop-link 450 200 \
-        "$DIST/Matticraft-${VERSION}-universal.dmg" "$APP"
+    create-dmg --volname "Matticraft" --app-drop-link 450 200 "$DMG" "$APP"
 else
-    hdiutil create -volname "Matticraft" -srcfolder "$APP" -ov -format UDZO \
-        "$DIST/Matticraft-${VERSION}-universal.dmg"
+    hdiutil create -volname "Matticraft" -srcfolder "$APP" -ov -format UDZO "$DMG"
 fi
 echo "DMG written to $DIST"
+echo "App bundle left at $APP for the ZIP step"
+echo "Architecture: $ARCH"

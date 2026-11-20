@@ -2,9 +2,12 @@ file(GLOB_RECURSE LIBMATTI_SOURCES
         CONFIGURE_DEPENDS
         "${CMAKE_CURRENT_SOURCE_DIR}/src/*.c"
 )
+# The Android Gradle build keeps its CMake cache and compiler probes inside
+# the source tree (src/mobile/matti-kotlin/.cxx); never compile those objects.
+list(FILTER LIBMATTI_SOURCES EXCLUDE REGEX "/\\.cxx/|/CMakeFiles/")
 
-# The vendored stb_truetype (used by the LWJGL STBTruetype port) instantiates
-# in exactly one translation unit, like the upstream "easy to use" section says.
+# stb_truetype (used by the LWJGL STBTruetype port) instantiates in exactly
+# one translation unit, like the upstream "easy to use" section says.
 list(APPEND LIBMATTI_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/libmatti/org/lwjgl/stb/stb_truetype_impl.c")
 
 # Java: loader/build.gradle generates FMLVersionProperties with the gradle project version
@@ -109,11 +112,6 @@ target_include_directories(matti_objects
         PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
-# the vendored stb headers (the stb submodule, see .gitmodules)
-target_include_directories(matti_objects
-        SYSTEM PUBLIC
-        ${CMAKE_CURRENT_SOURCE_DIR}/../vendor/stb
-)
 
 target_compile_definitions(matti_objects
         PRIVATE
@@ -126,8 +124,6 @@ target_compile_definitions(matti_objects
 # library links them transitively.
 # find_package(stb)
 # target_link_libraries(matti_objects PUBLIC stb::stb_truetype)
-
-target_include_directories(matti_objects PRIVATE ${CMAKE_SOURCE_DIR}/vendor/stb)
 
 find_package(ZLIB QUIET)
 if(ZLIB_FOUND)
@@ -156,6 +152,12 @@ if(CMAKE_DL_LIBS)
 endif()
 if(UNIX AND NOT APPLE)
     target_link_libraries(matti_objects PUBLIC m)
+endif()
+
+# Android's renderer talks EGL/GLES3 directly and uses the NDK's native window
+# bridge; no GLFW or SDL is loaded on this platform.
+if(ANDROID)
+    target_link_libraries(matti_objects PUBLIC EGL GLESv3 android log)
 endif()
 
 # Rust: the UI lives in library/src/libmatti/rs and is reached through the C

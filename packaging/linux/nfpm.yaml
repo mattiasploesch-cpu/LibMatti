@@ -16,37 +16,11 @@ vendor: Matticraft
 homepage: https://github.com/mattiasploesch-cpu/LibMatti
 license: See vendor licenses
 contents:
-  - src: ${PACKAGE_STAGE}/usr/bin/matticraft-launcher
-    dst: /usr/bin/matticraft-launcher
-    file_info:
-      mode: 0755
-  - src: ${PACKAGE_STAGE}/usr/bin/vulkancraft
-    dst: /usr/bin/vulkancraft
-    file_info:
-      mode: 0755
-  - src: ${PACKAGE_STAGE}/usr/bin/vulkanClient
-    dst: /usr/bin/vulkanClient
-    file_info:
-      mode: 0755
-  - src: ${PACKAGE_STAGE}/usr/bin/runClient
-    dst: /usr/bin/runClient
-    file_info:
-      mode: 0755
-  - src: ${PACKAGE_STAGE}/usr/lib/libmatti.so.0.1.0
-    dst: /usr/lib/libmatti.so.0.1.0
-  - src: ${PACKAGE_STAGE}/usr/lib/libmatti.so.0
-    dst: /usr/lib/libmatti.so.0
-    type: symlink
-  - src: ${PACKAGE_STAGE}/usr/lib/libmatti.so
-    dst: /usr/lib/libmatti.so
-    type: symlink
-  - src: ${PACKAGE_STAGE}/usr/share/doc/matticraft
-    dst: /usr/share/doc/matticraft
+  # The install tree is the source of truth: new binaries, headers, assets and
+  # desktop files land in the package without a second hand-maintained list.
+  - src: ${PACKAGE_STAGE}/usr
+    dst: /usr
     type: tree
-  - src: ${PACKAGE_STAGE}/usr/share/applications/org.matticraft.Matticraft.desktop
-    dst: /usr/share/applications/org.matticraft.Matticraft.desktop
-  - src: ${PACKAGE_STAGE}/usr/share/icons/hicolor/scalable/apps/org.matticraft.Matticraft.svg
-    dst: /usr/share/icons/hicolor/scalable/apps/org.matticraft.Matticraft.svg
 depends:
   - libc6
   - libgl1

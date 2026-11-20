@@ -132,7 +132,7 @@ pub fn main_window_should_close() -> bool {
 }
 
 pub fn main_window_take_restart() -> Option<(String, bool)> {
-    let mut selection = [0i8; 64];
+    let mut selection = [0 as c_char; 64];
     let mut fullscreen: c_int = 0;
     let taken = unsafe {
         LIBMATTI_UI_MainWindow_TakeRestart(selection.as_mut_ptr(), 64, &mut fullscreen) != 0

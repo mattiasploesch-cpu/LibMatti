@@ -27,8 +27,7 @@ static char *load_monocraft(long *outLength)
 
 
 
-    const char *path = "../vendor/FancyModLoader/earlydisplay/src/main/resources/"
-                       "net/neoforged/fml/earlydisplay/theme/Monocraft.ttf";
+    const char *path = "../library/src/libmatti/matti/ui/Monocraft.ttf";
     FILE *file = fopen(path, "rb");
     if (file == NULL)
         return NULL;

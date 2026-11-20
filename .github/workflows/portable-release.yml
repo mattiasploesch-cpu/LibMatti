@@ -23,6 +23,14 @@ on:
         required: false
         default: false
         type: boolean
+      update_nixpkgs:
+        description: "Update the nixpkgs package branch/PR"
+        required: false
+        default: false
+        type: boolean
+    secrets:
+      NIXPKGS_TOKEN:
+        required: false
   workflow_dispatch:
     inputs:
       version:
@@ -42,6 +50,11 @@ on:
         type: boolean
       prerelease:
         description: "Mark the release as a pre-release"
+        required: false
+        default: false
+        type: boolean
+      update_nixpkgs:
+        description: "Update the nixpkgs package branch/PR (requires NIXPKGS_TOKEN and NIXPKGS_FORK)"
         required: false
         default: false
         type: boolean
@@ -65,18 +78,32 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y cmake ninja-build clang libvulkan-dev \
             libglfw3-dev zlib1g-dev libgl1-mesa-dev pkg-config zstd rpm msitools \
-            genisoimage libfuse2 patchelf zip
-      - name: Install nfpm
+            genisoimage libfuse2 patchelf zip squashfs-tools desktop-file-utils
+      - name: Install release packaging tools
         run: |
-          sudo apt-get install -y golang-go
-          sudo env "PATH=$PATH" GOBIN=/usr/local/bin go install github.com/goreleaser/nfpm/v2/cmd/nfpm@latest
+          set -euo pipefail
+          NFPM_VERSION=2.49.0
+          curl -fsSL --retry 5 --retry-all-errors --connect-timeout 15 --max-time 180 \
+            "https://github.com/goreleaser/nfpm/releases/download/v${NFPM_VERSION}/nfpm_${NFPM_VERSION}_Linux_x86_64.tar.gz" |
+            sudo tar -xz -C /usr/local/bin nfpm
+          nfpm --version
+          curl -fsSL --retry 5 --retry-all-errors --connect-timeout 15 --max-time 180 \
+            -o /tmp/appimagetool.AppImage \
+            "https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-x86_64.AppImage"
+          chmod +x /tmp/appimagetool.AppImage
+          ( cd /tmp && /tmp/appimagetool.AppImage --appimage-extract >/dev/null )
+          sudo install -m 0755 /tmp/squashfs-root/usr/bin/appimagetool /usr/local/bin/appimagetool
+          rm -rf /tmp/squashfs-root /tmp/appimagetool.AppImage
+          appimagetool --version
       - name: Configure and build
         run: |
-          cmake --preset linux-x64
+          cmake --preset linux-x64 -DMATTI_UPDATE_PUBLIC_KEY="${{ vars.MATTI_UPDATE_PUBLIC_KEY }}"
           cmake --build --preset linux-x64 -j "$(nproc)"
       - name: Portable + system packages + AppImage
         run: |
           BUILD_DIR=build/linux-x64 VERSION="$MATTI_VERSION" packaging/linux/portable.sh
+          BUILD_DIR=build/linux-x64 VERSION="$MATTI_VERSION" packaging/linux/launcher-only.sh
+          BUILD_DIR=build/linux-x64 VERSION="$MATTI_VERSION" packaging/linux/libmatti.sh
           BUILD_DIR=build/linux-x64 VERSION="$MATTI_VERSION" packaging/linux/nfpm.sh
           BUILD_DIR=build/linux-x64 VERSION="$MATTI_VERSION" packaging/linux/appimage.sh
       - uses: actions/upload-artifact@v4
@@ -91,11 +118,16 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
-      - name: Install MinGW-w64, wixl and Rust
+      - name: Install MinGW-w64 and Rust
         run: |
-          sudo apt-get update
-          sudo apt-get install -y cmake ninja-build mingw-w64 msitools wixl nsis zip \
-            libz-mingw-w64-dev
+          APT_OPTS=(-o Acquire::Retries=4 -o Acquire::http::Timeout=60 -o Acquire::https::Timeout=60)
+          # Only the x86_64 toolchain is needed. The mingw-w64 metapackage also
+          # pulls the i686 and win32 variants (293 MB) and repeatedly stalled
+          # on the runner's slow archive mirror.
+          PACKAGES=(cmake ninja-build gcc-mingw-w64-x86-64 libz-mingw-w64-dev wixl msitools nsis zip)
+          sudo timeout 300 apt-get "${APT_OPTS[@]}" update
+          sudo timeout 900 env DEBIAN_FRONTEND=noninteractive apt-get "${APT_OPTS[@]}" \
+            install -y --no-install-recommends "${PACKAGES[@]}"
       - uses: dtolnay/rust-toolchain@stable
         with:
           targets: x86_64-pc-windows-gnu
@@ -106,11 +138,29 @@ jobs:
             -DCMAKE_BUILD_TYPE=Release \
             -DMATTI_BUILD_LAUNCHER=OFF
           cmake --build build/windows-mingw-x64 \
-            --target vulkancraft runClient matti_shared -j "$(nproc)"
+            --target matticraft vulkancraft runClient vulkanClient matti_shared -j "$(nproc)"
       - name: Build the Windows launcher
+        env:
+          MATTI_UPDATE_PUBLIC_KEY: ${{ vars.MATTI_UPDATE_PUBLIC_KEY }}
         run: |
           cargo build --manifest-path launchers/Cargo.toml --release \
             --target x86_64-pc-windows-gnu -p launcher-desktop
+      - name: Package launcher only
+        run: |
+          mkdir -p dist/launcher
+          cp launchers/target/x86_64-pc-windows-gnu/release/matticraft-launcher.exe dist/launcher/
+          (cd dist/launcher && python3 -m zipfile -c \
+            "../Matticraft-Launcher-${MATTI_VERSION}-windows-x64.zip" matticraft-launcher.exe)
+      - name: Package game ZIP
+        run: |
+          STAGE=$(mktemp -d)
+          DESTDIR="$STAGE" cmake --install build/windows-mingw-x64 --prefix /Matticraft
+          mkdir -p "$STAGE/Matticraft/bin" dist
+          cp launchers/target/x86_64-pc-windows-gnu/release/matticraft-launcher.exe \
+            "$STAGE/Matticraft/bin/"
+          DIST_DIR="$(cd dist && pwd)"
+          (cd "$STAGE/Matticraft" && zip -qr \
+            "$DIST_DIR/Matticraft-${MATTI_VERSION}-windows-x64.zip" .)
       - name: Build MSI on Linux
         run: |
           BUILD_DIR=build/windows-mingw-x64 VERSION="$MATTI_VERSION" \
@@ -123,31 +173,60 @@ jobs:
           if-no-files-found: error
 
   macos:
-    runs-on: macos-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: macos-15
+            arch: arm64
+          - runner: macos-15-intel
+            arch: x86_64
+    runs-on: ${{ matrix.runner }}
     steps:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
       - name: Install build dependencies
         run: |
-          brew update
-          brew install cmake ninja pkg-config glfw sdl3 vulkan-loader molten-vk zlib
+          # Homebrew's auto-update was taking >25 minutes on the Intel runner.
+          # Vulkan/MoltenVK are optional here; the macOS default is SDL + OpenGL.
+          export HOMEBREW_NO_AUTO_UPDATE=1
+          brew install cmake ninja pkg-config glfw sdl3 zlib
       - uses: dtolnay/rust-toolchain@stable
       - name: Configure and build
         run: |
           cmake -S . -B build/macos -G Ninja \
             -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_OSX_ARCHITECTURES="${{ matrix.arch }}" \
+            -DMATTI_UPDATE_PUBLIC_KEY="${{ vars.MATTI_UPDATE_PUBLIC_KEY }}" \
             -DCMAKE_PREFIX_PATH="$(brew --prefix)"
           cmake --build build/macos -j "$(sysctl -n hw.ncpu)"
-      - name: Build the app bundle and DMG
+      - name: Build the app bundle, ZIP and DMG
         run: |
-          BUILD_DIR=build/macos VERSION="$MATTI_VERSION" packaging/macos/dmg.sh
+          BUILD_DIR=build/macos VERSION="$MATTI_VERSION" ARCH="${{ matrix.arch }}" \
+            packaging/macos/dmg.sh
           ditto -c -k --keepParent dist/Matticraft.app \
-            "dist/Matticraft-${MATTI_VERSION}-macos.zip"
+            "dist/Matticraft-${MATTI_VERSION}-macos-${{ matrix.arch }}.zip"
+          # The .app directory is a build input, not a release asset. Keeping it
+          # in dist/ made actions/upload-artifact flatten every binary, PNG and
+          # TTF inside the bundle into the release root.
+          rm -rf dist/Matticraft.app
+      - name: Package launcher only
+        run: |
+          if [ -x build/macos/launchers/matticraft-launcher ]; then
+            mkdir -p /tmp/matticraft-launcher
+            cp build/macos/launchers/matticraft-launcher /tmp/matticraft-launcher/Matticraft
+            ditto -c -k --keepParent /tmp/matticraft-launcher \
+              "dist/Matticraft-Launcher-${MATTI_VERSION}-macos-${{ matrix.arch }}.zip"
+          else
+            echo "launcher-only macOS archive skipped (launcher was not built)"
+          fi
       - uses: actions/upload-artifact@v4
         with:
-          name: macos-packages
-          path: dist/*
+          name: macos-packages-${{ matrix.arch }}
+          path: |
+            dist/*.zip
+            dist/*.dmg
           if-no-files-found: error
 
   android:
@@ -190,12 +269,12 @@ jobs:
             -PmattiVersion="${MATTI_VERSION#v}" \
             :mobile_client:assembleRelease :mobile_client:bundleRelease --no-daemon
           mkdir -p dist
-          find library/src/mobile/mobile_client/build/outputs/apk/release \
-            -name '*.apk' -exec cp {} dist/ \;
-          find library/src/mobile/mobile_client/build/outputs/bundle/release \
-            -name '*.aab' -exec cp {} dist/ \;
-          test -n "$(find dist -name '*.apk' -print -quit)"
-          test -n "$(find dist -name '*.aab' -print -quit)"
+          APK="$(find library/src/mobile/mobile_client/build/outputs/apk/release -name '*.apk' -print -quit)"
+          AAB="$(find library/src/mobile/mobile_client/build/outputs/bundle/release -name '*.aab' -print -quit)"
+          test -n "$APK"
+          test -n "$AAB"
+          cp "$APK" "dist/Matticraft-${MATTI_VERSION}-android.apk"
+          cp "$AAB" "dist/Matticraft-${MATTI_VERSION}-android.aab"
       - uses: actions/upload-artifact@v4
         with:
           name: android-packages
@@ -222,19 +301,111 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
+      - uses: dtolnay/rust-toolchain@stable
       - uses: actions/download-artifact@v4
         with:
           path: artifacts
+      - name: Build game delta patch
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          RELEASE_VERSION="${MATTI_VERSION#v}"
+          PREV_TAG="$(gh release list --exclude-drafts --limit 1 --json tagName --jq '.[0].tagName // empty' 2>/dev/null || true)"
+          NEW_TAR="$(find dist -maxdepth 1 -name "Matticraft-${RELEASE_VERSION}-linux-x86_64.tar.zst" -print -quit)"
+          if [ -z "$PREV_TAG" ] || [ "$PREV_TAG" = "v${RELEASE_VERSION}" ] || [ -z "$NEW_TAR" ]; then
+            echo "no previous Linux release; skipping delta patch"
+            exit 0
+          fi
+          mkdir -p old/tree new/tree
+          if ! gh release download "$PREV_TAG" --pattern 'Matticraft-*-linux-x86_64.tar.zst' --dir old; then
+            echo "previous release has no Linux archive; skipping delta patch"
+            exit 0
+          fi
+          OLD_TAR="$(find old -maxdepth 1 -name 'Matticraft-[0-9]*-linux-x86_64.tar.zst' -print -quit)"
+          tar --zstd -xf "$OLD_TAR" -C old/tree ./usr/bin/matticraft
+          tar --zstd -xf "$NEW_TAR" -C new/tree ./usr/bin/matticraft
+          PREV_VERSION="${PREV_TAG#v}"
+          python3 tools/make_binary_patch.py \
+            old/tree/usr/bin/matticraft new/tree/usr/bin/matticraft \
+            "dist/Matticraft-${PREV_VERSION}-to-${RELEASE_VERSION}-linux-x86_64.patch" \
+            --from-version "$PREV_VERSION" --to-version "$RELEASE_VERSION"
       - name: Checksums and manifest
+        env:
+          MATTI_UPDATE_SIGNING_KEY_BASE64: ${{ secrets.MATTI_UPDATE_SIGNING_KEY_BASE64 }}
+          MATTI_UPDATE_PUBLIC_KEY: ${{ vars.MATTI_UPDATE_PUBLIC_KEY }}
         run: |
           RELEASE_VERSION="${MATTI_VERSION#v}"
           echo "RELEASE_VERSION=$RELEASE_VERSION" >> "$GITHUB_ENV"
           mkdir -p dist
+          # Artifacts are downloaded as artifacts/<name>/<file>. macОS used to
+          # upload the whole .app tree, which flattened Mach-O binaries and
+          # image/font resources into the release root. Only real packages are
+          # release assets now.
+          find artifacts -type d -name 'Matticraft.app' -exec rm -rf {} +
           find artifacts -type f -exec cp {} dist/ \;
-          (cd dist && sha256sum * > SHA256SUMS)
-          cat > dist/latest.json <<EOF
-          {"version":"$RELEASE_VERSION","channel":"$MATTI_CHANNEL","commit":"$GITHUB_SHA","artifacts":[]}
-          EOF
+          for loose in '*.png' '*.ttf' '*.dylib' 'Info.plist' 'Matticraft' 'vulkancraft'; do
+            if find artifacts -type f -name "$loose" | grep -q .; then
+              echo "refusing loose macOS payload in release: $loose" >&2
+              exit 1
+            fi
+          done
+          PATCH_ARGS=()
+          PATCH_FILE="$(find dist -maxdepth 1 -name '*-to-*-linux-x86_64.patch' -print -quit)"
+          if [ -n "$PATCH_FILE" ]; then
+            PATCH_ARGS=(--patch "$PATCH_FILE" --patch-platform linux --patch-arch x86_64)
+          fi
+          MATTI_RELEASED_AT="$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+            python3 tools/make_update_manifest.py \
+              --dist dist \
+              --version "$RELEASE_VERSION" \
+              --channel "$MATTI_CHANNEL" \
+              --base-url "https://github.com/${GITHUB_REPOSITORY}/releases/download/v${RELEASE_VERSION}" \
+              "${PATCH_ARGS[@]}" \
+              --out dist/latest.json
+          if [ -n "${MATTI_UPDATE_SIGNING_KEY_BASE64:-}" ]; then
+            printf '%s' "$MATTI_UPDATE_SIGNING_KEY_BASE64" | base64 -d > /tmp/update.pk8
+            chmod 600 /tmp/update.pk8
+            cargo run --quiet --manifest-path launchers/Cargo.toml -p launcher-core \
+              --bin matticraft-update-sign -- sign --key /tmp/update.pk8 --manifest dist/latest.json
+            cargo run --quiet --manifest-path launchers/Cargo.toml -p launcher-core \
+              --bin matticraft-update-sign -- verify --manifest dist/latest.json \
+              --public-key "$MATTI_UPDATE_PUBLIC_KEY"
+            rm -f /tmp/update.pk8
+          else
+            echo "::warning::MATTI_UPDATE_SIGNING_KEY_BASE64 is not set; latest.json stays unsigned"
+          fi
+          (cd dist && find . -maxdepth 1 -type f ! -name SHA256SUMS -printf '%f\n' |
+            sort | xargs sha256sum > SHA256SUMS)
+      - name: Remove stale release assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag="v${RELEASE_VERSION}"
+          # Old draft releases with this tag are leftovers from earlier runs.
+          # Delete them before the uploader runs; otherwise its parallel
+          # uploads race with the stale files and fail with already_exists.
+          gh api --paginate "repos/${GITHUB_REPOSITORY}/releases?per_page=100" \
+            --jq ".[] | select(.tag_name == \"${tag}\" and .draft) | .id" |
+          while read -r id; do
+            if [ -n "$id" ]; then
+              gh api -X DELETE "repos/${GITHUB_REPOSITORY}/releases/${id}"
+            fi
+          done
+          # A published release is kept, but its old assets are removed so
+          # the upload sees no stale PNG/TTF/Mach-O files or duplicate archives.
+          gh api --paginate "repos/${GITHUB_REPOSITORY}/releases?per_page=100" \
+            --jq ".[] | select(.tag_name == \"${tag}\" and (.draft | not)) | .id" |
+          while read -r id; do
+            [ -z "$id" ] && continue
+            gh api --paginate "repos/${GITHUB_REPOSITORY}/releases/${id}/assets?per_page=100" \
+              --jq '.[].id' |
+            while read -r asset; do
+              if [ -n "$asset" ]; then
+                gh api -X DELETE "repos/${GITHUB_REPOSITORY}/releases/assets/${asset}"
+              fi
+            done
+          done
       - uses: softprops/action-gh-release@v2
         with:
           draft: ${{ inputs.draft }}
@@ -243,3 +414,42 @@ jobs:
           files: dist/*
           tag_name: v${{ env.RELEASE_VERSION }}
           name: Matticraft ${{ env.RELEASE_VERSION }}
+
+  nixpkgs:
+    if: ${{ inputs.update_nixpkgs || vars.NIXPKGS_AUTO_UPDATE == 'true' }}
+    needs: [release]
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: cachix/install-nix-action@v27
+      - name: Resolve source hash
+        id: source
+        run: |
+          URL="https://codeload.github.com/${GITHUB_REPOSITORY}/legacy.tar.gz/${GITHUB_SHA}"
+          HASH="$(nix hash convert --hash-algo sha256 --to sri \
+            "$(nix-prefetch-url "$URL")")"
+          echo "url=$URL" >> "$GITHUB_OUTPUT"
+          echo "hash=$HASH" >> "$GITHUB_OUTPUT"
+      - name: Check out the nixpkgs fork
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ vars.NIXPKGS_FORK }}
+          token: ${{ secrets.NIXPKGS_TOKEN }}
+          path: nixpkgs
+          fetch-depth: 0
+      - name: Update the nixpkgs branch and PR
+        env:
+          GH_TOKEN: ${{ secrets.NIXPKGS_TOKEN }}
+          NIXPKGS_FORK: ${{ vars.NIXPKGS_FORK }}
+        run: |
+          if [ -z "${NIXPKGS_FORK:-}" ]; then
+            echo "set the repository variable NIXPKGS_FORK to <owner>/nixpkgs" >&2
+            exit 1
+          fi
+          tools/update-nixpkgs.sh --nixpkgs nixpkgs \
+            --version "${MATTI_VERSION#v}" \
+            --rev "$GITHUB_SHA" \
+            --source-url "${{ steps.source.outputs.url }}" \
+            --hash "${{ steps.source.outputs.hash }}" \
+            --branch "matticraft-${MATTI_VERSION#v}" \
+            --fork "$NIXPKGS_FORK" --push --pr

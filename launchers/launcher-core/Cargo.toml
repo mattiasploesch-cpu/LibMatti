@@ -16,6 +16,7 @@ serde_json.workspace = true
 directories.workspace = true
 ring.workspace = true
 hex.workspace = true
+flate2 = "1"
 time.workspace = true
 ureq = { version = "2", default-features = false, features = ["tls"], optional = true }
 

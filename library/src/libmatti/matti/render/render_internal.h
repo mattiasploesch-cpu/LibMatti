@@ -74,6 +74,7 @@ struct LIBMATTI_Renderer
 
 
 
+const LIBMATTI_RenderBackendOps *LIBMATTI_Render_AndroidOps(void);
 const LIBMATTI_RenderBackendOps *LIBMATTI_Render_OpenGLOps(void);
 const LIBMATTI_RenderBackendOps *LIBMATTI_Render_VulkanOps(void);
 const LIBMATTI_RenderBackendOps *LIBMATTI_Render_SDL3Ops(void);

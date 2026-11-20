@@ -64,8 +64,12 @@ set_target_properties(demo_lib PROPERTIES
         LIBRARY_OUTPUT_DIRECTORY "${DEMO_MODS_OUTPUT_DIR}"
 )
 
-# Building the run target also builds the demo mods.
-add_dependencies(matticraft demo_app demo_lib)
+# Building the run target also builds the demo mods. The demo mods inject ELF
+# sections, so they are development artifacts on ELF hosts only; the Windows
+# release ships the client without them.
+if(UNIX)
+    add_dependencies(matticraft demo_app demo_lib)
+endif()
 
 # Demo mods loaded when running the matticraft target.
 # VS_DEBUGGER_ENVIRONMENT is only honoured by the Visual Studio generator.

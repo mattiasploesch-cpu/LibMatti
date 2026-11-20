@@ -115,6 +115,44 @@ CMake adds the Home Manager profile (`~/.nix-profile`) to `CMAKE_PREFIX_PATH`
 itself, so `find_package(ZLIB)` and the configure checks find the headers and
 library installed by the module.
 
+### NixOS flake (no AppImage needed)
+
+The flake exposes the standalone library and the client directly from source:
+
+```bash
+nix build .#matticraft          # client binaries in ./result/bin
+nix build .#matticraft-launcher # Rust/egui launcher in ./result/bin
+nix build .#libmatti            # libmatti.so* in ./result/lib
+nix build .#libmatti-dev        # public headers in ./result/include
+
+nix profile install .#matticraft
+nix profile install .#matticraft-launcher
+nix profile install .#libmatti
+
+nix develop                   # CMake, Rust and the runtime libraries
+```
+
+The flake is the supported distribution path for now. It also exposes
+`overlays.default`, so a NUR-compatible consumer can import it with:
+
+```nix
+# flake.nix: inputs.matticraft.url = "github:mattiasploesch-cpu/LibMatti";
+nixpkgs.overlays = [ inputs.matticraft.overlays.default ];
+```
+
+`search.nix.org` only indexes nixpkgs; the flake packages are available
+immediately from `nix build`, `nix profile install` and the overlay. The
+prepared nixpkgs files remain in `nixpkgs-pr/` for later, but are not submitted
+until the project meets the nixpkgs packaging requirements.
+
+`libmatti` is also published as a standalone tarball
+(`libmatti-<version>-linux-<arch>.tar.zst`) next to the AppImage, deb and rpm.
+Install it into `/usr/local` with:
+
+```bash
+tar --zstd -xf libmatti-0.1.0-linux-x86_64.tar.zst -C /usr/local
+```
+
 ### Run configurations (CLion)
 
 The project ships ready-made run configurations (`.idea/runConfigurations/`):
@@ -145,6 +183,8 @@ same drawing code runs on every backend:
 Select the layer and API at runtime. The platform default is detected by
 `LibMatti` itself; `auto` lets the library pick the first usable backend:
 
+r
+
 ```bash
 ./build/runClient --layer native --api vulkan
 ./build/runClient --layer native --api opengl
@@ -170,8 +210,11 @@ available; otherwise they simply report themselves as unavailable.
 
 ## Launcher
 
-`matticraft-launcher` is the entry point of every package. It is a Rust
-workspace under `launchers/`:
+`matticraft-launcher` is the entry point of every package. The launcher-only
+archive contains no game binary or game assets: open **Updates → Game Library**,
+choose a Matticraft version and the launcher downloads it on demand. A delta
+`.patch` can then update the installed game and start it directly. The Rust
+workspace lives under `launchers/`:
 
 | Crate | Target | Notes |
 | --- | --- | --- |
@@ -201,6 +244,12 @@ channel and pass the public key when building the launcher:
 launchers/target/debug/matticraft-update-sign generate --key update.pk8
 cmake -S . -B build -DMATTI_UPDATE_PUBLIC_KEY=<hex public key>
 ```
+
+For release automation, set the repository variable
+`MATTI_UPDATE_PUBLIC_KEY` to the generated public key and the secret
+`MATTI_UPDATE_SIGNING_KEY_BASE64` to the base64-encoded private key. The release
+workflow signs `latest.json` before uploading it. Without those values the
+launcher still works, but signed update checks remain disabled.
 
 ## Tests
 

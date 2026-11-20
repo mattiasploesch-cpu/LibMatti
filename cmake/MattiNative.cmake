@@ -125,7 +125,7 @@ set(MATTI_NATIVE_UI_FONT_SECTION ".matti_font_monocraft")
 # it up after the game's own asset root, so an installed resource pack wins.
 function(matti_embed_ui_assets target)
     set(_matti_font
-            "${CMAKE_SOURCE_DIR}/vendor/FancyModLoader/earlydisplay/src/main/resources/net/neoforged/fml/earlydisplay/theme/Monocraft.ttf")
+            "${CMAKE_SOURCE_DIR}/library/src/libmatti/matti/ui/Monocraft.ttf")
     if(EXISTS "${_matti_font}")
         matti_embed_native_library(${target} "${MATTI_NATIVE_UI_FONT_SECTION}" "${_matti_font}")
     else()
