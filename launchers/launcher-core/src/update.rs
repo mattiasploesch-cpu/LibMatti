@@ -5,8 +5,11 @@
 //! embeds that public key and refuses a manifest that does not verify. Each
 //! artifact additionally carries the SHA-256 of the exact download.
 
+use std::fs::File;
+use std::io::{Read, Seek, SeekFrom, Write};
 use std::path::Path;
 
+use flate2::read::ZlibDecoder;
 use ring::signature::{Ed25519KeyPair, KeyPair, UnparsedPublicKey, ED25519};
 use serde::{Deserialize, Serialize};
 
@@ -31,6 +34,24 @@ pub struct Artifact {
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct Patch {
+    pub platform: String,
+    pub arch: String,
+    #[serde(default)]
+    pub name: String,
+    pub from_version: String,
+    pub to_version: String,
+    pub url: String,
+    pub sha256: String,
+    #[serde(default)]
+    pub size: u64,
+    pub from_sha256: String,
+    pub to_sha256: String,
+    pub to_size: u64,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
 pub struct UpdateManifest {
     #[serde(default = "default_schema")]
     pub schema: u32,
@@ -42,6 +63,8 @@ pub struct UpdateManifest {
     pub notes: String,
     #[serde(default)]
     pub artifacts: Vec<Artifact>,
+    #[serde(default)]
+    pub patch: Option<Patch>,
     #[serde(default)]
     pub signature: String,
 }
@@ -58,6 +81,7 @@ struct Unsigned<'a> {
     released_at: &'a str,
     notes: &'a str,
     artifacts: &'a [Artifact],
+    patch: &'a Option<Patch>,
 }
 
 impl UpdateManifest {
@@ -73,13 +97,24 @@ impl UpdateManifest {
             return Err(Error::Invalid("update manifest has no version".into()));
         }
         for artifact in &manifest.artifacts {
-            if artifact.sha256.len() != 64
-                || !artifact.sha256.chars().all(|ch| ch.is_ascii_hexdigit())
-            {
+            if !is_sha256(&artifact.sha256) {
                 return Err(Error::Invalid(format!(
                     "artifact '{}' has an invalid SHA-256",
                     artifact.name
                 )));
+            }
+        }
+        if let Some(patch) = &manifest.patch {
+            if !is_sha256(&patch.sha256)
+                || !is_sha256(&patch.from_sha256)
+                || !is_sha256(&patch.to_sha256)
+            {
+                return Err(Error::Invalid(
+                    "update patch has an invalid SHA-256".into(),
+                ));
+            }
+            if patch.to_size == 0 || patch.url.trim().is_empty() {
+                return Err(Error::Invalid("update patch is incomplete".into()));
             }
         }
         Ok(manifest)
@@ -94,6 +129,7 @@ impl UpdateManifest {
             released_at: &self.released_at,
             notes: &self.notes,
             artifacts: &self.artifacts,
+            patch: &self.patch,
         })
         .unwrap_or_default()
     }
@@ -144,6 +180,24 @@ impl UpdateManifest {
             .find(|artifact| artifact.kind == kind)
     }
 
+    pub fn patch_for(&self, platform: &str, arch: &str) -> Option<&Patch> {
+        self.patch.as_ref().filter(|patch| {
+            (patch.platform == platform || patch.platform == "any")
+                && (patch.arch == arch || patch.arch == "any")
+        })
+    }
+
+    pub fn verify_patch(&self, path: &Path, patch: &Patch) -> Result<()> {
+        if patch.size != 0 && std::fs::metadata(path)?.len() != patch.size {
+            return Err(Error::Invalid(format!(
+                "patch has {} bytes, manifest says {}",
+                std::fs::metadata(path)?.len(),
+                patch.size
+            )));
+        }
+        verify_file_sha256(path, &patch.sha256, "update patch")
+    }
+
     pub fn verify_artifact(&self, path: &Path, artifact: &Artifact) -> Result<()> {
         let metadata = std::fs::metadata(path)?;
         if artifact.size != 0 && metadata.len() != artifact.size {
@@ -177,6 +231,12 @@ pub fn release_public_key() -> Option<String> {
 /// Read an update manifest from a local path, `file://` URL or HTTP(S) URL.
 #[cfg(feature = "upload")]
 pub fn fetch_manifest(location: &str) -> Result<Vec<u8>> {
+    fetch_bytes(location)
+}
+
+/// Read any update resource (manifest, patch or artifact) from disk or HTTP(S).
+#[cfg(feature = "upload")]
+pub fn fetch_bytes(location: &str) -> Result<Vec<u8>> {
     if let Some(path) = location.strip_prefix("file://") {
         return std::fs::read(path).map_err(Error::Io);
     }
@@ -184,16 +244,197 @@ pub fn fetch_manifest(location: &str) -> Result<Vec<u8>> {
         return std::fs::read(location).map_err(Error::Io);
     }
     let response = ureq::get(location)
-        .timeout(std::time::Duration::from_secs(30))
+        .timeout(std::time::Duration::from_secs(60))
         .call()
-        .map_err(|error| Error::Invalid(format!("update check failed: {error}")))?;
+        .map_err(|error| Error::Invalid(format!("update download failed: {error}")))?;
     let mut bytes = Vec::new();
-    use std::io::Read;
     response
         .into_reader()
         .read_to_end(&mut bytes)
         .map_err(Error::Io)?;
     Ok(bytes)
+}
+
+/// Stream a download to a file. Used for game archives, which are much larger
+/// than the in-memory manifest/patch path.
+#[cfg(feature = "upload")]
+pub fn download_to_file(location: &str, target: &Path) -> Result<()> {
+    if let Some(parent) = target.parent() {
+        std::fs::create_dir_all(parent)?;
+    }
+    if let Some(path) = location.strip_prefix("file://") {
+        std::fs::copy(path, target)?;
+        return Ok(());
+    }
+    if !location.starts_with("http://") && !location.starts_with("https://") {
+        std::fs::copy(location, target)?;
+        return Ok(());
+    }
+    let temp = target.with_extension("part");
+    let _ = std::fs::remove_file(&temp);
+    let response = ureq::get(location)
+        .timeout(std::time::Duration::from_secs(300))
+        .call()
+        .map_err(|error| Error::Invalid(format!("game download failed: {error}")))?;
+    let mut reader = response.into_reader();
+    let mut file = File::create(&temp)?;
+    std::io::copy(&mut reader, &mut file)?;
+    file.flush()?;
+    std::fs::rename(&temp, target)?;
+    Ok(())
+}
+
+pub const PATCH_MAGIC: &[u8; 16] = b"MATTICRAFTPATCH1";
+
+#[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct PatchHeader {
+    from_version: String,
+    to_version: String,
+    from_sha256: String,
+    to_sha256: String,
+    to_size: u64,
+}
+
+pub fn is_sha256(value: &str) -> bool {
+    value.len() == 64 && value.chars().all(|ch| ch.is_ascii_hexdigit())
+}
+
+pub fn verify_file_sha256(path: &Path, expected: &str, label: &str) -> Result<()> {
+    let actual = crate::mods::sha256_file(path)?;
+    if !actual.eq_ignore_ascii_case(expected) {
+        return Err(Error::Invalid(format!(
+            "{label} SHA-256 mismatch (expected {expected}, got {actual})"
+        )));
+    }
+    Ok(())
+}
+
+/// Apply a `MATTICRAFTPATCH1` delta to `base`, writing the result to `output`.
+///
+/// The operation stream is zlib-compressed. COPY instructions refer to byte
+/// offsets in the base binary; ADD instructions carry new bytes. The base and
+/// result are both checked against the SHA-256 values in the patch header.
+pub fn apply_file_patch(base: &Path, patch_path: &Path, output: &Path) -> Result<()> {
+    let base_len = std::fs::metadata(base)?.len();
+    let base_hash = crate::mods::sha256_file(base)?;
+
+    let mut patch_file = std::io::BufReader::new(File::open(patch_path)?);
+    let mut magic = [0u8; 16];
+    patch_file.read_exact(&mut magic)?;
+    if &magic != PATCH_MAGIC {
+        return Err(Error::Invalid("unknown update patch format".into()));
+    }
+    let mut length_bytes = [0u8; 4];
+    patch_file.read_exact(&mut length_bytes)?;
+    let header_len = u32::from_le_bytes(length_bytes) as usize;
+    if header_len == 0 || header_len > 64 * 1024 {
+        return Err(Error::Invalid("invalid update patch header".into()));
+    }
+    let mut header_bytes = vec![0u8; header_len];
+    patch_file.read_exact(&mut header_bytes)?;
+    let header: PatchHeader = serde_json::from_slice(&header_bytes)?;
+    if !header.from_sha256.eq_ignore_ascii_case(&base_hash) {
+        return Err(Error::Invalid(format!(
+            "installed game does not match patch {} → {} (expected {}, got {})",
+            header.from_version, header.to_version, header.from_sha256, base_hash
+        )));
+    }
+    if header.to_size == 0 || !is_sha256(&header.to_sha256) {
+        return Err(Error::Invalid("update patch header is incomplete".into()));
+    }
+
+    if let Some(parent) = output.parent() {
+        std::fs::create_dir_all(parent)?;
+    }
+    let _ = std::fs::remove_file(output);
+    let mut out = File::create(output)?;
+    let mut base_file = File::open(base)?;
+    let mut ops = ZlibDecoder::new(patch_file);
+
+    loop {
+        let mut opcode = [0u8; 1];
+        match ops.read(&mut opcode) {
+            Ok(0) => break,
+            Ok(_) => {}
+            Err(error) => {
+                let _ = std::fs::remove_file(output);
+                return Err(Error::Io(error));
+            }
+        }
+        let result = match opcode[0] {
+            0x01 => {
+                let offset = read_u64(&mut ops)?;
+                let length = read_u64(&mut ops)?;
+                if offset.checked_add(length).map_or(true, |end| end > base_len) {
+                    Err(Error::Invalid("patch COPY lies outside the installed game".into()))
+                } else {
+                    base_file.seek(SeekFrom::Start(offset))?;
+                    let copied = std::io::copy(&mut Read::by_ref(&mut base_file).take(length), &mut out)?;
+                    if copied == length {
+                        Ok(())
+                    } else {
+                        Err(Error::Invalid("patch COPY ended too early".into()))
+                    }
+                }
+            }
+            0x02 => {
+                let length = read_u64(&mut ops)?;
+                let copied = std::io::copy(&mut Read::by_ref(&mut ops).take(length), &mut out)?;
+                if copied == length {
+                    Ok(())
+                } else {
+                    Err(Error::Invalid("patch ADD ended too early".into()))
+                }
+            }
+            other => Err(Error::Invalid(format!("unknown patch opcode {other}"))),
+        };
+        if let Err(error) = result {
+            let _ = std::fs::remove_file(output);
+            return Err(error);
+        }
+    }
+    out.flush()?;
+    drop(out);
+
+    let size = std::fs::metadata(output)?.len();
+    if size != header.to_size {
+        let _ = std::fs::remove_file(output);
+        return Err(Error::Invalid(format!(
+            "patched game has {size} bytes, expected {}",
+            header.to_size
+        )));
+    }
+    if let Err(error) = verify_file_sha256(output, &header.to_sha256, "patched game") {
+        let _ = std::fs::remove_file(output);
+        return Err(error);
+    }
+    Ok(())
+}
+
+fn read_u64(input: &mut impl Read) -> Result<u64> {
+    let mut bytes = [0u8; 8];
+    input.read_exact(&mut bytes)?;
+    Ok(u64::from_le_bytes(bytes))
+}
+
+/// Apply a patch to an installed executable atomically. The old binary is kept
+/// as `<name>.matti-backup` until the verified replacement is in place.
+pub fn apply_patch_to_file(base: &Path, patch_path: &Path) -> Result<()> {
+    let temp = base.with_extension("matti-new");
+    apply_file_patch(base, patch_path, &temp)?;
+    if let Ok(metadata) = std::fs::metadata(base) {
+        let _ = std::fs::set_permissions(&temp, metadata.permissions());
+    }
+    let backup = base.with_extension("matti-backup");
+    let _ = std::fs::remove_file(&backup);
+    std::fs::rename(base, &backup)?;
+    if let Err(error) = std::fs::rename(&temp, base) {
+        let _ = std::fs::rename(&backup, base);
+        let _ = std::fs::remove_file(&temp);
+        return Err(Error::Io(error));
+    }
+    Ok(())
 }
 
 pub struct GeneratedKeyPair {
@@ -242,6 +483,7 @@ mod tests {
                 sha256: "a".repeat(64),
                 size: 0,
             }],
+            patch: None,
             signature: String::new(),
         }
     }
@@ -298,6 +540,52 @@ mod tests {
         manifest.verify_artifact(&path, &artifact).unwrap();
         artifact.size = 4;
         assert!(manifest.verify_artifact(&path, &artifact).is_err());
+        let _ = std::fs::remove_dir_all(dir);
+    }
+
+    #[test]
+    fn binary_patch_applies_and_rejects_a_different_base() {
+        use flate2::write::ZlibEncoder;
+        use flate2::Compression;
+
+        let dir = crate::temp_dir("binary-patch");
+        let base = dir.join("matticraft");
+        let other = dir.join("other");
+        let patch = dir.join("update.patch");
+        let output = dir.join("matticraft.new");
+        let old_bytes = b"hello old";
+        let new_bytes = b"hello new";
+        std::fs::write(&base, old_bytes).unwrap();
+        std::fs::write(&other, b"different").unwrap();
+
+        let header = serde_json::json!({
+            "fromVersion": "1.0.0",
+            "toVersion": "1.0.1",
+            "fromSha256": crate::mods::sha256_file(&base).unwrap(),
+            "toSha256": hex::encode(ring::digest::digest(&ring::digest::SHA256, new_bytes)),
+            "toSize": new_bytes.len(),
+        });
+        let header = serde_json::to_vec(&header).unwrap();
+
+        let mut encoder = ZlibEncoder::new(Vec::new(), Compression::best());
+        encoder.write_all(&[0x01]).unwrap();
+        encoder.write_all(&0u64.to_le_bytes()).unwrap();
+        encoder.write_all(&5u64.to_le_bytes()).unwrap();
+        encoder.write_all(&[0x02]).unwrap();
+        encoder.write_all(&4u64.to_le_bytes()).unwrap();
+        encoder.write_all(b" new").unwrap();
+        let encoded = encoder.finish().unwrap();
+
+        let mut bytes = Vec::new();
+        bytes.extend_from_slice(PATCH_MAGIC);
+        bytes.extend_from_slice(&(header.len() as u32).to_le_bytes());
+        bytes.extend_from_slice(&header);
+        bytes.extend_from_slice(&encoded);
+        std::fs::write(&patch, bytes).unwrap();
+
+        apply_file_patch(&base, &patch, &output).unwrap();
+        assert_eq!(std::fs::read(&output).unwrap(), new_bytes);
+        assert!(apply_file_patch(&other, &patch, &output).is_err());
         let _ = std::fs::remove_dir_all(dir);
     }
 

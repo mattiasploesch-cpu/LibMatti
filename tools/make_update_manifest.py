@@ -19,6 +19,9 @@ import sys
 # kind, platform, arch matchers applied to the file name (first match wins).
 RULES = [
     # Current release names: Matticraft-<version>-<platform>-<arch>.<ext>
+    (re.compile(r"^Matticraft-Launcher-.+-linux-(?P<arch>x86_64|aarch64)\.tar\.zst$"), "linux", "launcher"),
+    (re.compile(r"^Matticraft-Launcher-.+-windows-x64\.zip$"), "windows", "launcher"),
+    (re.compile(r"^Matticraft-Launcher-.+-macos-(?P<arch>arm64|x86_64)\.zip$"), "macos", "launcher"),
     (re.compile(r"^Matticraft-.+-linux-(?P<arch>x86_64|aarch64)\.AppImage$"), "linux", "appimage"),
     (re.compile(r"^Matticraft-.+-linux-(?P<arch>x86_64|aarch64)\.deb$"), "linux", "deb"),
     (re.compile(r"^Matticraft-.+-linux-(?P<arch>x86_64|aarch64)\.rpm$"), "linux", "rpm"),
@@ -90,6 +93,9 @@ def main():
     parser.add_argument("--channel", default="stable")
     parser.add_argument("--base-url", default="")
     parser.add_argument("--notes", default="")
+    parser.add_argument("--patch", default="", help="MATTICRAFTPATCH1 file for the game binary")
+    parser.add_argument("--patch-platform", default="linux")
+    parser.add_argument("--patch-arch", default="x86_64")
     parser.add_argument("--out", default="")
     args = parser.parse_args()
 
@@ -118,6 +124,30 @@ def main():
             "size": os.path.getsize(path),
         })
 
+    patch = None
+    if args.patch:
+        with open(args.patch, "rb") as handle:
+            magic = handle.read(16)
+            if magic != b"MATTICRAFTPATCH1":
+                print(f"not a MATTICRAFTPATCH1 file: {args.patch}", file=sys.stderr)
+                return 1
+            length = int.from_bytes(handle.read(4), "little")
+            header = json.loads(handle.read(length).decode("utf-8"))
+        patch_name = os.path.basename(args.patch)
+        patch = {
+            "platform": args.patch_platform,
+            "arch": normalize_arch(args.patch_arch),
+            "name": patch_name,
+            "fromVersion": header.get("fromVersion", ""),
+            "toVersion": header.get("toVersion", args.version.lstrip("v")),
+            "url": (args.base_url.rstrip("/") + "/" + patch_name) if args.base_url else patch_name,
+            "sha256": sha256(args.patch),
+            "size": os.path.getsize(args.patch),
+            "fromSha256": header["fromSha256"],
+            "toSha256": header["toSha256"],
+            "toSize": header["toSize"],
+        }
+
     manifest = {
         "schema": 1,
         "version": args.version.lstrip("v"),
@@ -125,6 +155,7 @@ def main():
         "released_at": os.environ.get("MATTI_RELEASED_AT", ""),
         "notes": args.notes,
         "artifacts": artifacts,
+        "patch": patch,
         "signature": "",
     }
 
@@ -135,6 +166,8 @@ def main():
     print(f"wrote {output}: {len(artifacts)} artifact(s)")
     for artifact in artifacts:
         print(f"  {artifact['platform']}/{artifact['arch']}/{artifact['kind']}  {artifact['name']}")
+    if patch:
+        print(f"  patch {patch['fromVersion']} -> {patch['toVersion']}  {patch['name']}")
     return 0
 
 

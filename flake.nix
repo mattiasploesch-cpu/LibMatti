@@ -21,6 +21,14 @@
           default = self.packages.${system}.matticraft;
         });
 
+      # NUR/flake users can import this overlay. Nixpkgs deliberately stays
+      # downstream of the flake until the project has the required user base.
+      overlays.default = final: prev: {
+        libmatti = final.callPackage ./nix/libmatti.nix { src = self; };
+        matticraft = final.callPackage ./nix/matticraft.nix { src = self; };
+        matticraft-launcher = final.callPackage ./nix/launcher.nix { src = self; };
+      };
+
       devShells = forAllSystems (system: pkgs: {
         default = pkgs.mkShell {
           nativeBuildInputs = with pkgs; [

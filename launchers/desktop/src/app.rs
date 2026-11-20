@@ -6,6 +6,7 @@ use std::path::{Path, PathBuf};
 use eframe::egui;
 use egui::{Color32, RichText};
 use launcher_core::account::Account;
+use launcher_core::game::{self, GameRelease};
 use launcher_core::launch::{find_game_binary, preflight, LaunchPlan};
 use launcher_core::logs;
 use launcher_core::mods::{self, ModValidation};
@@ -17,19 +18,76 @@ use launcher_core::{Error, Result};
 
 use crate::LauncherOptions;
 
-const ACCENT: Color32 = Color32::from_rgb(74, 222, 128);
-const ACCENT_DARK: Color32 = Color32::from_rgb(34, 120, 70);
-const MUTED: Color32 = Color32::from_rgb(150, 160, 170);
-const BG: Color32 = Color32::from_rgb(15, 17, 21);
-const PANEL: Color32 = Color32::from_rgb(22, 25, 31);
-const CARD: Color32 = Color32::from_rgb(30, 34, 42);
+// NoRiskClient-inspired palette: near-black chrome, cool grey cards and one
+// strong blue accent. The vendored launcher is a design reference only; no
+// GPL source is linked into this crate.
+const ACCENT: Color32 = Color32::from_rgb(79, 142, 255);
+const ACCENT_DARK: Color32 = Color32::from_rgb(30, 74, 138);
+const MUTED: Color32 = Color32::from_rgb(171, 171, 171);
+const BG: Color32 = Color32::from_rgb(18, 18, 18);
+const PANEL: Color32 = Color32::from_rgb(23, 23, 23);
+const CARD: Color32 = Color32::from_rgb(31, 31, 31);
+const WARNING: Color32 = Color32::from_rgb(245, 158, 64);
+const BORDER: Color32 = Color32::from_rgb(49, 49, 49);
+const NAV_BG: Color32 = Color32::from_rgb(14, 14, 14);
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 enum Tab {
     Profiles,
+    Updates,
     Mods,
     Logs,
     Settings,
+}
+
+impl Tab {
+    const ALL: [Tab; 5] = [
+        Tab::Profiles,
+        Tab::Updates,
+        Tab::Mods,
+        Tab::Logs,
+        Tab::Settings,
+    ];
+
+    fn label(self) -> &'static str {
+        match self {
+            Tab::Profiles => "PLAY",
+            Tab::Updates => "LIBRARY",
+            Tab::Mods => "MODS",
+            Tab::Logs => "LOGS",
+            Tab::Settings => "SETTINGS",
+        }
+    }
+
+    fn title(self) -> &'static str {
+        match self {
+            Tab::Profiles => "Ready to play",
+            Tab::Updates => "Game library",
+            Tab::Mods => "Mods",
+            Tab::Logs => "Logs & crashes",
+            Tab::Settings => "Settings",
+        }
+    }
+
+    fn subtitle(self) -> &'static str {
+        match self {
+            Tab::Profiles => "Choose a profile and launch your next world",
+            Tab::Updates => "Download a version or apply a delta update",
+            Tab::Mods => "Check installed files against mods.json",
+            Tab::Logs => "Read the latest log and inspect crash reports",
+            Tab::Settings => "Paths, updates and launcher behaviour",
+        }
+    }
+
+    fn glyph(self) -> &'static str {
+        match self {
+            Tab::Profiles => "▶",
+            Tab::Updates => "◆",
+            Tab::Mods => "▦",
+            Tab::Logs => "≡",
+            Tab::Settings => "⚙",
+        }
+    }
 }
 
 pub fn run_native(options: LauncherOptions) -> eframe::Result<()> {
@@ -64,6 +122,8 @@ struct LauncherApp {
     crash_url_text: String,
     update_status: String,
     update_manifest: Option<UpdateManifest>,
+    game_versions: Vec<GameRelease>,
+    game_status: String,
     child: Option<std::process::Child>,
     child_pid: Option<u32>,
     frames: u64,
@@ -102,7 +162,12 @@ impl LauncherApp {
             .as_ref()
             .map(|path| path.display().to_string())
             .unwrap_or_default();
-        let update_url_text = store.settings.update_manifest_url.clone().unwrap_or_default();
+        let update_url_text = store.settings.update_manifest_url.clone().unwrap_or_else(|| {
+            format!(
+                "https://github.com/{}/releases/latest/download/latest.json",
+                game::github_repo()
+            )
+        });
         let crash_url_text = store.settings.crash_upload_url.clone().unwrap_or_default();
 
         let crash_dir = store.root().join(logs::CRASH_DIR);
@@ -129,6 +194,8 @@ impl LauncherApp {
             crash_url_text,
             update_status: String::new(),
             update_manifest: None,
+            game_versions: Vec::new(),
+            game_status: String::new(),
             child: None,
             child_pid: None,
             frames: 0,
@@ -342,9 +409,14 @@ impl LauncherApp {
             self.update_status = "Set an update manifest URL first".into();
             return;
         }
-        match launcher_core::update::fetch_manifest(self.update_url_text.trim())
-            .and_then(|bytes| UpdateManifest::from_json(&bytes))
-        {
+        #[cfg(feature = "upload")]
+        let fetched = launcher_core::update::fetch_manifest(self.update_url_text.trim())
+            .and_then(|bytes| UpdateManifest::from_json(&bytes));
+        #[cfg(not(feature = "upload"))]
+        let fetched: Result<UpdateManifest> = Err(Error::Unsupported(
+            "this launcher was built without network support".into(),
+        ));
+        match fetched {
             Ok(manifest) => match manifest.verify_release() {
                 Ok(()) => {
                     let platform = platform::Platform::current().name();
@@ -368,10 +440,106 @@ impl LauncherApp {
         }
     }
 
+    fn refresh_game_versions(&mut self) {
+        self.game_status = "Loading game versions…".into();
+        match game::available(
+            &game::github_repo(),
+            platform::Platform::current().name(),
+            platform::arch(),
+        ) {
+            Ok(releases) => {
+                self.game_status = if releases.is_empty() {
+                    "No downloadable game builds found".into()
+                } else {
+                    format!("{} game version(s) available", releases.len())
+                };
+                self.game_versions = releases;
+            }
+            Err(error) => {
+                self.game_status = format!("Could not load game versions: {error}");
+            }
+        }
+    }
+
+    fn install_game(&mut self, release: &GameRelease) {
+        self.game_status = format!("Downloading Matticraft {}…", release.version);
+        match game::install(release, self.store.root()) {
+            Ok(path) => {
+                self.game_binary_text = path.display().to_string();
+                self.store.settings.game_binary = Some(path.clone());
+                if let Err(error) = self.store.save() {
+                    self.game_status = format!("Game installed, but settings were not saved: {error}");
+                } else {
+                    self.game_status = format!("Matticraft {} installed", release.version);
+                }
+                self.status = format!("Game ready: {}", path.display());
+            }
+            Err(error) => self.game_status = format!("Game install failed: {error}"),
+        }
+    }
+
+    #[cfg(feature = "upload")]
+    fn apply_update_and_play(&mut self) {
+        if self.update_manifest.is_none() {
+            self.check_updates();
+        }
+        let Some(manifest) = self.update_manifest.clone() else {
+            return;
+        };
+        let Some(patch) = manifest
+            .patch_for(
+                platform::Platform::current().name(),
+                platform::arch(),
+            )
+            .cloned()
+        else {
+            self.update_status = "This release has no delta for this platform".into();
+            return;
+        };
+        let game = match find_game_binary(&self.store.settings) {
+            Ok(path) => path,
+            Err(error) => {
+                self.update_status = format!("Install a game version first: {error}");
+                return;
+            }
+        };
+        let updates = self.store.root().join("updates");
+        let _ = std::fs::create_dir_all(&updates);
+        let patch_path = updates.join(format!(
+            "{}-to-{}.patch",
+            launcher_core::slugify(&patch.from_version),
+            launcher_core::slugify(&patch.to_version)
+        ));
+        let result = launcher_core::update::fetch_bytes(&patch.url).and_then(|bytes| {
+            std::fs::write(&patch_path, bytes)?;
+            manifest.verify_patch(&patch_path, &patch)?;
+            launcher_core::update::apply_patch_to_file(&game, &patch_path)
+        });
+        match result {
+            Ok(()) => {
+                self.update_status = format!(
+                    "Updated {} → {}; starting the game",
+                    patch.from_version, patch.to_version
+                );
+                self.play();
+            }
+            Err(error) => {
+                self.update_status = format!("Patch update failed: {error}");
+            }
+        }
+    }
+
+    #[cfg(not(feature = "upload"))]
+    fn apply_update_and_play(&mut self) {
+        self.update_status = "This build has no download support".into();
+    }
+
     fn upload_crash(&mut self) {
         let Some(report) = self.selected_crash.clone() else {
             return;
         };
+        #[cfg(not(feature = "upload"))]
+        let _ = &report;
         let Some(endpoint) = non_empty(&self.crash_url_text) else {
             self.status = "Set the crash upload endpoint first".into();
             return;
@@ -401,42 +569,153 @@ impl LauncherApp {
 
     fn header(&mut self, ctx: &egui::Context) {
         egui::TopBottomPanel::top("header")
-            .frame(egui::Frame::NONE.fill(BG).inner_margin(egui::Margin::symmetric(18, 12)))
+            .frame(
+                egui::Frame::NONE
+                    .fill(BG)
+                    .inner_margin(egui::Margin::symmetric(24, 12)),
+            )
             .show(ctx, |ui| {
+                let rect = ui.max_rect();
+                ui.painter().line_segment(
+                    [rect.left_top(), rect.right_top()],
+                    egui::Stroke::new(2.0_f32, ACCENT),
+                );
                 ui.horizontal(|ui| {
                     ui.vertical(|ui| {
                         ui.label(
-                            RichText::new("MATTICRAFT")
-                                .size(24.0)
+                            RichText::new("MATTICRAFT  /  LAUNCHER")
+                                .size(10.0)
                                 .strong()
                                 .color(ACCENT),
                         );
+                        ui.label(RichText::new(self.tab.title()).size(26.0).strong());
+                        ui.label(
+                            RichText::new(self.tab.subtitle())
+                                .size(12.0)
+                                .color(MUTED),
+                        );
+                    });
+                    ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                        if ui.button("Check updates").clicked() {
+                            self.check_updates();
+                        }
+                        let account = self
+                            .store
+                            .active_account()
+                            .map(|account| account.username.clone())
+                            .unwrap_or_else(|| "Guest".to_string());
+                        ui.label(
+                            RichText::new(format!("●  {account}"))
+                                .size(12.0)
+                                .color(MUTED),
+                        );
+                        ui.label(
+                            RichText::new(format!("v{}", env!("CARGO_PKG_VERSION")))
+                                .size(11.0)
+                                .color(MUTED),
+                        );
                         ui.label(
                             RichText::new(format!(
-                                "Launcher {}  ·  {} {}  ·  default {}",
-                                env!("CARGO_PKG_VERSION"),
+                                "{} {}",
                                 platform::Platform::current().name(),
-                                platform::arch(),
-                                platform::default_selection()
+                                platform::arch()
                             ))
                             .size(11.0)
                             .color(MUTED),
                         );
                     });
-                    ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-                        for (tab, label) in [
-                            (Tab::Settings, "Settings"),
-                            (Tab::Logs, "Logs"),
-                            (Tab::Mods, "Mods"),
-                            (Tab::Profiles, "Profiles"),
-                        ] {
-                            if ui
-                                .selectable_label(self.tab == tab, RichText::new(label).strong())
-                                .clicked()
-                            {
-                                self.tab = tab;
-                            }
-                        }
+                });
+            });
+    }
+
+    fn nav_rail(&mut self, ctx: &egui::Context) {
+        egui::SidePanel::left("nav-rail")
+            .resizable(false)
+            .exact_width(176.0)
+            .frame(
+                egui::Frame::NONE
+                    .fill(NAV_BG)
+                    .inner_margin(egui::Margin::symmetric(12, 16))
+                    .stroke(egui::Stroke::new(1.0_f32, BORDER)),
+            )
+            .show(ctx, |ui| {
+                ui.horizontal(|ui| {
+                    ui.add_sized(
+                        [38.0, 38.0],
+                        egui::Button::new(RichText::new("M").size(21.0).strong())
+                            .fill(ACCENT)
+                            .stroke(egui::Stroke::NONE),
+                    );
+                    ui.vertical(|ui| {
+                        ui.label(RichText::new("MATTICRAFT").size(14.0).strong());
+                        ui.label(RichText::new("LAUNCHER").size(9.0).color(MUTED));
+                    });
+                });
+                ui.add_space(26.0);
+                ui.label(RichText::new("NAVIGATION").size(9.0).color(MUTED));
+                ui.add_space(6.0);
+                for tab in Tab::ALL {
+                    let active = self.tab == tab;
+                    let button = egui::Button::new(
+                        RichText::new(format!("{}   {}", tab.glyph(), tab.label()))
+                            .size(12.0)
+                            .strong(),
+                    )
+                    .fill(if active { ACCENT_DARK } else { Color32::TRANSPARENT })
+                    .stroke(if active {
+                        egui::Stroke::new(1.0_f32, ACCENT)
+                    } else {
+                        egui::Stroke::NONE
+                    });
+                    if ui.add_sized([ui.available_width(), 38.0], button).clicked() {
+                        self.tab = tab;
+                    }
+                    ui.add_space(4.0);
+                }
+
+                ui.with_layout(egui::Layout::bottom_up(egui::Align::LEFT), |ui| {
+                    ui.vertical(|ui| {
+                        let account = self
+                            .store
+                            .active_account()
+                            .map(|account| account.username.clone())
+                            .unwrap_or_else(|| "Guest".to_string());
+                        let initial = account
+                            .chars()
+                            .next()
+                            .map(|ch| ch.to_uppercase().to_string())
+                            .unwrap_or_else(|| "G".into());
+                        ui.horizontal(|ui| {
+                            ui.add_sized(
+                                [34.0, 34.0],
+                                egui::Button::new(RichText::new(initial).size(15.0).strong())
+                                    .fill(ACCENT_DARK)
+                                    .stroke(egui::Stroke::new(1.0_f32, ACCENT)),
+                            );
+                            ui.vertical(|ui| {
+                                ui.label(RichText::new(&account).size(12.0).strong());
+                                ui.label(
+                                    RichText::new("ACTIVE ACCOUNT").size(9.0).color(MUTED),
+                                );
+                            });
+                        });
+                        ui.add_space(10.0);
+                        ui.separator();
+                        ui.add_space(8.0);
+                        ui.label(
+                            RichText::new(format!(
+                                "{} {}",
+                                platform::Platform::current().name(),
+                                platform::arch()
+                            ))
+                            .size(10.0)
+                            .color(MUTED),
+                        );
+                        ui.label(
+                            RichText::new(format!("launcher {}", env!("CARGO_PKG_VERSION")))
+                                .size(10.0)
+                                .color(MUTED),
+                        );
                     });
                 });
             });
@@ -448,7 +727,12 @@ impl LauncherApp {
             .default_width(286.0)
             .frame(egui::Frame::NONE.fill(PANEL).inner_margin(egui::Margin::same(14)))
             .show(ctx, |ui| {
-                ui.label(RichText::new("PROFILES").size(11.0).color(MUTED));
+                ui.label(RichText::new("PROFILE LIBRARY").size(11.0).color(MUTED));
+                ui.label(
+                    RichText::new(format!("{} local profile(s)", self.store.profiles.len()))
+                        .size(10.0)
+                        .color(MUTED),
+                );
                 ui.add_space(6.0);
 
                 let mut select = None;
@@ -573,6 +857,84 @@ impl LauncherApp {
             });
     }
 
+    fn play_hero(&mut self, ui: &mut egui::Ui, profile: Profile) {
+        let account = self
+            .store
+            .active_account()
+            .map(|account| account.username.clone())
+            .unwrap_or_else(|| "Guest".to_string());
+        let game = find_game_binary(&self.store.settings)
+            .map(|path| path.display().to_string())
+            .unwrap_or_else(|_| "Game not installed yet".to_string());
+        egui::Frame::NONE
+            .fill(CARD)
+            .stroke(egui::Stroke::new(1.0_f32, BORDER))
+            .inner_margin(egui::Margin::same(20))
+            .show(ui, |ui| {
+                ui.horizontal(|ui| {
+                    ui.vertical(|ui| {
+                        ui.label(RichText::new("READY TO PLAY").size(10.0).color(ACCENT));
+                        ui.label(RichText::new(&profile.name).size(30.0).strong());
+                        ui.label(
+                            RichText::new(format!(
+                                "{}  ·  {}  ·  {} × {}",
+                                profile.game_version,
+                                profile.display_selection(),
+                                profile.width,
+                                profile.height
+                            ))
+                            .size(12.0)
+                            .color(MUTED),
+                        );
+                        ui.add_space(14.0);
+                        ui.horizontal(|ui| {
+                            if ui
+                                .add_sized(
+                                    [170.0, 48.0],
+                                    egui::Button::new(
+                                        RichText::new("▶  PLAY").size(20.0).strong(),
+                                    )
+                                    .fill(ACCENT),
+                                )
+                                .clicked()
+                            {
+                                self.play();
+                            }
+                            if ui.button("GAME LIBRARY").clicked() {
+                                self.tab = Tab::Updates;
+                            }
+                        });
+                    });
+                    ui.with_layout(
+                        egui::Layout::right_to_left(egui::Align::Min),
+                        |ui| {
+                            ui.vertical(|ui| {
+                                ui.label(RichText::new("ACCOUNT").size(9.0).color(MUTED));
+                                ui.label(RichText::new(&account).size(14.0).strong());
+                                ui.add_space(8.0);
+                                ui.label(RichText::new("GAME").size(9.0).color(MUTED));
+                                ui.label(
+                                    RichText::new(&game)
+                                        .size(11.0)
+                                        .color(if game.starts_with("Game not") {
+                                            WARNING
+                                        } else {
+                                            MUTED
+                                        }),
+                                );
+                                ui.add_space(8.0);
+                                ui.label(
+                                    RichText::new(format!("{} MiB memory", profile.memory_mb))
+                                        .size(11.0)
+                                        .color(MUTED),
+                                );
+                            });
+                        },
+                    );
+                });
+            });
+    }
+
     fn profile_tab(&mut self, ui: &mut egui::Ui) {
         if let Some(error) = &self.open_error {
             ui.label(
@@ -581,7 +943,11 @@ impl LauncherApp {
             );
             ui.add_space(8.0);
         }
-        ui.label(RichText::new("PROFILE").size(12.0).color(MUTED));
+        if let Some(profile) = self.draft.clone() {
+            self.play_hero(ui, profile);
+            ui.add_space(18.0);
+        }
+        ui.label(RichText::new("PROFILE SETTINGS").size(12.0).color(MUTED));
         ui.add_space(4.0);
         let Some(draft) = &mut self.draft else {
             ui.label("No profile selected.");
@@ -886,6 +1252,147 @@ impl LauncherApp {
         }
     }
 
+    fn updates_tab(&mut self, ui: &mut egui::Ui) {
+        ui.horizontal(|ui| {
+            ui.vertical(|ui| {
+                ui.label(RichText::new("GAME LIBRARY").size(12.0).color(MUTED));
+                ui.label(
+                    RichText::new("The launcher ships without the game. Pick a version to download it here.")
+                        .size(13.0),
+                );
+            });
+            ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                if ui.button("Refresh versions").clicked() {
+                    self.refresh_game_versions();
+                }
+                if ui.button("Check updates").clicked() {
+                    self.check_updates();
+                }
+            });
+        });
+
+        if !self.game_status.is_empty() {
+            ui.add_space(8.0);
+            ui.label(RichText::new(&self.game_status).size(12.0).color(MUTED));
+        }
+        ui.add_space(10.0);
+
+        let releases = self.game_versions.clone();
+        let mut install = None;
+        if releases.is_empty() {
+            egui::Frame::NONE
+                .fill(CARD)
+                .stroke(egui::Stroke::new(1.0_f32, BORDER))
+                .inner_margin(egui::Margin::same(16))
+                .show(ui, |ui| {
+                    ui.label(RichText::new("No game versions loaded yet.").strong());
+                    ui.label(
+                        RichText::new("Use Refresh versions to list the available Matticraft builds.")
+                            .size(12.0)
+                            .color(MUTED),
+                    );
+                });
+        } else {
+            egui::ScrollArea::vertical()
+                .id_salt("game-versions")
+                .max_height(250.0)
+                .show(ui, |ui| {
+                    for release in releases.iter().take(20) {
+                        egui::Frame::NONE
+                            .fill(CARD)
+                            .stroke(egui::Stroke::new(1.0_f32, BORDER))
+                            .inner_margin(egui::Margin::symmetric(14, 10))
+                            .show(ui, |ui| {
+                                ui.horizontal(|ui| {
+                                    ui.vertical(|ui| {
+                                        ui.label(
+                                            RichText::new(format!("Matticraft {}", release.version))
+                                                .strong()
+                                                .size(15.0),
+                                        );
+                                        ui.label(
+                                            RichText::new(&release.name).size(11.0).color(MUTED),
+                                        );
+                                    });
+                                    ui.with_layout(
+                                        egui::Layout::right_to_left(egui::Align::Center),
+                                        |ui| {
+                                            if ui.button("Download & use").clicked() {
+                                                install = Some(release.clone());
+                                            }
+                                            if let Some(digest) = &release.digest {
+                                                ui.label(
+                                                    RichText::new(format!(
+                                                        "sha256 {}",
+                                                        &digest[..digest.len().min(12)]
+                                                    ))
+                                                    .size(10.0)
+                                                    .color(MUTED),
+                                                );
+                                            }
+                                        },
+                                    );
+                                });
+                            });
+                        ui.add_space(6.0);
+                    }
+                });
+        }
+        if let Some(release) = install {
+            self.install_game(&release);
+        }
+
+        ui.add_space(16.0);
+        ui.separator();
+        ui.add_space(10.0);
+        ui.label(RichText::new("DELTA UPDATE").size(12.0).color(MUTED));
+        let manifest = self.update_manifest.clone();
+        if let Some(manifest) = manifest {
+            ui.label(
+                RichText::new(format!(
+                    "Release {} · {} · {}",
+                    manifest.version, manifest.channel, manifest.released_at
+                ))
+                .strong(),
+            );
+            if let Some(patch) = manifest
+                .patch_for(
+                    platform::Platform::current().name(),
+                    platform::arch(),
+                )
+                .cloned()
+            {
+                ui.label(
+                    RichText::new(format!(
+                        "Small patch {} → {} · {} bytes",
+                        patch.from_version, patch.to_version, patch.size
+                    ))
+                    .size(12.0)
+                    .color(MUTED),
+                );
+                if ui.button("Apply patch & play").clicked() {
+                    self.apply_update_and_play();
+                }
+            } else {
+                ui.label(
+                    RichText::new("No delta patch is published for this platform yet.")
+                        .size(12.0)
+                        .color(WARNING),
+                );
+            }
+        } else {
+            ui.label(
+                RichText::new("Check updates to load the signed release manifest.")
+                    .size(12.0)
+                    .color(MUTED),
+            );
+        }
+        if !self.update_status.is_empty() {
+            ui.add_space(6.0);
+            ui.label(RichText::new(&self.update_status).size(12.0));
+        }
+    }
+
     fn settings_tab(&mut self, ui: &mut egui::Ui) {
         ui.label(RichText::new("SETTINGS").size(12.0).color(MUTED));
         ui.monospace(self.store.root().display().to_string());
@@ -1025,6 +1532,14 @@ impl LauncherApp {
         egui::TopBottomPanel::bottom("status")
             .frame(egui::Frame::NONE.fill(BG).inner_margin(egui::Margin::symmetric(18, 8)))
             .show(ctx, |ui| {
+                let rect = ui.max_rect();
+                ui.painter().line_segment(
+                    [rect.left_top(), rect.right_top()],
+                    egui::Stroke::new(
+                        1.0_f32,
+                        Color32::from_rgba_unmultiplied(79, 142, 255, 48),
+                    ),
+                );
                 ui.horizontal(|ui| {
                     if self.status.is_empty() {
                         ui.label(RichText::new("Ready").size(11.0).color(MUTED));
@@ -1064,11 +1579,15 @@ impl eframe::App for LauncherApp {
         }
         self.header(ctx);
         self.status_bar(ctx);
-        self.sidebar(ctx);
+        self.nav_rail(ctx);
+        if matches!(self.tab, Tab::Profiles | Tab::Mods | Tab::Logs) {
+            self.sidebar(ctx);
+        }
         egui::CentralPanel::default()
             .frame(egui::Frame::NONE.fill(BG).inner_margin(egui::Margin::same(18)))
             .show(ctx, |ui| match self.tab {
                 Tab::Profiles => self.profile_tab(ui),
+                Tab::Updates => self.updates_tab(ui),
                 Tab::Mods => self.mods_tab(ui),
                 Tab::Logs => self.logs_tab(ui),
                 Tab::Settings => self.settings_tab(ui),
@@ -1077,6 +1596,7 @@ impl eframe::App for LauncherApp {
 }
 
 fn install_style(ctx: &egui::Context) {
+    install_fonts(ctx);
     let mut visuals = egui::Visuals::dark();
     visuals.panel_fill = BG;
     visuals.window_fill = PANEL;
@@ -1086,15 +1606,45 @@ fn install_style(ctx: &egui::Context) {
     visuals.selection.stroke.color = ACCENT;
     visuals.hyperlink_color = ACCENT;
     visuals.widgets.inactive.bg_fill = CARD;
-    visuals.widgets.hovered.bg_fill = Color32::from_rgb(42, 48, 58);
+    visuals.widgets.hovered.bg_fill = Color32::from_rgb(42, 47, 57);
     visuals.widgets.active.bg_fill = ACCENT_DARK;
+    visuals.widgets.inactive.bg_stroke = egui::Stroke::new(1.0_f32, Color32::from_rgb(51, 51, 51));
+    visuals.widgets.hovered.bg_stroke = egui::Stroke::new(1.0_f32, ACCENT);
     ctx.set_visuals(visuals);
 
     let mut style = (*ctx.style()).clone();
-    style.spacing.item_spacing = egui::vec2(8.0, 8.0);
-    style.spacing.button_padding = egui::vec2(10.0, 6.0);
-    style.spacing.interact_size.y = 26.0;
+    style.spacing.item_spacing = egui::vec2(9.0, 9.0);
+    style.spacing.button_padding = egui::vec2(12.0, 7.0);
+    style.spacing.interact_size.y = 30.0;
+    style.text_styles.insert(
+        egui::TextStyle::Heading,
+        egui::FontId::proportional(26.0),
+    );
+    style.text_styles.insert(
+        egui::TextStyle::Body,
+        egui::FontId::proportional(14.0),
+    );
+    style.text_styles.insert(
+        egui::TextStyle::Button,
+        egui::FontId::proportional(13.0),
+    );
     ctx.set_style(style);
+}
+
+fn install_fonts(ctx: &egui::Context) {
+    let mut fonts = egui::FontDefinitions::default();
+    fonts.font_data.insert(
+        "smallcaps".to_owned(),
+        std::sync::Arc::new(egui::FontData::from_static(include_bytes!(
+            "../assets/smallcaps.ttf"
+        ))),
+    );
+    fonts
+        .families
+        .entry(egui::FontFamily::Proportional)
+        .or_default()
+        .insert(0, "smallcaps".to_owned());
+    ctx.set_fonts(fonts);
 }
 
 fn non_empty(value: &str) -> Option<&str> {

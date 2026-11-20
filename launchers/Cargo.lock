@@ -1663,6 +1663,7 @@ name = "launcher-core"
 version = "0.1.0"
 dependencies = [
  "directories",
+ "flate2",
  "hex",
  "ring",
  "serde",
