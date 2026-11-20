@@ -124,7 +124,7 @@ jobs:
           # Only the x86_64 toolchain is needed. The mingw-w64 metapackage also
           # pulls the i686 and win32 variants (293 MB) and repeatedly stalled
           # on the runner's slow archive mirror.
-          PACKAGES=(cmake ninja-build gcc-mingw-w64-x86-64 libz-mingw-w64-dev wixl zip)
+          PACKAGES=(cmake ninja-build gcc-mingw-w64-x86-64 libz-mingw-w64-dev wixl msitools nsis zip)
           sudo timeout 300 apt-get "${APT_OPTS[@]}" update
           sudo timeout 900 env DEBIAN_FRONTEND=noninteractive apt-get "${APT_OPTS[@]}" \
             install -y --no-install-recommends "${PACKAGES[@]}"

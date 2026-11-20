@@ -167,7 +167,7 @@
     {
       "name": "linux-x64",
       "configurePreset": "linux-x64",
-      "targets": ["all"]
+      "targets": ["vulkancraft", "runClient", "matti_shared", "launcher"]
     },
     {
       "name": "linux-x64-debug",
