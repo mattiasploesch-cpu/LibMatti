@@ -183,6 +183,8 @@ same drawing code runs on every backend:
 Select the layer and API at runtime. The platform default is detected by
 `LibMatti` itself; `auto` lets the library pick the first usable backend:
 
+r
+
 ```bash
 ./build/runClient --layer native --api vulkan
 ./build/runClient --layer native --api opengl
@@ -219,13 +221,6 @@ workspace lives under `launchers/`:
 | `launcher-core` | all frontends | profiles, accounts, mods, logs, update manifests |
 | `launcher-desktop` | Linux/Windows | egui UI, `--check`, `--launch`, `--ui-once` |
 | `launcher-macos` | macOS `.app` | thin wrapper around the desktop crate |
-
-The launcher layout, palette and SmallCaps typography are inspired by
-[NoRiskClient](https://github.com/NoRiskClient/noriskclient-launcher), which is
-vendored under `vendor/noriskclient-launcher`. The vendored font is used as a
-UI asset. The launcher mirrors the same visual language in egui: near-black
-chrome, cool grey cards, blue accent, square edges, vertical navigation and a
-large play surface.
 
 The launcher stores `profile.json` per instance and asks `libmatti`
 (`LIBMATTI_Platform_DefaultRenderer`) for the renderer preset when the library
