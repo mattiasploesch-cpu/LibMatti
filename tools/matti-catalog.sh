@@ -9,8 +9,12 @@ trap 'rm -f "$TMP"' EXIT
 printf '{\n  "schema": 1,\n  "name": "Matticraft mods",\n  "repository": "mattiasploesch-cpu/LibMatti",\n  "updated": "%s",\n  "mods": [\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" > "$TMP"
 
 first=1
-for metadata in "$ROOT"/mods/*/metadata.matti; do
+for metadata in "$ROOT"/mods/*/metadata.matti "$ROOT"/mods/custom/*/metadata.matti; do
     [ -f "$metadata" ] || continue
+    case "$metadata" in
+        "$ROOT"/mods/custom/*/metadata.matti) ;;
+        "$ROOT"/mods/custom/*) continue ;;
+    esac
     [ "$first" -eq 1 ] || printf ',\n' >> "$TMP"
     first=0
     python3 - "$metadata" >> "$TMP" <<'PY'
@@ -34,7 +38,7 @@ entry = {
     "homepage": data.get("homepage", ""),
     "game_versions": data.get("game_versions", []),
     "tags": data.get("tags", []),
-    "file": f"{mod_id}-{version}.so",
+    "file": f"{mod_id}-{version}.matti",
     "url": f"https://github.com/mattiasploesch-cpu/LibMatti/releases/latest/download/{mod_id}-{version}.matti",
     "downloads": [
         {

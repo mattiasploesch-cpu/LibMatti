@@ -2,7 +2,7 @@
     "schema": 1,
     "name": "Matticraft mods",
     "repository": "mattiasploesch-cpu/LibMatti",
-    "updated": "2026-11-20T06:30:26Z",
+    "updated": "2026-11-20T06:34:43Z",
     "mods": [
         {
             "id": "examplemod",
@@ -20,7 +20,7 @@
                 "template",
                 "example"
             ],
-            "file": "examplemod-1.0.so",
+            "file": "examplemod-1.0.matti",
             "url": "https://github.com/mattiasploesch-cpu/LibMatti/releases/latest/download/examplemod-1.0.matti",
             "downloads": [
                 {

@@ -557,17 +557,7 @@ fn mods(app: &mut LauncherApp, ui: &mut egui::Ui) {
         ui.horizontal(|ui| {
             ui.label(RichText::new(validation.summary()).font(theme.body()).strong().color(if validation.ok() { theme.success } else { theme.error }));
             ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
-                if widgets::secondary_button(ui, &theme, "Write mods.json", Some(Icon::Check)).clicked() {
-                    match launcher_core::mods::build_manifest(&profile.mods_dir)
-                        .and_then(|manifest| launcher_core::mods::write_manifest(&profile.mods_dir, &manifest))
-                    {
-                        Ok(()) => {
-                            app.ui.success("Manifest written", "The current files are now the expected set.");
-                            app.refresh_profile_views();
-                        }
-                        Err(error) => app.ui.error("Manifest failed", error.to_string()),
-                    }
-                }
+                ui.label(RichText::new("Catalog comes from metadata.matti").font(theme.micro()).color(theme.faint));
             });
         });
         ui.add_space(8.0);
@@ -749,7 +739,7 @@ fn studio_page(app: &mut LauncherApp, ui: &mut egui::Ui) {
             .show(&mut columns[1], |ui| {
                 for (index, (title, detail)) in [
                     ("metadata.matti", "Mandatory in the project root; mods.json is generated from it."),
-                    ("MDK", "Clone mattiasploesch-cpu/matti-ndk or use MATTI_MDK_DIR."),
+                    ("MDK", "Clone mattiasploesch-cpu/matti-mdk or use MATTI_MDK_DIR."),
                     ("Build", "CMake builds the shared object against library/src."),
                     ("Pack", ".matti receives pack, metadata and source sections."),
                     ("Import", "Place the package in mods/import for the new_mod workflow."),

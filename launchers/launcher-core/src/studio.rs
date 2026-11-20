@@ -4,7 +4,7 @@ use std::process::Command;
 use crate::metadata::{ModMetadata, METADATA_FILE};
 use crate::{slugify, Error, Result};
 
-pub const MDK_REPOSITORY: &str = "https://github.com/mattiasploesch-cpu/matti-ndk.git";
+pub const MDK_REPOSITORY: &str = "https://github.com/mattiasploesch-cpu/matti-mdk.git";
 pub const PACKAGE_DIR: &str = "mods/import";
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -59,6 +59,7 @@ pub fn create_project(
     std::fs::create_dir_all(&src)?;
     let resources = root.join("resources");
     std::fs::create_dir_all(&resources)?;
+    write_mod_toml(&resources, &metadata)?;
     let source_path = src.join(format!("{}.c", c_identifier(&metadata.id)));
     if !source_path.exists() {
         std::fs::write(&source_path, source_template(&metadata))?;
@@ -122,7 +123,12 @@ pub fn build_project(
     }
     std::fs::create_dir_all(output_dir)?;
     let build_dir = project.root.join("build");
-    let helper = repository_root.join("mods/cmake/MattiMod.cmake");
+    let helper = project
+        .mdk
+        .as_ref()
+        .map(|mdk| mdk.join("cmake/MattiMod.cmake"))
+        .filter(|path| path.is_file())
+        .unwrap_or_else(|| repository_root.join("mods/cmake/MattiMod.cmake"));
     if !helper.is_file() {
         return Err(Error::NotFound(format!(
             "mod CMake helper {}",
@@ -140,7 +146,8 @@ pub fn build_project(
             repository_root.join("library/src").display()
         ))
         .arg(format!("-DMATTI_MODS_DIR={}", output_dir.display()))
-        .arg(format!("-DMATTI_MOD_CMAKE={}", helper.display()));
+        .arg(format!("-DMATTI_MOD_CMAKE={}", helper.display()))
+        .arg(format!("-DMATTICRAFT_DIR={}", repository_root.display()));
     run(configure, "configure the mod project")?;
     let mut build = Command::new("cmake");
     build.arg("--build").arg(&build_dir).arg("-j").arg("2");
@@ -395,6 +402,32 @@ fn run(mut command: Command, action: &str) -> Result<()> {
     )))
 }
 
+fn write_mod_toml(resources: &Path, metadata: &ModMetadata) -> Result<()> {
+    let meta_inf = resources.join("META-INF");
+    std::fs::create_dir_all(&meta_inf)?;
+    let path = meta_inf.join("neoforge.mods.toml");
+    if path.is_file() {
+        return Ok(());
+    }
+    let description = if metadata.description.trim().is_empty() {
+        "A Matticraft mod built with the MDK."
+    } else {
+        metadata.description.trim()
+    };
+    std::fs::write(
+        path,
+        format!(
+            "modLoader=\"javafml\"\nloaderVersion=\"[1,)\"\nlicense=\"{}\"\n\n[[mods]]\nmodId=\"{}\"\nversion=\"{}\"\ndisplayName=\"{}\"\ndescription=\"{}\"\n",
+            if metadata.license.trim().is_empty() { "MIT" } else { metadata.license.trim() },
+            metadata.id,
+            metadata.version,
+            metadata.name,
+            description.replace('"', "'")
+        ),
+    )?;
+    Ok(())
+}
+
 fn c_identifier(id: &str) -> String {
     id.chars()
         .map(|ch| if ch.is_ascii_alphanumeric() { ch } else { '_' })
@@ -458,6 +491,25 @@ mod tests {
         assert!(project.root.join("metadata.matti").is_file());
         assert!(project.root.join("CMakeLists.txt").is_file());
         assert!(project.root.join("src/studio_mod.c").is_file());
+        assert!(project.root.join("resources/META-INF/neoforge.mods.toml").is_file());
+        let _ = std::fs::remove_dir_all(root);
+    }
+
+    #[test]
+    fn builds_with_a_local_mdk_when_requested() {
+        let Ok(mdk) = std::env::var("MATTI_TEST_MDK") else {
+            return;
+        };
+        let root = crate::temp_dir("studio-build");
+        let metadata = ModMetadata::new("studio-build", "Studio Build", "1.0.0").unwrap();
+        let project = create_project(&root, metadata, "", Some(Path::new(&mdk))).unwrap();
+        let repository = Path::new(env!("CARGO_MANIFEST_DIR"))
+            .parent()
+            .and_then(Path::parent)
+            .unwrap();
+        let output = build_project(&project, repository, &root.join("out")).unwrap();
+        assert!(output.library.is_file());
+        assert!(output.package.is_file());
         let _ = std::fs::remove_dir_all(root);
     }
 }
