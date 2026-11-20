@@ -312,6 +312,15 @@ impl LauncherApp {
         }
     }
 
+    fn installed_game_version(&self) -> Option<String> {
+        let path = find_game_binary(&self.store.settings).ok()?;
+        let relative = path.strip_prefix(self.store.root().join("games")).ok()?;
+        relative
+            .components()
+            .next()
+            .map(|component| component.as_os_str().to_string_lossy().to_string())
+    }
+
     fn refresh_profile_views(&mut self) {
         let Some(profile) = self.draft.clone() else {
             self.mod_validation = None;
@@ -381,6 +390,11 @@ impl LauncherApp {
     }
 
     fn play_with_args(&mut self, extra: &[String]) {
+        if self.draft.is_none() {
+            self.status = "Create a profile before launching".into();
+            self.ui.warn("No profile", "Create a profile before launching the game.");
+            return;
+        }
         if let Err(error) = self.save_draft().and_then(|_| self.save_settings()) {
             self.status = format!("Cannot start: {error}");
             return;

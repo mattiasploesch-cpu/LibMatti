@@ -12,6 +12,8 @@ use crate::app::{LauncherApp, Tab};
 const NAV_WIDTH: f32 = 218.0;
 
 pub fn show(app: &mut LauncherApp, ctx: &egui::Context) {
+    let density = if app.ui.compact { 5.0 } else { 8.0 };
+    ctx.style_mut(|style| style.spacing.item_spacing.y = density);
     app.ui.tick(ctx);
     app.ensure_textures(ctx);
     shortcuts(app, ctx);
@@ -20,6 +22,7 @@ pub fn show(app: &mut LauncherApp, ctx: &egui::Context) {
     status_bar(app, ctx);
     central(app, ctx);
     command_palette(app, ctx);
+    shortcuts_dialog(app, ctx);
     notification_center(app, ctx);
     confirm_dialog(app, ctx);
     toasts(app, ctx);
@@ -28,19 +31,70 @@ pub fn show(app: &mut LauncherApp, ctx: &egui::Context) {
 fn shortcuts(app: &mut LauncherApp, ctx: &egui::Context) {
     let command = ctx.input(|input| input.modifiers.command);
     let shift = ctx.input(|input| input.modifiers.shift);
-    if command && ctx.input(|input| input.key_pressed(egui::Key::K)) {
-        app.ui.command_open = true;
+    let pressed = |key| ctx.input(|input| input.key_pressed(key));
+
+    if command && shift {
+        if pressed(egui::Key::M) {
+            jump_to(app, Tab::Studio);
+        } else if pressed(egui::Key::S) {
+            jump_to(app, Tab::Servers);
+        } else if pressed(egui::Key::C) {
+            jump_to(app, Tab::Cosmetics);
+        } else if pressed(egui::Key::N) {
+            jump_to(app, Tab::News);
+        } else if pressed(egui::Key::D) {
+            jump_to(app, Tab::Downloads);
+        } else if pressed(egui::Key::L) {
+            jump_to(app, Tab::Logs);
+        } else if pressed(egui::Key::P) {
+            app.open_path(app.store.root().to_path_buf());
+        } else if pressed(egui::Key::R) {
+            app.ui.reset_preferences();
+            app.theme = Theme::matticraft();
+            app.theme.apply(ctx);
+            app.ui.info("Preferences reset", "Theme, density and filters are back to their defaults.");
+        }
+    } else if command {
+        if pressed(egui::Key::K) {
+            app.ui.command_open = true;
+        } else if pressed(egui::Key::Comma) {
+            jump_to(app, Tab::Settings);
+        } else if pressed(egui::Key::L) {
+            jump_to(app, Tab::Library);
+        } else if pressed(egui::Key::M) {
+            jump_to(app, Tab::Mods);
+        } else if pressed(egui::Key::N) {
+            app.create_profile();
+        } else if pressed(egui::Key::D) {
+            app.duplicate_profile();
+        } else if pressed(egui::Key::R) {
+            refresh_active(app);
+        } else if pressed(egui::Key::F) {
+            app.ui.focus_search = true;
+            if !matches!(app.tab, Tab::Library | Tab::Mods | Tab::Servers) {
+                jump_to(app, Tab::Library);
+            }
+        } else if pressed(egui::Key::Q) {
+            ctx.send_viewport_cmd(egui::ViewportCommand::Close);
+        }
     }
-    if command && shift && ctx.input(|input| input.key_pressed(egui::Key::M)) {
-        app.tab = Tab::Mods;
-    }
-    if command && ctx.input(|input| input.key_pressed(egui::Key::Comma)) {
-        app.tab = Tab::Settings;
-    }
-    if ctx.input(|input| input.key_pressed(egui::Key::F1)) {
+
+    if pressed(egui::Key::F1) {
         app.ui.shortcuts_open = true;
     }
-    if ctx.input(|input| input.key_pressed(egui::Key::Escape)) {
+    if pressed(egui::Key::F5) {
+        refresh_active(app);
+    }
+    if app.tab == Tab::Home
+        && pressed(egui::Key::Enter)
+        && !ctx.wants_keyboard_input()
+        && !app.ui.command_open
+        && !app.ui.shortcuts_open
+        && app.ui.confirm.is_none()
+    {
+        app.play();
+    }
+    if pressed(egui::Key::Escape) {
         app.ui.command_open = false;
         app.ui.notifications_open = false;
         app.ui.shortcuts_open = false;
@@ -48,6 +102,21 @@ fn shortcuts(app: &mut LauncherApp, ctx: &egui::Context) {
         app.ui.add_profile_open = false;
         app.ui.add_account_open = false;
         app.ui.server_dialog_open = false;
+    }
+}
+
+fn jump_to(app: &mut LauncherApp, tab: Tab) {
+    app.tab = tab;
+    app.ui.page_enter = 0.0;
+    app.ui.last_tab_switch = app.ui.now;
+}
+
+fn refresh_active(app: &mut LauncherApp) {
+    match app.tab {
+        Tab::Library | Tab::Downloads => app.refresh_game_versions(),
+        Tab::Mods => app.refresh_catalog(),
+        Tab::Logs => app.refresh_profile_views(),
+        _ => app.refresh_profile_views(),
     }
 }
 
@@ -320,7 +389,7 @@ fn central(app: &mut LauncherApp, ctx: &egui::Context) {
                 .inner_margin(egui::Margin::symmetric(24, 18)),
         )
         .show(ctx, |ui| {
-            if app.tab == Tab::Home {
+            if app.tab == Tab::Home && app.ui.show_background {
                 assets::paint_background(
                     ui,
                     app.background.as_ref(),
@@ -421,6 +490,9 @@ fn command_palette(app: &mut LauncherApp, ctx: &egui::Context) {
                         .frame(false)
                         .desired_width(f32::INFINITY),
                 );
+                if response.changed() {
+                    app.ui.command_selected = 0;
+                }
                 response.request_focus();
             });
             widgets::divider(ui, &theme);
@@ -429,19 +501,39 @@ fn command_palette(app: &mut LauncherApp, ctx: &egui::Context) {
                 .into_iter()
                 .filter(|item| app.ui.command_matches(&app.ui.command_query, item.label, item.hint))
                 .collect();
+            let count = filtered.len();
+            let selected = if count == 0 {
+                0
+            } else {
+                app.ui.command_selected.min(count - 1)
+            };
+            if count > 0 {
+                if ctx.input(|input| input.key_pressed(egui::Key::ArrowDown)) {
+                    app.ui.command_selected = (selected + 1) % count;
+                }
+                if ctx.input(|input| input.key_pressed(egui::Key::ArrowUp)) {
+                    app.ui.command_selected = (selected + count - 1) % count;
+                }
+                if ctx.input(|input| input.key_pressed(egui::Key::Enter)) {
+                    (filtered[selected].action)(app);
+                    app.ui.close_command();
+                    return;
+                }
+            }
             egui::ScrollArea::vertical()
                 .max_height(330.0)
                 .show(ui, |ui| {
-                    for item in filtered {
+                    for (index, item) in filtered.iter().enumerate() {
+                        let active = index == selected;
                         let response = ui.add_sized(
                             [ui.available_width(), 34.0],
                             egui::Button::new(
                                 RichText::new(format!("{}   {}", item.glyph, item.label))
                                     .font(theme.body())
-                                    .color(theme.on_surface),
+                                    .color(if active { theme.primary } else { theme.on_surface }),
                             )
-                            .fill(Color32::TRANSPARENT)
-                            .stroke(Stroke::NONE),
+                            .fill(if active { theme.primary_container } else { Color32::TRANSPARENT })
+                            .stroke(if active { Stroke::new(1.0, theme.primary) } else { Stroke::NONE }),
                         );
                         if response.clicked() {
                             (item.action)(app);
@@ -451,12 +543,12 @@ fn command_palette(app: &mut LauncherApp, ctx: &egui::Context) {
                 });
             ui.add_space(4.0);
             ui.label(
-                RichText::new("Enter selects · Esc closes")
+                RichText::new(format!("{} result(s) · ↑↓ navigate · Enter selects · Esc closes", count))
                     .font(theme.micro())
                     .color(theme.faint),
             );
         });
-    app.ui.command_open = open;
+    app.ui.command_open = open && app.ui.command_open;
 }
 
 struct CommandItem {
@@ -466,7 +558,7 @@ struct CommandItem {
     action: fn(&mut LauncherApp),
 }
 
-fn command_items(app: &LauncherApp) -> Vec<CommandItem> {
+fn command_items(_app: &LauncherApp) -> Vec<CommandItem> {
     let mut items = Vec::new();
     for tab in Tab::ALL {
         items.push(CommandItem {
@@ -521,6 +613,67 @@ fn command_items(app: &LauncherApp) -> Vec<CommandItem> {
         action: |app| app.open_path(app.store.root().to_path_buf()),
     });
     items
+}
+
+fn shortcuts_dialog(app: &mut LauncherApp, ctx: &egui::Context) {
+    if !app.ui.shortcuts_open {
+        return;
+    }
+    let theme = app.theme;
+    let mut open = app.ui.shortcuts_open;
+    egui::Window::new("shortcuts-dialog")
+        .id(egui::Id::new("shortcuts-dialog"))
+        .title_bar(false)
+        .resizable(false)
+        .collapsible(false)
+        .anchor(Align2::CENTER_CENTER, [0.0, 0.0])
+        .fixed_size([640.0, 520.0])
+        .frame(super::theme::modal_frame(&theme))
+        .show(ctx, |ui| {
+            ui.horizontal(|ui| {
+                ui.vertical(|ui| {
+                    ui.label(
+                        RichText::new("KEYBOARD SHORTCUTS")
+                            .font(Theme::display_font(12.0))
+                            .color(theme.primary),
+                    );
+                    ui.label(
+                        RichText::new("Move through the launcher without leaving the keyboard.")
+                            .font(theme.small())
+                            .color(theme.on_surface_variant),
+                    );
+                });
+                ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
+                    if ui.small_button("×").clicked() {
+                        open = false;
+                    }
+                });
+            });
+            ui.add_space(10.0);
+            egui::ScrollArea::vertical().max_height(400.0).show(ui, |ui| {
+                egui::Grid::new("shortcut-grid")
+                    .num_columns(3)
+                    .spacing([16.0, 9.0])
+                    .striped(true)
+                    .show(ui, |ui| {
+                        for shortcut in data::SHORTCUTS {
+                            widgets::badge(ui, &theme, shortcut.keys, theme.secondary);
+                            ui.label(
+                                RichText::new(shortcut.action)
+                                    .font(theme.small())
+                                    .color(theme.on_surface),
+                            );
+                            ui.label(
+                                RichText::new(shortcut.context)
+                                    .font(theme.micro())
+                                    .color(theme.faint),
+                            );
+                            ui.end_row();
+                        }
+                    });
+            });
+        });
+    app.ui.shortcuts_open = open;
 }
 
 fn notification_center(app: &mut LauncherApp, ctx: &egui::Context) {

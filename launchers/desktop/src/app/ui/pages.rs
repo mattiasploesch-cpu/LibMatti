@@ -49,7 +49,49 @@ fn home(app: &mut LauncherApp, ui: &mut egui::Ui) {
             }
         },
     );
-    ui.add_space(14.0);
+    let game_ready = launcher_core::launch::find_game_binary(&app.store.settings).is_ok();
+    let account_ready = app.store.active_account().is_some();
+    let profile_ready = profile.is_some();
+    if !game_ready || !account_ready || !profile_ready {
+        egui::Frame::NONE
+            .fill(theme.surface)
+            .stroke(Stroke::new(1.0, theme.outline))
+            .corner_radius(egui::CornerRadius::same(18))
+            .inner_margin(egui::Margin::same(16))
+            .show(ui, |ui| {
+                ui.horizontal(|ui| {
+                    ui.vertical(|ui| {
+                        widgets::label(ui, &theme, "SETUP CHECKLIST", theme.primary, 9.5, true);
+                        ui.label(RichText::new("Three steps before the first launch").font(theme.subheading()).strong().color(theme.on_surface));
+                    });
+                    ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
+                        let ready = [game_ready, account_ready, profile_ready].iter().filter(|done| **done).count();
+                        widgets::badge(ui, &theme, &format!("{ready}/3 READY"), if ready == 3 { theme.success } else { theme.warning });
+                    });
+                });
+                ui.add_space(10.0);
+                for (done, title, detail, action, tab) in [
+                    (game_ready, "Game build", "Install a portable build from the release library.", "Install", Tab::Library),
+                    (account_ready, "Player identity", "Add an offline account or pick an existing one.", "Accounts", Tab::Accounts),
+                    (profile_ready, "Profile", "Create an instance for worlds and mods.", "Profiles", Tab::Profiles),
+                ] {
+                    ui.horizontal(|ui| {
+                        widgets::badge(ui, &theme, if done { "READY" } else { "NEEDED" }, if done { theme.success } else { theme.warning });
+                        ui.vertical(|ui| {
+                            ui.label(RichText::new(title).font(theme.small()).strong().color(theme.on_surface));
+                            ui.label(RichText::new(detail).font(theme.micro()).color(theme.on_surface_variant));
+                        });
+                        ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
+                            if !done && ui.small_button(action).clicked() {
+                                app.tab = tab;
+                            }
+                        });
+                    });
+                    ui.add_space(3.0);
+                }
+            });
+        ui.add_space(14.0);
+    }
 
     if let Some(profile) = profile {
         egui::Frame::NONE
@@ -60,7 +102,7 @@ fn home(app: &mut LauncherApp, ui: &mut egui::Ui) {
             .show(ui, |ui| {
                 ui.horizontal(|ui| {
                     ui.vertical(|ui| {
-                        widgets::label(ui, &theme, "READY TO PLAY", theme.primary, 9.5, true);
+                        widgets::label(ui, &theme, if game_ready && account_ready { "READY TO PLAY" } else { "SETUP INCOMPLETE" }, theme.primary, 9.5, true);
                         ui.label(
                             RichText::new(&profile.name)
                                 .font(FontId::proportional(34.0))
@@ -80,8 +122,12 @@ fn home(app: &mut LauncherApp, ui: &mut egui::Ui) {
                         );
                         ui.add_space(16.0);
                         ui.horizontal(|ui| {
-                            if widgets::primary_button(ui, &theme, "Launch", Some(Icon::Play)).clicked() {
-                                app.play();
+                            if widgets::primary_button(ui, &theme, if game_ready { "Launch" } else { "Install a build" }, Some(Icon::Play)).clicked() {
+                                if game_ready {
+                                    app.play();
+                                } else {
+                                    app.tab = Tab::Library;
+                                }
                             }
                             if widgets::secondary_button(ui, &theme, "Edit profile", Some(Icon::Settings)).clicked() {
                                 app.tab = Tab::Profiles;
@@ -258,7 +304,11 @@ fn library(app: &mut LauncherApp, ui: &mut egui::Ui) {
             |filter| filter.label().to_string(),
         );
         ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
-            widgets::search_field(ui, &theme, &mut app.ui.command_query, "Search versions");
+            let response = widgets::search_field(ui, &theme, &mut app.ui.library_query, "Search versions");
+            if app.ui.focus_search {
+                response.request_focus();
+                app.ui.focus_search = false;
+            }
         });
     });
     if !app.game_status.is_empty() {
@@ -270,9 +320,26 @@ fn library(app: &mut LauncherApp, ui: &mut egui::Ui) {
         app.refresh_game_versions();
     }
 
-    let installed = launcher_core::launch::find_game_binary(&app.store.settings).ok();
-    let versions = app.game_versions.clone();
-    if versions.is_empty() {
+    let installed_version = app.installed_game_version();
+    let query = app.ui.library_query.trim().to_ascii_lowercase();
+    let versions = app
+        .game_versions
+        .iter()
+        .filter(|release| {
+            let matches_query = query.is_empty()
+                || release.version.to_ascii_lowercase().contains(&query)
+                || release.name.to_ascii_lowercase().contains(&query);
+            let installed = installed_version.as_deref() == Some(release.version.as_str());
+            let matches_filter = match app.ui.library_filter {
+                LibraryFilter::All => true,
+                LibraryFilter::Installed => installed,
+                LibraryFilter::Available => !installed,
+            };
+            matches_query && matches_filter
+        })
+        .cloned()
+        .collect::<Vec<_>>();
+    if app.game_versions.is_empty() {
         egui::Frame::NONE
             .fill(theme.card)
             .stroke(Stroke::new(1.0, theme.outline))
@@ -281,9 +348,18 @@ fn library(app: &mut LauncherApp, ui: &mut egui::Ui) {
             .show(ui, |ui| {
                 widgets::empty_state(ui, &theme, Icon::Grid, "No builds loaded", "Refresh the library to read the published game versions.");
             });
+    } else if versions.is_empty() {
+        egui::Frame::NONE
+            .fill(theme.card)
+            .stroke(Stroke::new(1.0, theme.outline))
+            .corner_radius(egui::CornerRadius::same(16))
+            .inner_margin(egui::Margin::same(18))
+            .show(ui, |ui| {
+                widgets::empty_state(ui, &theme, Icon::Filter, "No matching builds", "Change the search or filter to see more releases.");
+            });
     } else {
         for release in versions {
-            let is_installed = installed.as_ref().is_some_and(|_| false);
+            let is_installed = installed_version.as_deref() == Some(release.version.as_str());
             egui::Frame::NONE
                 .fill(theme.card)
                 .stroke(Stroke::new(1.0, theme.outline))
@@ -600,7 +676,11 @@ fn mods(app: &mut LauncherApp, ui: &mut egui::Ui) {
     ui.add_space(18.0);
     widgets::section_title(ui, &theme, "Mod catalog", "Live entries from mods.json in the configured GitHub repository");
     let mut query = app.catalog_query.clone();
-    widgets::search_field(ui, &theme, &mut query, "Search the catalog");
+    let response = widgets::search_field(ui, &theme, &mut query, "Search the catalog");
+    if app.ui.focus_search {
+        response.request_focus();
+        app.ui.focus_search = false;
+    }
     app.catalog_query = query;
     ui.horizontal(|ui| {
         if widgets::secondary_button(ui, &theme, "Refresh catalog", Some(Icon::Refresh)).clicked() {
@@ -887,7 +967,11 @@ fn servers(app: &mut LauncherApp, ui: &mut egui::Ui) {
         });
     ui.add_space(8.0);
     let mut query = app.ui.server_query.clone();
-    widgets::search_field(ui, &theme, &mut query, "Search servers");
+    let response = widgets::search_field(ui, &theme, &mut query, "Search servers");
+    if app.ui.focus_search {
+        response.request_focus();
+        app.ui.focus_search = false;
+    }
     app.ui.server_query = query;
     ui.add_space(8.0);
     let filter = app.ui.server_query.to_lowercase();
@@ -1360,6 +1444,7 @@ fn appearance(app: &mut LauncherApp, ui: &mut egui::Ui) {
             .interact(egui::Sense::click());
         if response.clicked() {
             app.theme = Theme::new(preset);
+            app.theme.apply(ui.ctx());
             app.ui.accent_index = 0;
         }
         ui.add_space(5.0);
