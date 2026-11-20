@@ -37,7 +37,7 @@ pub fn page_header(
     });
 }
 
-pub fn label(ui: &mut Ui, theme: &Theme, text: &str, color: Color32, size: f32, strong: bool) {
+pub fn label(ui: &mut Ui, _theme: &Theme, text: &str, color: Color32, size: f32, strong: bool) {
     let mut text = RichText::new(text)
         .font(FontId::proportional(size))
         .color(color);
