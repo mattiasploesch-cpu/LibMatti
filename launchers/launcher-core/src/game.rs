@@ -106,6 +106,11 @@ fn is_game_artifact(name: &str, platform: &str, arch: &str) -> bool {
     match platform {
         "linux" => {
             name.ends_with(&format!("-linux-{linux_arch}.tar.zst"))
+                || name.ends_with(&format!("-linux-{arch}.tar.gz"))
+                || name.ends_with(&format!("-portable-linux-{arch}.zip"))
+                || name.ends_with(&format!("-{arch}.AppImage"))
+                || name.ends_with("-x86_64.AppImage")
+                || name.ends_with("-aarch64.AppImage")
         }
         "windows" => {
             (arch == "x86_64" && name.contains("-windows-x64."))
@@ -131,6 +136,16 @@ pub fn install(release: &GameRelease, root: &Path) -> Result<PathBuf> {
     if let Some(digest) = &release.digest {
         crate::update::verify_file_sha256(&archive, digest, "game archive")?;
     }
+    if release.name.ends_with(".AppImage") {
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::PermissionsExt;
+            let mut permissions = std::fs::metadata(&archive)?.permissions();
+            permissions.set_mode(0o755);
+            std::fs::set_permissions(&archive, permissions)?;
+        }
+        return Ok(archive);
+    }
 
     let extracted = target.join("root");
     let _ = std::fs::remove_dir_all(&extracted);
@@ -155,6 +170,21 @@ pub fn install(_release: &GameRelease, _root: &Path) -> Result<PathBuf> {
 
 #[cfg(feature = "upload")]
 fn extract(archive: &Path, target: &Path) -> Result<()> {
+    if archive.extension().and_then(|value| value.to_str()) == Some("gz") {
+        let status = Command::new("tar")
+            .arg("-xzf")
+            .arg(archive)
+            .arg("-C")
+            .arg(target)
+            .status();
+        if status.map(|status| status.success()).unwrap_or(false) {
+            return Ok(());
+        }
+        return Err(Error::Invalid(format!(
+            "could not unpack game archive {}",
+            archive.display()
+        )));
+    }
     if archive.extension().and_then(|value| value.to_str()) == Some("zst") {
         let status = Command::new("tar")
             .arg("--zstd")
@@ -241,6 +271,16 @@ mod tests {
         assert!(is_game_artifact(
             "Matticraft-1.2.0-windows-x64.zip",
             "windows",
+            "x86_64"
+        ));
+        assert!(is_game_artifact(
+            "Matticraft-1.2.0-portable-linux-x64.zip",
+            "linux",
+            "x86_64"
+        ));
+        assert!(is_game_artifact(
+            "Matticraft-1.2.0-x86_64.AppImage",
+            "linux",
             "x86_64"
         ));
         assert!(!is_game_artifact(

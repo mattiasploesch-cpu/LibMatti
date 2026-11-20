@@ -30,6 +30,20 @@ pub struct Settings {
     pub game_binary: Option<PathBuf>,
     #[serde(default)]
     pub close_on_launch: bool,
+    #[serde(default = "default_catalog_repo")]
+    pub catalog_repo: String,
+    #[serde(default = "default_mdk_repo")]
+    pub mdk_repo: String,
+    #[serde(default)]
+    pub last_server: String,
+}
+
+fn default_catalog_repo() -> String {
+    crate::catalog::DEFAULT_CATALOG_REPO.to_string()
+}
+
+fn default_mdk_repo() -> String {
+    crate::studio::MDK_REPOSITORY.to_string()
 }
 
 fn default_channel() -> String {
@@ -45,6 +59,9 @@ impl Default for Settings {
             upload_crash_reports: false,
             game_binary: None,
             close_on_launch: false,
+            catalog_repo: default_catalog_repo(),
+            mdk_repo: default_mdk_repo(),
+            last_server: String::new(),
         }
     }
 }

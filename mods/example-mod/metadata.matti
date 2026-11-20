@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "id": "examplemod",
+  "name": "Example Mod",
+  "version": "1.0",
+  "author": "Matticraft",
+  "description": "A small template with a block and an item.",
+  "license": "LGPL-3.0-or-later",
+  "entry": "examplemod_init",
+  "game_versions": ["1.21.11"],
+  "tags": ["template", "example"],
+  "required": true
+}

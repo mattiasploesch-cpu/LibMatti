@@ -1,18 +1,20 @@
-//! The egui frontend. It renders [`launcher_core`] state only; every decision
-//! (profile format, selection, mods, updates) stays in the core.
-
 use std::path::{Path, PathBuf};
+
+mod ui;
 
 use eframe::egui;
 use egui::{Color32, RichText};
 use launcher_core::account::Account;
+use launcher_core::catalog::{CatalogEntry, ModCatalog};
 use launcher_core::game::{self, GameRelease};
 use launcher_core::launch::{find_game_binary, preflight, LaunchPlan};
 use launcher_core::logs;
+use launcher_core::metadata::ModMetadata;
 use launcher_core::mods::{self, ModValidation};
 use launcher_core::platform;
 use launcher_core::profile::{Profile, PRESETS};
 use launcher_core::store::Store;
+use launcher_core::studio;
 use launcher_core::update::UpdateManifest;
 use launcher_core::{Error, Result};
 
@@ -33,59 +35,107 @@ const NAV_BG: Color32 = Color32::from_rgb(14, 14, 14);
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 enum Tab {
+    Home,
+    Library,
     Profiles,
-    Updates,
     Mods,
+    Studio,
+    Accounts,
+    Servers,
+    Cosmetics,
+    News,
+    Downloads,
     Logs,
     Settings,
+    About,
 }
 
 impl Tab {
-    const ALL: [Tab; 5] = [
+    const ALL: [Tab; 13] = [
+        Tab::Home,
+        Tab::Library,
         Tab::Profiles,
-        Tab::Updates,
         Tab::Mods,
+        Tab::Studio,
+        Tab::Accounts,
+        Tab::Servers,
+        Tab::Cosmetics,
+        Tab::News,
+        Tab::Downloads,
         Tab::Logs,
         Tab::Settings,
+        Tab::About,
     ];
 
     fn label(self) -> &'static str {
         match self {
-            Tab::Profiles => "PLAY",
-            Tab::Updates => "LIBRARY",
+            Tab::Home => "HOME",
+            Tab::Library => "LIBRARY",
+            Tab::Profiles => "PROFILES",
             Tab::Mods => "MODS",
+            Tab::Studio => "STUDIO",
+            Tab::Accounts => "ACCOUNTS",
+            Tab::Servers => "SERVERS",
+            Tab::Cosmetics => "COSMETICS",
+            Tab::News => "NEWS",
+            Tab::Downloads => "DOWNLOADS",
             Tab::Logs => "LOGS",
             Tab::Settings => "SETTINGS",
+            Tab::About => "ABOUT",
         }
     }
 
     fn title(self) -> &'static str {
         match self {
-            Tab::Profiles => "Ready to play",
-            Tab::Updates => "Game library",
+            Tab::Home => "Your world starts here",
+            Tab::Library => "Game library",
+            Tab::Profiles => "Profiles",
             Tab::Mods => "Mods",
+            Tab::Studio => "Mod Studio",
+            Tab::Accounts => "Accounts",
+            Tab::Servers => "Servers",
+            Tab::Cosmetics => "Cosmetics",
+            Tab::News => "News & updates",
+            Tab::Downloads => "Downloads",
             Tab::Logs => "Logs & crashes",
             Tab::Settings => "Settings",
+            Tab::About => "About Matticraft",
         }
     }
 
     fn subtitle(self) -> &'static str {
         match self {
-            Tab::Profiles => "Choose a profile and launch your next world",
-            Tab::Updates => "Download a version or apply a delta update",
-            Tab::Mods => "Check installed files against mods.json",
-            Tab::Logs => "Read the latest log and inspect crash reports",
-            Tab::Settings => "Paths, updates and launcher behaviour",
+            Tab::Home => "One profile, one click, the next world",
+            Tab::Library => "Install a build or apply a delta update",
+            Tab::Profiles => "Separate worlds, mods and renderer settings",
+            Tab::Mods => "Installed files, manifests and the mod catalog",
+            Tab::Studio => "Create, build and pack a mod with the MDK",
+            Tab::Accounts => "Choose the identity used at launch",
+            Tab::Servers => "Saved worlds, ping and direct connect",
+            Tab::Cosmetics => "Hats, capes and emotes for your next session",
+            Tab::News => "Release notes and development updates",
+            Tab::Downloads => "Queue, install and keep builds up to date",
+            Tab::Logs => "Read latest.log and inspect crash reports",
+            Tab::Settings => "Appearance, game, network and privacy",
+            Tab::About => "Build information, credits and licenses",
         }
     }
 
     fn glyph(self) -> &'static str {
         match self {
+            Tab::Home => "⌂",
+            Tab::Library => "▦",
             Tab::Profiles => "▶",
-            Tab::Updates => "◆",
-            Tab::Mods => "▦",
-            Tab::Logs => "≡",
+            Tab::Mods => "▤",
+            Tab::Studio => "⚒",
+            Tab::Accounts => "●",
+            Tab::Servers => "◎",
+            Tab::Cosmetics => "✦",
+            Tab::News => "▥",
+            Tab::Downloads => "↓",
+            Tab::Logs => ">_",
             Tab::Settings => "⚙",
+            Tab::About => "i",
         }
     }
 }
@@ -93,8 +143,8 @@ impl Tab {
 pub fn run_native(options: LauncherOptions) -> eframe::Result<()> {
     let mut native = eframe::NativeOptions::default();
     native.viewport = egui::ViewportBuilder::default()
-        .with_inner_size([1120.0, 760.0])
-        .with_min_inner_size([900.0, 600.0])
+        .with_inner_size([1360.0, 860.0])
+        .with_min_inner_size([1060.0, 700.0])
         .with_title("Matticraft Launcher");
     eframe::run_native(
         "Matticraft Launcher",
@@ -128,6 +178,24 @@ struct LauncherApp {
     child_pid: Option<u32>,
     frames: u64,
     max_frames: Option<u64>,
+    catalog: Option<ModCatalog>,
+    catalog_status: String,
+    catalog_query: String,
+    catalog_tag: String,
+    studio: Option<studio::StudioProject>,
+    studio_status: String,
+    studio_package: Option<PathBuf>,
+    studio_name: String,
+    studio_id: String,
+    studio_version: String,
+    studio_author: String,
+    studio_description: String,
+    server_address: String,
+    server_status: String,
+    ui: ui::state::UiState,
+    theme: ui::theme::Theme,
+    background: Option<egui::TextureHandle>,
+    skin: Option<egui::TextureHandle>,
 }
 
 impl LauncherApp {
@@ -181,7 +249,7 @@ impl LauncherApp {
             selected,
             draft,
             dirty: false,
-            tab: Tab::Profiles,
+            tab: Tab::Home,
             account_name: String::new(),
             status: String::new(),
             log_lines: Vec::new(),
@@ -196,13 +264,41 @@ impl LauncherApp {
             update_manifest: None,
             game_versions: Vec::new(),
             game_status: String::new(),
+            catalog: None,
+            catalog_status: "Load the catalog to list modules from mods.json".into(),
+            catalog_query: String::new(),
+            catalog_tag: String::new(),
+            studio: None,
+            studio_status: String::new(),
+            studio_package: None,
+            studio_name: "My Mod".into(),
+            studio_id: "mymod".into(),
+            studio_version: "1.0.0".into(),
+            studio_author: String::new(),
+            studio_description: String::new(),
+            server_address: String::new(),
+            server_status: String::new(),
             child: None,
             child_pid: None,
             frames: 0,
             max_frames,
+            ui: ui::state::UiState::default(),
+            theme: ui::theme::Theme::matticraft(),
+            background: None,
+            skin: None,
         };
         app.refresh_profile_views();
+        app.load_catalog_cache();
         app
+    }
+
+    fn ensure_textures(&mut self, ctx: &egui::Context) {
+        if self.background.is_none() {
+            self.background = ui::assets::background(ctx);
+        }
+        if self.skin.is_none() {
+            self.skin = ui::assets::steve(ctx);
+        }
     }
 
     fn select_profile(&mut self, id: &str) {
@@ -281,6 +377,10 @@ impl LauncherApp {
     }
 
     fn play(&mut self) {
+        self.play_with_args(&[]);
+    }
+
+    fn play_with_args(&mut self, extra: &[String]) {
         if let Err(error) = self.save_draft().and_then(|_| self.save_settings()) {
             self.status = format!("Cannot start: {error}");
             return;
@@ -293,7 +393,7 @@ impl LauncherApp {
             return;
         }
         let account = self.store.active_account().cloned();
-        match LaunchPlan::prepare(&profile, &self.store.settings, account.as_ref(), &[]) {
+        match LaunchPlan::prepare(&profile, &self.store.settings, account.as_ref(), extra) {
             Ok(plan) => match plan.spawn() {
                 Ok(child) => {
                     self.child_pid = Some(child.id());
@@ -476,6 +576,176 @@ impl LauncherApp {
             }
             Err(error) => self.game_status = format!("Game install failed: {error}"),
         }
+    }
+
+    fn load_catalog_cache(&mut self) {
+        let path = self.store.root().join("catalog/mods.json");
+        if let Ok(catalog) = ModCatalog::load(&path, &self.store.settings.catalog_repo) {
+            self.catalog_status = format!("{} mod(s) from the local catalog", catalog.mods.len());
+            self.catalog = Some(catalog);
+        }
+    }
+
+    fn refresh_catalog(&mut self) {
+        let repo = self.store.settings.catalog_repo.clone();
+        self.catalog_status = format!("Loading mods.json from {repo}…");
+        let local = std::env::current_dir()
+            .ok()
+            .map(|root| root.join("mods/mods.json"))
+            .filter(|path| path.is_file());
+        if let Some(path) = local {
+            if let Ok(catalog) = ModCatalog::load(&path, &repo) {
+                self.catalog_status = format!("{} mod(s) from the repository catalog", catalog.mods.len());
+                self.catalog = Some(catalog);
+                return;
+            }
+        }
+        match ModCatalog::fetch(&repo) {
+            Ok(catalog) => {
+                self.catalog_status = format!("{} mod(s) in {}", catalog.mods.len(), catalog.updated);
+                self.catalog = Some(catalog);
+            }
+            Err(error) => {
+                self.catalog_status = format!("Catalog unavailable: {error}");
+            }
+        }
+    }
+
+    fn install_catalog_mod(&mut self, entry: CatalogEntry) {
+        let Some(profile) = self.draft.clone() else {
+            self.catalog_status = "Select a profile first".into();
+            return;
+        };
+        let Some(catalog) = self.catalog.clone() else {
+            return;
+        };
+        match catalog.install(
+            &entry,
+            &profile.mods_dir,
+            platform::Platform::current().name(),
+            platform::arch(),
+        ) {
+            Ok(path) => {
+                self.catalog_status = format!("Installed {}", entry.name);
+                self.status = format!("Installed mod: {}", path.display());
+                self.refresh_profile_views();
+            }
+            Err(error) => self.catalog_status = format!("Install failed: {error}"),
+        }
+    }
+
+    fn create_studio_project(&mut self) {
+        let id = launcher_core::slugify(&self.studio_id);
+        if id.is_empty() {
+            self.studio_status = "Set a mod id first".into();
+            return;
+        }
+        let mut metadata = match ModMetadata::new(&id, &self.studio_name, &self.studio_version) {
+            Ok(metadata) => metadata,
+            Err(error) => {
+                self.studio_status = error.to_string();
+                return;
+            }
+        };
+        metadata.author = self.studio_author.clone();
+        metadata.description = self.studio_description.clone();
+        let root = self.store.root().join("studio").join(&id);
+        let mdk_source = std::env::var_os("MATTI_MDK_DIR").map(PathBuf::from);
+        match studio::create_project(&root, metadata, &self.store.settings.mdk_repo, mdk_source.as_deref()) {
+            Ok(project) => {
+                self.studio_status = if project.notes.is_empty() {
+                    format!("Project ready at {}", project.root.display())
+                } else {
+                    project.notes.join(" · ")
+                };
+                self.studio = Some(project);
+            }
+            Err(error) => self.studio_status = format!("Project failed: {error}"),
+        }
+    }
+
+    fn open_studio_project(&mut self, root: PathBuf) {
+        match ModMetadata::load(&root) {
+            Ok(metadata) => {
+                self.studio_id = metadata.id.clone();
+                self.studio_name = metadata.name.clone();
+                self.studio_version = metadata.version.clone();
+                self.studio_author = metadata.author.clone();
+                self.studio_description = metadata.description.clone();
+                self.studio_status = format!("Opened {}", root.display());
+                self.studio = Some(studio::StudioProject {
+                    root,
+                    metadata,
+                    mdk: None,
+                    notes: Vec::new(),
+                });
+            }
+            Err(error) => self.studio_status = error.to_string(),
+        }
+    }
+
+    fn build_studio(&mut self) {
+        let Some(project) = self.studio.clone() else {
+            self.studio_status = "Create or open a project first".into();
+            return;
+        };
+        let repo = std::env::var_os("MATTI_SOURCE_DIR")
+            .map(PathBuf::from)
+            .or_else(|| std::env::current_dir().ok())
+            .unwrap_or_else(|| PathBuf::from("."));
+        let out = project.root.join("out");
+        self.studio_status = "Building the mod…".into();
+        match studio::build_project(&project, &repo, &out) {
+            Ok(output) => {
+                self.studio_package = Some(output.package.clone());
+                self.studio_status = format!("Built {} and {}", output.library.display(), output.package.display());
+            }
+            Err(error) => self.studio_status = format!("Build failed: {error}"),
+        }
+    }
+
+    fn stage_studio(&mut self) {
+        let Some(package) = self.studio_package.clone() else {
+            self.studio_status = "Build the package first".into();
+            return;
+        };
+        let repo = std::env::var_os("MATTI_SOURCE_DIR")
+            .map(PathBuf::from)
+            .or_else(|| std::env::current_dir().ok())
+            .unwrap_or_else(|| PathBuf::from("."));
+        match studio::stage_import(&repo, &package) {
+            Ok(path) => self.studio_status = format!("Staged {} for the import workflow", path.display()),
+            Err(error) => self.studio_status = format!("Import staging failed: {error}"),
+        }
+    }
+
+    fn join_server(&mut self, address: &str) {
+        let parsed = match launcher_core::server::ServerAddress::parse(address) {
+            Ok(parsed) => parsed,
+            Err(error) => {
+                self.server_status = error.to_string();
+                return;
+            }
+        };
+        self.server_status = format!("Pinging {}…", parsed.display());
+        match launcher_core::server::ping(&parsed, std::time::Duration::from_secs(4)) {
+            Ok(status) => {
+                self.server_status = format!(
+                    "{} · {}/{} online · {} ms · {}",
+                    parsed.display(),
+                    status.players_online,
+                    status.players_max,
+                    status.latency_ms,
+                    status.version_name
+                );
+            }
+            Err(error) => {
+                self.server_status = format!("Ping failed, starting anyway: {error}");
+            }
+        }
+        self.store.settings.last_server = parsed.display();
+        let _ = self.store.save();
+        self.play_with_args(&["--server".into(), parsed.display()]);
     }
 
     #[cfg(feature = "upload")]
@@ -901,7 +1171,7 @@ impl LauncherApp {
                                 self.play();
                             }
                             if ui.button("GAME LIBRARY").clicked() {
-                                self.tab = Tab::Updates;
+                                self.tab = Tab::Library;
                             }
                         });
                     });
@@ -1577,73 +1847,27 @@ impl eframe::App for LauncherApp {
             }
             ctx.request_repaint();
         }
-        self.header(ctx);
-        self.status_bar(ctx);
-        self.nav_rail(ctx);
-        if matches!(self.tab, Tab::Profiles | Tab::Mods | Tab::Logs) {
-            self.sidebar(ctx);
-        }
-        egui::CentralPanel::default()
-            .frame(egui::Frame::NONE.fill(BG).inner_margin(egui::Margin::same(18)))
-            .show(ctx, |ui| match self.tab {
-                Tab::Profiles => self.profile_tab(ui),
-                Tab::Updates => self.updates_tab(ui),
-                Tab::Mods => self.mods_tab(ui),
-                Tab::Logs => self.logs_tab(ui),
-                Tab::Settings => self.settings_tab(ui),
-            });
+        ui::shell::show(self, ctx);
     }
 }
 
 fn install_style(ctx: &egui::Context) {
     install_fonts(ctx);
-    let mut visuals = egui::Visuals::dark();
-    visuals.panel_fill = BG;
-    visuals.window_fill = PANEL;
-    visuals.extreme_bg_color = Color32::from_rgb(10, 12, 15);
-    visuals.faint_bg_color = CARD;
-    visuals.selection.bg_fill = ACCENT_DARK;
-    visuals.selection.stroke.color = ACCENT;
-    visuals.hyperlink_color = ACCENT;
-    visuals.widgets.inactive.bg_fill = CARD;
-    visuals.widgets.hovered.bg_fill = Color32::from_rgb(42, 47, 57);
-    visuals.widgets.active.bg_fill = ACCENT_DARK;
-    visuals.widgets.inactive.bg_stroke = egui::Stroke::new(1.0_f32, Color32::from_rgb(51, 51, 51));
-    visuals.widgets.hovered.bg_stroke = egui::Stroke::new(1.0_f32, ACCENT);
-    ctx.set_visuals(visuals);
-
-    let mut style = (*ctx.style()).clone();
-    style.spacing.item_spacing = egui::vec2(9.0, 9.0);
-    style.spacing.button_padding = egui::vec2(12.0, 7.0);
-    style.spacing.interact_size.y = 30.0;
-    style.text_styles.insert(
-        egui::TextStyle::Heading,
-        egui::FontId::proportional(26.0),
-    );
-    style.text_styles.insert(
-        egui::TextStyle::Body,
-        egui::FontId::proportional(14.0),
-    );
-    style.text_styles.insert(
-        egui::TextStyle::Button,
-        egui::FontId::proportional(13.0),
-    );
-    ctx.set_style(style);
+    ui::theme::Theme::matticraft().apply(ctx);
 }
 
 fn install_fonts(ctx: &egui::Context) {
     let mut fonts = egui::FontDefinitions::default();
     fonts.font_data.insert(
-        "smallcaps".to_owned(),
+        ui::theme::SMALL_CAPS.to_owned(),
         std::sync::Arc::new(egui::FontData::from_static(include_bytes!(
             "../assets/smallcaps.ttf"
         ))),
     );
-    fonts
-        .families
-        .entry(egui::FontFamily::Proportional)
-        .or_default()
-        .insert(0, "smallcaps".to_owned());
+    fonts.families.insert(
+        egui::FontFamily::Name(ui::theme::SMALL_CAPS.into()),
+        vec![ui::theme::SMALL_CAPS.to_owned()],
+    );
     ctx.set_fonts(fonts);
 }
 

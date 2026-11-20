@@ -23,6 +23,10 @@ option(MATTI_BUILD_LAUNCHER
         "Build the Matticraft launcher (Rust/egui frontend)" ${_matti_launcher_default})
 set(MATTI_UPDATE_PUBLIC_KEY "" CACHE STRING
         "Ed25519 public key (hex) compiled into the launcher for update manifests")
+set(MATTI_LAUNCHER_LIB_DIR "" CACHE PATH
+        "Optional directory with libX11/libwayland/libGL runtime libraries to ship")
+option(MATTI_LAUNCHER_BUNDLE_LIBS
+        "Collect X11/Wayland/GL runtime libraries next to the launcher" ON)
 
 function(matti_add_launcher)
     if(NOT MATTI_BUILD_LAUNCHER)
@@ -57,10 +61,10 @@ function(matti_add_launcher)
         set(_bin_name "matticraft-launcher")
     endif()
 
-    # Keep cargo's default target directory (launchers/target) so a dev tree
-    # launcher finds the game binary through launch::local_candidates().
-    set(_target_dir "${CMAKE_SOURCE_DIR}/launchers/target")
+    set(_target_dir "${CMAKE_BINARY_DIR}/cargo/launchers")
     set(_binary "${_target_dir}/${_profile_dir}/${_bin_name}${CMAKE_EXECUTABLE_SUFFIX}")
+    set(_staged "${CMAKE_BINARY_DIR}/bin/${_bin_name}${CMAKE_EXECUTABLE_SUFFIX}")
+    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 
     file(GLOB_RECURSE _sources CONFIGURE_DEPENDS
             "${CMAKE_SOURCE_DIR}/launchers/*.rs"
@@ -73,6 +77,9 @@ function(matti_add_launcher)
     if(MATTI_UPDATE_PUBLIC_KEY)
         list(APPEND _env "MATTI_UPDATE_PUBLIC_KEY=${MATTI_UPDATE_PUBLIC_KEY}")
     endif()
+    if(UNIX AND NOT APPLE)
+        list(APPEND _env "RUSTFLAGS=-C link-arg=-Wl,-rpath,$ORIGIN/lib -C link-arg=-Wl,-rpath,$ORIGIN/../lib")
+    endif()
 
     add_custom_command(
             OUTPUT "${_binary}"
@@ -82,6 +89,9 @@ function(matti_add_launcher)
                     --package "${_package}"
                     --bin "${_bin_name}"
                     --profile "${_profile}"
+            COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_BINARY_DIR}/bin"
+            COMMAND ${CMAKE_COMMAND} -E copy "${_binary}" "${_staged}"
+            BYPRODUCTS "${_staged}"
             DEPENDS ${_sources}
             COMMENT "Building Matticraft launcher ${_bin_name} (${_profile})"
             USES_TERMINAL
@@ -89,7 +99,54 @@ function(matti_add_launcher)
 
     add_custom_target(launcher ALL DEPENDS "${_binary}")
 
-    install(PROGRAMS "${_binary}"
+    if(MATTI_LAUNCHER_LIB_DIR)
+        if(EXISTS "${MATTI_LAUNCHER_LIB_DIR}")
+            file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/bin/lib")
+            file(GLOB _runtime_libs
+                    "${MATTI_LAUNCHER_LIB_DIR}/libX11.so*"
+                    "${MATTI_LAUNCHER_LIB_DIR}/libX11-xcb.so*"
+                    "${MATTI_LAUNCHER_LIB_DIR}/libXcursor.so*"
+                    "${MATTI_LAUNCHER_LIB_DIR}/libXrandr.so*"
+                    "${MATTI_LAUNCHER_LIB_DIR}/libXi.so*"
+                    "${MATTI_LAUNCHER_LIB_DIR}/libXext.so*"
+                    "${MATTI_LAUNCHER_LIB_DIR}/libXau.so*"
+                    "${MATTI_LAUNCHER_LIB_DIR}/libXdmcp.so*"
+                    "${MATTI_LAUNCHER_LIB_DIR}/libXrender.so*"
+                    "${MATTI_LAUNCHER_LIB_DIR}/libXfixes.so*"
+                    "${MATTI_LAUNCHER_LIB_DIR}/libxcb.so*"
+                    "${MATTI_LAUNCHER_LIB_DIR}/libxcb-render.so*"
+                    "${MATTI_LAUNCHER_LIB_DIR}/libxcb-shm.so*"
+                    "${MATTI_LAUNCHER_LIB_DIR}/libxkbcommon.so*"
+                    "${MATTI_LAUNCHER_LIB_DIR}/libwayland-client.so*"
+                    "${MATTI_LAUNCHER_LIB_DIR}/libwayland-cursor.so*"
+                    "${MATTI_LAUNCHER_LIB_DIR}/libwayland-egl.so*"
+                    "${MATTI_LAUNCHER_LIB_DIR}/libGL.so*"
+                    "${MATTI_LAUNCHER_LIB_DIR}/libEGL.so*")
+            foreach(_lib IN LISTS _runtime_libs)
+                add_custom_command(TARGET launcher POST_BUILD
+                        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${_lib}" "${CMAKE_BINARY_DIR}/bin/lib/"
+                        VERBATIM)
+            endforeach()
+            install(DIRECTORY "${CMAKE_BINARY_DIR}/bin/lib/"
+                    DESTINATION ${CMAKE_INSTALL_BINDIR}/lib)
+        else()
+            message(WARNING "MATTI_LAUNCHER_LIB_DIR does not exist: ${MATTI_LAUNCHER_LIB_DIR}")
+        endif()
+    endif()
+
+    if(MATTI_LAUNCHER_BUNDLE_LIBS AND UNIX AND NOT APPLE)
+        add_custom_command(TARGET launcher POST_BUILD
+                COMMAND bash "${CMAKE_SOURCE_DIR}/packaging/linux/bundle-launcher-libs.sh"
+                        "${_staged}" "${CMAKE_BINARY_DIR}/bin/lib"
+                COMMENT "Bundling launcher runtime libraries"
+                VERBATIM)
+    endif()
+    if(EXISTS "${CMAKE_BINARY_DIR}/bin/lib")
+        install(DIRECTORY "${CMAKE_BINARY_DIR}/bin/lib/"
+                DESTINATION ${CMAKE_INSTALL_BINDIR}/lib)
+    endif()
+
+    install(PROGRAMS "${_staged}"
             DESTINATION ${CMAKE_INSTALL_BINDIR}
             RENAME "matticraft-launcher${CMAKE_EXECUTABLE_SUFFIX}")
 
@@ -107,5 +164,5 @@ function(matti_add_launcher)
                 DESTINATION ${CMAKE_INSTALL_DATADIR}/metainfo)
     endif()
 
-    message(STATUS "Matticraft launcher: ${_binary}")
+    message(STATUS "Matticraft launcher: ${_staged}")
 endfunction()

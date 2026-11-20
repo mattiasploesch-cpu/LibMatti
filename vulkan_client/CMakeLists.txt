@@ -33,6 +33,7 @@ target_compile_definitions(vulkancraft PRIVATE
 set_target_properties(vulkancraft PROPERTIES
         ENABLE_EXPORTS ON
 )
+matti_copy_bin(vulkancraft)
 
 # Ship the native libraries inside the binary: only glibc comes from the host.
 if(COMMAND matti_embed_native_bundle)

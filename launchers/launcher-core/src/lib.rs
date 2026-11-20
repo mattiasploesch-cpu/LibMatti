@@ -9,13 +9,17 @@
 //! tested headlessly on the CI hosts.
 
 pub mod account;
+pub mod catalog;
 pub mod game;
 pub mod launch;
 pub mod logs;
+pub mod metadata;
 pub mod mods;
 pub mod platform;
 pub mod profile;
+pub mod server;
 pub mod store;
+pub mod studio;
 pub mod update;
 
 pub use account::{Account, AccountKind};
